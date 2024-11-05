@@ -5,8 +5,10 @@
 #include "Selection.h"
 #include "LevelEditor.h"
 #include "ContentBrowserModule.h"
+#include "Misc/OutputDeviceNull.h"
 #include "Modules/ModuleManager.h"
 #include "Kismet/GameplayStatics.h"
+//#include "Kismet2/BlueprintEditorUtils.h"
 #include "PhysicsEngine/BodySetup.h"
 
 #include "Newton.h"
@@ -20,6 +22,8 @@
 
 FLinearColor UNewtonRigidBody::m_awakeColor(0.0f, 0.5f, 1.0f);
 FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 0.125f, 0.25f);
+
+#define ND_RIGID_BODIES_EVENT_NAME "OnNewtonForceAndTorque"
 
 class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 {
@@ -51,6 +55,7 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 		,m_rotation0(src.m_rotation0)
 		,m_rotation1(src.m_rotation1)
 		,m_owner(src.m_owner)
+		,m_sleepState(false)
 	{
 	}
 
@@ -104,6 +109,10 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 		ndBodyDynamic* const body = GetBody()->GetAsBodyDynamic();
 		const ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
 		body->SetForce(force);
+		if (body->GetInvMass() > ndFloat32(0.0f))
+		{
+			m_owner->CallBlueprintFunction(timestep);
+		}
 	}
 
 	ndVector m_posit0;
@@ -393,19 +402,6 @@ void UNewtonRigidBody::CalculateLocalTransform()
 	m_localTransform.SetScale3D(m_localScale);
 }
 
-// Called every frame
-void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (m_newtonWorld)
-	{
-		SetRelativeTransform(m_localTransform);
-		SetComponentToWorld(m_globalTransform);
-
-		DrawGizmo(DeltaTime);
-	}
-}
-
 void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep)
 {
 	m_newtonWorld = worldActor;
@@ -567,4 +563,81 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 		ndFloat32 scale2 = UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM;
 		Inertia.PrincipalInertia = FVector(scaledMassMatrix.m_x * scale2, scaledMassMatrix.m_y * scale2, scaledMassMatrix.m_z * scale2);
 	}
+}
+
+FVector UNewtonRigidBody::GetUpVectorNotWorking() const
+{
+	return FVector(0.0, 0.0, 0.0);
+}
+
+//FVector UNewtonRigidBody::GetForce() const
+//{
+//	FVector force(0.0f, 0.0f, 0.0f);
+//	if (m_body)
+//	{
+//		ndVector f(m_body->GetForce().Scale(UNREAL_UNIT_SYSTEM));
+//		force.X = f.m_x;
+//		force.Y = f.m_y;
+//		force.Z = f.m_z;
+//	}
+//	return force;
+//}
+
+//void UNewtonRigidBody::SetForce(const FVector& force)
+//{
+//	if (m_body)
+//	{
+//		ndVector f(ndFloat32 (force.X), ndFloat32(force.Y), ndFloat32(force.Z), ndFloat32 (0.0f));
+//		m_body->SetForce(f.Scale(UNREAL_INV_UNIT_SYSTEM));
+//	}
+//}
+//
+//FVector UNewtonRigidBody::GetTorque() const
+//{
+//	FVector torque(0.0f, 0.0f, 0.0f);
+//	if (m_body)
+//	{
+//		ndVector f(m_body->GetTorque().Scale(UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM));
+//		torque.X = f.m_x;
+//		torque.Y = f.m_y;
+//		torque.Z = f.m_z;
+//	}
+//	return torque;
+//}
+//
+//void UNewtonRigidBody::SetTorque(const FVector& torque)
+//{
+//	if (m_body)
+//	{
+//		ndVector t(ndFloat32(torque.X), ndFloat32(torque.Y), ndFloat32(torque.Z), ndFloat32(0.0f));
+//		m_body->SetForce(t.Scale(UNREAL_INV_UNIT_SYSTEM * UNREAL_INV_UNIT_SYSTEM));
+//	}
+//}
+
+// Called every frame
+void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (m_newtonWorld)
+	{
+		SetRelativeTransform(m_localTransform);
+		SetComponentToWorld(m_globalTransform);
+
+		DrawGizmo(DeltaTime);
+
+		//CallBlueprintFunction();
+	}
+}
+
+void UNewtonRigidBody::CallBlueprintFunction(float timestep)
+{
+	char text[256];
+	FOutputDeviceNull ar;
+
+	AActor* const actorOwner = GetOwner();
+	snprintf(text, sizeof(text), "%s %f", ND_RIGID_BODIES_EVENT_NAME, timestep);
+	FString command(text);
+	
+	bool test = actorOwner->CallFunctionByNameWithArguments(*command, ar, nullptr, true);
+	check(test);
 }

@@ -35,7 +35,7 @@ struct FInertiaStruct
 /**
  * 
  */
-UCLASS(ClassGroup = Newton, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision), MinimalAPI)
+UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision), MinimalAPI)
 class UNewtonRigidBody : public USceneComponent
 {
 	GENERATED_BODY()
@@ -49,6 +49,23 @@ class UNewtonRigidBody : public USceneComponent
 	void InterpolateTransform(float param);
 	void CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep);
 
+	// BluePrint interface
+	//UFUNCTION(BlueprintCallable, Category="Newton")
+	//FVector GetForce() const;
+
+	UFUNCTION(BlueprintCallable, Category="Transformation")
+	FVector GetUpVectorNotWorking() const;
+
+
+	//UFUNCTION(BlueprintCallable)
+	//void SetForce(const FVector& force);
+	//
+	//UFUNCTION(BlueprintCallable)
+	//FVector GetTorque() const;
+	//
+	//UFUNCTION(BlueprintCallable)
+	//void SetTorque(const FVector& torque);
+
 	protected:
 	// Called every frame
 	virtual void PostLoad() override;
@@ -59,7 +76,7 @@ class UNewtonRigidBody : public USceneComponent
 	virtual void OnChildDetached(USceneComponent* ChildComponent);
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
+	
 	void DestroyRigidBody();
 	
 	void DrawGizmo(float timestep);
@@ -95,7 +112,6 @@ class UNewtonRigidBody : public USceneComponent
 	float AngularDamp;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	//UPROPERTY(EditAnywhere, Category = Newton, ReplicatedUsing=OnRep_Transform)
 	FVector InitialVeloc;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
@@ -106,6 +122,8 @@ class UNewtonRigidBody : public USceneComponent
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
+
+	void CallBlueprintFunction(float timestep);
 
 	FVector m_localScale;
 	FVector m_globalScale;
