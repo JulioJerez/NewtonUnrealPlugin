@@ -9,8 +9,8 @@
 /**
  * 
  */
-UCLASS(ClassGroup = NewtonScene, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision), MinimalAPI)
-class UNewtonSceneRigidBody : public UNewtonRigidBody
+UCLASS(ClassGroup = NewtonScene, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+class NEWTON_API UNewtonSceneRigidBody : public UNewtonRigidBody
 {
 	GENERATED_BODY()
 

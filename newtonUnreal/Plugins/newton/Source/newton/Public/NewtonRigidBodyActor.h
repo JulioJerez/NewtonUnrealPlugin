@@ -7,11 +7,11 @@
 #include "NewtonRigidBodyActor.generated.h"
 
 UCLASS( ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent) )
-class ANewtonRigidBodyActor : public AActor
+class NEWTON_API ANewtonRigidBodyActor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+	public:	
 	// Sets default values for this actor's properties
 	ANewtonRigidBodyActor();
 

@@ -8,8 +8,8 @@
 
 class ALandscapeProxy;
 
-UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision), MinimalAPI)
-class ANewtonSceneActor : public AActor
+UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+class NEWTON_API ANewtonSceneActor : public AActor
 {
 	GENERATED_BODY()
 
