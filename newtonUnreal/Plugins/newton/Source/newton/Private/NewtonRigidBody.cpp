@@ -23,8 +23,6 @@
 FLinearColor UNewtonRigidBody::m_awakeColor(0.0f, 0.5f, 1.0f);
 FLinearColor UNewtonRigidBody::m_sleepingColor(0.0f, 0.125f, 0.25f);
 
-#define ND_RIGID_BODIES_EVENT_NAME "OnNewtonForceAndTorque"
-
 class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 {
 	public:
@@ -124,6 +122,8 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 };
 
 // Sets default values for this component's properties
+//UNewtonRigidBody::UNewtonRigidBody(const FObjectInitializer& ObjectInitializer)
+//	:Super(ObjectInitializer)
 UNewtonRigidBody::UNewtonRigidBody()
 	:Super()
 	,ShowDebug(false)
@@ -565,54 +565,139 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 	}
 }
 
-FVector UNewtonRigidBody::GetUpVectorNotWorking() const
+
+float UNewtonRigidBody::GetMass() const
 {
-	return FVector(0.0, 0.0, 0.0);
+	return m_body ? m_body->GetMassMatrix().m_w : 0.0f;
 }
 
-//FVector UNewtonRigidBody::GetForce() const
-//{
-//	FVector force(0.0f, 0.0f, 0.0f);
-//	if (m_body)
-//	{
-//		ndVector f(m_body->GetForce().Scale(UNREAL_UNIT_SYSTEM));
-//		force.X = f.m_x;
-//		force.Y = f.m_y;
-//		force.Z = f.m_z;
-//	}
-//	return force;
-//}
+FVector UNewtonRigidBody::GetFrontDir() const
+{
+	FVector dir(1.0f, 0.0f, 0.0f);
+	if (m_body)
+	{
+		ndMatrix matrix(m_body->GetMatrix());
+		dir.X = matrix[0].m_x;
+		dir.Y = matrix[0].m_y;
+		dir.Z = matrix[0].m_z;
+	}
+	return dir;
+}
 
-//void UNewtonRigidBody::SetForce(const FVector& force)
-//{
-//	if (m_body)
-//	{
-//		ndVector f(ndFloat32 (force.X), ndFloat32(force.Y), ndFloat32(force.Z), ndFloat32 (0.0f));
-//		m_body->SetForce(f.Scale(UNREAL_INV_UNIT_SYSTEM));
-//	}
-//}
-//
-//FVector UNewtonRigidBody::GetTorque() const
-//{
-//	FVector torque(0.0f, 0.0f, 0.0f);
-//	if (m_body)
-//	{
-//		ndVector f(m_body->GetTorque().Scale(UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM));
-//		torque.X = f.m_x;
-//		torque.Y = f.m_y;
-//		torque.Z = f.m_z;
-//	}
-//	return torque;
-//}
-//
-//void UNewtonRigidBody::SetTorque(const FVector& torque)
-//{
-//	if (m_body)
-//	{
-//		ndVector t(ndFloat32(torque.X), ndFloat32(torque.Y), ndFloat32(torque.Z), ndFloat32(0.0f));
-//		m_body->SetForce(t.Scale(UNREAL_INV_UNIT_SYSTEM * UNREAL_INV_UNIT_SYSTEM));
-//	}
-//}
+FVector UNewtonRigidBody::GetRightDir() const
+{
+	FVector dir(0.0f, 1.0f, 0.0f);
+	if (m_body)
+	{
+		ndMatrix matrix(m_body->GetMatrix());
+		dir.X = matrix[1].m_x;
+		dir.Y = matrix[1].m_y;
+		dir.Z = matrix[1].m_z;
+	}
+	return dir;
+}
+
+FVector UNewtonRigidBody::GetUpDir() const
+{
+	FVector dir(0.0f, 0.0f, 1.0f);
+	if (m_body)
+	{
+		ndMatrix matrix(m_body->GetMatrix());
+		dir.X = matrix[2].m_x;
+		dir.Y = matrix[2].m_y;
+		dir.Z = matrix[2].m_z;
+	}
+	return dir;
+}
+
+
+FVector UNewtonRigidBody::GetVelocity() const
+{
+	FVector veloc(0.0f, 0.0f, 0.0f);
+	if (m_body)
+	{
+		ndVector f(m_body->GetVelocity().Scale(UNREAL_UNIT_SYSTEM));
+		veloc.X = f.m_x;
+		veloc.Y = f.m_y;
+		veloc.Z = f.m_z;
+	}
+	return veloc;
+}
+
+void UNewtonRigidBody::SetVelocity(const FVector& veloc) const
+{
+	if (m_body)
+	{
+		ndVector v(ndFloat32(veloc.X), ndFloat32(veloc.Y), ndFloat32(veloc.Z), ndFloat32(0.0f));
+		m_body->SetVelocity(v.Scale(UNREAL_INV_UNIT_SYSTEM));
+	}
+}
+
+FVector UNewtonRigidBody::GetOmega() const
+{
+	FVector omega(0.0f, 0.0f, 0.0f);
+	if (m_body)
+	{
+		ndVector f(m_body->GetOmega());
+		omega.X = f.m_x;
+		omega.Y = f.m_y;
+		omega.Z = f.m_z;
+	}
+	return omega;
+}
+
+void UNewtonRigidBody::SetOmega(const FVector& omega) const
+{
+	if (m_body)
+	{
+		ndVector w(ndFloat32(omega.X), ndFloat32(omega.Y), ndFloat32(omega.Z), ndFloat32(0.0f));
+		m_body->SetVelocity(w);
+	}
+}
+
+FVector UNewtonRigidBody::GetForce() const
+{
+	FVector force(0.0f, 0.0f, 0.0f);
+	if (m_body)
+	{
+		ndVector f(m_body->GetForce().Scale(UNREAL_UNIT_SYSTEM));
+		force.X = f.m_x;
+		force.Y = f.m_y;
+		force.Z = f.m_z;
+	}
+	return force;
+}
+
+void UNewtonRigidBody::SetForce(const FVector& force)
+{
+	if (m_body)
+	{
+		ndVector f(ndFloat32 (force.X), ndFloat32(force.Y), ndFloat32(force.Z), ndFloat32 (0.0f));
+		m_body->SetForce(f.Scale(UNREAL_INV_UNIT_SYSTEM));
+	}
+}
+
+FVector UNewtonRigidBody::GetTorque() const
+{
+	FVector torque(0.0f, 0.0f, 0.0f);
+	if (m_body)
+	{
+		ndVector f(m_body->GetTorque().Scale(UNREAL_UNIT_SYSTEM * UNREAL_UNIT_SYSTEM));
+		torque.X = f.m_x;
+		torque.Y = f.m_y;
+		torque.Z = f.m_z;
+	}
+	return torque;
+}
+
+void UNewtonRigidBody::SetTorque(const FVector& torque)
+{
+	if (m_body)
+	{
+		ndVector t(ndFloat32(torque.X), ndFloat32(torque.Y), ndFloat32(torque.Z), ndFloat32(0.0f));
+		m_body->SetForce(t.Scale(UNREAL_INV_UNIT_SYSTEM * UNREAL_INV_UNIT_SYSTEM));
+	}
+}
 
 // Called every frame
 void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -620,12 +705,9 @@ void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (m_newtonWorld)
 	{
+		DrawGizmo(DeltaTime);
 		SetRelativeTransform(m_localTransform);
 		SetComponentToWorld(m_globalTransform);
-
-		DrawGizmo(DeltaTime);
-
-		//CallBlueprintFunction();
 	}
 }
 

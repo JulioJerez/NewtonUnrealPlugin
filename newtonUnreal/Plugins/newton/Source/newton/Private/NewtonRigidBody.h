@@ -39,6 +39,7 @@ UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnab
 class UNewtonRigidBody : public USceneComponent
 {
 	GENERATED_BODY()
+	//GENERATED_UCLASS_BODY()
 	class NotifyCallback;
 
 	public:
@@ -49,22 +50,44 @@ class UNewtonRigidBody : public USceneComponent
 	void InterpolateTransform(float param);
 	void CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep);
 
+	// **********************************
 	// BluePrint interface
-	//UFUNCTION(BlueprintCallable, Category="Newton")
-	//FVector GetForce() const;
+	// **********************************
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	float GetMass() const;
 
-	UFUNCTION(BlueprintCallable, Category="Transformation")
-	FVector GetUpVectorNotWorking() const;
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetFrontDir() const;
 
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetRightDir() const;
 
-	//UFUNCTION(BlueprintCallable)
-	//void SetForce(const FVector& force);
-	//
-	//UFUNCTION(BlueprintCallable)
-	//FVector GetTorque() const;
-	//
-	//UFUNCTION(BlueprintCallable)
-	//void SetTorque(const FVector& torque);
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetUpDir() const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetVelocity() const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	void SetVelocity(const FVector& veloc) const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetOmega() const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	void SetOmega(const FVector& omega) const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetForce() const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
+	void SetForce(const FVector& force);
+	
+	UFUNCTION(BlueprintCallable)
+	FVector GetTorque() const;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetTorque(const FVector& torque);
 
 	protected:
 	// Called every frame
