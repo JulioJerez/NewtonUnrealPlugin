@@ -57,6 +57,9 @@ class UNewtonRigidBody : public USceneComponent
 	float GetMass() const;
 
 	UFUNCTION(BlueprintCallable, Category="Newton")
+	FVector GetInertia() const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
 	FVector GetFrontDir() const;
 
 	UFUNCTION(BlueprintCallable, Category="Newton")
