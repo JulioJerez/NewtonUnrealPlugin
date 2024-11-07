@@ -94,6 +94,8 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 
 # Unreal engine filters
 .vs
-practice/
-Intermediate/
-UnrealNewtonProject*/
+.vsconfig
+*/Saved
+*/Intermediate
+*/Binaries/Win64
+*/DerivedDataCache
