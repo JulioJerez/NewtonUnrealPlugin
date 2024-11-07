@@ -35,7 +35,7 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 	virtual ndShapeInstance* CreateInstanceShape() const override;
 	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.001f))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0001f))
 	float Tolerance;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 16))

@@ -54,6 +54,9 @@ class NEWTON_API UNewtonRigidBody : public USceneComponent
 	// BluePrint interface
 	// **********************************
 	UFUNCTION(BlueprintCallable, Category="Newton")
+	float GetTimeStep() const;
+
+	UFUNCTION(BlueprintCallable, Category="Newton")
 	float GetMass() const;
 
 	UFUNCTION(BlueprintCallable, Category="Newton")
@@ -149,7 +152,7 @@ class NEWTON_API UNewtonRigidBody : public USceneComponent
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
 
-	void CallBlueprintFunction(float timestep);
+	//void CallBlueprintFunction(float timestep);
 
 	FVector m_localScale;
 	FVector m_globalScale;

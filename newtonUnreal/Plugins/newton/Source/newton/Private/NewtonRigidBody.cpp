@@ -8,7 +8,6 @@
 #include "Misc/OutputDeviceNull.h"
 #include "Modules/ModuleManager.h"
 #include "Kismet/GameplayStatics.h"
-//#include "Kismet2/BlueprintEditorUtils.h"
 #include "PhysicsEngine/BodySetup.h"
 
 #include "Newton.h"
@@ -44,6 +43,11 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 		m_rotation0.m_y = ndFloat32(rot.Y);
 		m_rotation0.m_z = ndFloat32(rot.Z);
 		m_rotation0.m_w = ndFloat32(rot.W);
+
+		m_timestep = 0.0f;
+		AActor* const actorOwner = m_owner->GetOwner();
+		FString onforceAndTRqueName(ND_RIGID_BODIES_EVENT_NAME);
+		m_onForceAndTorque = actorOwner->FindFunction(FName(*onforceAndTRqueName));
 	}
 
 	NotifyCallback(const NotifyCallback& src)
@@ -55,6 +59,10 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 		,m_owner(src.m_owner)
 		,m_sleepState(false)
 	{
+		m_timestep = 0.0f;
+		AActor* const actorOwner = m_owner->GetOwner();
+		FString onforceAndTRqueName(ND_RIGID_BODIES_EVENT_NAME);
+		m_onForceAndTorque = actorOwner->FindFunction(FName(*onforceAndTRqueName));
 	}
 
 	~NotifyCallback()
@@ -107,10 +115,26 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 		ndBodyDynamic* const body = GetBody()->GetAsBodyDynamic();
 		const ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
 		body->SetForce(force);
-		if (body->GetInvMass() > ndFloat32(0.0f))
+		if (m_onForceAndTorque)
 		{
-			m_owner->CallBlueprintFunction(timestep);
+			m_timestep = timestep;
+			CallBlueprintEvent();
 		}
+	}
+
+	void CallBlueprintFunction()
+	{
+		FOutputDeviceNull ar;
+		AActor* const actorOwner = m_owner->GetOwner();
+		FString command(ND_RIGID_BODIES_EVENT_NAME);
+		bool test = actorOwner->CallFunctionByNameWithArguments(*command, ar, nullptr, true);
+		check(test);
+	}
+
+	void CallBlueprintEvent()
+	{
+		AActor* const actorOwner = m_owner->GetOwner();
+		actorOwner->ProcessEvent(m_onForceAndTorque, nullptr);
 	}
 
 	ndVector m_posit0;
@@ -118,12 +142,12 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 	ndQuaternion m_rotation0;
 	ndQuaternion m_rotation1;
 	UNewtonRigidBody* m_owner;
+	ndFloat32 m_timestep;
+	UFunction* m_onForceAndTorque;
 	bool m_sleepState;
 };
 
 // Sets default values for this component's properties
-//UNewtonRigidBody::UNewtonRigidBody(const FObjectInitializer& ObjectInitializer)
-//	:Super(ObjectInitializer)
 UNewtonRigidBody::UNewtonRigidBody()
 	:Super()
 	,ShowDebug(false)
@@ -577,24 +601,17 @@ void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 }
 
-void UNewtonRigidBody::CallBlueprintFunction(float timestep)
-{
-	char text[256];
-	FOutputDeviceNull ar;
-
-	AActor* const actorOwner = GetOwner();
-	snprintf(text, sizeof(text), "%s %f", ND_RIGID_BODIES_EVENT_NAME, timestep);
-	FString command(text);
-	
-	bool test = actorOwner->CallFunctionByNameWithArguments(*command, ar, nullptr, true);
-	check(test);
-}
-
 //************************************************
 //
 // Blueprint interface
 // 
 //************************************************
+float UNewtonRigidBody::GetTimeStep() const
+{
+	NotifyCallback* const notify = (NotifyCallback*)m_body->GetNotifyCallback();
+	return notify ? notify->m_timestep : 0.0f;
+}
+
 float UNewtonRigidBody::GetMass() const
 {
 	return m_body ? m_body->GetMassMatrix().m_w : 0.0f;
@@ -651,7 +668,6 @@ FVector UNewtonRigidBody::GetUpDir() const
 	}
 	return tmp;
 }
-
 
 FVector UNewtonRigidBody::GetVelocity() const
 {
@@ -724,7 +740,6 @@ FVector UNewtonRigidBody::GetTorque() const
 	return tmp;
 }
 
-
 void UNewtonRigidBody::SetForce(const FVector& force)
 {
 	if (m_body)
@@ -742,5 +757,8 @@ void UNewtonRigidBody::SetTorque(const FVector& torque)
 		const ndVector t(ndFloat32(torque.X), ndFloat32(torque.Y), ndFloat32(torque.Z), ndFloat32(0.0f));
 		const ndVector tmp(t.Scale(UNREAL_INV_UNIT_SYSTEM * UNREAL_INV_UNIT_SYSTEM));
 		m_body->SetTorque(tmp);
+
+		//ndVector omega(m_body->GetOmega());
+		//UE_LOG(LogTemp, Display, TEXT("w(%f %f %f) T(%f %f %f)"), omega.m_x, omega.m_y, omega.m_z, tmp.m_x, tmp.m_y, tmp.m_z);
 	}
 }

@@ -11,7 +11,7 @@
 
 UNewtonCollisionConvexHull::UNewtonCollisionConvexHull()
 	:Super()
-	,Tolerance(1.0e-3f)
+	,Tolerance(1.0e-4f)
 	,MaxVertexCount(128)
 {
 }
@@ -85,8 +85,6 @@ void UNewtonCollisionConvexHull::GenerateMesh(const USceneComponent* const meshC
 
 void UNewtonCollisionConvexHull::SetTransform(const USceneComponent* const meshComponent)
 {
-	//AActor* xxx0 = GetOwner();
-	//AActor* xxx1 = meshComponent->GetOwner();
 	FTransform bodyTransform(GetComponentTransform());
 	for (USceneComponent* parent = GetAttachParent(); parent; parent = parent->GetAttachParent())
 	{
