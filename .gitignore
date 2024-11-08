@@ -100,3 +100,4 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 */Binaries/Win64
 */DerivedDataCache
 demo_01/demo_01.sln
+demo_01/Plugins/newton/Binaries/Win64
