@@ -243,6 +243,19 @@ ndShapeInstance* UNewtonCollision::CreateInstanceShape() const
 	return instance;
 }
 
+UNewtonRigidBody* UNewtonCollision::GetRigidBodyParent() const
+{
+	for (USceneComponent* parent = GetAttachParent(); parent; parent = parent->GetAttachParent())
+	{
+		UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(parent);
+		if (body)
+		{
+			return body;
+		}
+	}
+	return nullptr;
+}
+
 ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
 {
 	ndShapeInstance* const instance = CreateInstanceShape();

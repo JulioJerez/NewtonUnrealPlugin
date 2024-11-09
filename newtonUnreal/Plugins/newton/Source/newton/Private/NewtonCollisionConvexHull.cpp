@@ -139,7 +139,18 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 ndShapeInstance* UNewtonCollisionConvexHull::CreateInstanceShape() const
 {
 	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
-	instance->SetScale(ndVector(ndFloat32(1.0f)));
+
+	ndVector scale(1.0f);
+	UNewtonRigidBody* const bodyOwner = GetRigidBodyParent();
+	if (bodyOwner && !Cast<ANewtonSceneActor>(bodyOwner))
+	{
+		const FVector uScale(GetComponentTransform().GetScale3D());
+		scale.m_x = ndFloat32(1.0f / uScale.X);
+		scale.m_y = ndFloat32(1.0f / uScale.Y);
+		scale.m_z = ndFloat32(1.0f / uScale.Z);
+	}
+
+	instance->SetScale(scale);
 	instance->SetLocalMatrix(ndGetIdentityMatrix());
 	return instance;
 }

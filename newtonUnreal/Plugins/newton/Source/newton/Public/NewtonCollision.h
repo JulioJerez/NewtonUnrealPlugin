@@ -49,8 +49,9 @@ class NEWTON_API UNewtonCollision : public UDynamicMeshComponent
 	virtual ndShape* CreateShape() const;
 	virtual long long CalculateHash() const;
 	virtual ndShapeInstance* CreateInstanceShape() const;
-	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
+	virtual UNewtonRigidBody* GetRigidBodyParent() const;
 	virtual void SetTransform(const USceneComponent* const meshComponent);
+	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
 
 	//public:	
 	long long m_hash;
