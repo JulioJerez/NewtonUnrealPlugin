@@ -6,6 +6,7 @@
 #include "Newton.h"
 #include "NewtonRigidBody.h"
 #include "NewtonSceneActor.h"
+#include "NewtonSceneRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
@@ -142,7 +143,7 @@ ndShapeInstance* UNewtonCollisionConvexHull::CreateInstanceShape() const
 
 	ndVector scale(1.0f);
 	UNewtonRigidBody* const bodyOwner = GetRigidBodyParent();
-	if (bodyOwner && !Cast<ANewtonSceneActor>(bodyOwner))
+	if (bodyOwner && !Cast<UNewtonSceneRigidBody>(bodyOwner))
 	{
 		const FVector uScale(GetComponentTransform().GetScale3D());
 		scale.m_x = ndFloat32(1.0f / uScale.X);
