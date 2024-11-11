@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NewtonSceneActor.h"
-#include "LevelEditor.h"
 #include "EngineUtils.h"
-#include "LandscapeProxy.h"
 #include "LandscapeStreamingProxy.h"
 #include "LandscapeHeightfieldCollisionComponent.h"
 
@@ -229,10 +227,6 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 			GenerateStaticMeshCollision(sceneActor);
 		}
 	}
-	
-	FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-	levelEditor.BroadcastComponentsEdited();
-	levelEditor.BroadcastRedrawViewports(false);
 }
 
 void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)

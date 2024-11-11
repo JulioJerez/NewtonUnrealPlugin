@@ -1,18 +1,16 @@
 #include "NewtonRuntimeModuleModule.h"
-#include "Modules/ModuleManager.h"
-#include "EngineUtils.h"
-#include "Misc/MessageDialog.h"
-#include "Interfaces/IPluginManager.h"
+
 #include "Misc/Paths.h"
-#include "HAL/PlatformProcess.h"
+#include "EngineUtils.h"
+#include "LevelEditor.h"
 #include "Containers/Ticker.h"
-#include "ToolMenus.h"
-#include "Selection.h"
-#include "LandscapeProxy.h"
+#include "Misc/MessageDialog.h"
+#include "HAL/PlatformProcess.h"
+#include "Modules/ModuleManager.h"
 #include "BlueprintEditorModule.h"
 #include "Kismet/GameplayStatics.h"
+#include "Interfaces/IPluginManager.h"
 #include "Components/LineBatchComponent.h"
-
 
 #include "NewtonJoint.h"
 #include "NewtonCollision.h"
@@ -21,6 +19,10 @@
 #include "NewtonWorldActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
+// there is a very serious bug in unreal build system that for some reason without 
+// the #undef UpdateResource is generates: 
+// error C3668: 'UTexture2DArray::UpdateResourceW': method with override specifier 
+//#undef UpdateResource
 IMPLEMENT_MODULE(FNewtonRuntimeModule, NewtonRuntimeModule);
 
 
@@ -373,6 +375,9 @@ void FNewtonRuntimeModule::UpdatePropertyChanges(const UWorld* const world) cons
 				if (sceneActor)
 				{
 					sceneActor->ApplyPropertyChanges();
+					FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+					levelEditor.BroadcastComponentsEdited();
+					levelEditor.BroadcastRedrawViewports(false);
 				}
 
 				for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
