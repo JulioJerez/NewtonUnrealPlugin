@@ -4,8 +4,6 @@
 #include "NewtonCollisionPolygonalMesh.h"
 
 #include "NewtonRuntimeModuleModule.h"
-#include "NewtonRigidBody.h"
-#include "NewtonSceneActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 class UNewtonCollisionPolygonalMesh::ndShapeStatic : public ndShapeStatic_bvh

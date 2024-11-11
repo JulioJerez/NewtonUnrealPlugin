@@ -2,14 +2,10 @@
 
 
 #include "NewtonCollisionLandscape.h"
-
-#include "Landscape.h"
-#include "Landscape.h"
-#include "LandscapeProxy.h"
 #include "Chaos/HeightField.h"
+#include "LandscapeHeightfieldCollisionComponent.h"
 
 #include "NewtonRuntimeModuleModule.h"
-#include "NewtonRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonCollisionLandscape::UNewtonCollisionLandscape()
@@ -39,7 +35,7 @@ void UNewtonCollisionLandscape::Serialize(FArchive& ar)
 void UNewtonCollisionLandscape::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
 {
 	SetTransform(meshComponent);
-
+	
 	const ULandscapeHeightfieldCollisionComponent* const tile = Cast<ULandscapeHeightfieldCollisionComponent>(meshComponent);
 	check(tile);
 	
@@ -126,11 +122,11 @@ ndShape* UNewtonCollisionLandscape::CreateShape() const
 	ndShapeHeightfield* const shape = new ndShapeHeightfield(
 		m_tileSize_x, m_tileSize_y,
 		ndShapeHeightfield::m_normalDiagonals, m_scale_x, m_scale_z);
-
+	
 	const ndShapeInfo info(((ndShape*)shape)->GetShapeInfo());
 	ndInt8* const attributes = info.m_heightfield.m_atributes;
 	ndReal* const dstHeigh = info.m_heightfield.m_elevation;
-
+	
 	ndInt32 size = m_tileSize_x * m_tileSize_y;
 	for (ndInt32 i = 0; i < size; ++i)
 	{

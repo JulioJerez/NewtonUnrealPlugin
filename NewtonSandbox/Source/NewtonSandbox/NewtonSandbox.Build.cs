@@ -8,7 +8,15 @@ public class NewtonSandbox : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "NewtonRuntimeModule" });
+		PublicDependencyModuleNames.AddRange(new string[] { 
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"EnhancedInput",
+			"NewtonEditorModule",
+			"NewtonRuntimeModule"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

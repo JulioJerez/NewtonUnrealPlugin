@@ -139,7 +139,6 @@ class FNewtonRuntimeModule::ResourceCache
 	ndMovingAverage<16> m_physicsTime;
 };
 
-
 void FNewtonRuntimeModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
@@ -174,7 +173,6 @@ void FNewtonRuntimeModule::StartupModule()
 
 	m_pluginSingleton = this;
 	m_resourceCache = new ResourceCache;
-
 }
 
 void FNewtonRuntimeModule::ShutdownModule()
@@ -451,7 +449,6 @@ void FNewtonRuntimeModule::InitNewtonWorld(ANewtonWorldActor* const newtonWorld)
 
 bool FNewtonRuntimeModule::Tick(float timestep)
 {
-	//if (! (GEngine && m_runSimulation))
 	if (!GEngine)
 	{
 		return true;
@@ -498,7 +495,7 @@ bool FNewtonRuntimeModule::Tick(float timestep)
 	}
 	else
 	{
-#if WITH_EDITOR
+		#if WITH_EDITOR
 		const TIndirectArray<FWorldContext>& contexts = GEngine->GetWorldContexts();
 
 		//float persitentTimestep = timestep * 1.5f;
@@ -515,7 +512,7 @@ bool FNewtonRuntimeModule::Tick(float timestep)
 				DrawGizmos(world, persitentTimestep);
 			}
 		}
-#endif
+		#endif
 	}
 
 	return true;

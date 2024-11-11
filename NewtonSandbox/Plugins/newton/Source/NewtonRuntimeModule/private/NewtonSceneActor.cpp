@@ -1,13 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NewtonSceneActor.h"
-#include "Selection.h"
 #include "LevelEditor.h"
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
 #include "LandscapeStreamingProxy.h"
+#include "LandscapeHeightfieldCollisionComponent.h"
 
-#include "NewtonRuntimeModuleModule.h"
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
 #include "NewtonCollisionBox.h"
@@ -16,6 +15,7 @@
 #include "NewtonCollisionCapsule.h"
 #include "NewtonCollisionLandscape.h"
 #include "NewtonCollisionConvexHull.h"
+#include "NewtonRuntimeModuleModule.h"
 #include "NewtonCollisionPolygonalMesh.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
@@ -55,7 +55,7 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			bool hasSimple = false;
 			const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
 			const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
-
+	
 			const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
 			auto AddComponent = [this, staticComponent](UNewtonCollision* const childComp)
 			{
@@ -68,53 +68,53 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 				childComp->MarkRenderDynamicDataDirty();
 				childComp->NotifyMeshUpdated();
 			};
-
+	
 			for (ndInt32 i = aggGeom.SphereElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionSphere* const child = Cast<UNewtonCollisionSphere>(AddComponentByClass(UNewtonCollisionSphere::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
-
+	
 			for (ndInt32 i = aggGeom.SphylElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionCapsule* const child = Cast<UNewtonCollisionCapsule>(AddComponentByClass(UNewtonCollisionCapsule::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
-
+	
 			for (ndInt32 i = aggGeom.BoxElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionBox* const child = Cast<UNewtonCollisionBox>(AddComponentByClass(UNewtonCollisionBox::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
-
+	
 			for (ndInt32 i = aggGeom.ConvexElems.Num() - 1; i >= 0; --i)
 			{
 				UNewtonCollisionConvexHull* const child = Cast<UNewtonCollisionConvexHull>(AddComponentByClass(UNewtonCollisionConvexHull::StaticClass(), false, FTransform(), true));
 				AddComponent(child);
 				hasSimple = true;
 			}
-
+	
 			for (ndInt32 i = aggGeom.TaperedCapsuleElems.Num() - 1; i >= 0; --i)
 			{
 				check(0);
 			}
-
+	
 			for (ndInt32 i = aggGeom.LevelSetElems.Num() - 1; i >= 0; --i)
 			{
 				check(0);
 			}
-
+	
 			for (ndInt32 i = aggGeom.SkinnedLevelSetElems.Num() - 1; i >= 0; --i)
 			{
 				check(0);
 			}
-
+	
 			return hasSimple;
 		};
-
+	
 		auto GenerateComplexCollision = [this, staticComponent]()
 		{
 			UNewtonCollisionPolygonalMesh* const childComp = Cast<UNewtonCollisionPolygonalMesh>(AddComponentByClass(UNewtonCollisionPolygonalMesh::StaticClass(), false, FTransform(), true));
@@ -125,7 +125,7 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			childComp->MarkRenderDynamicDataDirty();
 			childComp->NotifyMeshUpdated();
 		};
-
+	
 		const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
 		ECollisionTraceFlag collisionFlag = bodySetup->GetCollisionTraceFlag();
 		switch (collisionFlag)
@@ -167,26 +167,26 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		return;
 	}
 	m_propertyChanged = false;
-
+	
 	if (!GenerateShapes)
 	{
 		return;
 	}
 	GenerateShapes = false;
-
+	
 	UNewtonSceneRigidBody* const staticSceneBody = FindComponentByClass<UNewtonSceneRigidBody>();
 	if (!staticSceneBody)
 	{
 		return;
 	}
-
+	
 	FFolder folder(GetFolder());
 	if (folder.IsNone())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NewtonSceneActor must be child of an oulier folder filder"));
 		return;
 	}
-
+	
 	ndArray<AActor*> actorList;
 	const UWorld* const world = GetWorld();
 	const FString key(folder.GetPath().ToString());
@@ -214,7 +214,7 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 			}
 		}
 	}
-
+	
 	staticSceneBody->RemoveAllCollisions();
 	for (ndInt32 i = ndInt32(actorList.GetCount()) - 1; i >= 0; --i)
 	{
@@ -226,11 +226,10 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		}
 		else
 		{
-//if (sceneActor->GetName() == FString("Railing_Stairs_001"))
 			GenerateStaticMeshCollision(sceneActor);
 		}
 	}
-
+	
 	FLevelEditorModule& levelEditor = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 	levelEditor.BroadcastComponentsEdited();
 	levelEditor.BroadcastRedrawViewports(false);
@@ -246,7 +245,7 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 		FinishAddComponent(collisionTile, false, FTransform());
 		AddInstanceComponent(collisionTile);
 		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
-
+	
 		collisionTile->InitStaticMeshCompoment(tile);
 		collisionTile->MarkRenderDynamicDataDirty();
 		collisionTile->NotifyMeshUpdated();

@@ -19,7 +19,7 @@ class FNewtonRuntimeModule : public FDefaultModuleImpl
 	
 	ndShape* FindShape(long long hash) const;
 	TSharedPtr<ndConvexHullSet> FindConvexHull(long long hash) const;
-	TSharedPtr<UE::Geometry::FDynamicMesh3> FindDynamicMesh (long long hash) const;
+	TSharedPtr<UE::Geometry::FDynamicMesh3> FindDynamicMesh(long long hash) const;
 	
 	void AddShape(ndShape* const shape, long long hash);
 	void AddConvexHull(const TSharedPtr<ndConvexHullSet>& hull, long long hash);
@@ -27,8 +27,6 @@ class FNewtonRuntimeModule : public FDefaultModuleImpl
 	
 	private:
 	bool Tick(float timestep);
-	void RegisterMenus();
-	
 	static void PhysicsFree(void* ptr);
 	static void* PhysicsAlloc(size_t sizeInBytes);
 	
@@ -36,13 +34,12 @@ class FNewtonRuntimeModule : public FDefaultModuleImpl
 	void InitNewtonWorld(ANewtonWorldActor* const newtonWorld) const;
 	void DrawGizmos(const UWorld* const world, float timestep) const;
 	void CleanupDebugLines(const UWorld* const world, float timestep) const;
-	
-	/** Handle to the test dll we will load */
+
+	///** Handle to the test dll we will load */
 	void* m_newtonLibraryHandle;
 	FTickerDelegate m_tickDelegate;
 	FTSTicker::FDelegateHandle m_tickDelegateHandle;
-	
-	// menu bar button
+
 	ResourceCache* m_resourceCache;
 	static FNewtonRuntimeModule* m_pluginSingleton;
 	
@@ -50,5 +47,4 @@ class FNewtonRuntimeModule : public FDefaultModuleImpl
 	const static FGuid m_guiID;
 	static int m_currentVersion;
 	static FCustomVersionRegistration m_guidRegistration;
-
 };

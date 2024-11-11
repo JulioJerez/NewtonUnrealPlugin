@@ -3,7 +3,6 @@
 #include "NewtonCollisionCylinder.h"
 
 #include "NewtonRuntimeModuleModule.h"
-#include "NewtonRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonCollisionCylinder::UNewtonCollisionCylinder()

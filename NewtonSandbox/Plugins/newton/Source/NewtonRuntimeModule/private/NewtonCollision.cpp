@@ -6,7 +6,6 @@
 
 #include "NewtonRuntimeModuleModule.h"
 #include "NewtonRigidBody.h"
-#include "NewtonWorldActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 class UNewtonCollision::PolygonizeMesh : public ndShapeDebugNotify

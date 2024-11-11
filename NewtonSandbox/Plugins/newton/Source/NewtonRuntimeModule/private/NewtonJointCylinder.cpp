@@ -3,9 +3,8 @@
 
 #include "NewtonJointCylinder.h"
 
-#include "NewtonRuntimeModuleModule.h"
-#include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
+#include "NewtonRuntimeModuleModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonJointCylinder::UNewtonJointCylinder()
