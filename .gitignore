@@ -95,6 +95,8 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 # Unreal engine filters
 .vs
 .vsconfig
+*.recipe
+vc143.pdb
 */Saved
 */Intermediate
 */Binaries/Win64
@@ -102,5 +104,5 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 
 NewtonSandbox/NewtonSandbox.sln
 NewtonSandbox/Plugins/newton/Binaries/Win64
-NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/x64
-NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/ExampleLibrary/x64
+#NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/x64
+#NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/ExampleLibrary/x64

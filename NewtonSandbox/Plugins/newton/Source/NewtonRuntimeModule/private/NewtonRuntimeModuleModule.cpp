@@ -22,7 +22,7 @@
 // there is a very serious bug in unreal build system that for some reason without 
 // the #undef UpdateResource is generates: 
 // error C3668: 'UTexture2DArray::UpdateResourceW': method with override specifier 
-#undef UpdateResource
+//#undef UpdateResource
 IMPLEMENT_MODULE(FNewtonRuntimeModule, NewtonRuntimeModule);
 
 
