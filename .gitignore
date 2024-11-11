@@ -100,11 +100,6 @@ sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 */Binaries/Win64
 */DerivedDataCache
 
-demo_01/demo_01.sln
-demo_01/Plugins/newton/Binaries/Win64
-demo_01/Plugins/newton/Source/ThirdParty/newtonLibrary/x64
-demo_01/Plugins/newton/Source/ThirdParty/newtonLibrary/ExampleLibrary/x64
-
 NewtonSandbox/NewtonSandbox.sln
 NewtonSandbox/Plugins/newton/Binaries/Win64
 NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/x64
