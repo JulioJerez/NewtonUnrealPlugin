@@ -16,6 +16,8 @@ public:
 	void DestroyToolbarButton();
 	void CreateEditorToolbarButton();
 
+	void RegisterNewtonSkeletalMeshAsset();
+
 	TSharedPtr<class FUICommandList> PluginCommands;
 	int m_toobarCount;
 };

@@ -4,7 +4,8 @@ public class NewtonEditorModule: ModuleRules
 {
     public NewtonEditorModule(ReadOnlyTargetRules Target) : base(Target)
     {
-        PrivateDependencyModuleNames.AddRange(new string[] {
+        PrivateDependencyModuleNames.AddRange(new string[] 
+        {
             "Core",
             "Slate",
             "Engine",
@@ -12,9 +13,16 @@ public class NewtonEditorModule: ModuleRules
             "UnrealEd",
             "SlateCore",
             "ToolMenus",
+            "AssetTools",
+            "CoreUObject",
             "GeometryCore",
             "EditorFramework",
             "GeometryFramework",
-            "NewtonRuntimeModule" });
+            //"EditorWidgets",
+            //"ContentBrowser",
+            //"ApplicationCore",
+            //"NavigationSystem",
+            "NewtonRuntimeModule"
+        });
     }
 }

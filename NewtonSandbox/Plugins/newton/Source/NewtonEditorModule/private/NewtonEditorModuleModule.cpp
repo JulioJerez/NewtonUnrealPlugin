@@ -1,8 +1,11 @@
 #include "NewtonEditorModuleModule.h"
+#include "IAssetTools.h"
+#include "AssetToolsModule.h"
 #include "Modules/ModuleManager.h"
 
 #include "testButtonStyle.h"
 #include "testButtonCommands.h"
+#include "NewtonSkeletalMeshAction.h"
 
 
 IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
@@ -10,6 +13,7 @@ IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
 void FNewtonEditorModule::StartupModule()
 {
 	CreateEditorToolbarButton();
+	RegisterNewtonSkeletalMeshAsset();
 }
 
 void FNewtonEditorModule::ShutdownModule()
@@ -70,4 +74,16 @@ void FNewtonEditorModule::DestroyToolbarButton()
 void FNewtonEditorModule::ToolbarUpdate()
 {
 	m_toobarCount++;
+}
+
+
+void FNewtonEditorModule::RegisterNewtonSkeletalMeshAsset()
+{
+	IAssetTools& assetTools = IAssetTools::Get();
+	const FName name(TEXT("NewtonSkeletalMesh"));
+	const FText showName(FText::FromString("Newton Skeletal Mesh"));
+	EAssetTypeCategories::Type assetType = assetTools.RegisterAdvancedAssetCategory(name, showName);
+
+	TSharedPtr<NewtonSkeletalMeshAction> skeletalMesh (MakeShareable(new NewtonSkeletalMeshAction(assetType)));
+	assetTools.RegisterAssetTypeActions(skeletalMesh.ToSharedRef());
 }

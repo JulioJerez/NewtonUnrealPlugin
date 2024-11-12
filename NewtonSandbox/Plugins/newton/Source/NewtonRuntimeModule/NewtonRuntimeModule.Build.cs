@@ -11,9 +11,9 @@ public class NewtonRuntimeModule: ModuleRules
         PrivateDefinitions.Add("_D_COLLISION_DLL");
 
         PrivateIncludePaths.AddRange(
-            new string[] {
-				// ... add other private include paths required here ...
-				"ThirdParty/newtonLibrary/Public/dCore/",
+            new string[] 
+            {
+                "ThirdParty/newtonLibrary/Public/dCore/",
                 "ThirdParty/newtonLibrary/Public/dNewton/",
                 "ThirdParty/newtonLibrary/Public/dCollision/",
                 "ThirdParty/newtonLibrary/Public/thirdParty/",
@@ -25,14 +25,14 @@ public class NewtonRuntimeModule: ModuleRules
         );
 
 
-        PrivateDependencyModuleNames.AddRange(new string[] {
+        PrivateDependencyModuleNames.AddRange(new string[] 
+        {
             "Core",
             "Slate",
             "Engine",
             "UnrealEd",
             "Projects",
             "SlateCore",
-            //"ToolMenus",
             "Landscape",
             "CoreUObject",
             "PhysicsCore",
