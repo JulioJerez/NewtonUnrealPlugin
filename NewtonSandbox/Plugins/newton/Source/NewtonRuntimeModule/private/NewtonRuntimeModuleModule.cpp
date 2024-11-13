@@ -170,7 +170,7 @@ void FNewtonRuntimeModule::StartupModule()
 	}
 	else
 	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString("ThirdPartyLibraryError: Failed to load example third party library"));
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("ThirdPartyLibraryError: Failed to load example third party library")));
 	}
 
 	m_pluginSingleton = this;

@@ -15,7 +15,7 @@ UNewtonSkeletalMeshFactory::UNewtonSkeletalMeshFactory()
 
 FText UNewtonSkeletalMeshFactory::GetDisplayName() const
 {
-	const FText factoryName(FText::FromString("Newton Skeletal Mesh"));
+	const FText factoryName(FText::FromString(TEXT("NewtonSkeletalMesh")));
 	return factoryName;
 }
 

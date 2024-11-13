@@ -4,6 +4,7 @@
 #include "NewtonSkeletalMeshAction.h"
 
 #include "NewtonSkeletalMesh.h"
+#include "NewtonSkeletalMeshEditor.h"
 
 NewtonSkeletalMeshAction::NewtonSkeletalMeshAction(EAssetTypeCategories::Type assetCategory)
 	:FAssetTypeActions_Base()
@@ -17,7 +18,8 @@ NewtonSkeletalMeshAction::~NewtonSkeletalMeshAction()
 
 FText NewtonSkeletalMeshAction::GetName() const
 {
-	return FText::FromString("NewtonSkeletonMesh");
+	//return FText::FromString(TEXT("NewtonSkeletonMesh"));
+	return FText::FromString(TEXT("ActionName"));
 }
 
 uint32 NewtonSkeletalMeshAction::GetCategories()
@@ -40,8 +42,18 @@ void NewtonSkeletalMeshAction::GetActions(const TArray<UObject*>& InObjects, str
 
 }
 
-void NewtonSkeletalMeshAction::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor)
+void NewtonSkeletalMeshAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TSharedPtr<class IToolkitHost> editWithinLevelEditor)
 {
+	EToolkitMode::Type mode = editWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
 
+	for (int i = 0; i < inObjects.Num(); ++i)
+	{
+		UNewtonSkeletalMesh* const mesh = Cast<UNewtonSkeletalMesh>(inObjects[i]);
+		if (mesh)
+		{
+			TSharedRef<NewtonSkeletalMeshEditor> editor(new NewtonSkeletalMeshEditor());
+			editor->InitEditor(mode, editWithinLevelEditor, mesh);
+		}
+	}
 }
 

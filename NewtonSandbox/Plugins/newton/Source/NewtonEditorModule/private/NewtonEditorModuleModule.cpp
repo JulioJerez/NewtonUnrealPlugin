@@ -81,7 +81,7 @@ void FNewtonEditorModule::RegisterNewtonSkeletalMeshAsset()
 {
 	IAssetTools& assetTools = IAssetTools::Get();
 	const FName name(TEXT("NewtonSkeletalMesh"));
-	const FText showName(FText::FromString("Newton Skeletal Mesh"));
+	const FText showName(FText::FromString(TEXT("Newton Skeletal Mesh")));
 	EAssetTypeCategories::Type assetType = assetTools.RegisterAdvancedAssetCategory(name, showName);
 
 	TSharedPtr<NewtonSkeletalMeshAction> skeletalMesh (MakeShareable(new NewtonSkeletalMeshAction(assetType)));
