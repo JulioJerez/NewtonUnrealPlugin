@@ -9,11 +9,26 @@
 NewtonSkeletalMeshEditor::NewtonSkeletalMeshEditor()
 	:FWorkflowCentricApplication()
 {
+	m_skeletalMesh = nullptr;
 }
 
 NewtonSkeletalMeshEditor::~NewtonSkeletalMeshEditor()
 {
 }
+
+void NewtonSkeletalMeshEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonSkeletalMesh* const skeletalMesh)
+{
+	TArray<UObject*> objectsToEdit;
+
+	m_skeletalMesh = skeletalMesh;
+	objectsToEdit.Push(m_skeletalMesh);
+	
+	InitAssetEditor(mode, initToolkitHost, TEXT("SkeletaMeshEditor"), FTabManager::FLayout::NullLayout, true, true, objectsToEdit);
+
+	AddApplicationMode(NewtonSkeletalMeshEditorMode::m_editorModeName, MakeShareable(new NewtonSkeletalMeshEditorMode(SharedThis(this))));
+	SetCurrentMode(NewtonSkeletalMeshEditorMode::m_editorModeName);
+}
+
 
 FName NewtonSkeletalMeshEditor::GetToolkitFName() const
 {
@@ -45,17 +60,6 @@ void NewtonSkeletalMeshEditor::RegisterTabSpawners(const TSharedRef<class FTabMa
 void NewtonSkeletalMeshEditor::UnregisterTabSpawners(const TSharedRef<class FTabManager>& manager)
 {
 
-}
-
-void NewtonSkeletalMeshEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonSkeletalMesh* const mesh)
-{
-	TArray<UObject*> objectsToEdit;
-	objectsToEdit.Push(mesh);
-	InitAssetEditor(mode, initToolkitHost, TEXT("SkeletaMeshEditor"), FTabManager::FLayout::NullLayout, true, true, objectsToEdit);
-	//InitAssetEditor(mode, initToolkitHost, TEXT("yyyyyyyyy"), FTabManager::FLayout::NullLayout, true, true, objectsToEdit);
-
-	AddApplicationMode(NewtonSkeletalMeshEditorMode::m_editorModeName, MakeShareable(new NewtonSkeletalMeshEditorMode(SharedThis(this))));
-	SetCurrentMode(NewtonSkeletalMeshEditorMode::m_editorModeName);
 }
 
 void NewtonSkeletalMeshEditor::OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit)

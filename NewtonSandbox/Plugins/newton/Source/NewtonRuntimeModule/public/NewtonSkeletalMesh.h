@@ -18,4 +18,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonSkeletalMesh : public USkinnedMeshComponent
 	public:
 	UNewtonSkeletalMesh();
 	
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	bool ShowDebug;
+
 };

@@ -158,8 +158,55 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 	}
 }
 
+void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
+{
+	const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
+	for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
+	{
+		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
+		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
+		FinishAddComponent(collisionTile, false, FTransform());
+		AddInstanceComponent(collisionTile);
+		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+	
+		collisionTile->InitStaticMeshCompoment(tile);
+		collisionTile->MarkRenderDynamicDataDirty();
+		collisionTile->NotifyMeshUpdated();
+	}
+}
+
+void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
+{
+	TArray<TObjectPtr<USceneComponent>> stack;
+	TArray<TObjectPtr<UStaticMeshComponent>> staticMesh;
+
+	stack.Push(TObjectPtr<USceneComponent>(actor->GetRootComponent()));
+	while (stack.Num())
+	{
+		TObjectPtr<USceneComponent> component(stack.Pop());
+		TObjectPtr<UStaticMeshComponent> mesh(Cast<UStaticMeshComponent>(component));
+		if (mesh)
+		{
+			staticMesh.Push(mesh);
+		}
+		const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
+		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
+		{
+			stack.Push(children[i].Get());
+		}
+	}
+
+	for (ndInt32 i = staticMesh.Num() - 1; i >= 0; --i)
+	{
+		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
+		CreateCollisionFromUnrealPrimitive(meshComponent);
+	}
+}
+
 void ANewtonSceneActor::ApplyPropertyChanges()
 {
+	DebugSkeletalMesh();
+
 	if (!m_propertyChanged)
 	{
 		return;
@@ -229,36 +276,20 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	}
 }
 
-void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
-{
-	const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
-	for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
-	{
-		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
-		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
-		FinishAddComponent(collisionTile, false, FTransform());
-		AddInstanceComponent(collisionTile);
-		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
 	
-		collisionTile->InitStaticMeshCompoment(tile);
-		collisionTile->MarkRenderDynamicDataDirty();
-		collisionTile->NotifyMeshUpdated();
-	}
-}
-
-void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
+#include "NewtonSkeletalMesh.h"
+void ANewtonSceneActor::DebugSkeletalMesh()
 {
 	TArray<TObjectPtr<USceneComponent>> stack;
-	TArray<TObjectPtr<UStaticMeshComponent>> staticMesh;
-
-	stack.Push(TObjectPtr<USceneComponent>(actor->GetRootComponent()));
+	TArray<TObjectPtr<UNewtonSkeletalMesh>> meshAsset;
+	stack.Push(TObjectPtr<USceneComponent>(GetRootComponent()));
 	while (stack.Num())
 	{
 		TObjectPtr<USceneComponent> component(stack.Pop());
-		TObjectPtr<UStaticMeshComponent> mesh(Cast<UStaticMeshComponent>(component));
+		TObjectPtr<UNewtonSkeletalMesh> mesh(Cast<UNewtonSkeletalMesh>(component));
 		if (mesh)
 		{
-			staticMesh.Push(mesh);
+			meshAsset.Push(mesh);
 		}
 		const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
 		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
@@ -266,11 +297,9 @@ void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
 			stack.Push(children[i].Get());
 		}
 	}
-
-	for (ndInt32 i = staticMesh.Num() - 1; i >= 0; --i)
+	if (meshAsset.Num())
 	{
-		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
-		CreateCollisionFromUnrealPrimitive(meshComponent);
+		UNewtonSkeletalMesh* const xxx0 = meshAsset[0];
+		UNewtonSkeletalMesh* const xxx1 = meshAsset[0];
 	}
 }
-

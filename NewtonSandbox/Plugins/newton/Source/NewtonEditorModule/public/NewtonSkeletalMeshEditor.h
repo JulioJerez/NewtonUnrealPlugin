@@ -18,7 +18,7 @@ class NEWTONEDITORMODULE_API NewtonSkeletalMeshEditor: public FWorkflowCentricAp
 
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
-	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonSkeletalMesh* const mesh);
+	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonSkeletalMesh* const skeletalMesh);
 
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
@@ -27,4 +27,6 @@ class NEWTONEDITORMODULE_API NewtonSkeletalMeshEditor: public FWorkflowCentricAp
 
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
+
+	UNewtonSkeletalMesh* m_skeletalMesh;
 };

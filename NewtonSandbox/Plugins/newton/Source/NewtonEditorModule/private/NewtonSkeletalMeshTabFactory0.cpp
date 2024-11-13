@@ -2,7 +2,10 @@
 
 
 #include "NewtonSkeletalMeshTabFactory0.h"
+#include "IDetailsView.h"
+#include "PropertyEditorModule.h"
 
+#include "NewtonSkeletalMesh.h"
 #include "NewtonSkeletalMeshEditor.h"
 
 FName NewtonSkeletalMeshTabFactory0::m_primaryTabName("NewtonSkeletalMeshTab0");
@@ -28,5 +31,24 @@ FText NewtonSkeletalMeshTabFactory0::GetTabToolTipText(const FWorkflowTabSpawnIn
 
 TSharedRef<SWidget> NewtonSkeletalMeshTabFactory0::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
 {
-	return SNew (STextBlock).Text(FText::FromString(TEXT("this a test newton skeletal mesh editor")));
+	TSharedPtr<NewtonSkeletalMeshEditor> editor = m_editor.Pin();
+	FPropertyEditorModule& propertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
+
+	FDetailsViewArgs detailArgumnets;
+
+	detailArgumnets.bLockable = false;
+	detailArgumnets.bShowOptions = true;
+	detailArgumnets.bAllowSearch = false;
+	detailArgumnets.bShowScrollBar = true;
+	detailArgumnets.bHideSelectionTip = false;
+	detailArgumnets.bSearchInitialKeyFocus = true;
+	detailArgumnets.bUpdatesFromSelection = false;
+	detailArgumnets.bShowModifiedPropertiesOption = false;
+	detailArgumnets.NotifyHook = nullptr;
+
+	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
+	detailView->SetObject(editor->m_skeletalMesh);
+
+	return SNew(SVerticalBox) + SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)[detailView.ToSharedRef()];
+	//return SNew (STextBlock).Text(FText::FromString(TEXT("this a test newton skeletal mesh editor")));
 }
