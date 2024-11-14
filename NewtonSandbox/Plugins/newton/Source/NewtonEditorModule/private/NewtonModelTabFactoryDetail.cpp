@@ -60,11 +60,14 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	);
 #else
 
-	TSharedRef<SWidget> viewRef(detailView.ToSharedRef());
+	//const FText msg(FText::FromString(TEXT("this is a lot more complicated that it needed to be.")));
+	//TSharedRef<STextBlock> editorRef (SNew(STextBlock));
+	//editorRef->SetText(msg);
+	TSharedRef<SWidget> editorRef(detailView.ToSharedRef());
 
 	SVerticalBox::FSlot::FSlotArguments arguments(SVerticalBox::Slot());
 	arguments.FillHeight(1.0);
-	arguments.HAlign(HAlign_Fill)[viewRef];
+	arguments.HAlign(HAlign_Fill)[editorRef];
 	TSharedRef<SWidget> widget(SNew(SVerticalBox) + arguments);
 #endif
 

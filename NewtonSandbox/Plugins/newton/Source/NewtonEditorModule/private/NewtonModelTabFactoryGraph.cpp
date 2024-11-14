@@ -2,8 +2,11 @@
 
 
 #include "NewtonModelTabFactoryGraph.h"
+#include "GraphEditor.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
+#include "Kismet2/KismetEditorUtilities.h"
+#include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
 
 #include "NewtonModel.h"
 #include "NewtonModelEditor.h"
@@ -43,13 +46,14 @@ TSharedRef<SWidget> NewtonModelTabFactoryGraph::CreateTabBody(const FWorkflowTab
 		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
 	);
 #else
-	const FText msg(FText::FromString(TEXT("this is a lot more complicated that it needed to be.")));
-	TSharedRef<STextBlock> textBlock (SNew(STextBlock));
-	textBlock->SetText(msg);
+	//const FText msg(FText::FromString(TEXT("this is a lot more complicated that it needed to be.")));
+	//TSharedRef<STextBlock> editorRef (SNew(STextBlock));
+	//editorRef->SetText(msg);
+	TSharedRef<SGraphEditor> editorRef(SNew(SGraphEditor).IsEditable(true).GraphToEdit(editor->m_graphEditor));
 
 	SVerticalBox::FSlot::FSlotArguments arg (SVerticalBox::Slot());
 	arg.FillHeight(1.0);
-	arg.HAlign(HAlign_Fill)[textBlock];
+	arg.HAlign(HAlign_Fill)[editorRef];
 	TSharedRef<SWidget> widget(SNew(SVerticalBox) + arg);
 #endif	
 	return widget;

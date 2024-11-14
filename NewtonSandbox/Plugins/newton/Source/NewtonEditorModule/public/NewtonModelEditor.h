@@ -28,5 +28,6 @@ class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplicati
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
 
+	UEdGraph* m_graphEditor;
 	UNewtonModel* m_newtonModel;
 };

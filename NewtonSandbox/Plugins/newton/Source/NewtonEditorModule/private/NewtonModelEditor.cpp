@@ -2,6 +2,8 @@
 
 
 #include "NewtonModelEditor.h"
+#include "Kismet2/BlueprintEditorUtils.h"
+#include "Kismet2/KismetEditorUtilities.h"
 
 #include "NewtonModel.h"
 #include "NewtonModelEditorMode.h"
@@ -9,6 +11,7 @@
 NewtonModelEditor::NewtonModelEditor()
 	:FWorkflowCentricApplication()
 {
+	m_graphEditor = nullptr;
 	m_newtonModel = nullptr;
 }
 
@@ -22,6 +25,9 @@ void NewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedP
 
 	m_newtonModel = newtonModel;
 	objectsToEdit.Push(m_newtonModel);
+	
+	const FName graphName(TEXT("NewtonModelGraph"));
+	m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, graphName, UEdGraph::StaticClass(), UEdGraphSchema::StaticClass());
 	
 	InitAssetEditor(mode, initToolkitHost, TEXT("NewtonModelEditor"), FTabManager::FLayout::NullLayout, true, true, objectsToEdit);
 
