@@ -3,9 +3,9 @@
 
 #include "NewtonSceneRigidBody.h"
 
-#include "NewtonWorldActor.h"
 #include "NewtonCollision.h"
-#include "NewtonRuntimeModuleModule.h"
+#include "NewtonWorldActor.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
 UNewtonSceneRigidBody::UNewtonSceneRigidBody()

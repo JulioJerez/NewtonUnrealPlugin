@@ -10,10 +10,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "PhysicsEngine/BodySetup.h"
 
-#include "NewtonRuntimeModuleModule.h"
 #include "NewtonJoint.h"
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 //FLinearColor UNewtonRigidBody::m_awakeColor(1.0f, 0.0f, 0.f);

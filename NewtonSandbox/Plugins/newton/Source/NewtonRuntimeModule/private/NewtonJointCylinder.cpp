@@ -4,7 +4,7 @@
 #include "NewtonJointCylinder.h"
 
 #include "NewtonWorldActor.h"
-#include "NewtonRuntimeModuleModule.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonJointCylinder::UNewtonJointCylinder()

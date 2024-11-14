@@ -3,7 +3,7 @@
 
 #include "NewtonCollisionBox.h"
 
-#include "NewtonRuntimeModuleModule.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonCollisionBox::UNewtonCollisionBox()

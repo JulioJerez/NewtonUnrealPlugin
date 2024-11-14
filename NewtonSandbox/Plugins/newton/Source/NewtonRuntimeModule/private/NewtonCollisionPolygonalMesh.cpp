@@ -3,7 +3,7 @@
 
 #include "NewtonCollisionPolygonalMesh.h"
 
-#include "NewtonRuntimeModuleModule.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 class UNewtonCollisionPolygonalMesh::ndShapeStatic : public ndShapeStatic_bvh

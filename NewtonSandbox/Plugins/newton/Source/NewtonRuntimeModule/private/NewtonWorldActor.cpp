@@ -2,7 +2,6 @@
 
 
 #include "NewtonWorldActor.h"
-#include "NewtonRuntimeModuleModule.h"
 #include "EngineUtils.h"
 #include "LevelEditor.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,6 +10,7 @@
 #include "NewtonWorld.h"
 #include "NewtonJoint.h"
 #include "NewtonRigidBody.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 // Sets default values

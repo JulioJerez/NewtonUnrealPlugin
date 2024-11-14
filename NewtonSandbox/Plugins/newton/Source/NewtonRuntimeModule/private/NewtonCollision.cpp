@@ -4,8 +4,8 @@
 #include "NewtonCollision.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "NewtonRuntimeModuleModule.h"
 #include "NewtonRigidBody.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 class UNewtonCollision::PolygonizeMesh : public ndShapeDebugNotify

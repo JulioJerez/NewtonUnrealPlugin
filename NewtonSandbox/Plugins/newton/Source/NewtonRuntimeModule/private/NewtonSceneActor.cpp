@@ -8,12 +8,12 @@
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
 #include "NewtonCollisionBox.h"
+#include "NewtonRuntimeModule.h"
 #include "NewtonSceneRigidBody.h"
 #include "NewtonCollisionSphere.h"
 #include "NewtonCollisionCapsule.h"
 #include "NewtonCollisionLandscape.h"
 #include "NewtonCollisionConvexHull.h"
-#include "NewtonRuntimeModuleModule.h"
 #include "NewtonCollisionPolygonalMesh.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 

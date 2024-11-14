@@ -1,4 +1,4 @@
-#include "NewtonRuntimeModuleModule.h"
+#include "NewtonRuntimeModule.h"
 
 #include "Misc/Paths.h"
 #include "EngineUtils.h"

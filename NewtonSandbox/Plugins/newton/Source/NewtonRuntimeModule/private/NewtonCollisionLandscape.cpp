@@ -5,7 +5,7 @@
 #include "Chaos/HeightField.h"
 #include "LandscapeHeightfieldCollisionComponent.h"
 
-#include "NewtonRuntimeModuleModule.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonCollisionLandscape::UNewtonCollisionLandscape()

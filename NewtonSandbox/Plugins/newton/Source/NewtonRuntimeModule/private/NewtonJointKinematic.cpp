@@ -3,9 +3,9 @@
 
 #include "NewtonJointKinematic.h"
 
-#include "NewtonRuntimeModuleModule.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonJointKinematic::UNewtonJointKinematic()

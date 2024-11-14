@@ -8,15 +8,16 @@
 
 class NewtonModelEditor;
 
+//This is the primary tab
 
 /**
  * 
  */
-class NEWTONEDITORMODULE_API NewtonModelTabFactoryDetail: public FWorkflowTabFactory
+class NEWTONEDITORMODULE_API NewtonModelTabFactoryGraph: public FWorkflowTabFactory
 {
 	public:
-	NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor);
-	~NewtonModelTabFactoryDetail();
+	NewtonModelTabFactoryGraph(const TSharedPtr<NewtonModelEditor>& editor);
+	~NewtonModelTabFactoryGraph();
 
 	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const;
 	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;

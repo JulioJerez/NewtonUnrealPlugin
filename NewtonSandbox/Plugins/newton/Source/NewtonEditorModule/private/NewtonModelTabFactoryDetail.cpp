@@ -8,13 +8,15 @@
 #include "NewtonModel.h"
 #include "NewtonModelEditor.h"
 
-FName NewtonModelTabFactoryDetail::m_primaryTabName("NewtonModelTab0");
+FName NewtonModelTabFactoryDetail::m_tabName("NewtonModelTabDetail");
 
 NewtonModelTabFactoryDetail::NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor)
-	:FWorkflowTabFactory(m_primaryTabName, editor)
+	:FWorkflowTabFactory(m_tabName, editor)
 	,m_editor(editor)
 {
+	// I prefer "Properties", but unreal uses "Detail" for this tab
 	TabLabel = FText::FromString(TEXT("Details"));
+	//TabLabel = FText::FromString(TEXT("Properties"));
 	ViewMenuDescription = FText::FromString(TEXT("Newton Model Detail"));
 	ViewMenuTooltip = FText::FromString(TEXT("Show Newton Model Detail"));
 }
@@ -25,7 +27,7 @@ NewtonModelTabFactoryDetail::~NewtonModelTabFactoryDetail()
 
 FText NewtonModelTabFactoryDetail::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
 {
-	const FText name(FText::FromString(TEXT("Newton Model Component Detail")));
+	const FText name(FText::FromString(TEXT("NewtonModelComponent detail view")));
 	return name;
 }
 
@@ -49,6 +51,22 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
 	detailView->SetObject(editor->m_newtonModel);
 
-	return SNew(SVerticalBox) + SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)[detailView.ToSharedRef()];
-	//return SNew (STextBlock).Text(FText::FromString(TEXT("this a test newton skeletal mesh editor")));
+#if 0
+	// this is by far, the worse c++ programing style I have ever seen.
+	// it is like some one when out of his way to obfuscate the code.
+	TSharedRef<SWidget> widget
+	(
+		SNew(SVerticalBox) + SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)[detailView.ToSharedRef()]
+	);
+#else
+
+	TSharedRef<SWidget> viewRef(detailView.ToSharedRef());
+
+	SVerticalBox::FSlot::FSlotArguments arguments(SVerticalBox::Slot());
+	arguments.FillHeight(1.0);
+	arguments.HAlign(HAlign_Fill)[viewRef];
+	TSharedRef<SWidget> widget(SNew(SVerticalBox) + arguments);
+#endif
+
+	return widget;
 }
