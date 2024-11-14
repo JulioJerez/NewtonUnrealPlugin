@@ -3,6 +3,7 @@
 
 #include "NewtonModelGraphSchema.h"
 
+#include "NewtonModelGraphNode.h"
 
 USTRUCT()
 struct FNewtonModelGraphSchemaAction : public FEdGraphSchemaAction
@@ -19,7 +20,8 @@ struct FNewtonModelGraphSchemaAction : public FEdGraphSchemaAction
 
 	virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, TArray<UEdGraphPin*>& fromPins, const FVector2D location, bool bSelectNewNode = true) override
 	{
-		UEdGraphNode* const node = NewObject<UEdGraphNode>(parentGraph);
+		//UEdGraphNode* const node = NewObject<UEdGraphNode>(parentGraph);
+		UEdGraphNode* const node = NewObject<UNewtonModelGraphNode>(parentGraph);
 		node->NodePosX = location.X;
 		node->NodePosY = location.Y;
 

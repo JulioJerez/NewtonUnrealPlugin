@@ -94,9 +94,18 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	const FVector2D iconSize(16.0f, 16.0f);
 	const FString iconPath(m_styleSet->RootToContentDir(TEXT("ndModelIcon.png")));
 	FSlateImageBrush* const newtonIcon = new FSlateImageBrush(iconPath, iconSize);
+	FSlateImageBrush* const nodeAddPinIcon = new FSlateImageBrush(iconPath, iconSize);
+	FSlateImageBrush* const nodeDeletePinIcon = new FSlateImageBrush(iconPath, iconSize);
+	FSlateImageBrush* const nodeDeleteNodeIcon = new FSlateImageBrush(iconPath, iconSize);
 	FSlateImageBrush* const newtonThumbnail = new FSlateImageBrush(iconPath, iconSize);
+
 	m_styleSet->Set(TEXT("ClassIcon.NewtonModel"), newtonIcon);
 	m_styleSet->Set(TEXT("ClassThumbnail.NewtonModel"), newtonThumbnail);
+
+	m_styleSet->Set(TEXT("NewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
+	m_styleSet->Set(TEXT("NewtonModelEditor.NodeDeletePinIcon"), nodeDeletePinIcon);
+	m_styleSet->Set(TEXT("NewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
+
 	FSlateStyleRegistry::RegisterSlateStyle(*m_styleSet);
 
 	// register the asset menu item entry
