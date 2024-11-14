@@ -35,7 +35,7 @@ class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
 	void CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMeshComponent> staticComponent);
 
 
-	void DebugSkeletalMesh();
+	void DebugNewonModel();
 
 	bool m_propertyChanged;
 	friend class FNewtonRuntimeModule;

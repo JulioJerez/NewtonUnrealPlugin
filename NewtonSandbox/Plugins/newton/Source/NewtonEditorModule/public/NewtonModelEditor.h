@@ -5,20 +5,20 @@
 #include "CoreMinimal.h"
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
 
-class UNewtonSkeletalMesh;
+class UNewtonModel;
 
 /**
  * 
  */
-class NEWTONEDITORMODULE_API NewtonSkeletalMeshEditor: public FWorkflowCentricApplication
+class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplication
 {
 	public:
-	NewtonSkeletalMeshEditor();
-	~NewtonSkeletalMeshEditor();
+	NewtonModelEditor();
+	~NewtonModelEditor();
 
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
-	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonSkeletalMesh* const skeletalMesh);
+	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
 
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
@@ -28,5 +28,5 @@ class NEWTONEDITORMODULE_API NewtonSkeletalMeshEditor: public FWorkflowCentricAp
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
 
-	UNewtonSkeletalMesh* m_skeletalMesh;
+	UNewtonModel* m_newtonModel;
 };

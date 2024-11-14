@@ -9,11 +9,11 @@
 /**
  * 
  */
-class NEWTONEDITORMODULE_API NewtonSkeletalMeshAction: public FAssetTypeActions_Base
+class NEWTONEDITORMODULE_API NewtonModelAction: public FAssetTypeActions_Base
 {
 	public:
-	NewtonSkeletalMeshAction(EAssetTypeCategories::Type assetCategory);
-	virtual ~NewtonSkeletalMeshAction();
+	NewtonModelAction(EAssetTypeCategories::Type assetCategory);
+	virtual ~NewtonModelAction();
 
 	virtual FText GetName() const override;
 	virtual uint32 GetCategories() override;

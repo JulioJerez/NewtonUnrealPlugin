@@ -7,23 +7,23 @@
 #include "WorkflowOrientedApp/WorkflowTabManager.h"
 
 
-class NewtonSkeletalMeshEditor;
+class NewtonModelEditor;
 /**
  * 
  */
-class NEWTONEDITORMODULE_API NewtonSkeletalMeshEditorMode: public FApplicationMode
+class NEWTONEDITORMODULE_API NewtonModelEditorMode: public FApplicationMode
 {
 	public:
-	NewtonSkeletalMeshEditorMode(TSharedPtr<NewtonSkeletalMeshEditor> editor);
-	~NewtonSkeletalMeshEditorMode();
+	NewtonModelEditorMode(TSharedPtr<NewtonModelEditor> editor);
+	~NewtonModelEditorMode();
 
 	virtual void PostActivateMode() override;
 	virtual void PreDeactivateMode() override;
 	virtual void RegisterTabFactories(TSharedPtr<FTabManager> inTabManager) override;
 
 	FWorkflowAllowedTabSet m_tabs;
-	TWeakPtr<NewtonSkeletalMeshEditor> m_editor;
+	TWeakPtr<NewtonModelEditor> m_editor;
 
-	static FName m_editorModeName;
+	static FName m_editorModelName;
 	static FName m_editorVersionName;
 };

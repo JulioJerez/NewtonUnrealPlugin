@@ -205,7 +205,7 @@ void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
 
 void ANewtonSceneActor::ApplyPropertyChanges()
 {
-	DebugSkeletalMesh();
+	DebugNewonModel();
 
 	if (!m_propertyChanged)
 	{
@@ -277,16 +277,16 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 }
 
 	
-#include "NewtonSkeletalMesh.h"
-void ANewtonSceneActor::DebugSkeletalMesh()
+#include "NewtonModel.h"
+void ANewtonSceneActor::DebugNewonModel()
 {
 	TArray<TObjectPtr<USceneComponent>> stack;
-	TArray<TObjectPtr<UNewtonSkeletalMesh>> meshAsset;
+	TArray<TObjectPtr<UNewtonModel>> meshAsset;
 	stack.Push(TObjectPtr<USceneComponent>(GetRootComponent()));
 	while (stack.Num())
 	{
 		TObjectPtr<USceneComponent> component(stack.Pop());
-		TObjectPtr<UNewtonSkeletalMesh> mesh(Cast<UNewtonSkeletalMesh>(component));
+		TObjectPtr<UNewtonModel> mesh(Cast<UNewtonModel>(component));
 		if (mesh)
 		{
 			meshAsset.Push(mesh);
@@ -299,7 +299,7 @@ void ANewtonSceneActor::DebugSkeletalMesh()
 	}
 	if (meshAsset.Num())
 	{
-		UNewtonSkeletalMesh* const xxx0 = meshAsset[0];
-		UNewtonSkeletalMesh* const xxx1 = meshAsset[0];
+		UNewtonModel* const xxx0 = meshAsset[0];
+		UNewtonModel* const xxx1 = meshAsset[0];
 	}
 }

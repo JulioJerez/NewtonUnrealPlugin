@@ -6,22 +6,22 @@
 
 #include "WorkflowOrientedApp/WorkflowTabFactory.h"
 
-class NewtonSkeletalMeshEditor;
+class NewtonModelEditor;
 
 
 /**
  * 
  */
-class NEWTONEDITORMODULE_API NewtonSkeletalMeshTabFactory0: public FWorkflowTabFactory
+class NEWTONEDITORMODULE_API NewtonModelTabFactoryDetail: public FWorkflowTabFactory
 {
 	public:
-	NewtonSkeletalMeshTabFactory0(const TSharedPtr<NewtonSkeletalMeshEditor>& editor);
-	~NewtonSkeletalMeshTabFactory0();
+	NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor);
+	~NewtonModelTabFactoryDetail();
 
 	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const;
 	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;
 
-	TWeakPtr<NewtonSkeletalMeshEditor> m_editor;
+	TWeakPtr<NewtonModelEditor> m_editor;
 
 	static FName m_primaryTabName;
 };

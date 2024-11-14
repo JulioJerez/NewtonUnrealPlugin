@@ -7,8 +7,6 @@
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Application/SlateApplication.h"
 
-#define RootToContentDir Style->RootToContentDir
-
 TSharedPtr<FSlateStyleSet> FtestButtonStyle::StyleInstance = nullptr;
 
 void FtestButtonStyle::Initialize()
@@ -33,20 +31,18 @@ FName FtestButtonStyle::GetStyleSetName()
 	return StyleSetName;
 }
 
-
 TSharedRef< FSlateStyleSet > FtestButtonStyle::Create()
 {
-	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("testButtonStyle"));
-	Style->SetContentRoot(IPluginManager::Get().FindPlugin("newton")->GetBaseDir() / TEXT("Resources"));
+	TSharedRef<FSlateStyleSet> styleSet(MakeShareable(new FSlateStyleSet(TEXT("testButtonStyle"))));
+	TSharedPtr<IPlugin> plugin (IPluginManager::Get().FindPlugin(TEXT("newton")));
+	const FString resourceDir(plugin->GetBaseDir() / TEXT("Resources"));
+	styleSet->SetContentRoot(resourceDir);
+	const FVector2D iconSize(40.0f, 40.0f);
 
-	//Style->Set("testButton.PluginAction", new IMAGE_BRUSH_SVG(TEXT("PlaceholderButtonIcon"), Icon40x40));
-	//Style->Set("testButton.PluginAction", new IMAGE_BRUSH_SVG(TEXT("newtonIcon"), Icon40x40));
-
-	const FVector2D Icon40x40(40.0f, 40.0f);
-	FSlateImageBrush* const newtonIcon = new IMAGE_BRUSH("newtonIcon", Icon40x40);
-	Style->Set("newton.PluginAction", newtonIcon);
-
-	return Style;
+	const FString iconPath(styleSet->RootToContentDir(TEXT("newtonIcon.png")));
+	FSlateImageBrush* const newtonIcon = new FSlateImageBrush(iconPath, iconSize);
+	styleSet->Set(TEXT("newton.PluginAction"), newtonIcon);
+	return styleSet;
 }
 
 void FtestButtonStyle::ReloadTextures()

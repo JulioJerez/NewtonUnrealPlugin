@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Factories/Factory.h"
-#include "NewtonSkeletalMeshFactory.generated.h"
+#include "NewtonModelFactory.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class NEWTONEDITORMODULE_API UNewtonSkeletalMeshFactory : public UFactory
+class NEWTONEDITORMODULE_API UNewtonModelFactory : public UFactory
 {
 	GENERATED_BODY()
 	public:
 
-	UNewtonSkeletalMeshFactory();
+	UNewtonModelFactory();
 
 	virtual bool CanCreateNew() const override;
 	virtual FText GetDisplayName() const override;

@@ -1,37 +1,37 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NewtonSkeletalMeshTabFactory0.h"
+#include "NewtonModelTabFactoryDetail.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
 
-#include "NewtonSkeletalMesh.h"
-#include "NewtonSkeletalMeshEditor.h"
+#include "NewtonModel.h"
+#include "NewtonModelEditor.h"
 
-FName NewtonSkeletalMeshTabFactory0::m_primaryTabName("NewtonSkeletalMeshTab0");
+FName NewtonModelTabFactoryDetail::m_primaryTabName("NewtonModelTab0");
 
-NewtonSkeletalMeshTabFactory0::NewtonSkeletalMeshTabFactory0(const TSharedPtr<NewtonSkeletalMeshEditor>& editor)
+NewtonModelTabFactoryDetail::NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor)
 	:FWorkflowTabFactory(m_primaryTabName, editor)
 	,m_editor(editor)
 {
-	TabLabel = FText::FromString(TEXT("NewtonSkeletalMesh0"));
-	ViewMenuDescription = FText::FromString(TEXT("Newton Skeletal Mesh Main Tab"));
-	ViewMenuTooltip = FText::FromString(TEXT("Show Newton Skeletal Mesh Main Tab"));
+	TabLabel = FText::FromString(TEXT("Details"));
+	ViewMenuDescription = FText::FromString(TEXT("Newton Model Detail"));
+	ViewMenuTooltip = FText::FromString(TEXT("Show Newton Model Detail"));
 }
 
-NewtonSkeletalMeshTabFactory0::~NewtonSkeletalMeshTabFactory0()
+NewtonModelTabFactoryDetail::~NewtonModelTabFactoryDetail()
 {
 }
 
-FText NewtonSkeletalMeshTabFactory0::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
+FText NewtonModelTabFactoryDetail::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
 {
-	const FText name(FText::FromString(TEXT("edit a Newton Skeletal Mesh component")));
+	const FText name(FText::FromString(TEXT("Newton Model Component Detail")));
 	return name;
 }
 
-TSharedRef<SWidget> NewtonSkeletalMeshTabFactory0::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
+TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
 {
-	TSharedPtr<NewtonSkeletalMeshEditor> editor = m_editor.Pin();
+	TSharedPtr<NewtonModelEditor> editor = m_editor.Pin();
 	FPropertyEditorModule& propertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
 	FDetailsViewArgs detailArgumnets;
@@ -47,7 +47,7 @@ TSharedRef<SWidget> NewtonSkeletalMeshTabFactory0::CreateTabBody(const FWorkflow
 	detailArgumnets.NotifyHook = nullptr;
 
 	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
-	detailView->SetObject(editor->m_skeletalMesh);
+	detailView->SetObject(editor->m_newtonModel);
 
 	return SNew(SVerticalBox) + SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)[detailView.ToSharedRef()];
 	//return SNew (STextBlock).Text(FText::FromString(TEXT("this a test newton skeletal mesh editor")));

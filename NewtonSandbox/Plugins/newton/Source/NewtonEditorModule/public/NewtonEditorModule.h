@@ -3,12 +3,16 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
 
+class FSlateStyleSet;
+class NewtonModelAction;
+
+#define ND_MESH_EDITOR_NAME TEXT("NewtonModel")
+
 class FNewtonEditorModule : public FDefaultModuleImpl
 {
-public:
+	public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-
 
 	private:
 	void RegisterMenus();
@@ -16,8 +20,12 @@ public:
 	void DestroyToolbarButton();
 	void CreateEditorToolbarButton();
 
-	void RegisterNewtonSkeletalMeshAsset();
+	void RegisterNewtonModelEditor();
+	void UnregisterNewtonModelEditor();
 
 	TSharedPtr<class FUICommandList> PluginCommands;
 	int m_toobarCount;
+
+	TSharedPtr<FSlateStyleSet> m_styleSet;
+	TSharedPtr<NewtonModelAction> m_newtonModelAction;
 };
