@@ -7,6 +7,7 @@
 
 #include "NewtonModel.h"
 #include "NewtonModelEditorMode.h"
+#include "NewtonModelGraphSchema.h"
 
 NewtonModelEditor::NewtonModelEditor()
 	:FWorkflowCentricApplication()
@@ -25,9 +26,10 @@ void NewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedP
 
 	m_newtonModel = newtonModel;
 	objectsToEdit.Push(m_newtonModel);
-	
+
 	const FName graphName(TEXT("NewtonModelGraph"));
-	m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, graphName, UEdGraph::StaticClass(), UEdGraphSchema::StaticClass());
+	//m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, graphName, UEdGraph::StaticClass(), UEdGraphSchema::StaticClass());
+	m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, graphName, UEdGraph::StaticClass(), UNewtonModelGraphSchema::StaticClass());
 	
 	InitAssetEditor(mode, initToolkitHost, TEXT("NewtonModelEditor"), FTabManager::FLayout::NullLayout, true, true, objectsToEdit);
 
