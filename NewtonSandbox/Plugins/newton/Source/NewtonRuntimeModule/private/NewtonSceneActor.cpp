@@ -280,26 +280,26 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 #include "NewtonModel.h"
 void ANewtonSceneActor::DebugNewonModel()
 {
-	TArray<TObjectPtr<USceneComponent>> stack;
-	TArray<TObjectPtr<UNewtonModel>> meshAsset;
-	stack.Push(TObjectPtr<USceneComponent>(GetRootComponent()));
-	while (stack.Num())
-	{
-		TObjectPtr<USceneComponent> component(stack.Pop());
-		TObjectPtr<UNewtonModel> mesh(Cast<UNewtonModel>(component));
-		if (mesh)
-		{
-			meshAsset.Push(mesh);
-		}
-		const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
-		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-		{
-			stack.Push(children[i].Get());
-		}
-	}
-	if (meshAsset.Num())
-	{
-		UNewtonModel* const xxx0 = meshAsset[0];
-		UNewtonModel* const xxx1 = meshAsset[0];
-	}
+	//TArray<TObjectPtr<USceneComponent>> stack;
+	//TArray<TObjectPtr<UNewtonModel>> meshAsset;
+	//stack.Push(TObjectPtr<USceneComponent>(GetRootComponent()));
+	//while (stack.Num())
+	//{
+	//	TObjectPtr<USceneComponent> component(stack.Pop());
+	//	TObjectPtr<UNewtonModel> mesh(Cast<UNewtonModel>(component));
+	//	if (mesh)
+	//	{
+	//		meshAsset.Push(mesh);
+	//	}
+	//	const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
+	//	for (ndInt32 i = children.Num() - 1; i >= 0; --i)
+	//	{
+	//		stack.Push(children[i].Get());
+	//	}
+	//}
+	//if (meshAsset.Num())
+	//{
+	//	UNewtonModel* const xxx0 = meshAsset[0];
+	//	UNewtonModel* const xxx1 = meshAsset[0];
+	//}
 }

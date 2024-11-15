@@ -18,18 +18,12 @@ struct FNewtonModelGraphSchemaAction : public FEdGraphSchemaAction
 	{
 	}
 
-	//virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, TArray<UEdGraphPin*>& fromPins, const FVector2D location, bool bSelectNewNode = true) override
 	virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, UEdGraphPin* fromPin, const FVector2D location, bool bSelectNewNode = true) override
 	{
-		//UEdGraphNode* const node = NewObject<UEdGraphNode>(parentGraph);
 		UNewtonModelGraphNode* const node = NewObject<UNewtonModelGraphNode>(parentGraph);
 		node->CreateNewGuid();
 		node->NodePosX = location.X;
 		node->NodePosY = location.Y;
-
-		//node->CreatePin(EEdGraphPinDirection::EGPD_Input, TEXT("InputCategory"), TEXT("InputName"));
-		//node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("OutputCategory1"), TEXT("OutputName1"));
-		//node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("OutputCategory2"), TEXT("OutputName2"));
 
 		UEdGraphPin* const inputPin = node->CreateNewtonModePin(EEdGraphPinDirection::EGPD_Input, TEXT("pinInput"));
 		node->CreateNewtonModePin(EEdGraphPinDirection::EGPD_Output, TEXT("pinOutput"));
@@ -44,7 +38,6 @@ struct FNewtonModelGraphSchemaAction : public FEdGraphSchemaAction
 		return node;
 	}
 };
-
 
 UNewtonModelGraphSchema::UNewtonModelGraphSchema()
 	:Super()
@@ -77,8 +70,6 @@ const FPinConnectionResponse UNewtonModelGraphSchema::CanCreateConnection(const 
 	if ((a->Direction == EEdGraphPinDirection::EGPD_Output) && (b->Direction == EEdGraphPinDirection::EGPD_Input))
 	{
 		UEdGraphNode* const inputNode = b->GetOwningNode();
-
-
 		bool hasInput = false;
 		inputNode->ForEachNodeDirectlyConnectedToInputs
 		(

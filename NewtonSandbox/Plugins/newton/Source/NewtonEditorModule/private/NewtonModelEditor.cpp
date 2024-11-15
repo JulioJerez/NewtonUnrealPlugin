@@ -66,7 +66,6 @@ void NewtonModelEditor::RegisterTabSpawners(const TSharedRef<class FTabManager>&
 
 void NewtonModelEditor::UnregisterTabSpawners(const TSharedRef<class FTabManager>& manager)
 {
-
 }
 
 void NewtonModelEditor::OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit)

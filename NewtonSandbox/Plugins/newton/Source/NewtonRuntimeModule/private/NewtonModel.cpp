@@ -9,6 +9,5 @@
 UNewtonModel::UNewtonModel()
 	:Super()
 {
-
-	ShowDebug = false;
+	SkeletalMeshAsset = nullptr;
 }
