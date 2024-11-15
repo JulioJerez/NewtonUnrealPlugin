@@ -18,4 +18,5 @@ class UNewtonModelGraphSchema : public UEdGraphSchema
 	UNewtonModelGraphSchema();
 
 	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
+	virtual const FPinConnectionResponse CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const override;
 };

@@ -18,17 +18,26 @@ struct FNewtonModelGraphSchemaAction : public FEdGraphSchemaAction
 	{
 	}
 
-	virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, TArray<UEdGraphPin*>& fromPins, const FVector2D location, bool bSelectNewNode = true) override
+	//virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, TArray<UEdGraphPin*>& fromPins, const FVector2D location, bool bSelectNewNode = true) override
+	virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, UEdGraphPin* fromPin, const FVector2D location, bool bSelectNewNode = true) override
 	{
 		//UEdGraphNode* const node = NewObject<UEdGraphNode>(parentGraph);
-		UEdGraphNode* const node = NewObject<UNewtonModelGraphNode>(parentGraph);
+		UNewtonModelGraphNode* const node = NewObject<UNewtonModelGraphNode>(parentGraph);
+		node->CreateNewGuid();
 		node->NodePosX = location.X;
 		node->NodePosY = location.Y;
 
-		node->CreatePin(EEdGraphPinDirection::EGPD_Input, TEXT("InputCategory"), TEXT("InputName"));
+		//node->CreatePin(EEdGraphPinDirection::EGPD_Input, TEXT("InputCategory"), TEXT("InputName"));
+		//node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("OutputCategory1"), TEXT("OutputName1"));
+		//node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("OutputCategory2"), TEXT("OutputName2"));
 
-		node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("OutputCategory1"), TEXT("OutputName1"));
-		node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("OutputCategory2"), TEXT("OutputName2"));
+		UEdGraphPin* const inputPin = node->CreateNewtonModePin(EEdGraphPinDirection::EGPD_Input, TEXT("pinInput"));
+		node->CreateNewtonModePin(EEdGraphPinDirection::EGPD_Output, TEXT("pinOutput"));
+
+		if (fromPin)
+		{
+			node->GetSchema()->TryCreateConnection(fromPin, inputPin);
+		}
 
 		parentGraph->NotifyGraphChanged();
 		parentGraph->AddNode(node, true, true);
@@ -52,3 +61,37 @@ void UNewtonModelGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& c
 	TSharedPtr<FNewtonModelGraphSchemaAction> node (new FNewtonModelGraphSchemaAction(category, desc, tip, 0));
 	contextMenuBuilder.AddAction(node);
 }
+
+const FPinConnectionResponse UNewtonModelGraphSchema::CanCreateConnection(const UEdGraphPin* a, const UEdGraphPin* b) const
+{
+	if (!(a && b))
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT(""));
+	}
+
+	if (a->Direction == b->Direction)
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT("concetion do not match"));
+	}
+
+	if ((a->Direction == EEdGraphPinDirection::EGPD_Output) && (b->Direction == EEdGraphPinDirection::EGPD_Input))
+	{
+		UEdGraphNode* const inputNode = b->GetOwningNode();
+
+
+		bool hasInput = false;
+		inputNode->ForEachNodeDirectlyConnectedToInputs
+		(
+			[&hasInput](UEdGraphNode* node)
+			{
+				hasInput = true;
+			}
+		);
+		if (!hasInput)
+		{
+			return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, TEXT(""));
+		}
+	}
+	return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT(""));
+}
+

@@ -5,6 +5,7 @@
 
 class FSlateStyleSet;
 class NewtonModelAction;
+class FNewtonModelPinFactory;
 
 #define ND_MESH_EDITOR_NAME TEXT("NewtonModel")
 
@@ -27,5 +28,6 @@ class FNewtonEditorModule : public FDefaultModuleImpl
 	int m_toobarCount;
 
 	TSharedPtr<FSlateStyleSet> m_styleSet;
+	TSharedPtr<FNewtonModelPinFactory> m_customPinFactory;
 	TSharedPtr<NewtonModelAction> m_newtonModelAction;
 };

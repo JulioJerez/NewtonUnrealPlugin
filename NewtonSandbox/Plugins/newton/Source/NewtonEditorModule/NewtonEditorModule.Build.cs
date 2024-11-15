@@ -15,6 +15,7 @@ public class NewtonEditorModule: ModuleRules
             "ToolMenus",
             "AssetTools",
             "CoreUObject",
+            "GraphEditor",
             "GeometryCore",
             "PropertyEditor",
             "EditorFramework",

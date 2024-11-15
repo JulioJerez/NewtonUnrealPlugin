@@ -21,5 +21,7 @@ class UNewtonModelGraphNode : public UEdGraphNode
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type titleType) const override;
 	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
+
+	UEdGraphPin* CreateNewtonModePin(EEdGraphPinDirection direction, FName name);
 	
 };

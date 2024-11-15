@@ -1,8 +1,11 @@
 #include "NewtonEditorModule.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
+#include "EdGraphUtilities.h"
+#include "EdGraph/EdGraphPin.h"
 #include "Styling/SlateStyle.h"
 #include "Modules/ModuleManager.h"
+#include "KismetPins/SGraphPinColor.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -11,6 +14,40 @@
 #include "testButtonCommands.h"
 
 IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
+
+class SNewtonModelGraphPin : public SGraphPin
+{
+	public:
+	SLATE_BEGIN_ARGS(SNewtonModelGraphPin) {}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& inArgs, UEdGraphPin* inPin)
+	{
+		SGraphPin::Construct(SGraphPin::FArguments(), inPin);
+	}
+
+	virtual FSlateColor GetPinColor() const
+	{
+		return FSlateColor(FLinearColor(0.3f, 1.0f, 0.2f));
+	}
+};
+
+class FNewtonModelPinFactory : public FGraphPanelPinFactory
+{
+	public:
+	virtual ~FNewtonModelPinFactory()
+	{
+	}
+
+	virtual TSharedPtr<class SGraphPin> CreatePin(class UEdGraphPin* pin) const override
+	{ 
+		if (FName(TEXT("SNewtonModelGraphPin")) == pin->PinType.PinSubCategory)
+		{
+			return SNew(SNewtonModelGraphPin, pin);
+		}
+		return nullptr;
+	}
+};
 
 void FNewtonEditorModule::StartupModule()
 {
@@ -117,13 +154,20 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	// register the action panes.
 	m_newtonModelAction = MakeShareable(new NewtonModelAction(assetType));
 	assetTools.RegisterAssetTypeActions(m_newtonModelAction.ToSharedRef());
+
+	m_customPinFactory = MakeShareable(new FNewtonModelPinFactory());
+	FEdGraphUtilities::RegisterVisualPinFactory(m_customPinFactory);
 }
 
 void FNewtonEditorModule::UnregisterNewtonModelEditor()
 {
 	FSlateStyleRegistry::UnRegisterSlateStyle(*m_styleSet);
+	FEdGraphUtilities::UnregisterVisualPinFactory(m_customPinFactory);
+
 	ensure(m_styleSet.IsUnique());
+	ensure(m_customPinFactory.IsUnique());
 	m_styleSet.Reset();
+	m_customPinFactory.Reset();
 
 	//IAssetTools& assetTools = IAssetTools::Get();
 	//assetTools.UnregisterAssetTypeActions(m_newtonModelAction.ToSharedRef());

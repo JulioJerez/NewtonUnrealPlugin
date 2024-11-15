@@ -27,6 +27,16 @@ bool UNewtonModelGraphNode::CanUserDeleteNode() const
 	return false;
 }
 
+UEdGraphPin* UNewtonModelGraphNode::CreateNewtonModePin(EEdGraphPinDirection direction, FName name)
+{
+	FName category = (direction == EGPD_Input) ? TEXT("input") : TEXT("output");
+	FName subCategory = TEXT("SNewtonModelGraphPin");
+
+	UEdGraphPin* const pin = CreatePin(direction, category, name);
+	pin->PinType.PinSubCategory = subCategory;
+	return pin;
+}
+
 void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, class UGraphNodeContextMenuContext* context) const
 {
 	FToolMenuSection& section = menu->AddSection(TEXT("secsionName"), FText::FromString(TEXT("NewtoModel graph node action")));
