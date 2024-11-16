@@ -25,8 +25,8 @@ struct FNewtonModelGraphSchemaAction : public FEdGraphSchemaAction
 		node->NodePosX = location.X;
 		node->NodePosY = location.Y;
 
-		UEdGraphPin* const inputPin = node->CreateNewtonModePin(EEdGraphPinDirection::EGPD_Input, TEXT("pinInput"));
-		node->CreateNewtonModePin(EEdGraphPinDirection::EGPD_Output, TEXT("pinOutput"));
+		UEdGraphPin* const inputPin = node->CreateNodePin(EEdGraphPinDirection::EGPD_Input);
+		node->CreateNodePin(EEdGraphPinDirection::EGPD_Output);
 
 		if (fromPin)
 		{
@@ -69,8 +69,8 @@ const FPinConnectionResponse UNewtonModelGraphSchema::CanCreateConnection(const 
 
 	if ((a->Direction == EEdGraphPinDirection::EGPD_Output) && (b->Direction == EEdGraphPinDirection::EGPD_Input))
 	{
-		UEdGraphNode* const inputNode = b->GetOwningNode();
 		bool hasInput = false;
+		UEdGraphNode* const inputNode = b->GetOwningNode();
 		inputNode->ForEachNodeDirectlyConnectedToInputs
 		(
 			[&hasInput](UEdGraphNode* node)

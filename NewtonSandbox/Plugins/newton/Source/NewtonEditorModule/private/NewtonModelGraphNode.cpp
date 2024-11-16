@@ -27,10 +27,11 @@ bool UNewtonModelGraphNode::CanUserDeleteNode() const
 	return false;
 }
 
-UEdGraphPin* UNewtonModelGraphNode::CreateNewtonModePin(EEdGraphPinDirection direction, FName name)
+UEdGraphPin* UNewtonModelGraphNode::CreateNodePin(EEdGraphPinDirection direction)
 {
-	FName category = (direction == EGPD_Input) ? TEXT("input") : TEXT("output");
-	FName subCategory = TEXT("SNewtonModelGraphPin");
+	const FName subCategory(TEXT("SNewtonModelGraphPin"));
+	const FName name ((direction == EGPD_Input) ? TEXT("parent") : TEXT("child"));
+	const FName category ((direction == EGPD_Input) ? TEXT("input") : TEXT("output"));
 
 	UEdGraphPin* const pin = CreatePin(direction, category, name);
 	pin->PinType.PinSubCategory = subCategory;
@@ -39,54 +40,55 @@ UEdGraphPin* UNewtonModelGraphNode::CreateNewtonModePin(EEdGraphPinDirection dir
 
 void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, class UGraphNodeContextMenuContext* context) const
 {
-	FToolMenuSection& section = menu->AddSection(TEXT("secsionName"), FText::FromString(TEXT("NewtoModel graph node action")));
+	FToolMenuSection& section = menu->AddSection(TEXT("sectionName"), FText::FromString(TEXT("NewtonModel graph node action")));
 
 	//this is fucking moronic
 	UNewtonModelGraphNode* const node = (UNewtonModelGraphNode*)this;
 
-	section.AddMenuEntry
-	(
-		TEXT("AddPinEntry"),
-		FText::FromString(TEXT("Add Pin")),
-		FText::FromString(TEXT("Create new pin")),
-		FSlateIcon(ND_MESH_EDITOR_NAME, TEXT("NewtonModelEditor.NodeAddPinIcon")),
-		FUIAction
-		(
-			FExecuteAction::CreateLambda
-			(
-				[node]()
-				{
-					node->CreatePin(EEdGraphPinDirection::EGPD_Output, TEXT("Ouput_1"), TEXT("Ouput_2"));
-					node->GetGraph()->NotifyGraphChanged();
-					node->Modify();
-				}
-			)
-		)
-	);
-
-	section.AddMenuEntry
-	(
-		TEXT("DeletePinEntry"),
-		FText::FromString(TEXT("Delete Pin")),
-		FText::FromString(TEXT("Delete last pin")),
-		FSlateIcon(ND_MESH_EDITOR_NAME,TEXT("NewtonModelEditor.NodeDeletePinIcon")),
-		FUIAction
-		(
-			FExecuteAction::CreateLambda
-			(
-				[node]()
-				{
-					UEdGraphPin* const pin = node->GetPinAt(node->Pins.Num() - 1);
-					if (pin->Direction == EEdGraphPinDirection::EGPD_Output)
-					{
-						node->RemovePin(pin);
-						node->GetGraph()->NotifyGraphChanged();
-						node->Modify();
-					}
-				}
-			)
-		)
-	);
+	// we do not add or delete pins for the joint graph 
+	//section.AddMenuEntry
+	//(
+	//	TEXT("AddPinEntry"),
+	//	FText::FromString(TEXT("Add Pin")),
+	//	FText::FromString(TEXT("Create new pin")),
+	//	FSlateIcon(ND_MESH_EDITOR_NAME, TEXT("NewtonModelEditor.NodeAddPinIcon")),
+	//	FUIAction
+	//	(
+	//		FExecuteAction::CreateLambda
+	//		(
+	//			[node]()
+	//			{
+	//				node->CreateNodePin(EEdGraphPinDirection::EGPD_Output);
+	//				node->GetGraph()->NotifyGraphChanged();
+	//				node->Modify();
+	//			}
+	//		)
+	//	)
+	//);
+	//
+	//section.AddMenuEntry
+	//(
+	//	TEXT("DeletePinEntry"),
+	//	FText::FromString(TEXT("Delete Pin")),
+	//	FText::FromString(TEXT("Delete last pin")),
+	//	FSlateIcon(ND_MESH_EDITOR_NAME,TEXT("NewtonModelEditor.NodeDeletePinIcon")),
+	//	FUIAction
+	//	(
+	//		FExecuteAction::CreateLambda
+	//		(
+	//			[node]()
+	//			{
+	//				UEdGraphPin* const pin = node->GetPinAt(node->Pins.Num() - 1);
+	//				if (pin->Direction == EEdGraphPinDirection::EGPD_Output)
+	//				{
+	//					node->RemovePin(pin);
+	//					node->GetGraph()->NotifyGraphChanged();
+	//					node->Modify();
+	//				}
+	//			}
+	//		)
+	//	)
+	//);
 
 	section.AddMenuEntry
 	(

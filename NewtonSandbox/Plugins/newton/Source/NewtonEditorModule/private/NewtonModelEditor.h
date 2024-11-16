@@ -25,9 +25,15 @@ class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplicati
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 
+	virtual void OnClose() override;
+	void NewtonModelGraphToEditorGraph();
+	void EditorGraphToNewtonModelGraph();
+	virtual void OnGraphChanged(const struct FEdGraphEditAction& InAction);
+
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
 
 	UEdGraph* m_graphEditor;
 	UNewtonModel* m_newtonModel;
+	FDelegateHandle m_graphListener;
 };
