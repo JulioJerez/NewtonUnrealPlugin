@@ -20,37 +20,35 @@
 */
 
 
-#include "NewtonModelFactory.h"
+#include "NewtonModelGraphNodeRoot.h"
 
-#include "NewtonModel.h"
-#include "NewtonEditorModule.h"
+const FName UNewtonModelGraphNodeRoot::m_subCategory(TEXT("UNewtonModelGraphNodeRoot"));
+const FName UNewtonModelGraphNodeRoot::m_nodeClassName(TEXT("Newton Model Root Node"));
+const FName UNewtonModelGraphNodeRoot::m_nodeInformation(TEXT("create the root Node"));
 
-UNewtonModelFactory::UNewtonModelFactory()
-	:UFactory()
+
+UNewtonModelGraphNodeRoot::UNewtonModelGraphNodeRoot()
+	:Super()
 {
-	bCreateNew = true;
-	bEditAfterNew = true;
-	SupportedClass = UNewtonModel::StaticClass();
 }
 
-FText UNewtonModelFactory::GetDisplayName() const
+FText UNewtonModelGraphNodeRoot::GetNodeTitle(ENodeTitleType::Type titleType) const
 {
-	const FText factoryName(FText::FromString(ND_MESH_EDITOR_NAME));
-	return factoryName;
+	return FText::FromString(TEXT("root node"));
 }
 
-bool UNewtonModelFactory::ShouldShowInNewMenu() const
+FLinearColor UNewtonModelGraphNodeRoot::GetNodeTitleColor() const
 {
-	return true;
+	return FLinearColor::Red;
 }
 
-bool UNewtonModelFactory::CanCreateNew() const
+UEdGraphPin* UNewtonModelGraphNodeRoot::CreateNodePin(EEdGraphPinDirection direction)
 {
-	return true;
-}
+	check (direction == EGPD_Output);
+	const FName name(TEXT("child"));
+	const FName category(TEXT("output"));
 
-UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParent, FName inName, EObjectFlags flags, UObject* context, FFeedbackContext* Warn, FName callingContext)
-{
-	UNewtonModel* const asset = NewObject<UNewtonModel>(inParent, inName, flags);
-	return asset;
+	UEdGraphPin* const pin = CreatePin(direction, category, name);
+	pin->PinType.PinSubCategory = m_subCategory;
+	return pin;
 }

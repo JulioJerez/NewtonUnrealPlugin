@@ -19,38 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#pragma once
 
-#include "NewtonModelFactory.h"
+#include "CoreMinimal.h"
 
-#include "NewtonModel.h"
-#include "NewtonEditorModule.h"
+#include "NewtonModelGraphNode.h"
 
-UNewtonModelFactory::UNewtonModelFactory()
-	:UFactory()
+#include "NewtonModelGraphNodeRoot.generated.h"
+
+/**
+ * 
+ */
+
+UCLASS()
+class UNewtonModelGraphNodeRoot: public UNewtonModelGraphNode
 {
-	bCreateNew = true;
-	bEditAfterNew = true;
-	SupportedClass = UNewtonModel::StaticClass();
-}
+	GENERATED_BODY()
 
-FText UNewtonModelFactory::GetDisplayName() const
-{
-	const FText factoryName(FText::FromString(ND_MESH_EDITOR_NAME));
-	return factoryName;
-}
+	public:
+	UNewtonModelGraphNodeRoot();
 
-bool UNewtonModelFactory::ShouldShowInNewMenu() const
-{
-	return true;
-}
+	virtual FLinearColor GetNodeTitleColor() const override;
+	virtual FText GetNodeTitle(ENodeTitleType::Type titleType) const override;
+	virtual UEdGraphPin* CreateNodePin(EEdGraphPinDirection direction) override;
 
-bool UNewtonModelFactory::CanCreateNew() const
-{
-	return true;
-}
-
-UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParent, FName inName, EObjectFlags flags, UObject* context, FFeedbackContext* Warn, FName callingContext)
-{
-	UNewtonModel* const asset = NewObject<UNewtonModel>(inParent, inName, flags);
-	return asset;
-}
+	public:
+	static const FName m_subCategory;
+	static const FName m_nodeClassName;
+	static const FName m_nodeInformation;
+};

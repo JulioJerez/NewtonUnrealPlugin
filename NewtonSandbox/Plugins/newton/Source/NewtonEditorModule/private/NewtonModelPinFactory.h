@@ -19,38 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#pragma once
 
-#include "NewtonModelFactory.h"
+#include "CoreMinimal.h"
+#include "EdGraphUtilities.h"
+#include "EdGraph/EdGraphPin.h"
+#include "KismetPins/SGraphPinColor.h"
 
-#include "NewtonModel.h"
-#include "NewtonEditorModule.h"
-
-UNewtonModelFactory::UNewtonModelFactory()
-	:UFactory()
+/**
+ * 
+ */
+class SNewtonModelGraphPin : public SGraphPin
 {
-	bCreateNew = true;
-	bEditAfterNew = true;
-	SupportedClass = UNewtonModel::StaticClass();
-}
+	public:
+	SLATE_BEGIN_ARGS(SNewtonModelGraphPin) {}
+	SLATE_END_ARGS()
 
-FText UNewtonModelFactory::GetDisplayName() const
-{
-	const FText factoryName(FText::FromString(ND_MESH_EDITOR_NAME));
-	return factoryName;
-}
+	virtual FSlateColor GetPinColor() const override;
+	void Construct(const FArguments& inArgs, UEdGraphPin* inPin);
+};
 
-bool UNewtonModelFactory::ShouldShowInNewMenu() const
+class SNewtonModelGraphPinRoot : public SGraphPin
 {
-	return true;
-}
+	public:
+	SLATE_BEGIN_ARGS(SNewtonModelGraphPinRoot) {}
+	SLATE_END_ARGS()
 
-bool UNewtonModelFactory::CanCreateNew() const
-{
-	return true;
-}
+	virtual FSlateColor GetPinColor() const override;
+	void Construct(const FArguments& inArgs, UEdGraphPin* inPin);
+};
 
-UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParent, FName inName, EObjectFlags flags, UObject* context, FFeedbackContext* Warn, FName callingContext)
+class FNewtonModelPinFactory : public FGraphPanelPinFactory
 {
-	UNewtonModel* const asset = NewObject<UNewtonModel>(inParent, inName, flags);
-	return asset;
-}
+	public:
+	virtual ~FNewtonModelPinFactory();
+	virtual TSharedPtr<class SGraphPin> CreatePin(class UEdGraphPin* pin) const override;
+};
+
+

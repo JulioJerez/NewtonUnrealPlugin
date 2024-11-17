@@ -1,11 +1,9 @@
 #include "NewtonEditorModule.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
-#include "EdGraphUtilities.h"
-#include "EdGraph/EdGraphPin.h"
 #include "Styling/SlateStyle.h"
 #include "Modules/ModuleManager.h"
-#include "KismetPins/SGraphPinColor.h"
+#include "NewtonModelPinFactory.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -15,39 +13,6 @@
 
 IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
 
-class SNewtonModelGraphPin : public SGraphPin
-{
-	public:
-	SLATE_BEGIN_ARGS(SNewtonModelGraphPin) {}
-	SLATE_END_ARGS()
-
-	void Construct(const FArguments& inArgs, UEdGraphPin* inPin)
-	{
-		SGraphPin::Construct(SGraphPin::FArguments(), inPin);
-	}
-
-	virtual FSlateColor GetPinColor() const
-	{
-		return FSlateColor(FLinearColor(0.3f, 1.0f, 0.2f));
-	}
-};
-
-class FNewtonModelPinFactory : public FGraphPanelPinFactory
-{
-	public:
-	virtual ~FNewtonModelPinFactory()
-	{
-	}
-
-	virtual TSharedPtr<class SGraphPin> CreatePin(class UEdGraphPin* pin) const override
-	{ 
-		if (FName(TEXT("SNewtonModelGraphPin")) == pin->PinType.PinSubCategory)
-		{
-			return SNew(SNewtonModelGraphPin, pin);
-		}
-		return nullptr;
-	}
-};
 
 void FNewtonEditorModule::StartupModule()
 {

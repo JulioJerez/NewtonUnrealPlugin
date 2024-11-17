@@ -1,5 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/* Copyright (c) <2024-2024> <Julio Jerez, Newton Game Dynamics>
+*
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+*
+* 1. The origin of this software must not be misrepresented; you must not
+* claim that you wrote the original software. If you use this software
+* in a product, an acknowledgment in the product documentation would be
+* appreciated but is not required.
+*
+* 2. Altered source versions must be plainly marked as such, and must not be
+* misrepresented as being the original software.
+*
+* 3. This notice may not be removed or altered from any source distribution.
+*/
 
 #include "NewtonModelTabFactoryDetail.h"
 #include "IDetailsView.h"
@@ -37,7 +55,6 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	FPropertyEditorModule& propertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
 	FDetailsViewArgs detailArgumnets;
-
 	detailArgumnets.bLockable = false;
 	detailArgumnets.bShowOptions = true;
 	detailArgumnets.bAllowSearch = false;
@@ -49,7 +66,11 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	detailArgumnets.NotifyHook = nullptr;
 
 	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
-	detailView->SetObject(editor->m_newtonModel);
+	detailView->SetObject(editor->GetNewtonMode());
+
+	TSharedPtr<IDetailsView> seletedNodeDetailView(propertyEditorModule.CreateDetailView(detailArgumnets));
+	seletedNodeDetailView->SetObject(nullptr);
+	editor->SetSelectedNodeDetailView(seletedNodeDetailView);
 
 #if 0
 	// this is by far, the worse c++ programing style I have ever seen.
@@ -60,15 +81,16 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	);
 #else
 
-	//const FText msg(FText::FromString(TEXT("this is a lot more complicated that it needed to be.")));
-	//TSharedRef<STextBlock> editorRef (SNew(STextBlock));
-	//editorRef->SetText(msg);
-	TSharedRef<SWidget> editorRef(detailView.ToSharedRef());
+	SVerticalBox::FSlot::FSlotArguments editorArguments(SVerticalBox::Slot());
+	editorArguments.FillHeight(0.25f);
+	editorArguments.HAlign(HAlign_Fill)[detailView.ToSharedRef()];
 
-	SVerticalBox::FSlot::FSlotArguments arguments(SVerticalBox::Slot());
-	arguments.FillHeight(1.0);
-	arguments.HAlign(HAlign_Fill)[editorRef];
-	TSharedRef<SWidget> widget(SNew(SVerticalBox) + arguments);
+	SVerticalBox::FSlot::FSlotArguments seletedNodeDetailViewArguments(SVerticalBox::Slot());
+	seletedNodeDetailViewArguments.FillHeight(.75f);
+	seletedNodeDetailViewArguments.HAlign(HAlign_Fill)[seletedNodeDetailView.ToSharedRef()];
+
+	TSharedRef<SWidget> widget(SNew(SVerticalBox) + 
+		editorArguments + seletedNodeDetailViewArguments);
 #endif
 
 	return widget;
