@@ -152,17 +152,6 @@ UNewtonModelGraphNode* NewtonModelEditor::GetSelectedNode(const FGraphPanelSelec
 
 void NewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& selectionSet)
 {
-	//for (UObject* object : selectionSet)
-	//{
-	//	UNewtonModelGraphNode* const node = Cast<UNewtonModelGraphNode>(object);
-	//	if (node)
-	//	{
-	//		m_selectedNodeDetailView->SetObject(node->GetNodeInfo());
-	//		return;
-	//	}
-	//}
-	////m_selectedNodeDetailView = nullptr;
-	//m_selectedNodeDetailView->SetObject(nullptr);
 	UNewtonModelGraphNode* const selectedNode = GetSelectedNode(selectionSet);
 	if (selectedNode)
 	{
