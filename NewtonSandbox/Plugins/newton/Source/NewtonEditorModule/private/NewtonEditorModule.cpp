@@ -1,9 +1,11 @@
 #include "NewtonEditorModule.h"
 #include "IAssetTools.h"
+#include "PersonaModule.h"
 #include "AssetToolsModule.h"
 #include "Styling/SlateStyle.h"
 #include "Modules/ModuleManager.h"
 #include "NewtonModelPinFactory.h"
+#include "ISkeletonEditorModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -112,16 +114,21 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 
 	// register the asset menu item entry
 	IAssetTools& assetTools = IAssetTools::Get();
-	const FName name(ND_MESH_EDITOR_NAME);
-	const FText showName(FText::FromString(TEXT("Newton Model")));
+	const FName name(TEXT("newtonPhysics"));
+	//const FText showName(FText::FromString(TEXT("Newton Model")));
+	const FText showName(FText::FromString(TEXT("Newton Physics")));
 	EAssetTypeCategories::Type assetType = assetTools.RegisterAdvancedAssetCategory(name, showName);
 
-	// register the action panes.
+	// register the menu action.
 	m_newtonModelAction = MakeShareable(new NewtonModelAction(assetType));
 	assetTools.RegisterAssetTypeActions(m_newtonModelAction.ToSharedRef());
 
 	m_customPinFactory = MakeShareable(new FNewtonModelPinFactory());
 	FEdGraphUtilities::RegisterVisualPinFactory(m_customPinFactory);
+
+	// load dependency modules
+	FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
+	FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
 }
 
 void FNewtonEditorModule::UnregisterNewtonModelEditor()

@@ -22,19 +22,20 @@
 #include "NewtonModelTabFactoryDetail.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
+#include "PropertyEditorDelegates.h"
 
 #include "NewtonModel.h"
 #include "NewtonModelEditor.h"
 
-FName NewtonModelTabFactoryDetail::m_tabName("NewtonModelTabDetail");
+#define DETAIL_IDENTIFIER TEXT("NewtonModelTabDetail")
+//FName NewtonModelTabFactoryDetail::m_tabName("NewtonModelTabDetail");
 
 NewtonModelTabFactoryDetail::NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor)
-	:FWorkflowTabFactory(m_tabName, editor)
+	:FWorkflowTabFactory(DETAIL_IDENTIFIER, editor)
 	,m_editor(editor)
 {
 	// I prefer "Properties", but unreal uses "Detail" for this tab
 	TabLabel = FText::FromString(TEXT("Details"));
-	//TabLabel = FText::FromString(TEXT("Properties"));
 	ViewMenuDescription = FText::FromString(TEXT("Newton Model Detail"));
 	ViewMenuTooltip = FText::FromString(TEXT("Show Newton Model Detail"));
 }
@@ -51,6 +52,14 @@ FText NewtonModelTabFactoryDetail::GetTabToolTipText(const FWorkflowTabSpawnInfo
 
 TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
 {
+#if 0
+	return TSharedRef<SWidget> 
+	(
+		SNew(SVerticalBox) +
+		SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)
+		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
+	);
+#else
 	TSharedPtr<NewtonModelEditor> editor = m_editor.Pin();
 	FPropertyEditorModule& propertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
@@ -66,32 +75,25 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	detailArgumnets.NotifyHook = nullptr;
 
 	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
-	detailView->SetObject(editor->GetNewtonMode());
+	detailView->SetObject(editor->GetNewtonModel());
+	FOnFinishedChangingProperties& propertyChange = detailView->OnFinishedChangingProperties();
+	propertyChange.AddSP(editor.Get(), &NewtonModelEditor::OnFinishedChangingProperties);
 
 	TSharedPtr<IDetailsView> seletedNodeDetailView(propertyEditorModule.CreateDetailView(detailArgumnets));
 	seletedNodeDetailView->SetObject(nullptr);
 	editor->SetSelectedNodeDetailView(seletedNodeDetailView);
 
-#if 0
-	// this is by far, the worse c++ programing style I have ever seen.
-	// it is like some one when out of his way to obfuscate the code.
-	TSharedRef<SWidget> widget
-	(
-		SNew(SVerticalBox) + SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)[detailView.ToSharedRef()]
-	);
-#else
-
 	SVerticalBox::FSlot::FSlotArguments editorArguments(SVerticalBox::Slot());
 	editorArguments.FillHeight(0.25f);
 	editorArguments.HAlign(HAlign_Fill)[detailView.ToSharedRef()];
 
-	SVerticalBox::FSlot::FSlotArguments seletedNodeDetailViewArguments(SVerticalBox::Slot());
-	seletedNodeDetailViewArguments.FillHeight(.75f);
-	seletedNodeDetailViewArguments.HAlign(HAlign_Fill)[seletedNodeDetailView.ToSharedRef()];
+	SVerticalBox::FSlot::FSlotArguments selectedNodeDetailViewArguments(SVerticalBox::Slot());
+	selectedNodeDetailViewArguments.FillHeight(.75f);
+	selectedNodeDetailViewArguments.HAlign(HAlign_Fill)[seletedNodeDetailView.ToSharedRef()];
 
 	TSharedRef<SWidget> widget(SNew(SVerticalBox) + 
-		editorArguments + seletedNodeDetailViewArguments);
-#endif
+		editorArguments + selectedNodeDetailViewArguments);
 
 	return widget;
+#endif
 }

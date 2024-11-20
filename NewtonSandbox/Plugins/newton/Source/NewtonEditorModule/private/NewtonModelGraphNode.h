@@ -41,17 +41,26 @@ class UNewtonModelGraphNode : public UEdGraphNode
 	// Unreal methods
 	virtual bool CanUserDeleteNode() const;
 	virtual FLinearColor GetNodeTitleColor() const override;
+	virtual void PinConnectionListChanged(UEdGraphPin* Pin) override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type titleType) const override;
 	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
 	
 	// Newton Model editor methods
-	void SyncPinsWithResponses();
+	virtual void SyncPinsWithResponses();
 	UNewtonModelInfo* GetNodeInfo() const;
-	virtual void SetNodeInfo(UNewtonModelInfo* const info);
-	virtual UEdGraphPin* CreateNodePin(EEdGraphPinDirection direction);
+	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
 
-	private:
+	UEdGraphPin* GetInputPin() const;
+	UEdGraphPin* GetOutputPin() const;
+
+	protected:
+	UEdGraphPin* CreateNodePin(EEdGraphPinDirection direction);
+
+	UPROPERTY()
 	UNewtonModelInfo* m_nodeInfo;
+
+	UEdGraphPin* m_inputPin;
+	UEdGraphPin* m_ouputPin;
 
 	public:
 	static const FName m_subCategory;

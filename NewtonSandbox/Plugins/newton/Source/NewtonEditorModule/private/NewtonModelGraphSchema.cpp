@@ -39,30 +39,28 @@ struct FNewtonModelGraphSchemaActionGraphNode : public FEdGraphSchemaAction
 	{
 	}
 
-	virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, UEdGraphPin* fromPin, const FVector2D location, bool bSelectNewNode = true) override
+	virtual UEdGraphNode* PerformAction(UEdGraph* parentGraph, UEdGraphPin* fromPin, const FVector2D location, bool bSelectNewNode = true) override
 	{
 		UNewtonModelGraphNode* const node = NewObject<UNewtonModelGraphNode>(parentGraph);
+		node->Initialize(nullptr);
 		node->CreateNewGuid();
 		node->NodePosX = location.X;
 		node->NodePosY = location.Y;
-		node->SetNodeInfo(NewObject<UNewtonModelInfo>(node));
 
-		UEdGraphPin* const inputPin = node->CreateNodePin(EEdGraphPinDirection::EGPD_Input);
-		node->CreateNodePin(EEdGraphPinDirection::EGPD_Output);
+		UEdGraphPin* const inputPin = node->GetInputPin();
 		FString defaulResponce(TEXT("output"));
 		node->GetNodeInfo()->Responses.Add(FText::FromString(defaulResponce));
 
-		if (fromPin)
+		if (fromPin && inputPin)
 		{
 			node->GetSchema()->TryCreateConnection(fromPin, inputPin);
 		}
 
-		parentGraph->NotifyGraphChanged();
 		parentGraph->AddNode(node, true, true);
+		//parentGraph->NotifyGraphChanged();
 		return node;
 	}
 };
-
 
 // **************************************************************************************
 // 
@@ -81,24 +79,22 @@ struct FNewtonModelGraphSchemaActionGraphNodeRoot : public FEdGraphSchemaAction
 	{
 	}
 
-	virtual UEdGraphNode* PerformAction(class UEdGraph* parentGraph, UEdGraphPin* fromPin, const FVector2D location, bool bSelectNewNode = true) override
+	virtual UEdGraphNode* PerformAction(UEdGraph* parentGraph, UEdGraphPin* fromPin, const FVector2D location, bool bSelectNewNode = true) override
 	{
 		UNewtonModelGraphNodeRoot* const node = NewObject<UNewtonModelGraphNodeRoot>(parentGraph);
+		node->Initialize(nullptr);
 		node->CreateNewGuid();
 		node->NodePosX = location.X;
-		node->NodePosY = location.Y;
-		node->SetNodeInfo(NewObject<UNewtonModelInfo>(node));
+		node->NodePosY = location.Y; 
 
-		node->CreateNodePin(EEdGraphPinDirection::EGPD_Output);
 		FString defaulResponce(TEXT("output"));
 		node->GetNodeInfo()->Responses.Add(FText::FromString(defaulResponce));
 
-		parentGraph->NotifyGraphChanged();
 		parentGraph->AddNode(node, true, true);
+		//parentGraph->NotifyGraphChanged();
 		return node;
 	}
 };
-
 
 // **************************************************************************************
 // 

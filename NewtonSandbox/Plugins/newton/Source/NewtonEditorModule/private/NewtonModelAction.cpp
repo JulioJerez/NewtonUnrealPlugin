@@ -45,6 +45,7 @@ uint32 NewtonModelAction::GetCategories()
 	return m_assetCategory;
 }
 
+
 FColor NewtonModelAction::GetTypeColor() const
 {
 	return FColor(255, 255, 255, 255);
@@ -63,7 +64,7 @@ void NewtonModelAction::GetActions(const TArray<UObject*>& InObjects, struct FTo
 void NewtonModelAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TSharedPtr<class IToolkitHost> editWithinLevelEditor)
 {
 	EToolkitMode::Type mode = editWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
-
+	
 	for (int i = 0; i < inObjects.Num(); ++i)
 	{
 		UNewtonModel* const mesh = Cast<UNewtonModel>(inObjects[i]);
@@ -74,4 +75,3 @@ void NewtonModelAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TShar
 		}
 	}
 }
-

@@ -34,8 +34,10 @@ const FName UNewtonModelGraphNode::m_nodeInformation(TEXT("create a child acycli
 
 UNewtonModelGraphNode::UNewtonModelGraphNode()
 	:Super()
-	,m_nodeInfo(nullptr)
 {
+	m_inputPin = nullptr;
+	m_ouputPin = nullptr;
+	m_nodeInfo = nullptr;
 }
 
 UNewtonModelInfo* UNewtonModelGraphNode::GetNodeInfo() const
@@ -43,17 +45,19 @@ UNewtonModelInfo* UNewtonModelGraphNode::GetNodeInfo() const
 	return m_nodeInfo;
 }
 
-void UNewtonModelGraphNode::SetNodeInfo(UNewtonModelInfo* const info)
+UEdGraphPin* UNewtonModelGraphNode::GetInputPin() const
 {
-	m_nodeInfo = info;
+	return m_inputPin;
+}
+
+UEdGraphPin* UNewtonModelGraphNode::GetOutputPin() const
+{
+	return m_ouputPin;
 }
 
 FText UNewtonModelGraphNode::GetNodeTitle(ENodeTitleType::Type titleType) const
 {
-	//if (m_nodeInfo->Title.IsEmpty())
-	//{
-	//	return FText::FromString(TEXT("new node"));
-	//}
+	check(m_nodeInfo);
 	return m_nodeInfo->Title;
 }
 
@@ -74,6 +78,7 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 	//this is fucking moronic
 	UNewtonModelGraphNode* const node = (UNewtonModelGraphNode*)this;
 
+#if 0
 	// we do not add or delete pins for the joint graph 
 	section.AddMenuEntry
 	(
@@ -122,6 +127,7 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 			)
 		)
 	);
+#endif
 
 	section.AddMenuEntry
 	(
@@ -142,33 +148,22 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 	);
 }
 
-
-void UNewtonModelGraphNode::SyncPinsWithResponses()
+void UNewtonModelGraphNode::Initialize(const UNewtonModelInfo* const srcInfo)
 {
-	UNewtonModelInfo* const nodeInfo = GetNodeInfo();
+	m_inputPin = CreateNodePin(EEdGraphPinDirection::EGPD_Input);
+	m_ouputPin = CreateNodePin(EEdGraphPinDirection::EGPD_Output);
 
-	int numGraphPins = Pins.Num() - 1;
-	int numInfoPins = nodeInfo->Responses.Num();;
-
-	while (numGraphPins > numInfoPins)
+	m_nodeInfo = NewObject<UNewtonModelInfo>(this);
+	if (srcInfo)
 	{
-		RemovePinAt(numGraphPins - 1, EEdGraphPinDirection::EGPD_Output);
-		numGraphPins--;
-	}
-	while (numInfoPins > numInfoPins)
-	{
-		//CreateNodePin(EEdGraphPinDirection::EGPD_Output, FName(nodeInfo->Responses[numGraphPins].ToString());
-		CreateNodePin(EEdGraphPinDirection::EGPD_Output);
-		numGraphPins++;
-	}
-
-	int index = 1;
-	for (const FText& options : nodeInfo->Responses)
-	{
-		GetPinAt(index)->PinName = FName(options.ToString());
+		m_nodeInfo->Initialize(srcInfo);
 	}
 }
 
+void UNewtonModelGraphNode::PinConnectionListChanged(UEdGraphPin* Pin)
+{
+	GetGraph()->NotifyGraphChanged();
+}
 
 UEdGraphPin* UNewtonModelGraphNode::CreateNodePin(EEdGraphPinDirection direction)
 {
@@ -178,4 +173,16 @@ UEdGraphPin* UNewtonModelGraphNode::CreateNodePin(EEdGraphPinDirection direction
 	UEdGraphPin* const pin = CreatePin(direction, category, name);
 	pin->PinType.PinSubCategory = m_subCategory;
 	return pin;
+}
+
+void UNewtonModelGraphNode::SyncPinsWithResponses()
+{
+	// at this time we are not changing the pin connections, since they are fixed
+	//const TArray<UEdGraphPin*>& pins = GetAllPins();
+	//const UNewtonModelInfo* const nodeInfo = GetNodeInfo();
+	//check(pins.Num() == nodeInfo->Responses.Num());
+	//
+	//const TArray<FText>& reponses = nodeInfo->Responses;
+	//pins[0]->PinName = FName(reponses[0].ToString());
+	//pins[1]->PinName = FName(reponses[1].ToString());
 }

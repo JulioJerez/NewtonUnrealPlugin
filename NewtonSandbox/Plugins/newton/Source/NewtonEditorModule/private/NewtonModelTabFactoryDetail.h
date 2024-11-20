@@ -41,6 +41,4 @@ class NEWTONEDITORMODULE_API NewtonModelTabFactoryDetail: public FWorkflowTabFac
 	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;
 
 	TWeakPtr<NewtonModelEditor> m_editor;
-
-	static FName m_tabName;
 };

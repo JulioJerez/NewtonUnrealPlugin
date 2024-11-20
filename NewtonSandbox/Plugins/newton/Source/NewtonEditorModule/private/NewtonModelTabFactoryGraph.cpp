@@ -29,10 +29,10 @@
 #include "NewtonModel.h"
 #include "NewtonModelEditor.h"
 
-FName NewtonModelTabFactoryGraph::m_tabName("NewtonModelTabGraph");
+#define GRAPH_IDENTIFIER TEXT("NewtonModelTabGraph")
 
 NewtonModelTabFactoryGraph::NewtonModelTabFactoryGraph(const TSharedPtr<NewtonModelEditor>& editor)
-	:FWorkflowTabFactory(m_tabName, editor)
+	:FWorkflowTabFactory(GRAPH_IDENTIFIER, editor)
 	,m_editor(editor)
 {
 	TabLabel = FText::FromString(TEXT("Graph"));
@@ -52,22 +52,20 @@ FText NewtonModelTabFactoryGraph::GetTabToolTipText(const FWorkflowTabSpawnInfo&
 
 TSharedRef<SWidget> NewtonModelTabFactoryGraph::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
 {
-	TSharedPtr<NewtonModelEditor> editor (m_editor.Pin());
-
-	SGraphEditor::FGraphEditorEvents graphEvents;
-	graphEvents.OnSelectionChanged.BindRaw(editor.Get(), &NewtonModelEditor::OnGraphSelectionChanged);
-	
 #if 0
-	// this is by far, the worse c++ programing style I have ever seen.
-	// it is like some one when out of his way to obfuscate the code.
-	TSharedRef<SWidget> widget
+	//check(0);
+	return TSharedRef<SWidget>
 	(
 		SNew(SVerticalBox) +
 		SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)
 		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
 	);
 #else
-
+	TSharedPtr<NewtonModelEditor> editor (m_editor.Pin());
+	
+	SGraphEditor::FGraphEditorEvents graphEvents;
+	graphEvents.OnSelectionChanged.BindRaw(editor.Get(), &NewtonModelEditor::OnGraphSelectionChanged);
+	
 	TSharedPtr<SGraphEditor> editorGraph(
 		SNew(SGraphEditor)
 		.IsEditable(true)
@@ -75,11 +73,12 @@ TSharedRef<SWidget> NewtonModelTabFactoryGraph::CreateTabBody(const FWorkflowTab
 		.GraphToEdit(editor->GetGraphEditor())
 	);
 	editor->SetWorkingGraphUi(editorGraph);
-
+	
 	SVerticalBox::FSlot::FSlotArguments editorGraphArg (SVerticalBox::Slot());
 	editorGraphArg.FillHeight(1.0);
 	editorGraphArg.HAlign(HAlign_Fill)[editorGraph.ToSharedRef()];
 	TSharedRef<SWidget> widget(SNew(SVerticalBox) + editorGraphArg);
-#endif	
+	
 	return widget;
+#endif
 }

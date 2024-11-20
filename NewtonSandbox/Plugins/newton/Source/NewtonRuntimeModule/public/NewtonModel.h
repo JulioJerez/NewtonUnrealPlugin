@@ -38,6 +38,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelInfo : public UObject
 	public:
 	UNewtonModelInfo();
 
+	void Initialize(const UNewtonModelInfo* const srcInfo);
+
 	UPROPERTY(EditAnywhere)
 	FText Title;
 
@@ -53,12 +55,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelPin : public UObject
 	public:
 	UNewtonModelPin();
 
-	//UPROPERTY()
-	//FName Name;
-
-	//UPROPERTY()
-	//FGuid Id;
-
 	UPROPERTY()
 	TArray<UNewtonModelPin*> Connections;
 };
@@ -72,10 +68,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 	public:
 	UNewtonModelNode();
 
-	virtual void CreatePinNodes();
-
-	virtual UNewtonModelPin* GetInputPin() const;
-	virtual UNewtonModelPin* GetOuputPin() const;
+	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
+	UNewtonModelPin* GetInputPin() const;
+	UNewtonModelPin* GetOuputPin() const;
 
 	UPROPERTY()
 	FVector2D Posit;
@@ -98,11 +93,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRoot : public UNewtonModelNode
 
 	public:
 	UNewtonModelNodeRoot();
-
-	virtual void CreatePinNodes();
-	virtual UNewtonModelPin* GetInputPin() const;
+	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
 };
-
 
 //**********************************************************************************
 UCLASS()
@@ -129,8 +121,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 	public:
 	UNewtonModel();
 
-	virtual void PreSave(FObjectPreSaveContext saveContext) override;
-	void SetPreSaveListeners(std::function<void()> onPreSaveListener);
+	//virtual void PreSave(FObjectPreSaveContext saveContext) override;
+	//void SetPreSaveListeners(std::function<void()> onPreSaveListener);
 
 	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
@@ -138,7 +130,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 	UPROPERTY()
 	UNewtonModelGraph* Graph;
 
-	private:
-	std::function<void()> m_onPresaveListener;
+	//private:
+	//std::function<void()> m_onPresaveListener;
 };
 

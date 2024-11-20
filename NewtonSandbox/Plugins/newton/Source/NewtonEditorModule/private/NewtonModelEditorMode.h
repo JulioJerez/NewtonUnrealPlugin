@@ -25,15 +25,17 @@
 #include "WorkflowOrientedApp/ApplicationMode.h"
 #include "WorkflowOrientedApp/WorkflowTabManager.h"
 
-
+class ISkeletonTree;
 class NewtonModelEditor;
+
+
 /**
  * 
  */
 class NEWTONEDITORMODULE_API NewtonModelEditorMode: public FApplicationMode
 {
 	public:
-	NewtonModelEditorMode(TSharedPtr<NewtonModelEditor> editor);
+	NewtonModelEditorMode(TSharedRef<NewtonModelEditor> editor, TSharedRef<ISkeletonTree> InSkeletonTree);
 	~NewtonModelEditorMode();
 
 	virtual void PostActivateMode() override;

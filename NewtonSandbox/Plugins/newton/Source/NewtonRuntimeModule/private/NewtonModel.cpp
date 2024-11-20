@@ -32,18 +32,18 @@ UNewtonModel::UNewtonModel()
 {
 }
 
-void UNewtonModel::SetPreSaveListeners(std::function<void()> onPreSaveListener)
-{
-	m_onPresaveListener = onPreSaveListener;
-}
-
-void UNewtonModel::PreSave(FObjectPreSaveContext saveContext)
-{
-	if (m_onPresaveListener)
-	{
-		m_onPresaveListener();
-	}
-}
+//void UNewtonModel::SetPreSaveListeners(std::function<void()> onPreSaveListener)
+//{
+//	m_onPresaveListener = onPreSaveListener;
+//}
+//
+//void UNewtonModel::PreSave(FObjectPreSaveContext saveContext)
+//{
+//	if (m_onPresaveListener)
+//	{
+//		m_onPresaveListener();
+//	}
+//}
 
 // ***************************************************************************** 
 //
@@ -55,6 +55,11 @@ UNewtonModelInfo::UNewtonModelInfo()
 	,Title(FText::FromString(TEXT("child node")))
 	,Responses()
 {
+}
+
+void UNewtonModelInfo::Initialize(const UNewtonModelInfo* const srcInfo)
+{
+	Title = srcInfo->Title;
 }
 
 //**********************************************************************************
@@ -74,10 +79,16 @@ UNewtonModelNode::UNewtonModelNode()
 {
 }
 
-void UNewtonModelNode::CreatePinNodes()
+void UNewtonModelNode::Initialize(const UNewtonModelInfo* const srcInfo)
 {
+	check(!Info);
+	check(srcInfo);
 	check(!InputPin);
 	check(!OutputPin);
+
+	Info = NewObject<UNewtonModelInfo>(this);
+	Info->Initialize(srcInfo);
+
 	InputPin = NewObject<UNewtonModelPin>(this);
 	OutputPin = NewObject<UNewtonModelPin>(this);
 }
@@ -96,19 +107,19 @@ UNewtonModelPin* UNewtonModelNode::GetOuputPin() const
 UNewtonModelNodeRoot::UNewtonModelNodeRoot()
 	:Super()
 {
-
 }
 
-void UNewtonModelNodeRoot::CreatePinNodes()
+void UNewtonModelNodeRoot::Initialize(const UNewtonModelInfo* const srcInfo)
 {
+	check(!Info);
+	check(srcInfo);
 	check(!InputPin);
 	check(!OutputPin);
-	OutputPin = NewObject<UNewtonModelPin>(this);
-}
 
-UNewtonModelPin* UNewtonModelNodeRoot::GetInputPin() const
-{
-	return nullptr;
+	Info = NewObject<UNewtonModelInfo>(this);
+	Info->Initialize(srcInfo);
+
+	OutputPin = NewObject<UNewtonModelPin>(this);
 }
 
 //**********************************************************************************

@@ -22,19 +22,15 @@
 
 #include "NewtonModelGraphNodeRoot.h"
 
+#include "NewtonModel.h"
+
 const FName UNewtonModelGraphNodeRoot::m_subCategory(TEXT("UNewtonModelGraphNodeRoot"));
 const FName UNewtonModelGraphNodeRoot::m_nodeClassName(TEXT("Newton Model Root Node"));
 const FName UNewtonModelGraphNodeRoot::m_nodeInformation(TEXT("create the root Node"));
 
-
 UNewtonModelGraphNodeRoot::UNewtonModelGraphNodeRoot()
 	:Super()
 {
-}
-
-FText UNewtonModelGraphNodeRoot::GetNodeTitle(ENodeTitleType::Type titleType) const
-{
-	return FText::FromString(TEXT("root node"));
 }
 
 FLinearColor UNewtonModelGraphNodeRoot::GetNodeTitleColor() const
@@ -42,13 +38,25 @@ FLinearColor UNewtonModelGraphNodeRoot::GetNodeTitleColor() const
 	return FLinearColor::Red;
 }
 
-UEdGraphPin* UNewtonModelGraphNodeRoot::CreateNodePin(EEdGraphPinDirection direction)
+void UNewtonModelGraphNodeRoot::Initialize(const UNewtonModelInfo* const srcInfo)
 {
-	check (direction == EGPD_Output);
-	const FName name(TEXT("child"));
-	const FName category(TEXT("output"));
+	m_ouputPin = CreateNodePin(EEdGraphPinDirection::EGPD_Output);
 
-	UEdGraphPin* const pin = CreatePin(direction, category, name);
-	pin->PinType.PinSubCategory = m_subCategory;
-	return pin;
+	m_nodeInfo = NewObject<UNewtonModelInfo>(this);
+	m_nodeInfo->Title = FText::FromString(TEXT("root node"));
+	if (srcInfo)
+	{
+		m_nodeInfo->Initialize(srcInfo);
+	}
+}
+
+void UNewtonModelGraphNodeRoot::SyncPinsWithResponses()
+{
+	// at this time we are not changing the pin connections, since they are fixed
+	//const UNewtonModelInfo* const nodeInfo = GetNodeInfo();
+	//const TArray<UEdGraphPin*>& pins = GetAllPins();
+	//check(pins.Num() == nodeInfo->Responses.Num());
+	//
+	//const TArray<FText>& reponses = nodeInfo->Responses;
+	//pins[0]->PinName = FName(reponses[0].ToString());
 }

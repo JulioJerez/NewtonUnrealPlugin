@@ -28,6 +28,12 @@
 class UNewtonModel;
 class UNewtonModelGraphNode;
 
+class ISkeletonTree;
+class IPersonaToolkit;
+class ISkeletonTreeItem;
+class IDetailLayoutBuilder;
+
+
 /**
  * 
  */
@@ -38,34 +44,35 @@ class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplicati
 	~NewtonModelEditor();
 
 	// editor methods
+	void CreateSkeletalMeshEditor();
 	UEdGraph* GetGraphEditor() const;
-	UNewtonModel* GetNewtonMode() const;
-	void SetNewtonMode(UNewtonModel* const model);
+	UNewtonModel* GetNewtonModel() const;
+	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
 	void SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph);
 	void SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData);
+
+	void OnGraphChanged(const FEdGraphEditAction& action);
 	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
-	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
-	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
+	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
 
 	// Toolkit methods
-	virtual void OnClose() override;
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
+	virtual bool OnRequestClose(EAssetEditorCloseReason InCloseReason) override;
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
 
-	//virtual void OnGraphChanged(const struct FEdGraphEditAction& inAction);
-	void OnWorkingAssetPreSave();
 	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
+	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
+	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
+	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
+	void HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& DetailBuilder);
+	void HandleSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
 
 	protected:
-	void NewtonModelGraphToEditorGraph();
-	void EditorGraphToNewtonModelGraph();
-	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
-
 	UPROPERTY()
 	UEdGraph* m_graphEditor;
 
@@ -73,5 +80,15 @@ class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplicati
 	UNewtonModel* m_newtonModel;
 
 	TSharedPtr<SGraphEditor> m_slateGraphUi;
+	TObjectPtr<USkeletalMesh> m_skeletalMeshAsset;
 	TSharedPtr<IDetailsView> m_selectedNodeDetailView;
+
+	/** Skeleton tree */
+	TSharedPtr<ISkeletonTree> SkeletonTree;
+
+	/** Persona toolkit */
+	TSharedPtr<IPersonaToolkit> PersonaToolkit;
+
+	bool m_modelChange;
+	static FName m_identifier;
 };

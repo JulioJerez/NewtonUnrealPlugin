@@ -22,55 +22,73 @@
 
 #include "NewtonModelEditorMode.h"
 
+#include "ISkeletonEditorModule.h"
+
 #include "NewtonModelEditor.h"
 #include "NewtonModelTabFactoryGraph.h"
 #include "NewtonModelTabFactoryDetail.h"
 
 FName NewtonModelEditorMode::m_editorModelName(TEXT("NewtonModelMode"));
-FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v00"));
+FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v19"));
 
-NewtonModelEditorMode::NewtonModelEditorMode(TSharedPtr<NewtonModelEditor> editor)
+NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<NewtonModelEditor> editor, TSharedRef<ISkeletonTree> skeletonTree)
 	:FApplicationMode(m_editorModelName)
 	,m_editor(editor)
 {
-	m_tabs.RegisterFactory(MakeShareable(new NewtonModelTabFactoryGraph(editor)));
-	m_tabs.RegisterFactory(MakeShareable(new NewtonModelTabFactoryDetail(editor)));
+	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
 
-#if 0
-	// this is by far, the worse c++ programing style I have ever seen.
-	// it is like some one when out of his way to obfuscate the code.
+	TSharedRef<FWorkflowTabFactory> graphTab(MakeShareable(new NewtonModelTabFactoryGraph(editor)));
+	TSharedRef<FWorkflowTabFactory> detailTab(MakeShareable(new NewtonModelTabFactoryDetail(editor)));
+	TSharedRef<FWorkflowTabFactory> skeletalTreeTab(skeletonEditorModule.CreateSkeletonTreeTabFactory(editor, skeletonTree));
 
-	TabLayout = FTabManager::NewLayout(m_editorVersionName)
-	->AddArea
-	(
-		FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
-		->Split
-		(
-			FTabManager::NewStack()->AddTab(NewtonModelTabFactoryDetail::m_tabName, ETabState::OpenedTab)
-		)
-	);
-#else
+	m_tabs.RegisterFactory(graphTab);
+	m_tabs.RegisterFactory(detailTab);
+	m_tabs.RegisterFactory(skeletalTreeTab);
 
-	TSharedRef<FTabManager::FStack> graphStack(FTabManager::NewStack());
-	graphStack->AddTab(NewtonModelTabFactoryGraph::m_tabName, ETabState::OpenedTab);
-	graphStack->SetSizeCoefficient(0.75f);
+	TSharedRef<FTabManager::FSplitter> skeletonArea(FTabManager::NewSplitter());
+	skeletonArea->SetOrientation(Orient_Vertical);
+	{
+		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
+		stack->AddTab(skeletalTreeTab->GetIdentifier(), ETabState::OpenedTab);
+		stack->SetSizeCoefficient(1.0f);
+		skeletonArea->Split(stack);
+	}
 
-	TSharedRef<FTabManager::FStack> detailStack(FTabManager::NewStack());
-	detailStack->AddTab(NewtonModelTabFactoryDetail::m_tabName, ETabState::OpenedTab);
-	detailStack->SetSizeCoefficient(0.25f);
+	TSharedRef<FTabManager::FSplitter> detailArea(FTabManager::NewSplitter());
+	detailArea->SetOrientation(Orient_Vertical);
+	{
+		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
+		stack->SetSizeCoefficient(1.0f);
+		stack->AddTab(detailTab->GetIdentifier(), ETabState::OpenedTab);
+		detailArea->Split(stack);
+	}
 
-	TSharedRef<FTabManager::FArea> area(FTabManager::NewPrimaryArea());
+	TSharedRef<FTabManager::FSplitter> graphArea(FTabManager::NewSplitter());
+	detailArea->SetOrientation(Orient_Vertical);
+	{
+		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
+		stack->SetSizeCoefficient(1.0f);
+		stack->AddTab(graphTab->GetIdentifier(), ETabState::OpenedTab);
+		graphArea->Split(stack);
+	}
 
-	area->Split(graphStack);
-	area->SetOrientation(Orient_Horizontal);
+	TSharedRef<FTabManager::FArea> mainArea(FTabManager::NewPrimaryArea());
+	mainArea->SetOrientation(Orient_Horizontal);
+	{
+		skeletonArea->SetSizeCoefficient(.2f);
+		mainArea->Split(skeletonArea);
 
-	area->Split(detailStack);
-	area->SetOrientation(Orient_Horizontal);
+		graphArea->SetSizeCoefficient(0.6f);
+		mainArea->Split(graphArea);
+
+		detailArea->SetSizeCoefficient(.2f);
+		mainArea->Split(detailArea);
+	}
 
 	TabLayout = FTabManager::NewLayout(m_editorVersionName);
-	TabLayout->AddArea(area);
+	TabLayout->AddArea(mainArea);
 
-#endif
+	//skeletalMeshEditor->RegisterModeToolbarIfUnregistered(GetModeName());
 }
 
 NewtonModelEditorMode::~NewtonModelEditorMode()

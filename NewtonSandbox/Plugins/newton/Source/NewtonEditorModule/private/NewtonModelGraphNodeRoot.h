@@ -39,9 +39,9 @@ class UNewtonModelGraphNodeRoot: public UNewtonModelGraphNode
 	public:
 	UNewtonModelGraphNodeRoot();
 
+	virtual void SyncPinsWithResponses() override;
 	virtual FLinearColor GetNodeTitleColor() const override;
-	virtual FText GetNodeTitle(ENodeTitleType::Type titleType) const override;
-	virtual UEdGraphPin* CreateNodePin(EEdGraphPinDirection direction) override;
+	virtual void Initialize(const UNewtonModelInfo* const srcInfo) override;
 
 	public:
 	static const FName m_subCategory;

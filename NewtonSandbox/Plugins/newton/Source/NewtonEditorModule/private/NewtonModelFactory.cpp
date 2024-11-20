@@ -51,6 +51,8 @@ bool UNewtonModelFactory::CanCreateNew() const
 
 UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParent, FName inName, EObjectFlags flags, UObject* context, FFeedbackContext* Warn, FName callingContext)
 {
-	UNewtonModel* const asset = NewObject<UNewtonModel>(inParent, inName, flags);
-	return asset;
+	UNewtonModel* const newtonModel = NewObject<UNewtonModel>(inParent, inName, flags);
+	newtonModel->SkeletalMeshAsset = NewObject<USkeletalMesh>(newtonModel, FName(TEXT("emptyMesh")));
+	newtonModel->SkeletalMeshAsset->SetSkeleton(NewObject<USkeleton>(newtonModel->SkeletalMeshAsset, FName(TEXT("emptySkeleton"))));
+	return newtonModel;
 }

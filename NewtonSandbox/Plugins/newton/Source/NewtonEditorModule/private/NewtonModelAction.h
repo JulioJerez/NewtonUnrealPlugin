@@ -43,3 +43,5 @@ class NEWTONEDITORMODULE_API NewtonModelAction: public FAssetTypeActions_Base
 
 	EAssetTypeCategories::Type m_assetCategory;
 };
+
+

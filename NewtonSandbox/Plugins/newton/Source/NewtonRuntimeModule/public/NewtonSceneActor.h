@@ -26,6 +26,7 @@
 #include "NewtonSceneActor.generated.h"
 
 class ALandscapeProxy;
+class UNewtonSceneRigidBody;
 
 UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
@@ -46,7 +47,7 @@ class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
 	bool GenerateShapes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = NewtonScene, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UNewtonSceneRigidBody> RootBody;
+	TObjectPtr<UNewtonSceneRigidBody> RootBody;
 
 	private:
 	void GenerateStaticMeshCollision(const AActor* const actor);
