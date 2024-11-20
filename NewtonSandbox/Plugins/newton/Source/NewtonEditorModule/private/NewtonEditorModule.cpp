@@ -106,9 +106,9 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	m_styleSet->Set(TEXT("ClassIcon.NewtonModel"), newtonIcon);
 	m_styleSet->Set(TEXT("ClassThumbnail.NewtonModel"), newtonThumbnail);
 
-	m_styleSet->Set(TEXT("NewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
-	m_styleSet->Set(TEXT("NewtonModelEditor.NodeDeletePinIcon"), nodeDeletePinIcon);
-	m_styleSet->Set(TEXT("NewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
+	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
+	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeletePinIcon"), nodeDeletePinIcon);
+	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*m_styleSet);
 

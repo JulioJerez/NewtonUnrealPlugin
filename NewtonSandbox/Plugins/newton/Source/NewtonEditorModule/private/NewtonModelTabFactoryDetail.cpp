@@ -30,7 +30,7 @@
 #define DETAIL_IDENTIFIER TEXT("NewtonModelTabDetail")
 //FName NewtonModelTabFactoryDetail::m_tabName("NewtonModelTabDetail");
 
-NewtonModelTabFactoryDetail::NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor)
+NewtonModelTabFactoryDetail::NewtonModelTabFactoryDetail(const TSharedPtr<FNewtonModelEditor>& editor)
 	:FWorkflowTabFactory(DETAIL_IDENTIFIER, editor)
 	,m_editor(editor)
 {
@@ -60,7 +60,7 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
 	);
 #else
-	TSharedPtr<NewtonModelEditor> editor = m_editor.Pin();
+	TSharedPtr<FNewtonModelEditor> editor = m_editor.Pin();
 	FPropertyEditorModule& propertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
 	FDetailsViewArgs detailArgumnets;
@@ -77,7 +77,7 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
 	detailView->SetObject(editor->GetNewtonModel());
 	FOnFinishedChangingProperties& propertyChange = detailView->OnFinishedChangingProperties();
-	propertyChange.AddSP(editor.Get(), &NewtonModelEditor::OnFinishedChangingProperties);
+	propertyChange.AddSP(editor.Get(), &FNewtonModelEditor::OnFinishedChangingProperties);
 
 	TSharedPtr<IDetailsView> seletedNodeDetailView(propertyEditorModule.CreateDetailView(detailArgumnets));
 	seletedNodeDetailView->SetObject(nullptr);

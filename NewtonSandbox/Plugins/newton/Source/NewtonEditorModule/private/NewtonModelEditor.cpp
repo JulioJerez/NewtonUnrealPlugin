@@ -21,7 +21,6 @@
 
 #include "NewtonModelEditor.h"
 #include "PersonaModule.h"
-
 #include "ISkeletonTree.h"
 #include "GraphEditAction.h"
 #include "IPersonaToolkit.h"
@@ -38,9 +37,9 @@
 #include "NewtonModelGraphSchema.h"
 #include "NewtonModelGraphNodeRoot.h"
 
-FName NewtonModelEditor::m_identifier(FName(TEXT("NewtonModelEditor")));
+FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 
-NewtonModelEditor::NewtonModelEditor()
+FNewtonModelEditor::FNewtonModelEditor()
 	:FWorkflowCentricApplication()
 {
 	m_modelChange = false;
@@ -53,60 +52,60 @@ NewtonModelEditor::NewtonModelEditor()
 	m_selectedNodeDetailView = nullptr;
 }
 
-NewtonModelEditor::~NewtonModelEditor()
+FNewtonModelEditor::~FNewtonModelEditor()
 {
 }
 
-void NewtonModelEditor::OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit)
+void FNewtonModelEditor::OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit)
 {
 }
 
-void NewtonModelEditor::OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit)
+void FNewtonModelEditor::OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit)
 {
 }
 
-UEdGraph* NewtonModelEditor::GetGraphEditor() const
+UEdGraph* FNewtonModelEditor::GetGraphEditor() const
 {
 	return m_graphEditor;
 }
 
-FName NewtonModelEditor::GetToolkitFName() const
+FName FNewtonModelEditor::GetToolkitFName() const
 {
-	return FName (TEXT("NewtonModelEditor"));
+	return FName (TEXT("FNewtonModelEditor"));
 }
 
-FText NewtonModelEditor::GetBaseToolkitName() const
+FText FNewtonModelEditor::GetBaseToolkitName() const
 {
-	return FText::FromString("NewtonModelEditor");
+	return FText::FromString("FNewtonModelEditor");
 }
 
-FString NewtonModelEditor::GetWorldCentricTabPrefix() const
+FString FNewtonModelEditor::GetWorldCentricTabPrefix() const
 {
-	return FString("NewtonModelEditor");
+	return FString("FNewtonModelEditor");
 }
 
-FLinearColor NewtonModelEditor::GetWorldCentricTabColorScale() const
+FLinearColor FNewtonModelEditor::GetWorldCentricTabColorScale() const
 {
 	return FLinearColor(0.3f, 0.2f, 0.5f, 0.5f);
 }
 
-UNewtonModel* NewtonModelEditor::GetNewtonModel() const
+UNewtonModel* FNewtonModelEditor::GetNewtonModel() const
 {
 	return m_newtonModel;
 }
 
-void NewtonModelEditor::SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph)
+void FNewtonModelEditor::SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph)
 {
 	m_slateGraphUi = workingGraph;
 }
 
-void NewtonModelEditor::SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData)
+void FNewtonModelEditor::SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData)
 {
 	m_selectedNodeDetailView = detailData;
-	m_selectedNodeDetailView->OnFinishedChangingProperties().AddRaw(this, &NewtonModelEditor::OnNodeDetailViewPropertiesUpdated);
+	m_selectedNodeDetailView->OnFinishedChangingProperties().AddRaw(this, &FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated);
 }
 
-void NewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event)
+void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event)
 {
 	if (m_slateGraphUi)
 	{
@@ -120,21 +119,21 @@ void NewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChanged
 	}
 }
 
-void NewtonModelEditor::SetNewtonModel(TObjectPtr<UNewtonModel> model)
+void FNewtonModelEditor::SetNewtonModel(TObjectPtr<UNewtonModel> model)
 {
 	m_newtonModel = model;
 }
 
-void NewtonModelEditor::RegisterTabSpawners(const TSharedRef<class FTabManager>& manager)
+void FNewtonModelEditor::RegisterTabSpawners(const TSharedRef<class FTabManager>& manager)
 {
 	FWorkflowCentricApplication::RegisterTabSpawners(manager);
 }
 
-void NewtonModelEditor::UnregisterTabSpawners(const TSharedRef<class FTabManager>& manager)
+void FNewtonModelEditor::UnregisterTabSpawners(const TSharedRef<class FTabManager>& manager)
 {
 }
 
-void NewtonModelEditor::HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& DetailBuilder)
+void FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& DetailBuilder)
 {
 	check(0);
 	//DetailBuilder.HideCategory("Mesh");
@@ -144,7 +143,7 @@ void NewtonModelEditor::HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuil
 	//DetailBuilder.HideCategory("Additional Meshes");
 }
 
-void NewtonModelEditor::HandleSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo)
+void FNewtonModelEditor::HandleSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo)
 {
 	check(0);
 	//if (DetailsView.IsValid())
@@ -169,12 +168,12 @@ void NewtonModelEditor::HandleSelectionChanged(const TArrayView<TSharedPtr<ISkel
 	//}
 }
 
-void NewtonModelEditor::CreateSkeletalMeshEditor()
+void FNewtonModelEditor::CreateSkeletalMeshEditor()
 {
 	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
 
 	FPersonaToolkitArgs personaToolkitArgs;
-	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &NewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
+	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
 
 	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	PersonaToolkit = personaModule.CreatePersonaToolkit(m_newtonModel->SkeletalMeshAsset, personaToolkitArgs);
@@ -183,7 +182,7 @@ void NewtonModelEditor::CreateSkeletalMeshEditor()
 	TSharedPtr<IPersonaPreviewScene> previewScene(PersonaToolkit->GetPreviewScene());
 
 	FSkeletonTreeArgs skeletonTreeArgs;
-	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &NewtonModelEditor::HandleSelectionChanged);
+	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSelectionChanged);
 	skeletonTreeArgs.PreviewScene = previewScene;
 	skeletonTreeArgs.ContextName = GetToolkitFName();
 
@@ -194,7 +193,7 @@ void NewtonModelEditor::CreateSkeletalMeshEditor()
 		MakeShareable(new NewtonModelEditorMode(SharedThis(this), SkeletonTree.ToSharedRef())));
 }
 
-void NewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent)
+void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent)
 {
 	for (int i = 0; i < propertyChangedEvent.GetNumObjectsBeingEdited(); ++i)
 	{
@@ -208,7 +207,7 @@ void NewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent
 	}
 }
 
-UNewtonModelGraphNode* NewtonModelEditor::GetSelectedNode(const FGraphPanelSelectionSet& selectionSet)
+UNewtonModelGraphNode* FNewtonModelEditor::GetSelectedNode(const FGraphPanelSelectionSet& selectionSet)
 {
 	for (UObject* object : selectionSet)
 	{
@@ -221,7 +220,7 @@ UNewtonModelGraphNode* NewtonModelEditor::GetSelectedNode(const FGraphPanelSelec
 	return nullptr;
 }
 
-void NewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& selectionSet)
+void FNewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& selectionSet)
 {
 	UNewtonModelGraphNode* const selectedNode = GetSelectedNode(selectionSet);
 	if (selectedNode)
@@ -234,7 +233,7 @@ void NewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& s
 	}
 }
 
-void NewtonModelEditor::BuildAsset()
+void FNewtonModelEditor::BuildAsset()
 {
 	if (m_modelChange && m_graphEditor && m_graphEditor->Nodes.Num() && m_newtonModel)
 	{
@@ -288,36 +287,36 @@ void NewtonModelEditor::BuildAsset()
 	m_modelChange = false;
 }
 
-bool NewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
+bool FNewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
 {
 	BuildAsset();
 	return FWorkflowCentricApplication::OnRequestClose(closeReason);
 }
 
-void NewtonModelEditor::OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext)
+void FNewtonModelEditor::OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext)
 {
 	BuildAsset();
 }
 
-void NewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
+void FNewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
 {
 	m_modelChange = true;
 }
 
-void NewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
+void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
 	m_modelChange = false;
 	m_newtonModel = newtonModel;
 	InitAssetEditor(mode, initToolkitHost, m_identifier, FTabManager::FLayout::NullLayout, true, true, m_newtonModel);
 
 	m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, TEXT("NewtonModelGraph"), UEdGraph::StaticClass(), UNewtonModelGraphSchema::StaticClass());
-	m_graphEditor->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &NewtonModelEditor::OnGraphChanged));
+	m_graphEditor->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &FNewtonModelEditor::OnGraphChanged));
 
 	CreateSkeletalMeshEditor();
 	SetCurrentMode(NewtonModelEditorMode::m_editorModelName);
 	
 	// register callback for rebuild model when 
-	FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &NewtonModelEditor::OnObjectSaved);
+	FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSaved);
 
 	//FName ParentName;
 	//const FName MenuName = GetToolMenuToolbarName(ParentName);

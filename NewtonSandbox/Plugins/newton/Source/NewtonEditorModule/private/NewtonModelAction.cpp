@@ -70,7 +70,7 @@ void NewtonModelAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TShar
 		UNewtonModel* const mesh = Cast<UNewtonModel>(inObjects[i]);
 		if (mesh)
 		{
-			TSharedRef<NewtonModelEditor> editor(new NewtonModelEditor());
+			TSharedRef<FNewtonModelEditor> editor(new FNewtonModelEditor());
 			editor->InitEditor(mode, editWithinLevelEditor, mesh);
 		}
 	}

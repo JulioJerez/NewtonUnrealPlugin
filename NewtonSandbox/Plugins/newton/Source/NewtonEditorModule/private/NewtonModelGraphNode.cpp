@@ -85,7 +85,7 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 		TEXT("AddPinEntry"),
 		FText::FromString(TEXT("Add Response")),
 		FText::FromString(TEXT("Create new pin")),
-		FSlateIcon(ND_MESH_EDITOR_NAME, TEXT("NewtonModelEditor.NodeAddPinIcon")),
+		FSlateIcon(ND_MESH_EDITOR_NAME, TEXT("FNewtonModelEditor.NodeAddPinIcon")),
 		FUIAction
 		(
 			FExecuteAction::CreateLambda
@@ -107,7 +107,7 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 		TEXT("DeletePinEntry"),
 		FText::FromString(TEXT("Delete Response")),
 		FText::FromString(TEXT("Delete last pin")),
-		FSlateIcon(ND_MESH_EDITOR_NAME,TEXT("NewtonModelEditor.NodeDeletePinIcon")),
+		FSlateIcon(ND_MESH_EDITOR_NAME,TEXT("FNewtonModelEditor.NodeDeletePinIcon")),
 		FUIAction
 		(
 			FExecuteAction::CreateLambda
@@ -134,7 +134,7 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 		TEXT("DeleteNodeEntry"),
 		FText::FromString(TEXT("Delete Node")),
 		FText::FromString(TEXT("Delete this node")),
-		FSlateIcon(ND_MESH_EDITOR_NAME, TEXT("NewtonModelEditor.NodeDeleteNodeIcon")),
+		FSlateIcon(ND_MESH_EDITOR_NAME, TEXT("FNewtonModelEditor.NodeDeleteNodeIcon")),
 		FUIAction
 		(
 			FExecuteAction::CreateLambda

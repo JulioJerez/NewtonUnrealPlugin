@@ -31,7 +31,7 @@
 
 #define GRAPH_IDENTIFIER TEXT("NewtonModelTabGraph")
 
-NewtonModelTabFactoryGraph::NewtonModelTabFactoryGraph(const TSharedPtr<NewtonModelEditor>& editor)
+NewtonModelTabFactoryGraph::NewtonModelTabFactoryGraph(const TSharedPtr<FNewtonModelEditor>& editor)
 	:FWorkflowTabFactory(GRAPH_IDENTIFIER, editor)
 	,m_editor(editor)
 {
@@ -61,10 +61,10 @@ TSharedRef<SWidget> NewtonModelTabFactoryGraph::CreateTabBody(const FWorkflowTab
 		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
 	);
 #else
-	TSharedPtr<NewtonModelEditor> editor (m_editor.Pin());
+	TSharedPtr<FNewtonModelEditor> editor (m_editor.Pin());
 	
 	SGraphEditor::FGraphEditorEvents graphEvents;
-	graphEvents.OnSelectionChanged.BindRaw(editor.Get(), &NewtonModelEditor::OnGraphSelectionChanged);
+	graphEvents.OnSelectionChanged.BindRaw(editor.Get(), &FNewtonModelEditor::OnGraphSelectionChanged);
 	
 	TSharedPtr<SGraphEditor> editorGraph(
 		SNew(SGraphEditor)

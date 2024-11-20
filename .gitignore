@@ -101,6 +101,7 @@ vc143.pdb
 */Intermediate
 */Binaries/Win64
 */DerivedDataCache
+*/Content/StarterContent
 
 NewtonSandbox/NewtonSandbox.sln
 NewtonSandbox/Plugins/newton/Binaries/Win64

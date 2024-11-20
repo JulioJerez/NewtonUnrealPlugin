@@ -37,11 +37,11 @@ class FObjectPreSaveContext;
 /**
  * 
  */
-class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplication
+class NEWTONEDITORMODULE_API FNewtonModelEditor: public FWorkflowCentricApplication
 {
 	public:
-	NewtonModelEditor();
-	~NewtonModelEditor();
+	FNewtonModelEditor();
+	~FNewtonModelEditor();
 
 	// editor methods
 	void BuildAsset();

@@ -25,7 +25,7 @@
 
 #include "WorkflowOrientedApp/WorkflowTabFactory.h"
 
-class NewtonModelEditor;
+class FNewtonModelEditor;
 
 
 /**
@@ -34,11 +34,11 @@ class NewtonModelEditor;
 class NEWTONEDITORMODULE_API NewtonModelTabFactoryDetail: public FWorkflowTabFactory
 {
 	public:
-	NewtonModelTabFactoryDetail(const TSharedPtr<NewtonModelEditor>& editor);
+	NewtonModelTabFactoryDetail(const TSharedPtr<FNewtonModelEditor>& editor);
 	~NewtonModelTabFactoryDetail();
 
 	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const;
 	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;
 
-	TWeakPtr<NewtonModelEditor> m_editor;
+	TWeakPtr<FNewtonModelEditor> m_editor;
 };

@@ -26,7 +26,7 @@
 #include "WorkflowOrientedApp/WorkflowTabManager.h"
 
 class ISkeletonTree;
-class NewtonModelEditor;
+class FNewtonModelEditor;
 
 
 /**
@@ -35,7 +35,7 @@ class NewtonModelEditor;
 class NEWTONEDITORMODULE_API NewtonModelEditorMode: public FApplicationMode
 {
 	public:
-	NewtonModelEditorMode(TSharedRef<NewtonModelEditor> editor, TSharedRef<ISkeletonTree> InSkeletonTree);
+	NewtonModelEditorMode(TSharedRef<FNewtonModelEditor> editor, TSharedRef<ISkeletonTree> InSkeletonTree);
 	~NewtonModelEditorMode();
 
 	virtual void PostActivateMode() override;
@@ -43,7 +43,7 @@ class NEWTONEDITORMODULE_API NewtonModelEditorMode: public FApplicationMode
 	virtual void RegisterTabFactories(TSharedPtr<FTabManager> inTabManager) override;
 
 	FWorkflowAllowedTabSet m_tabs;
-	TWeakPtr<NewtonModelEditor> m_editor;
+	TWeakPtr<FNewtonModelEditor> m_editor;
 
 	static FName m_editorModelName;
 	static FName m_editorVersionName;

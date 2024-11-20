@@ -31,7 +31,7 @@
 FName NewtonModelEditorMode::m_editorModelName(TEXT("NewtonModelMode"));
 FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v19"));
 
-NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<NewtonModelEditor> editor, TSharedRef<ISkeletonTree> skeletonTree)
+NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FNewtonModelEditor> editor, TSharedRef<ISkeletonTree> skeletonTree)
 	:FApplicationMode(m_editorModelName)
 	,m_editor(editor)
 {
@@ -107,7 +107,7 @@ void NewtonModelEditorMode::PreDeactivateMode()
 
 void NewtonModelEditorMode::RegisterTabFactories(TSharedPtr<FTabManager> inTabManager)
 {
-	TSharedPtr<NewtonModelEditor> editor (m_editor.Pin());
+	TSharedPtr<FNewtonModelEditor> editor (m_editor.Pin());
 	editor->PushTabFactories(m_tabs);
 	FApplicationMode::RegisterTabFactories(inTabManager);
 }
