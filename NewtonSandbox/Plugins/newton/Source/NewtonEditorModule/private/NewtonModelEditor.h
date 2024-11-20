@@ -32,7 +32,7 @@ class ISkeletonTree;
 class IPersonaToolkit;
 class ISkeletonTreeItem;
 class IDetailLayoutBuilder;
-
+class FObjectPreSaveContext;
 
 /**
  * 
@@ -44,6 +44,7 @@ class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplicati
 	~NewtonModelEditor();
 
 	// editor methods
+	void BuildAsset();
 	void CreateSkeletalMeshEditor();
 	UEdGraph* GetGraphEditor() const;
 	UNewtonModel* GetNewtonModel() const;
@@ -53,6 +54,7 @@ class NEWTONEDITORMODULE_API NewtonModelEditor: public FWorkflowCentricApplicati
 
 	void OnGraphChanged(const FEdGraphEditAction& action);
 	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
+	void OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext);
 	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
 

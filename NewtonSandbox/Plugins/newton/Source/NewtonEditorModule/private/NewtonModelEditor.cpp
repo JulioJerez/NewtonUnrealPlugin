@@ -28,6 +28,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "IPersonaPreviewScene.h"
 #include "ISkeletonEditorModule.h"
+#include "UObject/ObjectSaveContext.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 
@@ -233,11 +234,10 @@ void NewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& s
 	}
 }
 
-bool NewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
+void NewtonModelEditor::BuildAsset()
 {
 	if (m_modelChange && m_graphEditor && m_graphEditor->Nodes.Num() && m_newtonModel)
 	{
-		m_modelChange = false;
 		m_newtonModel->Graph = NewObject<UNewtonModelGraph>(m_newtonModel);
 
 		TMap<const UEdGraphPin*, UNewtonModelPin*> pinMap;
@@ -285,8 +285,18 @@ bool NewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
 			}
 		}
 	}
+	m_modelChange = false;
+}
 
+bool NewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
+{
+	BuildAsset();
 	return FWorkflowCentricApplication::OnRequestClose(closeReason);
+}
+
+void NewtonModelEditor::OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext)
+{
+	BuildAsset();
 }
 
 void NewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
@@ -306,6 +316,8 @@ void NewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedP
 	CreateSkeletalMeshEditor();
 	SetCurrentMode(NewtonModelEditorMode::m_editorModelName);
 	
+	// register callback for rebuild model when 
+	FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &NewtonModelEditor::OnObjectSaved);
 
 	//FName ParentName;
 	//const FName MenuName = GetToolMenuToolbarName(ParentName);
