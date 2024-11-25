@@ -23,54 +23,55 @@
 #include "NewtonModelEditorMode.h"
 
 #include "ISkeletonEditorModule.h"
+#include "PersonaModule.h"
+#include "IPersonaToolkit.h"
 
 #include "NewtonModelEditor.h"
-#include "NewtonModelTabFactoryGraph.h"
-#include "NewtonModelTabFactoryDetail.h"
+#include "factories/NewtonModelTabFactoryGraph.h"
+#include "factories/NewtonModelTabFactoryDetail.h"
 
 FName NewtonModelEditorMode::m_editorModelName(TEXT("NewtonModelMode"));
-FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v19"));
+FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v1.0"));
 
-NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FNewtonModelEditor> editor, TSharedRef<ISkeletonTree> skeletonTree)
+NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplication> editorInterface, TSharedRef<ISkeletonTree> skeletonTree)
 	:FApplicationMode(m_editorModelName)
-	,m_editor(editor)
+	,m_editor(editorInterface)
 {
+	TSharedRef<FNewtonModelEditor> editor (StaticCastSharedRef<FNewtonModelEditor>(editorInterface));
+
+	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
 
 	TSharedRef<FWorkflowTabFactory> graphTab(MakeShareable(new NewtonModelTabFactoryGraph(editor)));
 	TSharedRef<FWorkflowTabFactory> detailTab(MakeShareable(new NewtonModelTabFactoryDetail(editor)));
 	TSharedRef<FWorkflowTabFactory> skeletalTreeTab(skeletonEditorModule.CreateSkeletonTreeTabFactory(editor, skeletonTree));
+	
+	FPersonaViewportArgs viewportArgs(editor->GetPersonaToolkit()->GetPreviewScene());
+	viewportArgs.ContextName = TEXT("NewtonModelEditor.Viewport");
+	viewportArgs.OnViewportCreated = FOnViewportCreated::CreateSP(editor, &FNewtonModelEditor::HandleViewportCreated);
+	personaModule.RegisterPersonaViewportTabFactories(m_tabs, editor, viewportArgs);
 
 	m_tabs.RegisterFactory(graphTab);
 	m_tabs.RegisterFactory(detailTab);
 	m_tabs.RegisterFactory(skeletalTreeTab);
 
-	TSharedRef<FTabManager::FSplitter> skeletonArea(FTabManager::NewSplitter());
-	skeletonArea->SetOrientation(Orient_Vertical);
+	auto MakeArea = [](FName identifier)
 	{
-		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
-		stack->AddTab(skeletalTreeTab->GetIdentifier(), ETabState::OpenedTab);
-		stack->SetSizeCoefficient(1.0f);
-		skeletonArea->Split(stack);
-	}
+		TSharedRef<FTabManager::FSplitter> area(FTabManager::NewSplitter());
+		area->SetOrientation(Orient_Vertical);
+		{
+			TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
+			stack->SetSizeCoefficient(1.0f);
+			stack->AddTab(identifier, ETabState::OpenedTab);
+			area->Split(stack);
+		}
+		return area;
+	};
 
-	TSharedRef<FTabManager::FSplitter> detailArea(FTabManager::NewSplitter());
-	detailArea->SetOrientation(Orient_Vertical);
-	{
-		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
-		stack->SetSizeCoefficient(1.0f);
-		stack->AddTab(detailTab->GetIdentifier(), ETabState::OpenedTab);
-		detailArea->Split(stack);
-	}
-
-	TSharedRef<FTabManager::FSplitter> graphArea(FTabManager::NewSplitter());
-	detailArea->SetOrientation(Orient_Vertical);
-	{
-		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
-		stack->SetSizeCoefficient(1.0f);
-		stack->AddTab(graphTab->GetIdentifier(), ETabState::OpenedTab);
-		graphArea->Split(stack);
-	}
+	TSharedRef<FTabManager::FSplitter> viewportArea(MakeArea(TEXT("Viewport")));
+	TSharedRef<FTabManager::FSplitter> graphArea(MakeArea(graphTab->GetIdentifier()));
+	TSharedRef<FTabManager::FSplitter> detailArea(MakeArea(detailTab->GetIdentifier()));
+	TSharedRef<FTabManager::FSplitter> skeletonArea(MakeArea(skeletalTreeTab->GetIdentifier()));
 
 	TSharedRef<FTabManager::FArea> mainArea(FTabManager::NewPrimaryArea());
 	mainArea->SetOrientation(Orient_Horizontal);
@@ -78,7 +79,10 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FNewtonModelEditor> edit
 		skeletonArea->SetSizeCoefficient(.2f);
 		mainArea->Split(skeletonArea);
 
-		graphArea->SetSizeCoefficient(0.6f);
+		viewportArea->SetSizeCoefficient(0.3f);
+		mainArea->Split(viewportArea);
+
+		graphArea->SetSizeCoefficient(0.3f);
 		mainArea->Split(graphArea);
 
 		detailArea->SetSizeCoefficient(.2f);
@@ -88,11 +92,21 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FNewtonModelEditor> edit
 	TabLayout = FTabManager::NewLayout(m_editorVersionName);
 	TabLayout->AddArea(mainArea);
 
-	//skeletalMeshEditor->RegisterModeToolbarIfUnregistered(GetModeName());
+	personaModule.OnRegisterTabs().Broadcast(m_tabs, editorInterface);
+	LayoutExtender = MakeShared<FLayoutExtender>();
+	personaModule.OnRegisterLayoutExtensions().Broadcast(*LayoutExtender.Get());
+	TabLayout->ProcessExtensions(*LayoutExtender.Get());
+
+	editor->RegisterModeToolbarIfUnregistered(GetModeName());
 }
 
 NewtonModelEditorMode::~NewtonModelEditorMode()
 {
+}
+
+void CreateeLayout()
+{
+
 }
 
 void NewtonModelEditorMode::PostActivateMode()
@@ -107,7 +121,8 @@ void NewtonModelEditorMode::PreDeactivateMode()
 
 void NewtonModelEditorMode::RegisterTabFactories(TSharedPtr<FTabManager> inTabManager)
 {
-	TSharedPtr<FNewtonModelEditor> editor (m_editor.Pin());
+	TSharedPtr<FWorkflowCentricApplication> editor (m_editor.Pin());
 	editor->PushTabFactories(m_tabs);
+
 	FApplicationMode::RegisterTabFactories(inTabManager);
 }

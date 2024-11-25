@@ -31,7 +31,7 @@ class UNewtonModelInfo;
  * 
  */
 UCLASS()
-class UNewtonModelGraphNode : public UEdGraphNode
+class NEWTONEDITORMODULE_API UNewtonModelGraphNode : public UEdGraphNode
 {
 	GENERATED_BODY()
 

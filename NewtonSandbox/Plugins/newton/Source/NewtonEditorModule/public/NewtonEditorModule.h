@@ -16,10 +16,13 @@ class FNewtonEditorModule : public FDefaultModuleImpl
 	virtual void ShutdownModule() override;
 
 	private:
+	void CreateIcons();
 	void RegisterMenus();
 	void ToolbarUpdate();
 	void DestroyToolbarButton();
 	void CreateEditorToolbarButton();
+
+	void UnreagiterIcons();
 
 	void RegisterNewtonModelEditor();
 	void UnregisterNewtonModelEditor();

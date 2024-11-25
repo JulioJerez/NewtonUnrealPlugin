@@ -23,21 +23,31 @@
 
 #include "CoreMinimal.h"
 #include "SGraphPanel.h"
-#include "WorkflowOrientedApp/WorkflowCentricApplication.h"
+#include "IHasPersonaToolkit.h"
+#include "PersonaAssetEditorToolkit.h"
 
 class UNewtonModel;
 class UNewtonModelGraphNode;
 
 class ISkeletonTree;
 class IPersonaToolkit;
+class IPersonaViewport;
 class ISkeletonTreeItem;
 class IDetailLayoutBuilder;
 class FObjectPreSaveContext;
+class FNewtonModelEditorBinding;
+
+class INewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
+{
+	public:
+	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() = 0;
+};
+
 
 /**
  * 
  */
-class NEWTONEDITORMODULE_API FNewtonModelEditor: public FWorkflowCentricApplication
+class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 {
 	public:
 	FNewtonModelEditor();
@@ -45,18 +55,29 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor: public FWorkflowCentricApplicat
 
 	// editor methods
 	void BuildAsset();
+	void BindCommands();
 	void CreateSkeletalMeshEditor();
 	UEdGraph* GetGraphEditor() const;
 	UNewtonModel* GetNewtonModel() const;
 	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
+	TSharedRef<class ISkeletonTree> GetSkeletonTree() const;
+	TSharedRef<class IPersonaToolkit> GetPersonaToolkit() const;
 	void SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph);
 	void SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData);
-
-	void OnGraphChanged(const FEdGraphEditAction& action);
-	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
-	void OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext);
+	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() override;
 	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
+
+	// Delegates
+	void OnGraphChanged(const FEdGraphEditAction& action);
+	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
+	void HandleViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
+	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
+	void OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext);
+	void HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& betailBuilder);
+	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
+	void HandleSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
+
 
 	// Toolkit methods
 	virtual FName GetToolkitFName() const override;
@@ -66,13 +87,10 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor: public FWorkflowCentricApplicat
 	virtual bool OnRequestClose(EAssetEditorCloseReason InCloseReason) override;
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
-
-	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
-	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
+	
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
-	void HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& DetailBuilder);
-	void HandleSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
+	
 
 	protected:
 	UPROPERTY()
@@ -88,9 +106,16 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor: public FWorkflowCentricApplicat
 	/** Skeleton tree */
 	TSharedPtr<ISkeletonTree> SkeletonTree;
 
+	/** Viewport */
+	TSharedPtr<class IPersonaViewport> Viewport;
+
 	/** Persona toolkit */
 	TSharedPtr<IPersonaToolkit> PersonaToolkit;
+
+	// Binding to send/receive skeletal mesh modifications
+	TSharedPtr<FNewtonModelEditorBinding> Binding;
 
 	bool m_modelChange;
 	static FName m_identifier;
 };
+

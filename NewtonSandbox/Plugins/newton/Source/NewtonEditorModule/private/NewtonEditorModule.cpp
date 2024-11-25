@@ -4,14 +4,15 @@
 #include "AssetToolsModule.h"
 #include "Styling/SlateStyle.h"
 #include "Modules/ModuleManager.h"
-#include "NewtonModelPinFactory.h"
 #include "ISkeletonEditorModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
 #include "testButtonStyle.h"
-#include "NewtonModelAction.h"
 #include "testButtonCommands.h"
+
+#include "NewtonModelAction.h"
+#include "factories/NewtonModelPinFactory.h"
 
 IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
 
@@ -86,12 +87,10 @@ void FNewtonEditorModule::ToolbarUpdate()
 	m_toobarCount++;
 }
 
-
-void FNewtonEditorModule::RegisterNewtonModelEditor()
+void FNewtonEditorModule::CreateIcons()
 {
-	// register the asset icon
 	m_styleSet = MakeShareable(new FSlateStyleSet(ND_MESH_EDITOR_NAME));
-	TSharedPtr<IPlugin> plugin (IPluginManager::Get().FindPlugin(TEXT("newton")));
+	TSharedPtr<IPlugin> plugin(IPluginManager::Get().FindPlugin(TEXT("newton")));
 	const FString resourceDir(plugin->GetBaseDir() / TEXT("Resources"));
 	m_styleSet->SetContentRoot(resourceDir);
 
@@ -105,17 +104,31 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 
 	m_styleSet->Set(TEXT("ClassIcon.NewtonModel"), newtonIcon);
 	m_styleSet->Set(TEXT("ClassThumbnail.NewtonModel"), newtonThumbnail);
-
 	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
 	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeletePinIcon"), nodeDeletePinIcon);
 	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*m_styleSet);
+}
+
+void FNewtonEditorModule::UnreagiterIcons()
+{
+	if (m_styleSet)
+	{
+		FSlateStyleRegistry::UnRegisterSlateStyle(*m_styleSet);
+		ensure(m_styleSet.IsUnique());
+		m_styleSet.Reset();
+	}
+}
+
+void FNewtonEditorModule::RegisterNewtonModelEditor()
+{
+	// register the asset icon
+	//CreateIcons();
 
 	// register the asset menu item entry
 	IAssetTools& assetTools = IAssetTools::Get();
 	const FName name(TEXT("newtonPhysics"));
-	//const FText showName(FText::FromString(TEXT("Newton Model")));
 	const FText showName(FText::FromString(TEXT("Newton Physics")));
 	EAssetTypeCategories::Type assetType = assetTools.RegisterAdvancedAssetCategory(name, showName);
 
@@ -133,12 +146,10 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 
 void FNewtonEditorModule::UnregisterNewtonModelEditor()
 {
-	FSlateStyleRegistry::UnRegisterSlateStyle(*m_styleSet);
-	FEdGraphUtilities::UnregisterVisualPinFactory(m_customPinFactory);
+	UnreagiterIcons();
 
-	ensure(m_styleSet.IsUnique());
+	FEdGraphUtilities::UnregisterVisualPinFactory(m_customPinFactory);
 	ensure(m_customPinFactory.IsUnique());
-	m_styleSet.Reset();
 	m_customPinFactory.Reset();
 
 	//IAssetTools& assetTools = IAssetTools::Get();
