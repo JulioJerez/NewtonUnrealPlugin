@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/SCompoundWidget.h"
+
 //#include "SlateFwd.h"
 //#include "Misc/Attribute.h"
 //#include "Animation/Skeleton.h"
@@ -21,19 +21,20 @@
 //#include "Widgets/Views/STreeView.h"
 //#include "Preferences/PersonaOptions.h"
 //#include "ISkeletonTreeBuilder.h"
-//#include "ISkeletonTreeItem.h"
 //#include "SkeletonTreeBuilder.h"
 //#include "Widgets/Input/SSearchBox.h"
 //#include "EditorUndoClient.h"
 //#include "UObject/GCObject.h"
+
+#include "ISkeletonTreeItem.h"
+#include "Widgets/SCompoundWidget.h"
+#include "Widgets/Text/SInlineEditableTextBlock.h"
 
 //class FMenuBuilder;
 //class FSkeletonTreeAttachedAssetItem;
 //class FSkeletonTreeBoneItem;
 //class FSkeletonTreeSocketItem;
 //class FSkeletonTreeVirtualBoneItem;
-//class FTextFilterExpressionEvaluator;
-//class SBlendProfilePicker;
 //class SComboButton;
 //class UBlendProfile;
 //class UToolMenu;
@@ -44,10 +45,20 @@
 //enum class EBlendProfileMode : uint8;
 
 class IPinnedCommandList;
+class SBlendProfilePicker;
 class IPersonaPreviewScene;
 class FUICommandList_Pinnable;
+class FTextFilterExpressionEvaluator;
 
 class FNewtonModelEditor;
+class ISkeletonTreeBuilder;
+
+// Called when an item is selected/deselected
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnNewtonModelTreeSelectionChangedMulticast, const TArrayView<TSharedPtr<ISkeletonTreeItem>>&, ESelectInfo::Type);
+
+// Called when an item is selected/deselected
+typedef FOnNewtonModelTreeSelectionChangedMulticast::FDelegate FOnNewtonModelTreeSelectionChanged;
+
 
 #if 0
 //class FNewtonModelPhysicTree : public ISkeletonTree, public FSelfRegisteringEditorUndoClient
@@ -62,20 +73,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 
 		/** Skeleton tree allows picking of tree elements */
 		Picker,
-	};
-
-
-	class TreeBuilder : public TSharedFromThis<TreeBuilder>
-	{
-		public:
-		TreeBuilder()
-		{
-			check(0);
-		}
-		virtual ~TreeBuilder()
-		{
-			check(0);
-		}
 	};
 
 
@@ -109,15 +106,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	//virtual void SelectItemsBy(TFunctionRef<bool(const TSharedRef<ISkeletonTreeItem>&, bool&)> Predicate) const override;
 	//virtual void DuplicateAndSelectSocket(const FSelectedSocketInfo& SocketInfoToDuplicate, const FName& NewParentBoneName = FName()) override;
 	//
-	//virtual FDelegateHandle RegisterOnSelectionChanged(const FOnSkeletonTreeSelectionChanged& Delegate) override
-	//{
-	//	return OnSelectionChangedMulticast.Add(Delegate);
-	//}
-	//
-	//virtual void UnregisterOnSelectionChanged(FDelegateHandle DelegateHandle) override
-	//{
-	//	OnSelectionChangedMulticast.Remove(DelegateHandle);
-	//}
 	//
 	//virtual UBlendProfile* GetSelectedBlendProfile() override;
 	//virtual void AttachAssets(const TSharedRef<ISkeletonTreeItem>& TargetItem, const TArray<FAssetData>& AssetData) override;
@@ -128,29 +116,8 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	//virtual void PostUndo(bool bSuccess) override;
 	//virtual void PostRedo(bool bSuccess) override;
 	//
-	///** Creates the tree control and then populates */
-	//void CreateTreeColumns();
-	//
-	///** Function to build the skeleton tree widgets from the source skeleton tree */
-	//void CreateFromSkeleton();
-	//
-	///** Apply filtering to the tree */
-	//void ApplyFilter();
-	//
-	///** Set the initial expansion state of the tree items */
-	//void SetInitialExpansionState();
-	//
 	///** Utility function to print notifications to the user */
 	//void NotifyUser( FNotificationInfo& NotificationInfo );
-	//
-	///** Callback when an item is scrolled into view, handling calls to rename items */
-	//void OnItemScrolledIntoView( TSharedPtr<ISkeletonTreeItem> InItem, const TSharedPtr<ITableRow>& InWidget);
-	//
-	///** Callback for when the user double-clicks on an item in the tree */
-	//void OnTreeDoubleClick( TSharedPtr<ISkeletonTreeItem> InItem );
-	//
-	///** Handle recursive expansion/contraction of the tree */
-	//void SetTreeItemExpansionRecursive(TSharedPtr< ISkeletonTreeItem > TreeItem, bool bInExpansionState) const;
 	//
 	///** Set Bone Translation Retargeting Mode for bone selection, and their children. */
 	//void SetBoneTranslationRetargetingModeRecursive(EBoneTranslationRetargetingMode::Type NewRetargetingMode);
@@ -167,9 +134,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	///** Get the name of the currently selected blend profile */
 	//FName GetSelectedBlendProfileName() const;
 	//
-	///** Delegate handler for when the tree needs refreshing */
-	//void HandleTreeRefresh();
-	//
 	///** Get a shared reference to the skeleton tree that owns us */
 	//TSharedRef<FEditableSkeleton> GetEditableSkeletonInternal() const { return EditableSkeleton.Pin().ToSharedRef(); }
 	//
@@ -185,15 +149,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	private:
 	/** Binds the commands in FSkeletonTreeCommands to functions in this class */
 	//void BindCommands();
-	//
-	///** Create a widget for an entry in the tree from an info */
-	//TSharedRef<ITableRow> MakeTreeRowWidget(TSharedPtr<ISkeletonTreeItem> InInfo, const TSharedRef<STableViewBase>& OwnerTable);
-	//
-	///** Get all children for a given entry in the list */
-	//void GetFilteredChildren(TSharedPtr<ISkeletonTreeItem> InInfo, TArray< TSharedPtr<ISkeletonTreeItem> >& OutChildren);
-	//
-	///** Called to display context menu when right clicking on the widget */
-	//TSharedPtr< SWidget > CreateContextMenu();
 	
 	///** Called to create the add new menu */
 	//void RegisterNewMenu();
@@ -257,12 +212,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	//
 	///** Functions to copy sockets from the skeleton to the mesh */
 	//void OnCopySocketToMesh() {};
-	//
-	///** Callback function to be called when selection changes to check if the next item is selectable or navigable. */
-	//bool OnIsSelectableOrNavigable(TSharedPtr<class ISkeletonTreeItem> InItem) const;
-	//
-	///** Callback function to be called when selection changes in the tree view widget. */
-	//void OnSelectionChanged(TSharedPtr<class ISkeletonTreeItem> Selection, ESelectInfo::Type SelectInfo);
 	
 	///** Sets which types of bone to show */
 	//void SetBoneFilter(EBoneFilter InBoneFilter );
@@ -312,9 +261,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	///** Function to remove virtual bones from the skeleton/mesh */
 	//void DeleteVirtualBones(const TArray<TSharedPtr<class FSkeletonTreeVirtualBoneItem>>& InDisplayedVirtualBonestInfos);
 	
-	/** Called when the user selects a blend profile to edit */
-	void OnBlendProfileSelected(UBlendProfile* NewProfile);
-	
 	///** Sets the blend scale for the selected bones and all of their children */
 	//void RecursiveSetBlendProfileScales(float InScaleToSet);
 	//
@@ -359,38 +305,14 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	//
 	///** Create Blend Profile Menu */
 	//static void CreateBlendProfileMenu(UToolMenu* InMenu);
-	//
-	//TSharedRef<SWidget> GetBlendProfileColumnMenuContent();
-	//
 	//void ExpandTreeOnSelection(TSharedPtr<ISkeletonTreeItem> RowToExpand, bool bForce = false);
 
 	private:
 	///** Pointer back to the skeleton tree that owns us */
 	//TWeakPtr<FEditableSkeleton> EditableSkeleton;
 	
-	///** The blend profile picker displaying the selected profile */
-	//TSharedPtr<SBlendProfilePicker> BlendProfilePicker;
-	//
-	///** Blend Profile Header Label.  Also used to name new blend profiles */
-	//TSharedPtr<SInlineEditableTextBlock> BlendProfileHeader;
-	
-	///** Widget used to display the skeleton hierarchy */
-	//TSharedPtr<STreeView<TSharedPtr<class ISkeletonTreeItem>>> SkeletonTreeView;
-	//
-	///** A tree of unfiltered items */
-	//TArray<TSharedPtr<class ISkeletonTreeItem>> Items;
-	//
-	///** A "mirror" of the tree as a flat array for easier searching */
-	//TArray<TSharedPtr<class ISkeletonTreeItem>> LinearItems;
-	//
-	///** Filtered view of the skeleton tree. This is what is actually used in the tree widget */
-	//TArray<TSharedPtr<class ISkeletonTreeItem>> FilteredItems;
-	//
 	///** Is this view editable */
 	//TAttribute<bool> IsEditable;
-	//
-	///** Current text typed into NameFilterBox */
-	//FText FilterText;
 	
 	///** Current type of blend profile no create. We shouldn't need to hold state for this, but blend profile creation is tied to its header text committed*/
 	//EBlendProfileMode NewBlendProfileMode;
@@ -410,9 +332,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	///** Last Cached Preview Mesh Component LOD */
 	//int32 LastCachedLODForPreviewMeshComponent;
 	//
-	///** Delegate for when an item is selected */
-	//FOnSkeletonTreeSelectionChangedMulticast OnSelectionChangedMulticast;
-	//
 	///** Selection recursion guard flag */
 	//bool bSelecting;
 	
@@ -423,9 +342,6 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	///** Checks if the named profile is the currently selected/active one */
 	//bool IsBlendProfileSelected(FName ProfileName) const;
 	
-	///** Compiled filter search terms. */
-	//TSharedPtr<class FTextFilterExpressionEvaluator> TextFilterPtr;
-	//
 	///** Whether to allow operations that modify the mesh */
 	//bool bAllowMeshOperations;
 	//
@@ -436,15 +352,12 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	//bool bShowDebugVisualizationOptions;
 	///** Delegate that allows custom filtering text to be shown on the filter button */
 	//FOnGetFilterText OnGetFilterText;
-	
-	///** The builder we use to construct the tree */
-	//TSharedPtr<TreeBuilder> Builder;
 
 	///** Context name used to persist settings */
 	//FName ContextName;
 
 	TWeakPtr<FNewtonModelEditor> m_editor;
-	friend struct FScopedSavedSelection;
+	
 }; 
 #else
 
@@ -452,6 +365,14 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 class FNewtonModelPhysicTree : public SCompoundWidget
 {
 	public:
+	struct Columns
+	{
+		static const FName Name;
+		//static const FName Retargeting;
+		static const FName BlendProfile;
+		static const FName DebugVisualization;
+	};
+
 	enum ESkeletonTreeMode
 	{
 		/** Skeleton tree allows editing */
@@ -461,26 +382,11 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 		Picker,
 	};
 
-
-	class TreeBuilder : public TSharedFromThis<TreeBuilder>
-	{
-		public:
-		TreeBuilder()
-		{
-			check(0);
-		}
-		virtual ~TreeBuilder()
-		{
-			check(0);
-		}
-	};
-
-
 	SLATE_BEGIN_ARGS(FNewtonModelPhysicTree)
-		{
-			//_IsEditable(true);
-		}
-		SLATE_ARGUMENT(TSharedPtr<TreeBuilder>, builder)
+	{
+		//_IsEditable(true);
+	}
+	SLATE_ARGUMENT(TSharedPtr<ISkeletonTreeBuilder>, builder)
 	SLATE_END_ARGS()
 
 	FNewtonModelPhysicTree();
@@ -490,15 +396,64 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 
 	/** Called to display the add new menu */
 	TSharedRef< SWidget > CreateNewMenuWidget();
+	TSharedRef<SWidget> GetBlendProfileColumnMenuContent();
 
 	/** Filters the SListView when the user changes the search text box (NameFilterBox)	*/
 	void OnFilterTextChanged(const FText& SearchText);
+
+	/** Called when the user selects a blend profile to edit */
+	void OnBlendProfileSelected(UBlendProfile* NewProfile);
 
 	/** Returns the current text for the filter button tooltip - "All", "Mesh" or "Weighted" etc. */
 	FText GetFilterMenuTooltip() const;
 
 	/** Called to display the filter menu */
 	TSharedRef< SWidget > CreateFilterMenuWidget();
+
+	/** Creates the tree control and then populates */
+	void CreateTreeColumns();
+	
+	/** Function to build the skeleton tree widgets from the source skeleton tree */
+	void CreateFromSkeleton();
+	
+	/** Create a widget for an entry in the tree from an info */
+	TSharedRef<ITableRow> MakeTreeRowWidget(TSharedPtr<ISkeletonTreeItem> InInfo, const TSharedRef<STableViewBase>& OwnerTable);
+	
+	/** Get all children for a given entry in the list */
+	void GetFilteredChildren(TSharedPtr<ISkeletonTreeItem> InInfo, TArray< TSharedPtr<ISkeletonTreeItem> >& OutChildren);
+	
+	/** Called to display context menu when right clicking on the widget */
+	TSharedPtr< SWidget > CreateContextMenu();
+
+	/** Callback function to be called when selection changes in the tree view widget. */
+	void OnSelectionChanged(TSharedPtr<class ISkeletonTreeItem> Selection, ESelectInfo::Type SelectInfo);
+
+	virtual void UnregisterOnSelectionChanged(FDelegateHandle delegateHandle);
+	virtual FDelegateHandle RegisterOnSelectionChanged(const FOnNewtonModelTreeSelectionChanged& delegate);
+	
+	/** Callback function to be called when selection changes to check if the next item is selectable or navigable. */
+	bool OnIsSelectableOrNavigable(TSharedPtr<class ISkeletonTreeItem> InItem) const;
+
+	/** Callback when an item is scrolled into view, handling calls to rename items */
+	void OnItemScrolledIntoView( TSharedPtr<ISkeletonTreeItem> InItem, const TSharedPtr<ITableRow>& InWidget);
+
+	/** Callback for when the user double-clicks on an item in the tree */
+	void OnTreeDoubleClick( TSharedPtr<ISkeletonTreeItem> InItem );
+	
+	/** Handle recursive expansion/contraction of the tree */
+	void SetTreeItemExpansionRecursive(TSharedPtr< ISkeletonTreeItem > TreeItem, bool bInExpansionState) const;
+
+	/** Apply filtering to the tree */
+	void ApplyFilter();
+
+	
+	/** Set the initial expansion state of the tree items */
+	void SetInitialExpansionState();
+
+	
+	/** Delegate handler for when the tree needs refreshing */
+	void HandleTreeRefresh();
+
 
 	TWeakPtr<FNewtonModelEditor> m_editor;
 
@@ -520,12 +475,44 @@ class FNewtonModelPhysicTree : public SCompoundWidget
 	/** Hold onto the filter combo button to set its foreground color */
 	TSharedPtr<SComboButton> FilterComboButton;
 
+	/** Blend Profile Header Label.  Also used to name new blend profiles */
+	TSharedPtr<SInlineEditableTextBlock> BlendProfileHeader;
+
+	/** The blend profile picker displaying the selected profile */
+	//TSharedPtr<SBlendProfilePicker> BlendProfilePicker;
+
 	/** Widget user to hold the skeleton tree */
 	TSharedPtr<SOverlay> TreeHolder;
+
+	/** Filtered view of the skeleton tree. This is what is actually used in the tree widget */
+	TArray<TSharedPtr<class ISkeletonTreeItem>> FilteredItems;
+
+	/** Widget used to display the skeleton hierarchy */
+	TSharedPtr<STreeView<TSharedPtr<ISkeletonTreeItem>>> SkeletonTreeView;
+
+	/** Delegate for when an item is selected */
+	FOnNewtonModelTreeSelectionChangedMulticast OnSelectionChangedMulticast;
+
+	/** A "mirror" of the tree as a flat array for easier searching */
+	TArray<TSharedPtr<class ISkeletonTreeItem>> LinearItems;
 
 	/** The mode that this skeleton tree is in */
 	ESkeletonTreeMode Mode;
 
+	/** A tree of unfiltered items */
+	TArray<TSharedPtr<ISkeletonTreeItem>> Items;
+
+	/** Current text typed into NameFilterBox */
+	FText FilterText;
+
+	/** Compiled filter search terms. */
+	TSharedPtr<FTextFilterExpressionEvaluator> TextFilterPtr;
+
+
+	/** The builder we use to construct the tree */
+	TSharedPtr<ISkeletonTreeBuilder> Builder;
+
+	struct FScopedSavedSelection;
 };
 
 #endif

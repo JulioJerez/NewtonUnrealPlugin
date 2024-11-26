@@ -22,9 +22,10 @@
 
 #include "NewtonModelGraphSchema.h"
 
-#include "NewtonModel.h"
+
 #include "NewtonModelGraphNode.h"
 #include "NewtonModelGraphNodeRoot.h"
+#include "NewtonModelEditorCommon.h"
 
 USTRUCT()
 struct FNewtonModelGraphSchemaActionGraphNode : public FEdGraphSchemaAction

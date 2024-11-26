@@ -22,8 +22,8 @@
 
 #include "factories/NewtonModelFactory.h"
 
-#include "NewtonModel.h"
 #include "NewtonEditorModule.h"
+#include "NewtonModelEditorCommon.h"
 
 UNewtonModelFactory::UNewtonModelFactory()
 	:UFactory()

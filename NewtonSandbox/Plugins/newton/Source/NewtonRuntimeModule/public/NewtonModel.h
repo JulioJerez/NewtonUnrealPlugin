@@ -22,98 +22,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <functional>
+
+//#include <functional>
 #include "UObject/Object.h"
+#include "NewtonCommons.h"
 #include "NewtonModel.generated.h"
 
-// ***************************************************************************** 
-//
-// runtime support for NewtonModel asset
-// 
-// ***************************************************************************** 
-UCLASS(BlueprintType)
-class NEWTONRUNTIMEMODULE_API UNewtonModelInfo : public UObject
-{
-	GENERATED_BODY()
-	public:
-	UNewtonModelInfo();
+class UNewtonModelGraph;
 
-	void Initialize(const UNewtonModelInfo* const srcInfo);
-
-	UPROPERTY(EditAnywhere)
-	FText Title;
-
-	UPROPERTY(EditAnywhere)
-	TArray<FText> Responses;
-};
-
-//**********************************************************************************
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelPin : public UObject
-{
-	GENERATED_BODY()
-	public:
-	UNewtonModelPin();
-
-	UPROPERTY()
-	TArray<UNewtonModelPin*> Connections;
-};
-
-//**********************************************************************************
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
-{
-	GENERATED_BODY()
-
-	public:
-	UNewtonModelNode();
-
-	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
-	UNewtonModelPin* GetInputPin() const;
-	UNewtonModelPin* GetOuputPin() const;
-
-	UPROPERTY()
-	FVector2D Posit;
-
-	UPROPERTY()
-	UNewtonModelInfo* Info;
-
-	protected:
-	UPROPERTY()
-	UNewtonModelPin* InputPin;
-
-	UPROPERTY()
-	UNewtonModelPin* OutputPin;
-};
-
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRoot : public UNewtonModelNode
-{
-	GENERATED_BODY()
-
-	public:
-	UNewtonModelNodeRoot();
-	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
-};
-
-//**********************************************************************************
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelGraph : public UObject
-{
-	GENERATED_BODY()
-
-	public:
-	UNewtonModelGraph();
-
-	UPROPERTY()
-	TArray<UNewtonModelNode*> NodesArray;
-};
-
-// ***************************************************************************** 
-//
-// runtime NewtonModel asset
-// 
-// ***************************************************************************** 
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 {
@@ -127,6 +43,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
 
+	// to be removed 
 	UPROPERTY()
 	UNewtonModelGraph* Graph;
 

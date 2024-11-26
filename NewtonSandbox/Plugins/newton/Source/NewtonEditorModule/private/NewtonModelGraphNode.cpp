@@ -26,7 +26,7 @@
 #include "NewtonEditorModule.h"
 #include "Framework/Commands/UIAction.h"
 
-#include "NewtonModel.h"
+#include "NewtonModelEditorCommon.h"
 
 const FName UNewtonModelGraphNode::m_subCategory(TEXT("NewtonModelLinkNode"));
 const FName UNewtonModelGraphNode::m_nodeClassName(TEXT("Newton Model Link Node"));

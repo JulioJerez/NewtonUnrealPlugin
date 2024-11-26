@@ -56,6 +56,7 @@ class NEWTONEDITORMODULE_API UNewtonModelGraphNode : public UEdGraphNode
 	protected:
 	UEdGraphPin* CreateNodePin(EEdGraphPinDirection direction);
 
+	// to be removed 
 	UPROPERTY()
 	UNewtonModelInfo* m_nodeInfo;
 

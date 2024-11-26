@@ -22,8 +22,8 @@
 
 #include "NewtonModelAction.h"
 
-#include "NewtonModel.h"
 #include "NewtonModelEditor.h"
+#include "NewtonModelEditorCommon.h"
 
 NewtonModelAction::NewtonModelAction(EAssetTypeCategories::Type assetCategory)
 	:FAssetTypeActions_Base()

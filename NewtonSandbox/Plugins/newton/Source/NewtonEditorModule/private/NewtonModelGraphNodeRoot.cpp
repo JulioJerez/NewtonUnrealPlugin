@@ -22,7 +22,7 @@
 
 #include "NewtonModelGraphNodeRoot.h"
 
-#include "NewtonModel.h"
+#include "NewtonModelEditorCommon.h"
 
 const FName UNewtonModelGraphNodeRoot::m_subCategory(TEXT("UNewtonModelGraphNodeRoot"));
 const FName UNewtonModelGraphNodeRoot::m_nodeClassName(TEXT("Newton Model Root Node"));

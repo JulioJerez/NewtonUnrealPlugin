@@ -24,8 +24,8 @@
 #include "PropertyEditorModule.h"
 #include "PropertyEditorDelegates.h"
 
-#include "NewtonModel.h"
 #include "NewtonModelEditor.h"
+#include "NewtonModelEditorCommon.h"
 
 #define DETAIL_IDENTIFIER TEXT("NewtonModelTabDetail")
 //FName NewtonModelTabFactoryDetail::m_tabName("NewtonModelTabDetail");

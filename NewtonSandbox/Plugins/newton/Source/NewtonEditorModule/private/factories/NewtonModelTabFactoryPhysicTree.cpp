@@ -5,7 +5,6 @@
 //#include "IDocumentation.h"
 //#include "SkeletonEditor.h"
 
-#include "NewtonModel.h"
 #include "NewtonModelEditor.h"
 #include "NewtonModelPhysicTree.h"
 #include "NewtonModelEditorCommon.h"

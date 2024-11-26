@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-
-//#define ND_INCLUDE_GRAPH_EDITOR
+#include "NewtonModel.h"
+#include "NewtonModelGraph.h"
 
 /**
  * 

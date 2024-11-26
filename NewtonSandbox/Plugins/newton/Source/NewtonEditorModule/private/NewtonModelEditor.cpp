@@ -35,11 +35,12 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 
-#include "NewtonModel.h"
+
 #include "NewtonModelGraphNode.h"
 #include "NewtonModelPhysicTree.h"
 #include "NewtonModelEditorMode.h"
 #include "NewtonModelGraphSchema.h"
+#include "NewtonModelEditorCommon.h"
 #include "NewtonModelGraphNodeRoot.h"
 #include "NewtonModelEditorBinding.h"
 

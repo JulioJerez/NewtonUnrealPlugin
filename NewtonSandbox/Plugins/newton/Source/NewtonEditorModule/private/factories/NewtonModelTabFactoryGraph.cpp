@@ -26,7 +26,6 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
 
-#include "NewtonModel.h"
 #include "NewtonModelEditor.h"
 #include "NewtonModelEditorCommon.h"
 

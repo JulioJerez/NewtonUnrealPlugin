@@ -23,6 +23,7 @@
 #include "NewtonModel.h"
 #include "UObject/ObjectSaveContext.h"
 
+#include "NewtonModelGraph.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonModel::UNewtonModel()
@@ -32,99 +33,3 @@ UNewtonModel::UNewtonModel()
 {
 }
 
-//void UNewtonModel::SetPreSaveListeners(std::function<void()> onPreSaveListener)
-//{
-//	m_onPresaveListener = onPreSaveListener;
-//}
-//
-//void UNewtonModel::PreSave(FObjectPreSaveContext saveContext)
-//{
-//	if (m_onPresaveListener)
-//	{
-//		m_onPresaveListener();
-//	}
-//}
-
-// ***************************************************************************** 
-//
-// runtime support for newtonModel asset
-// 
-// ***************************************************************************** 
-UNewtonModelInfo::UNewtonModelInfo()
-	:Super()
-	,Title(FText::FromString(TEXT("child node")))
-	,Responses()
-{
-}
-
-void UNewtonModelInfo::Initialize(const UNewtonModelInfo* const srcInfo)
-{
-	Title = srcInfo->Title;
-}
-
-//**********************************************************************************
-UNewtonModelPin::UNewtonModelPin()
-	:Super()
-	,Connections()
-{
-}
-
-//**********************************************************************************
-UNewtonModelNode::UNewtonModelNode()
-	:Super()
-	,Posit(0.0f, 0.0f)
-	,Info(nullptr)
-	,InputPin(nullptr)
-	,OutputPin(nullptr)
-{
-}
-
-void UNewtonModelNode::Initialize(const UNewtonModelInfo* const srcInfo)
-{
-	check(!Info);
-	check(srcInfo);
-	check(!InputPin);
-	check(!OutputPin);
-
-	Info = NewObject<UNewtonModelInfo>(this);
-	Info->Initialize(srcInfo);
-
-	InputPin = NewObject<UNewtonModelPin>(this);
-	OutputPin = NewObject<UNewtonModelPin>(this);
-}
-
-UNewtonModelPin* UNewtonModelNode::GetInputPin() const
-{
-	return InputPin;
-}
-
-UNewtonModelPin* UNewtonModelNode::GetOuputPin() const
-{
-	return OutputPin;
-}
-
-//**********************************************************************************
-UNewtonModelNodeRoot::UNewtonModelNodeRoot()
-	:Super()
-{
-}
-
-void UNewtonModelNodeRoot::Initialize(const UNewtonModelInfo* const srcInfo)
-{
-	check(!Info);
-	check(srcInfo);
-	check(!InputPin);
-	check(!OutputPin);
-
-	Info = NewObject<UNewtonModelInfo>(this);
-	Info->Initialize(srcInfo);
-
-	OutputPin = NewObject<UNewtonModelPin>(this);
-}
-
-//**********************************************************************************
-UNewtonModelGraph::UNewtonModelGraph()
-	:Super()
-	,NodesArray()
-{
-}
