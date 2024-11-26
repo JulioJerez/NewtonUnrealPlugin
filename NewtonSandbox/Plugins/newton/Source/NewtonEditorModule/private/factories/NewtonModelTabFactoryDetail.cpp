@@ -46,7 +46,7 @@ NewtonModelTabFactoryDetail::~NewtonModelTabFactoryDetail()
 
 FText NewtonModelTabFactoryDetail::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
 {
-	const FText name(FText::FromString(TEXT("NewtonModelComponent detail view")));
+	const FText name(FText::FromString(TEXT("NewtonModel detail view")));
 	return name;
 }
 

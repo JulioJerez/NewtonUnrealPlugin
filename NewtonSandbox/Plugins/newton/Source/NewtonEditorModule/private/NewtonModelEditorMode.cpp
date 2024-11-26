@@ -27,33 +27,37 @@
 #include "IPersonaToolkit.h"
 
 #include "NewtonModelEditor.h"
+#include "NewtonModelEditorCommon.h"
 #include "factories/NewtonModelTabFactoryGraph.h"
 #include "factories/NewtonModelTabFactoryDetail.h"
+#include "factories/NewtonModelTabFactoryPhysicTree.h"
 
 FName NewtonModelEditorMode::m_editorModelName(TEXT("NewtonModelMode"));
-FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v1.0"));
+FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v1.1"));
 
 NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplication> editorInterface, TSharedRef<ISkeletonTree> skeletonTree)
 	:FApplicationMode(m_editorModelName)
-	,m_editor(editorInterface)
+	, m_editor(editorInterface)
 {
-	TSharedRef<FNewtonModelEditor> editor (StaticCastSharedRef<FNewtonModelEditor>(editorInterface));
+	TSharedRef<FNewtonModelEditor> editor(StaticCastSharedRef<FNewtonModelEditor>(editorInterface));
 
 	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
 
-	TSharedRef<FWorkflowTabFactory> graphTab(MakeShareable(new NewtonModelTabFactoryGraph(editor)));
+
 	TSharedRef<FWorkflowTabFactory> detailTab(MakeShareable(new NewtonModelTabFactoryDetail(editor)));
+	TSharedRef<FWorkflowTabFactory> physicsTreeTab(MakeShareable(new FNewtonModelTabFactoryPhysicTree(editor)));
 	TSharedRef<FWorkflowTabFactory> skeletalTreeTab(skeletonEditorModule.CreateSkeletonTreeTabFactory(editor, skeletonTree));
-	
+
 	FPersonaViewportArgs viewportArgs(editor->GetPersonaToolkit()->GetPreviewScene());
 	viewportArgs.ContextName = TEXT("NewtonModelEditor.Viewport");
 	viewportArgs.OnViewportCreated = FOnViewportCreated::CreateSP(editor, &FNewtonModelEditor::HandleViewportCreated);
 	personaModule.RegisterPersonaViewportTabFactories(m_tabs, editor, viewportArgs);
 
-	m_tabs.RegisterFactory(graphTab);
 	m_tabs.RegisterFactory(detailTab);
+	m_tabs.RegisterFactory(physicsTreeTab);
 	m_tabs.RegisterFactory(skeletalTreeTab);
+
 
 	auto MakeArea = [](FName identifier)
 	{
@@ -69,21 +73,49 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplicat
 	};
 
 	TSharedRef<FTabManager::FSplitter> viewportArea(MakeArea(TEXT("Viewport")));
-	TSharedRef<FTabManager::FSplitter> graphArea(MakeArea(graphTab->GetIdentifier()));
 	TSharedRef<FTabManager::FSplitter> detailArea(MakeArea(detailTab->GetIdentifier()));
-	TSharedRef<FTabManager::FSplitter> skeletonArea(MakeArea(skeletalTreeTab->GetIdentifier()));
+	//TSharedRef<FTabManager::FSplitter> skeletonArea(MakeArea(skeletalTreeTab->GetIdentifier()));
+	//TSharedRef<FTabManager::FSplitter> physicsTreeArea(MakeArea(skeletalTreeTab->GetIdentifier()));
+
+	TSharedRef<FTabManager::FSplitter> explorerArea(FTabManager::NewSplitter());
+	{
+		explorerArea->SetOrientation(Orient_Vertical);
+		TSharedRef<FTabManager::FStack> stack(FTabManager::NewStack());
+		stack->SetSizeCoefficient(1.0f);
+
+		TSharedRef<FTabManager::FSplitter> skeletonArea(MakeArea(skeletalTreeTab->GetIdentifier()));
+		skeletonArea->SetSizeCoefficient(0.5f);
+		explorerArea->Split(skeletonArea);
+
+		TSharedRef<FTabManager::FSplitter> physicsTreeArea(MakeArea(physicsTreeTab->GetIdentifier()));
+		physicsTreeArea->SetSizeCoefficient(0.5f);
+		explorerArea->Split(physicsTreeArea);
+	}
+
+#ifdef ND_INCLUDE_GRAPH_EDITOR
+	TSharedRef<FWorkflowTabFactory> graphTab(MakeShareable(new NewtonModelTabFactoryGraph(editor)));
+	m_tabs.RegisterFactory(graphTab);
+	TSharedRef<FTabManager::FSplitter> graphArea(MakeArea(graphTab->GetIdentifier()));
+#endif
 
 	TSharedRef<FTabManager::FArea> mainArea(FTabManager::NewPrimaryArea());
 	mainArea->SetOrientation(Orient_Horizontal);
 	{
-		skeletonArea->SetSizeCoefficient(.2f);
-		mainArea->Split(skeletonArea);
+		//skeletonArea->SetSizeCoefficient(.2f);
+		//mainArea->Split(skeletonArea);
+		explorerArea->SetSizeCoefficient(.2f);
+		mainArea->Split(explorerArea);
 
+#ifdef ND_INCLUDE_GRAPH_EDITOR
 		viewportArea->SetSizeCoefficient(0.3f);
 		mainArea->Split(viewportArea);
 
 		graphArea->SetSizeCoefficient(0.3f);
 		mainArea->Split(graphArea);
+#else
+		viewportArea->SetSizeCoefficient(0.6f);
+		mainArea->Split(viewportArea);
+#endif
 
 		detailArea->SetSizeCoefficient(.2f);
 		mainArea->Split(detailArea);

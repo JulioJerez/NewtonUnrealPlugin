@@ -26,6 +26,8 @@
 #include "IHasPersonaToolkit.h"
 #include "PersonaAssetEditorToolkit.h"
 
+#include "NewtonModelEditorCommon.h"
+
 class UNewtonModel;
 class UNewtonModelGraphNode;
 
@@ -33,8 +35,10 @@ class ISkeletonTree;
 class IPersonaToolkit;
 class IPersonaViewport;
 class ISkeletonTreeItem;
+class IPersonaPreviewScene;
 class IDetailLayoutBuilder;
 class FObjectPreSaveContext;
+class FNewtonModelPhysicTree;
 class FNewtonModelEditorBinding;
 
 class INewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
@@ -54,19 +58,25 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	~FNewtonModelEditor();
 
 	// editor methods
-	void BuildAsset();
+	void BuildGraphEditorAsset();
 	void BindCommands();
 	void CreateSkeletalMeshEditor();
-	UEdGraph* GetGraphEditor() const;
 	UNewtonModel* GetNewtonModel() const;
 	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
-	TSharedRef<class ISkeletonTree> GetSkeletonTree() const;
-	TSharedRef<class IPersonaToolkit> GetPersonaToolkit() const;
-	void SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph);
+	TSharedRef<ISkeletonTree> GetSkeletonTree() const;
+	TSharedRef<IPersonaToolkit> GetPersonaToolkit() const;
+	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
+	TSharedRef<FNewtonModelPhysicTree> GetNewtonModelPhysicTree() const;
+	
 	void SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData);
 	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() override;
 	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
+
+#ifdef ND_INCLUDE_GRAPH_EDITOR
+	UEdGraph* GetGraphEditor() const;
+	void SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph);
+#endif
 
 	// Delegates
 	void OnGraphChanged(const FEdGraphEditAction& action);
@@ -94,20 +104,28 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 
 	protected:
 	UPROPERTY()
-	UEdGraph* m_graphEditor;
-
-	UPROPERTY()
 	UNewtonModel* m_newtonModel;
 
+#ifdef ND_INCLUDE_GRAPH_EDITOR
+	UPROPERTY()
+	UEdGraph* m_graphEditor;
 	TSharedPtr<SGraphEditor> m_slateGraphUi;
+#endif
+
 	TObjectPtr<USkeletalMesh> m_skeletalMeshAsset;
 	TSharedPtr<IDetailsView> m_selectedNodeDetailView;
 
 	/** Skeleton tree */
 	TSharedPtr<ISkeletonTree> SkeletonTree;
 
+	/** Skeleton physics tree */
+	TSharedPtr<FNewtonModelPhysicTree> SkeletonPhysicsTree;
+
 	/** Viewport */
 	TSharedPtr<class IPersonaViewport> Viewport;
+
+	//** PreviewScene
+	TSharedPtr<IPersonaPreviewScene> PreviewScene;
 
 	/** Persona toolkit */
 	TSharedPtr<IPersonaToolkit> PersonaToolkit;

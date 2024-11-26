@@ -24,10 +24,12 @@
 #include "ISkeletonTree.h"
 #include "GraphEditAction.h"
 #include "IPersonaToolkit.h"
+#include "EdGraphUtilities.h"
 #include "IPersonaViewport.h"
 #include "Engine/SkeletalMesh.h"
 #include "IPersonaPreviewScene.h"
 #include "ISkeletonEditorModule.h"
+#include "Widgets/SCompoundWidget.h"
 #include "AssetRegistry/AssetData.h"
 #include "UObject/ObjectSaveContext.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -35,10 +37,12 @@
 
 #include "NewtonModel.h"
 #include "NewtonModelGraphNode.h"
+#include "NewtonModelPhysicTree.h"
 #include "NewtonModelEditorMode.h"
 #include "NewtonModelGraphSchema.h"
 #include "NewtonModelGraphNodeRoot.h"
 #include "NewtonModelEditorBinding.h"
+
 
 FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 
@@ -47,12 +51,15 @@ FNewtonModelEditor::FNewtonModelEditor()
 {
 	m_modelChange = false;
 	SkeletonTree = nullptr;
-	m_graphEditor = nullptr;
 	m_newtonModel = nullptr;
 	PersonaToolkit = nullptr;
-	m_slateGraphUi = nullptr;
 	m_skeletalMeshAsset = nullptr;
 	m_selectedNodeDetailView = nullptr;
+
+#ifdef ND_INCLUDE_GRAPH_EDITOR
+	m_graphEditor = nullptr;
+	m_slateGraphUi = nullptr;
+#endif
 }
 
 FNewtonModelEditor::~FNewtonModelEditor()
@@ -69,9 +76,14 @@ TSharedPtr<FNewtonModelEditorBinding> FNewtonModelEditor::GetBinding()
 	return Binding;
 }
 
-TSharedRef<class ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
+TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
 { 
 	return SkeletonTree.ToSharedRef(); 
+}
+
+TSharedRef<FNewtonModelPhysicTree> FNewtonModelEditor::GetNewtonModelPhysicTree() const
+{
+	return SkeletonPhysicsTree.ToSharedRef();
 }
 
 void FNewtonModelEditor::HandleViewportCreated(const TSharedRef<IPersonaViewport>& viewport)
@@ -91,14 +103,14 @@ void FNewtonModelEditor::OnToolkitHostingFinished(const TSharedRef<IToolkit>& To
 {
 }
 
-TSharedRef<class IPersonaToolkit> FNewtonModelEditor::GetPersonaToolkit() const
+TSharedRef<IPersonaToolkit> FNewtonModelEditor::GetPersonaToolkit() const
 { 
 	return PersonaToolkit.ToSharedRef(); 
 }
 
-UEdGraph* FNewtonModelEditor::GetGraphEditor() const
+TSharedRef<IPersonaPreviewScene> FNewtonModelEditor::GetPreviewScene() const
 {
-	return m_graphEditor;
+	return PreviewScene.ToSharedRef();
 }
 
 FName FNewtonModelEditor::GetToolkitFName() const
@@ -126,10 +138,17 @@ UNewtonModel* FNewtonModelEditor::GetNewtonModel() const
 	return m_newtonModel;
 }
 
+#ifdef ND_INCLUDE_GRAPH_EDITOR
+UEdGraph* FNewtonModelEditor::GetGraphEditor() const
+{
+	return m_graphEditor;
+}
+
 void FNewtonModelEditor::SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph)
 {
 	m_slateGraphUi = workingGraph;
 }
+#endif
 
 void FNewtonModelEditor::SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData)
 {
@@ -139,6 +158,7 @@ void FNewtonModelEditor::SetSelectedNodeDetailView(TSharedPtr<IDetailsView> deta
 
 void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event)
 {
+#ifdef ND_INCLUDE_GRAPH_EDITOR
 	if (m_slateGraphUi)
 	{
 		m_modelChange = true;
@@ -149,6 +169,7 @@ void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChange
 		}
 		m_slateGraphUi->NotifyGraphChanged();
 	}
+#endif
 }
 
 void FNewtonModelEditor::SetNewtonModel(TObjectPtr<UNewtonModel> model)
@@ -240,8 +261,9 @@ void FNewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& 
 	}
 }
 
-void FNewtonModelEditor::BuildAsset()
+void FNewtonModelEditor::BuildGraphEditorAsset()
 {
+#ifdef ND_INCLUDE_GRAPH_EDITOR
 	if (m_modelChange && m_graphEditor && m_graphEditor->Nodes.Num() && m_newtonModel)
 	{
 		m_newtonModel->Graph = NewObject<UNewtonModelGraph>(m_newtonModel);
@@ -291,18 +313,19 @@ void FNewtonModelEditor::BuildAsset()
 			}
 		}
 	}
+#endif
 	m_modelChange = false;
 }
 
 bool FNewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
 {
-	BuildAsset();
+	BuildGraphEditorAsset();
 	return FWorkflowCentricApplication::OnRequestClose(closeReason);
 }
 
 void FNewtonModelEditor::OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext)
 {
-	BuildAsset();
+	BuildGraphEditorAsset();
 }
 
 void FNewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
@@ -313,9 +336,14 @@ void FNewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
 
 void FNewtonModelEditor::CreateSkeletalMeshEditor()
 {
-	check(0);
-	//m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
-	//
+	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+
+	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
+	m_modelChange = true;
+
+
+	//NotifyPreChange(const FString & PropertyName);
+	
 	//FPersonaToolkitArgs personaToolkitArgs;
 	//personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
 	//
@@ -346,6 +374,10 @@ void FNewtonModelEditor::BindCommands()
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 }
 
+
+#include "ISkeletonTree.h"
+//#include "SSkeletonTree.h"
+
 void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
 	m_modelChange = false;
@@ -362,21 +394,32 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	personaModule.RecordAssetOpened(FAssetData(m_newtonModel));
 
-	TSharedPtr<IPersonaPreviewScene> previewScene(PersonaToolkit->GetPreviewScene());
+	//TSharedPtr<IPersonaPreviewScene> previewScene(PersonaToolkit->GetPreviewScene());
+	PreviewScene = PersonaToolkit->GetPreviewScene();
+	{
+		// create a skeleton tree editor
+		FSkeletonTreeArgs skeletonTreeArgs;
+		skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSelectionChanged);
+		skeletonTreeArgs.PreviewScene = PreviewScene;
+		skeletonTreeArgs.ContextName = GetToolkitFName();
+		ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
+		SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
+	}
 
-	FSkeletonTreeArgs skeletonTreeArgs;
-	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSelectionChanged);
-	skeletonTreeArgs.PreviewScene = previewScene;
-	skeletonTreeArgs.ContextName = GetToolkitFName();
+	{
+		//make the skeletal physics tree 
+		SkeletonPhysicsTree = SNew(FNewtonModelPhysicTree, SharedThis(this));
+	}
 
-	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
-	SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
+	#ifdef ND_INCLUDE_GRAPH_EDITOR
+	{
+		//Create a graph schematic editor
+		m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, TEXT("NewtonModelGraph"), UEdGraph::StaticClass(), UNewtonModelGraphSchema::StaticClass());
+		m_graphEditor->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &FNewtonModelEditor::OnGraphChanged));
+	}
+	#endif
 
 	FAssetEditorToolkit::InitAssetEditor(mode, initToolkitHost, m_identifier, FTabManager::FLayout::NullLayout, true, true, m_newtonModel);
-	//FAssetEditorToolkit::InitAssetEditor(mode, initToolkitHost, m_identifier, FTabManager::FLayout::NullLayout, true, true, m_skeletalMeshAsset);
-
-	m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, TEXT("NewtonModelGraph"), UEdGraph::StaticClass(), UNewtonModelGraphSchema::StaticClass());
-	m_graphEditor->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &FNewtonModelEditor::OnGraphChanged));
 
 	BindCommands();
 
@@ -413,6 +456,8 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	
 	if (m_newtonModel->Graph)
 	{
+		check(0);
+		#ifdef ND_INCLUDE_GRAPH_EDITOR
 		//create the editor graph from the the NewtonModel
 		TMap<const UNewtonModelPin*, UEdGraphPin*> pinMap;
 		UNewtonModelGraph* const graph = m_newtonModel->Graph;
@@ -468,6 +513,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 				}
 			}
 		}
+		#endif
 	}
 	m_modelChange = false;
 }

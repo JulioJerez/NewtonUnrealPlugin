@@ -28,6 +28,7 @@
 
 #include "NewtonModel.h"
 #include "NewtonModelEditor.h"
+#include "NewtonModelEditorCommon.h"
 
 #define GRAPH_IDENTIFIER TEXT("NewtonModelTabGraph")
 
@@ -36,8 +37,8 @@ NewtonModelTabFactoryGraph::NewtonModelTabFactoryGraph(const TSharedPtr<FNewtonM
 	,m_editor(editor)
 {
 	TabLabel = FText::FromString(TEXT("Graph"));
-	ViewMenuDescription = FText::FromString(TEXT("Newton Model Graph"));
-	ViewMenuTooltip = FText::FromString(TEXT("Show Newton Model Graph"));
+	ViewMenuDescription = FText::FromString(TEXT("NewtonModel Graph"));
+	ViewMenuTooltip = FText::FromString(TEXT("Show NewtonModel Graph"));
 }
 
 NewtonModelTabFactoryGraph::~NewtonModelTabFactoryGraph()
@@ -46,21 +47,13 @@ NewtonModelTabFactoryGraph::~NewtonModelTabFactoryGraph()
 
 FText NewtonModelTabFactoryGraph::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
 {
-	const FText name(FText::FromString(TEXT("NewtonModelComponent Graph view")));
+	const FText name(FText::FromString(TEXT("NewtonModel Graph view")));
 	return name;
 }
 
 TSharedRef<SWidget> NewtonModelTabFactoryGraph::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
 {
-#if 0
-	//check(0);
-	return TSharedRef<SWidget>
-	(
-		SNew(SVerticalBox) +
-		SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)
-		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
-	);
-#else
+#ifdef ND_INCLUDE_GRAPH_EDITOR
 	TSharedPtr<FNewtonModelEditor> editor (m_editor.Pin());
 	
 	SGraphEditor::FGraphEditorEvents graphEvents;
@@ -80,5 +73,13 @@ TSharedRef<SWidget> NewtonModelTabFactoryGraph::CreateTabBody(const FWorkflowTab
 	TSharedRef<SWidget> widget(SNew(SVerticalBox) + editorGraphArg);
 	
 	return widget;
+#else
+	//check(0);
+	return TSharedRef<SWidget>
+	(
+		SNew(SVerticalBox) +
+		SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)
+		[SNew(STextBlock).Text(FText::FromString(TEXT("dummyGraph")))]
+	);
 #endif
 }

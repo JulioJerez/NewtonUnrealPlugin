@@ -22,16 +22,15 @@ public class NewtonEditorModule: ModuleRules
             "ToolMenus",
             "AssetTools",
             "CoreUObject",
+            "ToolWidgets",
             "GraphEditor",
             "GeometryCore",
             "PropertyEditor",
             "EditorFramework",
             "GeometryFramework",
+            "PinnedCommandList",
             "SkeletalMeshUtilitiesCommon",
-            //"EditorWidgets",
-            //"ContentBrowser",
-            //"ApplicationCore",
-            //"NavigationSystem",
+
             "NewtonRuntimeModule"
         });
     }
