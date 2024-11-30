@@ -37,12 +37,13 @@
 
 
 #include "NewtonModelGraphNode.h"
-#include "NewtonModelPhysicTree.h"
 #include "NewtonModelEditorMode.h"
 #include "NewtonModelGraphSchema.h"
 #include "NewtonModelEditorCommon.h"
 #include "NewtonModelGraphNodeRoot.h"
 #include "NewtonModelEditorBinding.h"
+#include "ndTree/NewtonModelPhysicsTree.h"
+#include "ndTree/NewtonModelPhysicsTreeEditableSkeleton.h"
 
 
 FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
@@ -82,7 +83,7 @@ TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
 	return SkeletonTree.ToSharedRef(); 
 }
 
-TSharedRef<FNewtonModelPhysicTree> FNewtonModelEditor::GetNewtonModelPhysicTree() const
+TSharedRef<FNewtonModelPhysicsTree> FNewtonModelEditor::GetNewtonModelPhysicsTree() const
 {
 	return SkeletonPhysicsTree.ToSharedRef();
 }
@@ -376,8 +377,23 @@ void FNewtonModelEditor::BindCommands()
 }
 
 
-#include "ISkeletonTree.h"
-//#include "SSkeletonTree.h"
+TSharedRef< SWidget > XXXXXXX()
+{
+	//FToolMenuContext MenuContext(UICommandList, Extenders);
+	//USkeletonTreeMenuContext* SkeletonTreeMenuContext = NewObject<USkeletonTreeMenuContext>();
+	//SkeletonTreeMenuContext->SkeletonTree = SharedThis(this);
+	//MenuContext.AddObject(SkeletonTreeMenuContext);
+	//return UToolMenus::Get()->GenerateWidget("SkeletonTree.NewMenu", MenuContext);
+
+	check(0);
+	return TSharedRef<SWidget>
+	(
+		SNew(SVerticalBox) +
+		SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)
+		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
+	);
+}
+
 
 void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
@@ -398,7 +414,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	//TSharedPtr<IPersonaPreviewScene> previewScene(PersonaToolkit->GetPreviewScene());
 	PreviewScene = PersonaToolkit->GetPreviewScene();
 	{
-		// create a skeleton tree editor
+		// create a skeleton tree widgets for visualization.
 		FSkeletonTreeArgs skeletonTreeArgs;
 		skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSelectionChanged);
 		skeletonTreeArgs.PreviewScene = PreviewScene;
@@ -408,8 +424,15 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	}
 
 	{
-		//make the skeletal physics tree 
-		SkeletonPhysicsTree = SNew(FNewtonModelPhysicTree, SharedThis(this));
+		// create a acyclic tree widgets for physic model.
+		if (!m_newtonModel->AcyclicGraph)
+		{
+			m_newtonModel->AcyclicGraph = NewObject<UNewtonModelAcyclicGraph>(m_newtonModel);
+		}
+
+		FNewtonModelPhysicsTreeArgs args;
+		TSharedRef<FNewtonModelPhysicsTreeEditableSkeleton> editableTree(MakeShareable(new FNewtonModelPhysicsTreeEditableSkeleton(m_newtonModel->AcyclicGraph)));
+		SkeletonPhysicsTree = editableTree->CreateSkeletonTree(args);
 	}
 
 	#ifdef ND_INCLUDE_GRAPH_EDITOR
@@ -457,7 +480,8 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	
 	if (m_newtonModel->Graph)
 	{
-		check(0);
+		//check(0);
+		UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 		#ifdef ND_INCLUDE_GRAPH_EDITOR
 		//create the editor graph from the the NewtonModel
 		TMap<const UNewtonModelPin*, UEdGraphPin*> pinMap;

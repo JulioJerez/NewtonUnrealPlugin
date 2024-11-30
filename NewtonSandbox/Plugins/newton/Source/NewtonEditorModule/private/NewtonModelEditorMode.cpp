@@ -30,7 +30,7 @@
 #include "NewtonModelEditorCommon.h"
 #include "factories/NewtonModelTabFactoryGraph.h"
 #include "factories/NewtonModelTabFactoryDetail.h"
-#include "factories/NewtonModelTabFactoryPhysicTree.h"
+#include "factories/NewtonModelTabFactoryPhysicsTree.h"
 
 FName NewtonModelEditorMode::m_editorModelName(TEXT("NewtonModelMode"));
 FName NewtonModelEditorMode::m_editorVersionName(TEXT("NewtonModelModeLayout_v1.1"));
@@ -46,7 +46,7 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplicat
 
 
 	TSharedRef<FWorkflowTabFactory> detailTab(MakeShareable(new NewtonModelTabFactoryDetail(editor)));
-	TSharedRef<FWorkflowTabFactory> physicsTreeTab(MakeShareable(new FNewtonModelTabFactoryPhysicTree(editor)));
+	TSharedRef<FWorkflowTabFactory> physicsTreeTab(MakeShareable(new FNewtonModelTabFactoryPhysicsTree(editor)));
 	TSharedRef<FWorkflowTabFactory> skeletalTreeTab(skeletonEditorModule.CreateSkeletonTreeTabFactory(editor, skeletonTree));
 
 	FPersonaViewportArgs viewportArgs(editor->GetPersonaToolkit()->GetPreviewScene());

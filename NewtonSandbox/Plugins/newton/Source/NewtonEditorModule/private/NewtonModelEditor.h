@@ -35,11 +35,13 @@ class ISkeletonTree;
 class IPersonaToolkit;
 class IPersonaViewport;
 class ISkeletonTreeItem;
+class IPinnedCommandList;
 class IPersonaPreviewScene;
 class IDetailLayoutBuilder;
 class FObjectPreSaveContext;
-class FNewtonModelPhysicTree;
+class FNewtonModelPhysicsTree;
 class FNewtonModelEditorBinding;
+class FNewtonModelPhysicsTreeEditableSkeleton;
 
 class INewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
 {
@@ -48,9 +50,7 @@ class INewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersona
 };
 
 
-/**
- * 
- */
+
 class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 {
 	public:
@@ -66,7 +66,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	TSharedRef<ISkeletonTree> GetSkeletonTree() const;
 	TSharedRef<IPersonaToolkit> GetPersonaToolkit() const;
 	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
-	TSharedRef<FNewtonModelPhysicTree> GetNewtonModelPhysicTree() const;
+	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
 	
 	void SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData);
 	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() override;
@@ -102,6 +102,12 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	
 
+
+
+	TSharedRef< SWidget > XXXXXXX();
+
+
+
 	protected:
 	UPROPERTY()
 	UNewtonModel* m_newtonModel;
@@ -119,7 +125,11 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	TSharedPtr<ISkeletonTree> SkeletonTree;
 
 	/** Skeleton physics tree */
-	TSharedPtr<FNewtonModelPhysicTree> SkeletonPhysicsTree;
+	TSharedPtr<FNewtonModelPhysicsTree> SkeletonPhysicsTree;
+
+	/** The builder we use to construct the tree */
+	TSharedPtr<class FNewtonModelPhysicsTreeBuilder> Builder;
+
 
 	/** Viewport */
 	TSharedPtr<class IPersonaViewport> Viewport;
@@ -132,6 +142,10 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 
 	// Binding to send/receive skeletal mesh modifications
 	TSharedPtr<FNewtonModelEditorBinding> Binding;
+
+	/** Pinned commands panel */
+	TSharedPtr<IPinnedCommandList> PinnedCommands;
+
 
 	bool m_modelChange;
 	static FName m_identifier;

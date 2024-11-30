@@ -28,8 +28,9 @@
 
 UNewtonModel::UNewtonModel()
 	:Super()
-	,SkeletalMeshAsset(nullptr)
-	,Graph(nullptr)
 {
+	Graph = nullptr;
+	AcyclicGraph = nullptr;
+	SkeletalMeshAsset = nullptr;
 }
 

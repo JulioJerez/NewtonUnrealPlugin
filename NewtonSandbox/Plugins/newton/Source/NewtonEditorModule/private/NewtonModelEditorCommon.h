@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "NewtonModel.h"
 #include "NewtonModelGraph.h"
+#include "NewtonModelAcyclicNode.h"
+#include "NewtonModelAcyclicGraph.h"
 
 /**
  * 

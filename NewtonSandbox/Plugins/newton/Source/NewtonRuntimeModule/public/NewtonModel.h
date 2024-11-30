@@ -29,6 +29,7 @@
 #include "NewtonModel.generated.h"
 
 class UNewtonModelGraph;
+class UNewtonModelAcyclicGraph;
 
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
@@ -46,6 +47,10 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 	// to be removed 
 	UPROPERTY()
 	UNewtonModelGraph* Graph;
+
+	// to be removed 
+	UPROPERTY()
+	UNewtonModelAcyclicGraph* AcyclicGraph;
 
 	//private:
 	//std::function<void()> m_onPresaveListener;

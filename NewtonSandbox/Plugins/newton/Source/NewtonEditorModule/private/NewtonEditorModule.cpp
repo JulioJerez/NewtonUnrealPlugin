@@ -5,6 +5,7 @@
 #include "Styling/SlateStyle.h"
 #include "Modules/ModuleManager.h"
 #include "ISkeletonEditorModule.h"
+#include "IPinnedCommandListModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -142,6 +143,7 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	// load dependency modules
 	FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
+	FModuleManager::LoadModuleChecked<IPinnedCommandListModule>(TEXT("PinnedCommandList"));
 }
 
 void FNewtonEditorModule::UnregisterNewtonModelEditor()
