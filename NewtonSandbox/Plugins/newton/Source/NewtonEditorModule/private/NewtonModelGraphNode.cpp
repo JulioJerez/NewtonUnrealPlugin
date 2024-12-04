@@ -40,7 +40,7 @@ UNewtonModelGraphNode::UNewtonModelGraphNode()
 	m_nodeInfo = nullptr;
 }
 
-UNewtonModelInfo* UNewtonModelGraphNode::GetNodeInfo() const
+UGraphTestInfo* UNewtonModelGraphNode::GetNodeInfo() const
 {
 	return m_nodeInfo;
 }
@@ -148,12 +148,12 @@ void UNewtonModelGraphNode::GetNodeContextMenuActions(class UToolMenu* menu, cla
 	);
 }
 
-void UNewtonModelGraphNode::Initialize(const UNewtonModelInfo* const srcInfo)
+void UNewtonModelGraphNode::Initialize(const UGraphTestInfo* const srcInfo)
 {
 	m_inputPin = CreateNodePin(EEdGraphPinDirection::EGPD_Input);
 	m_ouputPin = CreateNodePin(EEdGraphPinDirection::EGPD_Output);
 
-	m_nodeInfo = NewObject<UNewtonModelInfo>(this);
+	m_nodeInfo = NewObject<UGraphTestInfo>(this);
 	if (srcInfo)
 	{
 		m_nodeInfo->Initialize(srcInfo);
@@ -179,7 +179,7 @@ void UNewtonModelGraphNode::SyncPinsWithResponses()
 {
 	// at this time we are not changing the pin connections, since they are fixed
 	//const TArray<UEdGraphPin*>& pins = GetAllPins();
-	//const UNewtonModelInfo* const nodeInfo = GetNodeInfo();
+	//const UGraphTestInfo* const nodeInfo = GetNodeInfo();
 	//check(pins.Num() == nodeInfo->Responses.Num());
 	//
 	//const TArray<FText>& reponses = nodeInfo->Responses;

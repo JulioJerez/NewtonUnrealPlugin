@@ -4,24 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "NewtonModelAcyclicNode.generated.h"
+#include "NewtonModelNode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelAcyclicNode : public UObject
+class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 {
 	GENERATED_BODY()
 	public:
-	UNewtonModelAcyclicNode();
+	UNewtonModelNode();
+
+
+	virtual void AttachNode(UNewtonModelNode* const node);
 
 	UPROPERTY(EditAnywhere)
-	FText Title;
+	FName Name;
 
 	UPROPERTY()
-	UNewtonModelAcyclicNode* Parent;
+	UNewtonModelNode* Parent;
 
 	UPROPERTY()
-	TArray<UNewtonModelAcyclicNode*> Children;
+	TArray<UNewtonModelNode*> Children;
 };

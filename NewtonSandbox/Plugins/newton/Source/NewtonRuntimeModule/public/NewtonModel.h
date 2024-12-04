@@ -28,8 +28,8 @@
 #include "NewtonCommons.h"
 #include "NewtonModel.generated.h"
 
-class UNewtonModelGraph;
-class UNewtonModelAcyclicGraph;
+class UGraphTestGraph;
+class UNewtonModelNodeRigidBodyRoot;
 
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
@@ -46,11 +46,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 
 	// to be removed 
 	UPROPERTY()
-	UNewtonModelGraph* Graph;
+	UGraphTestGraph* Graph;
 
 	// to be removed 
 	UPROPERTY()
-	UNewtonModelAcyclicGraph* AcyclicGraph;
+	UNewtonModelNodeRigidBodyRoot* RootBody;
 
 	//private:
 	//std::function<void()> m_onPresaveListener;

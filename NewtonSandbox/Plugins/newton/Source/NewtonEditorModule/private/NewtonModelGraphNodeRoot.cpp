@@ -38,11 +38,11 @@ FLinearColor UNewtonModelGraphNodeRoot::GetNodeTitleColor() const
 	return FLinearColor::Red;
 }
 
-void UNewtonModelGraphNodeRoot::Initialize(const UNewtonModelInfo* const srcInfo)
+void UNewtonModelGraphNodeRoot::Initialize(const UGraphTestInfo* const srcInfo)
 {
 	m_ouputPin = CreateNodePin(EEdGraphPinDirection::EGPD_Output);
 
-	m_nodeInfo = NewObject<UNewtonModelInfo>(this);
+	m_nodeInfo = NewObject<UGraphTestInfo>(this);
 	m_nodeInfo->Title = FText::FromString(TEXT("root node"));
 	if (srcInfo)
 	{
@@ -53,7 +53,7 @@ void UNewtonModelGraphNodeRoot::Initialize(const UNewtonModelInfo* const srcInfo
 void UNewtonModelGraphNodeRoot::SyncPinsWithResponses()
 {
 	// at this time we are not changing the pin connections, since they are fixed
-	//const UNewtonModelInfo* const nodeInfo = GetNodeInfo();
+	//const UGraphTestInfo* const nodeInfo = GetNodeInfo();
 	//const TArray<UEdGraphPin*>& pins = GetAllPins();
 	//check(pins.Num() == nodeInfo->Responses.Num());
 	//

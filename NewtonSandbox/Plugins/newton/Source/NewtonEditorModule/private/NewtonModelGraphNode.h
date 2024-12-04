@@ -25,7 +25,7 @@
 #include "EdGraph/EdGraphNode.h"
 #include "NewtonModelGraphNode.generated.h"
 
-class UNewtonModelInfo;
+class UGraphTestInfo;
 
 /**
  * 
@@ -47,8 +47,8 @@ class NEWTONEDITORMODULE_API UNewtonModelGraphNode : public UEdGraphNode
 	
 	// Newton Model editor methods
 	virtual void SyncPinsWithResponses();
-	UNewtonModelInfo* GetNodeInfo() const;
-	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
+	UGraphTestInfo* GetNodeInfo() const;
+	virtual void Initialize(const UGraphTestInfo* const srcInfo);
 
 	UEdGraphPin* GetInputPin() const;
 	UEdGraphPin* GetOutputPin() const;
@@ -58,7 +58,7 @@ class NEWTONEDITORMODULE_API UNewtonModelGraphNode : public UEdGraphNode
 
 	// to be removed 
 	UPROPERTY()
-	UNewtonModelInfo* m_nodeInfo;
+	UGraphTestInfo* m_nodeInfo;
 
 	UEdGraphPin* m_inputPin;
 	UEdGraphPin* m_ouputPin;

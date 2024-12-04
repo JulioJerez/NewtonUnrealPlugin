@@ -86,10 +86,11 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	void OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& betailBuilder);
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
-	void HandleSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
+	void HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
 
 
 	// Toolkit methods
+	virtual void OnClose() override;
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
@@ -104,7 +105,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 
 
 
-	TSharedRef< SWidget > XXXXXXX();
+	//TSharedRef< SWidget > XXXXXXX();
 
 
 
@@ -127,6 +128,10 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	/** Skeleton physics tree */
 	TSharedPtr<FNewtonModelPhysicsTree> SkeletonPhysicsTree;
 
+	/** not caching editable skeleton tree */
+	TSharedPtr<FNewtonModelPhysicsTreeEditableSkeleton> EditableSkeletonPhysicsTree;
+
+
 	/** The builder we use to construct the tree */
 	TSharedPtr<class FNewtonModelPhysicsTreeBuilder> Builder;
 
@@ -146,6 +151,8 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	/** Pinned commands panel */
 	TSharedPtr<IPinnedCommandList> PinnedCommands;
 
+         /** save model when closing editor*/
+	FDelegateHandle m_onCloseHandle;
 
 	bool m_modelChange;
 	static FName m_identifier;

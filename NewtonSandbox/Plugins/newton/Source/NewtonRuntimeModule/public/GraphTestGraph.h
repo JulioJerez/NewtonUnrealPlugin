@@ -26,21 +26,21 @@
 
 #include <functional>
 #include "UObject/Object.h"
-#include "NewtonModelGraph.generated.h"
+#include "GraphTestGraph.generated.h"
 
 // ***************************************************************************** 
 //
-// runtime support for NewtonModel asset
+// runtime support for GraphTest asset
 // 
 // ***************************************************************************** 
 UCLASS(BlueprintType)
-class NEWTONRUNTIMEMODULE_API UNewtonModelInfo : public UObject
+class NEWTONRUNTIMEMODULE_API UGraphTestInfo : public UObject
 {
 	GENERATED_BODY()
 	public:
-	UNewtonModelInfo();
+	UGraphTestInfo();
 
-	void Initialize(const UNewtonModelInfo* const srcInfo);
+	void Initialize(const UGraphTestInfo* const srcInfo);
 
 	UPROPERTY(EditAnywhere)
 	FText Title;
@@ -51,63 +51,63 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelInfo : public UObject
 
 //**********************************************************************************
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelPin : public UObject
+class NEWTONRUNTIMEMODULE_API UGraphTestPin : public UObject
 {
 	GENERATED_BODY()
 	public:
-	UNewtonModelPin();
+	UGraphTestPin();
 
 	UPROPERTY()
-	TArray<UNewtonModelPin*> Connections;
+	TArray<UGraphTestPin*> Connections;
 };
 
 //**********************************************************************************
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
+class NEWTONRUNTIMEMODULE_API UGraphTestGraphNode : public UObject
 {
 	GENERATED_BODY()
 
 	public:
-	UNewtonModelNode();
+	UGraphTestGraphNode();
 
-	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
-	UNewtonModelPin* GetInputPin() const;
-	UNewtonModelPin* GetOuputPin() const;
+	virtual void Initialize(const UGraphTestInfo* const srcInfo);
+	UGraphTestPin* GetInputPin() const;
+	UGraphTestPin* GetOuputPin() const;
 
 	UPROPERTY()
 	FVector2D Posit;
 
 	UPROPERTY()
-	UNewtonModelInfo* Info;
+	UGraphTestInfo* Info;
 
 	protected:
 	UPROPERTY()
-	UNewtonModelPin* InputPin;
+	UGraphTestPin* InputPin;
 
 	UPROPERTY()
-	UNewtonModelPin* OutputPin;
+	UGraphTestPin* OutputPin;
 };
 
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRoot : public UNewtonModelNode
+class NEWTONRUNTIMEMODULE_API UGraphTestGraphNodeRoot : public UGraphTestGraphNode
 {
 	GENERATED_BODY()
 
 	public:
-	UNewtonModelNodeRoot();
-	virtual void Initialize(const UNewtonModelInfo* const srcInfo);
+	UGraphTestGraphNodeRoot();
+	virtual void Initialize(const UGraphTestInfo* const srcInfo);
 };
 
 //**********************************************************************************
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonModelGraph : public UObject
+class NEWTONRUNTIMEMODULE_API UGraphTestGraph : public UObject
 {
 	GENERATED_BODY()
 
 	public:
-	UNewtonModelGraph();
+	UGraphTestGraph();
 
 	UPROPERTY()
-	TArray<UNewtonModelNode*> NodesArray;
+	TArray<UGraphTestGraphNode*> NodesArray;
 };
 

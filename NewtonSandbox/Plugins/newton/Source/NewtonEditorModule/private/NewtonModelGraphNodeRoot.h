@@ -41,7 +41,7 @@ class UNewtonModelGraphNodeRoot: public UNewtonModelGraphNode
 
 	virtual void SyncPinsWithResponses() override;
 	virtual FLinearColor GetNodeTitleColor() const override;
-	virtual void Initialize(const UNewtonModelInfo* const srcInfo) override;
+	virtual void Initialize(const UGraphTestInfo* const srcInfo) override;
 
 	public:
 	static const FName m_subCategory;

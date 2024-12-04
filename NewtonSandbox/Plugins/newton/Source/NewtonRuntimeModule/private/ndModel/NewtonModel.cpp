@@ -23,14 +23,14 @@
 #include "NewtonModel.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include "NewtonModelGraph.h"
+#include "GraphTestGraph.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonModel::UNewtonModel()
 	:Super()
 {
 	Graph = nullptr;
-	AcyclicGraph = nullptr;
+	RootBody = nullptr;
 	SkeletalMeshAsset = nullptr;
 }
 

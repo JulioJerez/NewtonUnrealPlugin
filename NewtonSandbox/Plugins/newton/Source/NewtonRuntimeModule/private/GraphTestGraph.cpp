@@ -20,32 +20,32 @@
 */
 
 
-#include "NewtonModelGraph.h"
+#include "GraphTestGraph.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonModelInfo::UNewtonModelInfo()
+UGraphTestInfo::UGraphTestInfo()
 	:Super()
 	,Title(FText::FromString(TEXT("child node")))
 	,Responses()
 {
 }
 
-void UNewtonModelInfo::Initialize(const UNewtonModelInfo* const srcInfo)
+void UGraphTestInfo::Initialize(const UGraphTestInfo* const srcInfo)
 {
 	Title = srcInfo->Title;
 }
 
 //**********************************************************************************
-UNewtonModelPin::UNewtonModelPin()
+UGraphTestPin::UGraphTestPin()
 	:Super()
 	,Connections()
 {
 }
 
 //**********************************************************************************
-UNewtonModelNode::UNewtonModelNode()
+UGraphTestGraphNode::UGraphTestGraphNode()
 	:Super()
 	,Posit(0.0f, 0.0f)
 	,Info(nullptr)
@@ -54,51 +54,51 @@ UNewtonModelNode::UNewtonModelNode()
 {
 }
 
-void UNewtonModelNode::Initialize(const UNewtonModelInfo* const srcInfo)
+void UGraphTestGraphNode::Initialize(const UGraphTestInfo* const srcInfo)
 {
 	check(!Info);
 	check(srcInfo);
 	check(!InputPin);
 	check(!OutputPin);
 
-	Info = NewObject<UNewtonModelInfo>(this);
+	Info = NewObject<UGraphTestInfo>(this);
 	Info->Initialize(srcInfo);
 
-	InputPin = NewObject<UNewtonModelPin>(this);
-	OutputPin = NewObject<UNewtonModelPin>(this);
+	InputPin = NewObject<UGraphTestPin>(this);
+	OutputPin = NewObject<UGraphTestPin>(this);
 }
 
-UNewtonModelPin* UNewtonModelNode::GetInputPin() const
+UGraphTestPin* UGraphTestGraphNode::GetInputPin() const
 {
 	return InputPin;
 }
 
-UNewtonModelPin* UNewtonModelNode::GetOuputPin() const
+UGraphTestPin* UGraphTestGraphNode::GetOuputPin() const
 {
 	return OutputPin;
 }
 
 //**********************************************************************************
-UNewtonModelNodeRoot::UNewtonModelNodeRoot()
+UGraphTestGraphNodeRoot::UGraphTestGraphNodeRoot()
 	:Super()
 {
 }
 
-void UNewtonModelNodeRoot::Initialize(const UNewtonModelInfo* const srcInfo)
+void UGraphTestGraphNodeRoot::Initialize(const UGraphTestInfo* const srcInfo)
 {
 	check(!Info);
 	check(srcInfo);
 	check(!InputPin);
 	check(!OutputPin);
 
-	Info = NewObject<UNewtonModelInfo>(this);
+	Info = NewObject<UGraphTestInfo>(this);
 	Info->Initialize(srcInfo);
 
-	OutputPin = NewObject<UNewtonModelPin>(this);
+	OutputPin = NewObject<UGraphTestPin>(this);
 }
 
 //**********************************************************************************
-UNewtonModelGraph::UNewtonModelGraph()
+UGraphTestGraph::UGraphTestGraph()
 	:Super()
 	,NodesArray()
 {

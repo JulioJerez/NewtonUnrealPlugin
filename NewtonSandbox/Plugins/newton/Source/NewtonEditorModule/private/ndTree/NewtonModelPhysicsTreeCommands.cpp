@@ -50,12 +50,11 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	//UI_COMMAND( DeleteCurrentBlendProfile, "Delete the Current Blend Profile", "Delete the active blend profile for this skeleton", EUserInterfaceActionType::Button, FInputChord() );
 	//UI_COMMAND( RenameBlendProfile, "Rename the Current Blend Profile", "Rename the active blend profile for this skeleton", EUserInterfaceActionType::Button, FInputChord());
 
-	UI_COMMAND(AddRootBody, "Add Root Body", "the Root body must be the parenet of all nodes", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddLinkBody, "Add Link Body", "Link body can only the only child of a joint", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddBoxShape, "Add Box Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddSphereShape, "Add Sphere Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddHingeJoint, "Add Hinge Joint", "Joint must be child of a rigi body ", EUserInterfaceActionType::Button, FInputChord());
-
+	UI_COMMAND(AddBodyRoot, "Add Root Body", "the Root body must be the parent of all acyclic nodes", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddBodyLink, "Add Link Body", "Link body can only be child of a joint", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeBox, "Add Box Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeSphere, "Add Sphere Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointHinge, "Add Hinge Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

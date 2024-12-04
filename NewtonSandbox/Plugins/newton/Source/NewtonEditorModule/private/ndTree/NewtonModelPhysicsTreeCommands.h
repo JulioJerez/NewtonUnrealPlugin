@@ -104,10 +104,9 @@ public:
 	///** Rename an existing BlendProfile */
 	//TSharedPtr< FUICommandInfo > RenameBlendProfile;
 
-
-	TSharedPtr< FUICommandInfo > AddRootBody;
-	TSharedPtr< FUICommandInfo > AddLinkBody;
-	TSharedPtr< FUICommandInfo > AddBoxShape;
-	TSharedPtr< FUICommandInfo > AddSphereShape;
-	TSharedPtr< FUICommandInfo > AddHingeJoint;
+	TSharedPtr< FUICommandInfo > AddBodyRoot;
+	TSharedPtr< FUICommandInfo > AddBodyLink;
+	TSharedPtr< FUICommandInfo > AddShapeBox;
+	TSharedPtr< FUICommandInfo > AddJointHinge;
+	TSharedPtr< FUICommandInfo > AddShapeSphere;
 };
