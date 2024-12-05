@@ -40,7 +40,6 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	//UI_COMMAND( CreateMeshSocket, "Create Mesh Socket", "Duplicate this socket from skeleton to the current mesh and modify the socket data for it", EUserInterfaceActionType::Button, FInputChord() );
 	//UI_COMMAND( RemoveMeshSocket, "Remove Mesh Socket", "Remove duplicated version of this socket for the current mesh (reverts to the socket in the skeleton)", EUserInterfaceActionType::Button, FInputChord() );
 	//UI_COMMAND( PromoteSocketToSkeleton, "Promote Socket To Skeleton", "Makes this socket available for all meshes that use the same skeleton (copies the socket from this mesh to the skeleton)", EUserInterfaceActionType::Button, FInputChord() );
-	//UI_COMMAND(DeleteSelectedRows, "Delete", "Delete all selected items in the tree", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
 	//UI_COMMAND( ShowActiveSockets, "Show Active Sockets", "Show mesh and skeleton sockets, hiding the skeleton sockets that have a customized mesh socket", EUserInterfaceActionType::RadioButton, FInputChord() );
 	//UI_COMMAND( ShowAllSockets, "Show All Sockets", "Show all sockets that are in the mesh and skeleton", EUserInterfaceActionType::RadioButton, FInputChord() );
 	//UI_COMMAND( ShowMeshSockets, "Show Mesh Sockets", "Show sockets that are in the mesh only", EUserInterfaceActionType::RadioButton, FInputChord() );
@@ -55,6 +54,8 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(AddShapeBox, "Add Box Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeSphere, "Add Sphere Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointHinge, "Add Hinge Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+
+	UI_COMMAND(DeleteSelectedRows, "Delete", "Delete all selected items in the tree", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
 }
 
 #undef LOCTEXT_NAMESPACE

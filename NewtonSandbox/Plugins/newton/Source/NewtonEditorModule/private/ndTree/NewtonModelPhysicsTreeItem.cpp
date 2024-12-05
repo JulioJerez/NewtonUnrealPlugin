@@ -4,11 +4,13 @@
 
 #include "NewtonEditorModule.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
+#include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
 	m_parent = parentNode;
+	m_acyclicGraph = nullptr;
 	m_displayName = displayName;
 }
 
@@ -24,7 +26,6 @@ const FName& FNewtonModelPhysicsTreeItem::GetDisplayName() const
 const FSlateBrush* FNewtonModelPhysicsTreeItem::GetIcon() const
 {
 	FNewtonEditorModule& module = FModuleManager::GetModuleChecked<FNewtonEditorModule>(TEXT("NewtonEditorModule"));
-	//return styleSet.GetBrush("SkeletonTree.Bone");
 	return module.GetBrush(BrushName());
 }
 

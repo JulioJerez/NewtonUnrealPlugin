@@ -3,6 +3,8 @@
 
 #include "ndTree/NewtonModelPhysicsTree.h"
 
+#define TREE_STACK_DEPTH	256
+
 #if 0
 #include "IPinnedCommandList.h"
 #include "SPositiveActionButton.h"
@@ -264,11 +266,6 @@ void FNewtonModelPhysicsTree::BindCommands()
 	//commandList.MapAction(
 	//	menuActions.PromoteSocketToSkeleton,
 	//	FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnPromoteSocket)); // Adding customization just deletes the mesh socket
-	//
-	//commandList.MapAction(
-	//	menuActions.DeleteSelectedRows,
-	//	FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnDeleteSelectedRows),
-	//	FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::CanDeleteSelectedRows));
 	//
 	//commandList.MapAction(
 	//	menuActions.CopyBoneNames,
@@ -744,245 +741,6 @@ void FNewtonModelPhysicsTree::SetTreeItemExpansionRecursive(TSharedPtr<INewtonMo
 	}
 }
 
-//TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
-//{
-//	const FNewtonModelPhysicsTreeCommands& Actions = FNewtonModelPhysicsTreeCommands::Get();
-//
-//	TArray<TSharedPtr<INewtonModelPhysicsTreeItem>> SelectedItems = SkeletonTreeView->GetSelectedItems();
-//	FSkeletonTreeSelection BoneTreeSelection(SelectedItems);
-//
-//	const bool CloseAfterSelection = true;
-//	FMenuBuilder MenuBuilder(CloseAfterSelection, UICommandList, Extenders);
-//	{
-//		if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeAttachedAssetItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeSocketItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>())
-//		{
-//			MenuBuilder.BeginSection("SkeletonTreeSelectedItemsActions", LOCTEXT("SelectedActions", "Selected Item Actions"));
-//			MenuBuilder.AddMenuEntry(Actions.DeleteSelectedRows);
-//			MenuBuilder.EndSection();
-//		}
-//
-//
-//		const bool bNeedsBoneActionsHeading = BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>();
-//
-//		if (bNeedsBoneActionsHeading)
-//		{
-//			MenuBuilder.BeginSection("SkeletonTreeBonesAction", LOCTEXT("BoneActions", "Selected Bone Actions"));
-//		}
-//
-//		const bool bHasBoneSelected = BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>();
-//		const bool bHasVirtualBoneSelected = BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>();
-//		if (bHasBoneSelected || bHasVirtualBoneSelected)
-//		{
-//			MenuBuilder.AddMenuEntry(Actions.CopyBoneNames);
-//
-//			if (bHasBoneSelected)
-//			{
-//				MenuBuilder.AddMenuEntry(Actions.ResetBoneTransforms);
-//			}
-//
-//			if (BoneTreeSelection.IsSingleOfTypesSelected<FSkeletonTreeBoneItem, FSkeletonTreeVirtualBoneItem>() && bAllowSkeletonOperations)
-//			{
-//				MenuBuilder.AddMenuEntry(Actions.AddSocket);
-//				MenuBuilder.AddMenuEntry(Actions.PasteSockets);
-//				MenuBuilder.AddMenuEntry(Actions.PasteSocketsToSelectedBone);
-//			}
-//		}
-//
-//		if (bNeedsBoneActionsHeading)
-//		{
-//			if (bAllowSkeletonOperations)
-//			{
-//				MenuBuilder.AddSubMenu(LOCTEXT("AddVirtualBone", "Add Virtual Bone"),
-//					LOCTEXT("AddVirtualBone_ToolTip", "Adds a virtual bone to the skeleton."),
-//					FNewMenuDelegate::CreateLambda([this](FMenuBuilder& MenuBuilder)
-//						{
-//							TSharedRef<SBoneTreeMenu> MenuContent = SSkeletonTree::CreateVirtualBoneMenu(this);
-//							MenuBuilder.AddWidget(MenuContent, FText::GetEmpty(), true);
-//						}));
-//			}
-//
-//			MenuBuilder.EndSection();
-//		}
-//
-//		if (bAllowSkeletonOperations)
-//		{
-//			if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>())
-//			{
-//				UBlendProfile* const SelectedBlendProfile = BlendProfilePicker->GetSelectedBlendProfile();
-//				if (SelectedBlendProfile && BoneTreeSelection.IsSingleOfTypeSelected<FSkeletonTreeBoneItem>())
-//				{
-//					TSharedPtr<FSkeletonTreeBoneItem> BoneItem = BoneTreeSelection.GetSelectedItems<FSkeletonTreeBoneItem>()[0];
-//
-//					FName BoneName = BoneItem->GetAttachName();
-//					const USkeleton& Skeleton = GetEditableSkeletonInternal()->GetSkeleton();
-//					int32 BoneIndex = Skeleton.GetReferenceSkeleton().FindBoneIndex(BoneName);
-//
-//					float CurrentBlendScale = SelectedBlendProfile->GetBoneBlendScale(BoneIndex);
-//
-//					MenuBuilder.BeginSection("SkeletonTreeBlendProfileScales", LOCTEXT("BlendProfileContextOptions", "Blend Profile"));
-//					{
-//						FUIAction RecursiveSetScales;
-//						RecursiveSetScales.ExecuteAction = FExecuteAction::CreateSP(this, &SSkeletonTree::RecursiveSetBlendProfileScales, CurrentBlendScale);
-//
-//						MenuBuilder.AddMenuEntry
-//						(
-//							FText::Format(LOCTEXT("RecursiveSetBlendScales_Label", "Recursively Set Blend Scales To {0}"), FText::AsNumber(CurrentBlendScale)),
-//							LOCTEXT("RecursiveSetBlendScales_ToolTip", "Sets all child bones to use the same blend profile scale as the selected bone"),
-//							FSlateIcon(),
-//							RecursiveSetScales
-//						);
-//					}
-//					MenuBuilder.EndSection();
-//				}
-//
-//				if (IsShowingAdvancedOptions())
-//				{
-//					MenuBuilder.BeginSection("SkeletonTreeBoneTranslationRetargeting", LOCTEXT("BoneTranslationRetargetingHeader", "Bone Translation Retargeting"));
-//					{
-//						FUIAction RecursiveRetargetingSkeletonAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::Skeleton));
-//						FUIAction RecursiveRetargetingAnimationAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::Animation));
-//						FUIAction RecursiveRetargetingAnimationScaledAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::AnimationScaled));
-//						FUIAction RecursiveRetargetingAnimationRelativeAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::AnimationRelative));
-//						FUIAction RecursiveRetargetingOrientAndScaleAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::OrientAndScale));
-//
-//						MenuBuilder.AddMenuEntry
-//						(LOCTEXT("SetTranslationRetargetingSkeletonChildrenAction", "Recursively Set Translation Retargeting Skeleton")
-//							, LOCTEXT("BoneTranslationRetargetingSkeletonToolTip", "Use translation from Skeleton.")
-//							, FSlateIcon()
-//							, RecursiveRetargetingSkeletonAction
-//						);
-//
-//						MenuBuilder.AddMenuEntry
-//						(LOCTEXT("SetTranslationRetargetingAnimationChildrenAction", "Recursively Set Translation Retargeting Animation")
-//							, LOCTEXT("BoneTranslationRetargetingAnimationToolTip", "Use translation from animation.")
-//							, FSlateIcon()
-//							, RecursiveRetargetingAnimationAction
-//						);
-//
-//						MenuBuilder.AddMenuEntry
-//						(LOCTEXT("SetTranslationRetargetingAnimationScaledChildrenAction", "Recursively Set Translation Retargeting AnimationScaled")
-//							, LOCTEXT("BoneTranslationRetargetingAnimationScaledToolTip", "Use translation from animation, scale length by Skeleton's proportions.")
-//							, FSlateIcon()
-//							, RecursiveRetargetingAnimationScaledAction
-//						);
-//
-//						MenuBuilder.AddMenuEntry
-//						(LOCTEXT("SetTranslationRetargetingAnimationRelativeChildrenAction", "Recursively Set Translation Retargeting AnimationRelative")
-//							, LOCTEXT("BoneTranslationRetargetingAnimationRelativeToolTip", "Use relative translation from animation similar to an additive animation.")
-//							, FSlateIcon()
-//							, RecursiveRetargetingAnimationRelativeAction
-//						);
-//
-//						MenuBuilder.AddMenuEntry
-//						(LOCTEXT("SetTranslationRetargetingOrientAndScaleChildrenAction", "Recursively Set Translation Retargeting OrientAndScale")
-//							, LOCTEXT("BoneTranslationRetargetingOrientAndScaleToolTip", "Orient And Scale Translation.")
-//							, FSlateIcon()
-//							, RecursiveRetargetingOrientAndScaleAction
-//						);
-//					}
-//					MenuBuilder.EndSection();
-//				}
-//			}
-//		}
-//
-//		if (bAllowMeshOperations)
-//		{
-//			MenuBuilder.BeginSection("SkeletonTreeBoneReductionForLOD", LOCTEXT("BoneReductionHeader", "LOD Bone Reduction"));
-//			{
-//				MenuBuilder.AddSubMenu(
-//					LOCTEXT("SkeletonTreeBoneReductionForLOD_RemoveSelectedFromLOD", "Remove Selected..."),
-//					FText::GetEmpty(),
-//					FNewMenuDelegate::CreateStatic(&SSkeletonTree::CreateMenuForBoneReduction, this, LastCachedLODForPreviewMeshComponent, true)
-//				);
-//
-//				MenuBuilder.AddSubMenu(
-//					LOCTEXT("SkeletonTreeBoneReductionForLOD_RemoveChildrenFromLOD", "Remove Children..."),
-//					FText::GetEmpty(),
-//					FNewMenuDelegate::CreateStatic(&SSkeletonTree::CreateMenuForBoneReduction, this, LastCachedLODForPreviewMeshComponent, false)
-//				);
-//			}
-//			MenuBuilder.EndSection();
-//		}
-//
-//		if (bAllowSkeletonOperations)
-//		{
-//			if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>())
-//			{
-//				MenuBuilder.BeginSection("SkeletonTreeVirtualBoneActions", LOCTEXT("VirtualBoneActions", "Selected Virtual Bone Actions"));
-//
-//				if (BoneTreeSelection.IsSingleOfTypeSelected<FSkeletonTreeVirtualBoneItem>())
-//				{
-//					MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("RenameVirtualBone_Label", "Rename Virtual Bone"), LOCTEXT("RenameVirtualBone_Tooltip", "Rename this virtual bone"));
-//				}
-//
-//				MenuBuilder.EndSection();
-//			}
-//
-//			if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeSocketItem>())
-//			{
-//				MenuBuilder.BeginSection("SkeletonTreeSocketsActions", LOCTEXT("SocketActions", "Selected Socket Actions"));
-//
-//				MenuBuilder.AddMenuEntry(Actions.CopySockets);
-//
-//				if (BoneTreeSelection.IsSingleOfTypeSelected<FSkeletonTreeSocketItem>())
-//				{
-//					MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("RenameSocket_Label", "Rename Socket"), LOCTEXT("RenameSocket_Tooltip", "Rename this socket"));
-//
-//					TSharedPtr<FSkeletonTreeSocketItem> SocketItem = BoneTreeSelection.GetSelectedItems<FSkeletonTreeSocketItem>()[0];
-//
-//					if (SocketItem->IsSocketCustomized() && SocketItem->GetParentType() == ESocketParentType::Mesh)
-//					{
-//						MenuBuilder.AddMenuEntry(Actions.RemoveMeshSocket);
-//					}
-//
-//					// If the socket is on the skeleton, we have a valid mesh
-//					// and there isn't one of the same name on the mesh, we can customize it
-//					if (SocketItem->CanCustomizeSocket())
-//					{
-//						if (SocketItem->GetParentType() == ESocketParentType::Skeleton)
-//						{
-//							MenuBuilder.AddMenuEntry(Actions.CreateMeshSocket);
-//						}
-//						else if (SocketItem->GetParentType() == ESocketParentType::Mesh)
-//						{
-//							// If a socket is on the mesh only, then offer to promote it to the skeleton
-//							MenuBuilder.AddMenuEntry(Actions.PromoteSocketToSkeleton);
-//						}
-//					}
-//				}
-//
-//				MenuBuilder.EndSection();
-//			}
-//		}
-//
-//		if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeSocketItem>())
-//		{
-//			MenuBuilder.BeginSection("SkeletonTreeAttachedAssets", LOCTEXT("AttachedAssetsActionsHeader", "Attached Assets Actions"));
-//
-//			if (BoneTreeSelection.IsSingleItemSelected())
-//			{
-//				MenuBuilder.AddSubMenu(LOCTEXT("AttachNewAsset", "Add Preview Asset"),
-//					LOCTEXT("AttachNewAsset_ToolTip", "Attaches an asset to this part of the skeleton. Assets can also be dragged onto the skeleton from a content browser to attach"),
-//					FNewMenuDelegate::CreateSP(this, &SSkeletonTree::FillAttachAssetSubmenu, BoneTreeSelection.GetSingleSelectedItem()));
-//			}
-//
-//			FUIAction RemoveAllAttachedAssets = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::OnRemoveAllAssets),
-//				FCanExecuteAction::CreateSP(this, &SSkeletonTree::CanRemoveAllAssets));
-//
-//			MenuBuilder.AddMenuEntry(LOCTEXT("RemoveAllAttachedAssets", "Remove All Attached Assets"),
-//				LOCTEXT("RemoveAllAttachedAssets_ToolTip", "Removes all the attached assets from the skeleton and mesh."),
-//				FSlateIcon(), RemoveAllAttachedAssets);
-//
-//			MenuBuilder.EndSection();
-//		}
-//
-//		// Add an empty section so the menu can be extended when there are no optionally-added entries
-//		MenuBuilder.BeginSection("SkeletonTreeContextMenu");
-//		MenuBuilder.EndSection();
-//	}
-//
-//	return MenuBuilder.MakeWidget();
-//}
 
 void FNewtonModelPhysicsTree::CreateTreeColumns()
 {
@@ -1156,6 +914,7 @@ void FNewtonModelPhysicsTree::CreateFromSkeleton()
 #include "ndTree/NewtonModelPhysicsTreeItem.h"
 #include "ndTree/NewtonModelPhysicsTreeItemRow.h"
 #include "ndTree/NewtonModelPhysicsTreeCommands.h"
+#include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
 
@@ -1164,70 +923,77 @@ FName FNewtonModelPhysicsTree::m_menuName(TEXT("NewtonModelPhysicsTreeMenu"));
 FName FNewtonModelPhysicsTree::m_contextName(TEXT("NewtonModelPhysicsTreeMenuItem"));
 
 
-class FNewtonModelPhysicsTree::FScopedSavedSelection
-{
-	public:
-	FScopedSavedSelection(TSharedPtr<FNewtonModelPhysicsTree> tree)
-		:SkeletonTree(tree)
-	{
-		// record selected items
-		if (SkeletonTree.IsValid() && tree->m_treeView.IsValid())
-		{
-			TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>> SelectedItems = tree->m_treeView->GetSelectedItems();
-			for (const TSharedPtr<FNewtonModelPhysicsTreeItem>& SelectedItem : SelectedItems)
-			{
-				check(0);
-				//SavedSelections.Add({ SelectedItem->GetRowItemName(), SelectedItem->GetTypeName(), SelectedItem->GetObject() });
-			}
-		}
-	}
-
-	~FScopedSavedSelection()
-	{
-		if (SkeletonTree.IsValid() && SkeletonTree->m_treeView.IsValid())
-		{
-			// restore selection
-			for (const TSharedPtr<FNewtonModelPhysicsTreeItem>& Item : SkeletonTree->m_items)
-			{
-				check(0);
-				//if (Item->GetFilterResult() != Hidden)
-				//{
-				//	for (FSavedSelection& SavedSelection : SavedSelections)
-				//	{
-				//		if (Item->GetRowItemName() == SavedSelection.ItemName && Item->GetTypeName() == SavedSelection.ItemType && Item->GetObject() == SavedSelection.ItemObject)
-				//		{
-				//			SkeletonTree->SkeletonTreeView->SetItemSelection(Item, true);
-				//			break;
-				//		}
-				//	}
-				//}
-			}
-		}
-	}
-
-	struct FSavedSelection
-	{
-		/** Name of the selected item */
-		FName ItemName;
-
-		/** Type of the selected item */
-		FName ItemType;
-
-		/** Object of selected item */
-		UObject* ItemObject;
-	};
-
-	TArray<FSavedSelection> SavedSelections;
-	TSharedPtr<FNewtonModelPhysicsTree> SkeletonTree;
-};
+//class FNewtonModelPhysicsTree::FScopedSavedSelection
+//{
+//	public:
+//	FScopedSavedSelection(TSharedPtr<FNewtonModelPhysicsTree> tree)
+//		:SkeletonTree(tree)
+//	{
+//		// record selected items
+//		if (SkeletonTree.IsValid() && tree->m_treeView.IsValid())
+//		{
+//			TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>> SelectedItems = tree->m_treeView->GetSelectedItems();
+//			for (const TSharedPtr<FNewtonModelPhysicsTreeItem>& SelectedItem : SelectedItems)
+//			{
+//				check(0);
+//				//SavedSelections.Add({ SelectedItem->GetRowItemName(), SelectedItem->GetTypeName(), SelectedItem->GetObject() });
+//			}
+//		}
+//	}
+//
+//	~FScopedSavedSelection()
+//	{
+//		if (SkeletonTree.IsValid() && SkeletonTree->m_treeView.IsValid())
+//		{
+//			// restore selection
+//			for (const TSharedPtr<FNewtonModelPhysicsTreeItem>& Item : SkeletonTree->m_items)
+//			{
+//				check(0);
+//				//if (Item->GetFilterResult() != Hidden)
+//				//{
+//				//	for (FSavedSelection& SavedSelection : SavedSelections)
+//				//	{
+//				//		if (Item->GetRowItemName() == SavedSelection.ItemName && Item->GetTypeName() == SavedSelection.ItemType && Item->GetObject() == SavedSelection.ItemObject)
+//				//		{
+//				//			SkeletonTree->SkeletonTreeView->SetItemSelection(Item, true);
+//				//			break;
+//				//		}
+//				//	}
+//				//}
+//			}
+//		}
+//	}
+//
+//	struct FSavedSelection
+//	{
+//		/** Name of the selected item */
+//		FName ItemName;
+//
+//		/** Type of the selected item */
+//		FName ItemType;
+//
+//		/** Object of selected item */
+//		UObject* ItemObject;
+//	};
+//
+//	TArray<FSavedSelection> SavedSelections;
+//	TSharedPtr<FNewtonModelPhysicsTree> SkeletonTree;
+//};
 
 
 FNewtonModelPhysicsTree::FNewtonModelPhysicsTree()
 {
+	m_acyclicGraph = nullptr;
 }
 
 FNewtonModelPhysicsTree::~FNewtonModelPhysicsTree()
 {
+	m_selectedItem = nullptr;
+	if (m_acyclicGraph)
+	{
+		delete m_acyclicGraph;
+	}
+	m_items.Empty();
 }
 
 void FNewtonModelPhysicsTree::Tick(const FGeometry& geometry, const double currentTime, const float deltaTime)
@@ -1271,19 +1037,57 @@ TSharedRef< SWidget > FNewtonModelPhysicsTree::OnCreateNewMenuWidget()
 
 void FNewtonModelPhysicsTree::OnGetChildren(TSharedPtr<FNewtonModelPhysicsTreeItem> item, TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>>& outChildren)
 {
-	for (int i = 0; i < m_items.Num(); ++i)
+	check(m_acyclicGraph);
+	check(item->m_acyclicGraph);
+
+	const FNewtonModelPhysicsTreeItemAcyclicGraph* const root = item->m_acyclicGraph;
+	for (int i = 0; i < root->m_children.Num(); ++i)
 	{
-		TSharedPtr<FNewtonModelPhysicsTreeItem> child(m_items[i]);
-		if (child->m_parent == item)
-		{
-			outChildren.Push(child);
-		}
+		outChildren.Push(root->m_children[i]->m_item);
 	}
 }
 
 void FNewtonModelPhysicsTree::OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsTreeItem> item, ESelectInfo::Type selectInfo)
 {
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	m_selectedItem = item;
+}
+
+bool FNewtonModelPhysicsTree::CanDeleteSelectedRows() const
+{
+	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	if (m_selectedItem.IsValid())
+	{
+		return !m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody"));
+	}
+	return false;
+}
+
+void FNewtonModelPhysicsTree::OnDeleteSelectedRows()
+{
+	int stack = 1;
+	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
+
+	check(m_selectedItem.IsValid());
+	check(!m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+
+	nodeStack[0] = m_selectedItem->m_acyclicGraph;
+	while (stack)
+	{
+		stack--;
+		FNewtonModelPhysicsTreeItemAcyclicGraph* const node = nodeStack[stack];
+		m_items.FindAndRemoveChecked(node->m_item.Get());
+		for (int i = node->m_children.Num() - 1; i >= 0; --i)
+		{
+			nodeStack[stack] = node->m_children[i];
+			stack++;
+		}
+	}
+
+	m_selectedItem->m_acyclicGraph->m_parent->RemoveChild(m_selectedItem->m_acyclicGraph);
+	delete m_selectedItem->m_acyclicGraph;
+
+	RefreshView();
 }
 
 void FNewtonModelPhysicsTree::OnCreateItemBodyRoot()
@@ -1310,7 +1114,6 @@ void FNewtonModelPhysicsTree::OnCreateItemJointHinge()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 }
-
 
 void FNewtonModelPhysicsTree::RegisterNewMenu()
 {
@@ -1351,13 +1154,266 @@ void FNewtonModelPhysicsTree::BindCommands()
 	// Grab the list of menu commands to bind...
 	const FNewtonModelPhysicsTreeCommands& menuActions = FNewtonModelPhysicsTreeCommands::Get();
 
+	// map node crations actions
 	commandList.MapAction(menuActions.AddBodyRoot, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCreateItemBodyRoot));
 	commandList.MapAction(menuActions.AddBodyLink, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCreateItemBodyLink));
 	commandList.MapAction(menuActions.AddShapeBox, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCreateItemShapeBox));
 	commandList.MapAction(menuActions.AddJointHinge, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCreateItemJointHinge));
 	commandList.MapAction(menuActions.AddShapeSphere, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCreateItemShapeShere));
 
+	// delete any node action
+	commandList.MapAction(menuActions.DeleteSelectedRows, 
+		FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnDeleteSelectedRows),
+		FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::CanDeleteSelectedRows));
+
 	PinnedCommands->BindCommandList(UICommandList.ToSharedRef());
+}
+
+TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
+{
+	//return SNew(STableRow<TSharedPtr<FNewtonModelPhysicsTreeItem>>, ownerTable)
+	//[
+	//	SNew(STextBlock)
+	//	.Text(FText::FromString(TEXT("some when wrong ")))
+	//];
+
+	const FNewtonModelPhysicsTreeCommands& Actions = FNewtonModelPhysicsTreeCommands::Get();
+	
+	//TArray<TSharedPtr<INewtonModelPhysicsTreeItem>> SelectedItems = SkeletonTreeView->GetSelectedItems();
+	//FSkeletonTreeSelection BoneTreeSelection(SelectedItems);
+	//
+	//const bool CloseAfterSelection = true;
+
+	FMenuBuilder MenuBuilder(true, UICommandList);
+	//{
+	//	if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeAttachedAssetItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeSocketItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>())
+	//	{
+			MenuBuilder.BeginSection("SkeletonTreeSelectedItemsActions", LOCTEXT("SelectedActions", "Selected Item Actions"));
+			MenuBuilder.AddMenuEntry(Actions.DeleteSelectedRows);
+			MenuBuilder.EndSection();
+	//	}
+	//
+	//
+	//	const bool bNeedsBoneActionsHeading = BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>();
+	//
+	//	if (bNeedsBoneActionsHeading)
+	//	{
+	//		MenuBuilder.BeginSection("SkeletonTreeBonesAction", LOCTEXT("BoneActions", "Selected Bone Actions"));
+	//	}
+	//
+	//	const bool bHasBoneSelected = BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>();
+	//	const bool bHasVirtualBoneSelected = BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>();
+	//	if (bHasBoneSelected || bHasVirtualBoneSelected)
+	//	{
+	//		MenuBuilder.AddMenuEntry(Actions.CopyBoneNames);
+	//
+	//		if (bHasBoneSelected)
+	//		{
+	//			MenuBuilder.AddMenuEntry(Actions.ResetBoneTransforms);
+	//		}
+	//
+	//		if (BoneTreeSelection.IsSingleOfTypesSelected<FSkeletonTreeBoneItem, FSkeletonTreeVirtualBoneItem>() && bAllowSkeletonOperations)
+	//		{
+	//			MenuBuilder.AddMenuEntry(Actions.AddSocket);
+	//			MenuBuilder.AddMenuEntry(Actions.PasteSockets);
+	//			MenuBuilder.AddMenuEntry(Actions.PasteSocketsToSelectedBone);
+	//		}
+	//	}
+	//
+	//	if (bNeedsBoneActionsHeading)
+	//	{
+	//		if (bAllowSkeletonOperations)
+	//		{
+	//			MenuBuilder.AddSubMenu(LOCTEXT("AddVirtualBone", "Add Virtual Bone"),
+	//				LOCTEXT("AddVirtualBone_ToolTip", "Adds a virtual bone to the skeleton."),
+	//				FNewMenuDelegate::CreateLambda([this](FMenuBuilder& MenuBuilder)
+	//					{
+	//						TSharedRef<SBoneTreeMenu> MenuContent = SSkeletonTree::CreateVirtualBoneMenu(this);
+	//						MenuBuilder.AddWidget(MenuContent, FText::GetEmpty(), true);
+	//					}));
+	//		}
+	//
+	//		MenuBuilder.EndSection();
+	//	}
+	//
+	//	if (bAllowSkeletonOperations)
+	//	{
+	//		if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>())
+	//		{
+	//			UBlendProfile* const SelectedBlendProfile = BlendProfilePicker->GetSelectedBlendProfile();
+	//			if (SelectedBlendProfile && BoneTreeSelection.IsSingleOfTypeSelected<FSkeletonTreeBoneItem>())
+	//			{
+	//				TSharedPtr<FSkeletonTreeBoneItem> BoneItem = BoneTreeSelection.GetSelectedItems<FSkeletonTreeBoneItem>()[0];
+	//
+	//				FName BoneName = BoneItem->GetAttachName();
+	//				const USkeleton& Skeleton = GetEditableSkeletonInternal()->GetSkeleton();
+	//				int32 BoneIndex = Skeleton.GetReferenceSkeleton().FindBoneIndex(BoneName);
+	//
+	//				float CurrentBlendScale = SelectedBlendProfile->GetBoneBlendScale(BoneIndex);
+	//
+	//				MenuBuilder.BeginSection("SkeletonTreeBlendProfileScales", LOCTEXT("BlendProfileContextOptions", "Blend Profile"));
+	//				{
+	//					FUIAction RecursiveSetScales;
+	//					RecursiveSetScales.ExecuteAction = FExecuteAction::CreateSP(this, &SSkeletonTree::RecursiveSetBlendProfileScales, CurrentBlendScale);
+	//
+	//					MenuBuilder.AddMenuEntry
+	//					(
+	//						FText::Format(LOCTEXT("RecursiveSetBlendScales_Label", "Recursively Set Blend Scales To {0}"), FText::AsNumber(CurrentBlendScale)),
+	//						LOCTEXT("RecursiveSetBlendScales_ToolTip", "Sets all child bones to use the same blend profile scale as the selected bone"),
+	//						FSlateIcon(),
+	//						RecursiveSetScales
+	//					);
+	//				}
+	//				MenuBuilder.EndSection();
+	//			}
+	//
+	//			if (IsShowingAdvancedOptions())
+	//			{
+	//				MenuBuilder.BeginSection("SkeletonTreeBoneTranslationRetargeting", LOCTEXT("BoneTranslationRetargetingHeader", "Bone Translation Retargeting"));
+	//				{
+	//					FUIAction RecursiveRetargetingSkeletonAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::Skeleton));
+	//					FUIAction RecursiveRetargetingAnimationAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::Animation));
+	//					FUIAction RecursiveRetargetingAnimationScaledAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::AnimationScaled));
+	//					FUIAction RecursiveRetargetingAnimationRelativeAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::AnimationRelative));
+	//					FUIAction RecursiveRetargetingOrientAndScaleAction = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::SetBoneTranslationRetargetingModeRecursive, EBoneTranslationRetargetingMode::OrientAndScale));
+	//
+	//					MenuBuilder.AddMenuEntry
+	//					(LOCTEXT("SetTranslationRetargetingSkeletonChildrenAction", "Recursively Set Translation Retargeting Skeleton")
+	//						, LOCTEXT("BoneTranslationRetargetingSkeletonToolTip", "Use translation from Skeleton.")
+	//						, FSlateIcon()
+	//						, RecursiveRetargetingSkeletonAction
+	//					);
+	//
+	//					MenuBuilder.AddMenuEntry
+	//					(LOCTEXT("SetTranslationRetargetingAnimationChildrenAction", "Recursively Set Translation Retargeting Animation")
+	//						, LOCTEXT("BoneTranslationRetargetingAnimationToolTip", "Use translation from animation.")
+	//						, FSlateIcon()
+	//						, RecursiveRetargetingAnimationAction
+	//					);
+	//
+	//					MenuBuilder.AddMenuEntry
+	//					(LOCTEXT("SetTranslationRetargetingAnimationScaledChildrenAction", "Recursively Set Translation Retargeting AnimationScaled")
+	//						, LOCTEXT("BoneTranslationRetargetingAnimationScaledToolTip", "Use translation from animation, scale length by Skeleton's proportions.")
+	//						, FSlateIcon()
+	//						, RecursiveRetargetingAnimationScaledAction
+	//					);
+	//
+	//					MenuBuilder.AddMenuEntry
+	//					(LOCTEXT("SetTranslationRetargetingAnimationRelativeChildrenAction", "Recursively Set Translation Retargeting AnimationRelative")
+	//						, LOCTEXT("BoneTranslationRetargetingAnimationRelativeToolTip", "Use relative translation from animation similar to an additive animation.")
+	//						, FSlateIcon()
+	//						, RecursiveRetargetingAnimationRelativeAction
+	//					);
+	//
+	//					MenuBuilder.AddMenuEntry
+	//					(LOCTEXT("SetTranslationRetargetingOrientAndScaleChildrenAction", "Recursively Set Translation Retargeting OrientAndScale")
+	//						, LOCTEXT("BoneTranslationRetargetingOrientAndScaleToolTip", "Orient And Scale Translation.")
+	//						, FSlateIcon()
+	//						, RecursiveRetargetingOrientAndScaleAction
+	//					);
+	//				}
+	//				MenuBuilder.EndSection();
+	//			}
+	//		}
+	//	}
+	//
+	//	if (bAllowMeshOperations)
+	//	{
+	//		MenuBuilder.BeginSection("SkeletonTreeBoneReductionForLOD", LOCTEXT("BoneReductionHeader", "LOD Bone Reduction"));
+	//		{
+	//			MenuBuilder.AddSubMenu(
+	//				LOCTEXT("SkeletonTreeBoneReductionForLOD_RemoveSelectedFromLOD", "Remove Selected..."),
+	//				FText::GetEmpty(),
+	//				FNewMenuDelegate::CreateStatic(&SSkeletonTree::CreateMenuForBoneReduction, this, LastCachedLODForPreviewMeshComponent, true)
+	//			);
+	//
+	//			MenuBuilder.AddSubMenu(
+	//				LOCTEXT("SkeletonTreeBoneReductionForLOD_RemoveChildrenFromLOD", "Remove Children..."),
+	//				FText::GetEmpty(),
+	//				FNewMenuDelegate::CreateStatic(&SSkeletonTree::CreateMenuForBoneReduction, this, LastCachedLODForPreviewMeshComponent, false)
+	//			);
+	//		}
+	//		MenuBuilder.EndSection();
+	//	}
+	//
+	//	if (bAllowSkeletonOperations)
+	//	{
+	//		if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeVirtualBoneItem>())
+	//		{
+	//			MenuBuilder.BeginSection("SkeletonTreeVirtualBoneActions", LOCTEXT("VirtualBoneActions", "Selected Virtual Bone Actions"));
+	//
+	//			if (BoneTreeSelection.IsSingleOfTypeSelected<FSkeletonTreeVirtualBoneItem>())
+	//			{
+	//				MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("RenameVirtualBone_Label", "Rename Virtual Bone"), LOCTEXT("RenameVirtualBone_Tooltip", "Rename this virtual bone"));
+	//			}
+	//
+	//			MenuBuilder.EndSection();
+	//		}
+	//
+	//		if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeSocketItem>())
+	//		{
+	//			MenuBuilder.BeginSection("SkeletonTreeSocketsActions", LOCTEXT("SocketActions", "Selected Socket Actions"));
+	//
+	//			MenuBuilder.AddMenuEntry(Actions.CopySockets);
+	//
+	//			if (BoneTreeSelection.IsSingleOfTypeSelected<FSkeletonTreeSocketItem>())
+	//			{
+	//				MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("RenameSocket_Label", "Rename Socket"), LOCTEXT("RenameSocket_Tooltip", "Rename this socket"));
+	//
+	//				TSharedPtr<FSkeletonTreeSocketItem> SocketItem = BoneTreeSelection.GetSelectedItems<FSkeletonTreeSocketItem>()[0];
+	//
+	//				if (SocketItem->IsSocketCustomized() && SocketItem->GetParentType() == ESocketParentType::Mesh)
+	//				{
+	//					MenuBuilder.AddMenuEntry(Actions.RemoveMeshSocket);
+	//				}
+	//
+	//				// If the socket is on the skeleton, we have a valid mesh
+	//				// and there isn't one of the same name on the mesh, we can customize it
+	//				if (SocketItem->CanCustomizeSocket())
+	//				{
+	//					if (SocketItem->GetParentType() == ESocketParentType::Skeleton)
+	//					{
+	//						MenuBuilder.AddMenuEntry(Actions.CreateMeshSocket);
+	//					}
+	//					else if (SocketItem->GetParentType() == ESocketParentType::Mesh)
+	//					{
+	//						// If a socket is on the mesh only, then offer to promote it to the skeleton
+	//						MenuBuilder.AddMenuEntry(Actions.PromoteSocketToSkeleton);
+	//					}
+	//				}
+	//			}
+	//
+	//			MenuBuilder.EndSection();
+	//		}
+	//	}
+	//
+	//	if (BoneTreeSelection.HasSelectedOfType<FSkeletonTreeBoneItem>() || BoneTreeSelection.HasSelectedOfType<FSkeletonTreeSocketItem>())
+	//	{
+	//		MenuBuilder.BeginSection("SkeletonTreeAttachedAssets", LOCTEXT("AttachedAssetsActionsHeader", "Attached Assets Actions"));
+	//
+	//		if (BoneTreeSelection.IsSingleItemSelected())
+	//		{
+	//			MenuBuilder.AddSubMenu(LOCTEXT("AttachNewAsset", "Add Preview Asset"),
+	//				LOCTEXT("AttachNewAsset_ToolTip", "Attaches an asset to this part of the skeleton. Assets can also be dragged onto the skeleton from a content browser to attach"),
+	//				FNewMenuDelegate::CreateSP(this, &SSkeletonTree::FillAttachAssetSubmenu, BoneTreeSelection.GetSingleSelectedItem()));
+	//		}
+	//
+	//		FUIAction RemoveAllAttachedAssets = FUIAction(FExecuteAction::CreateSP(this, &SSkeletonTree::OnRemoveAllAssets),
+	//			FCanExecuteAction::CreateSP(this, &SSkeletonTree::CanRemoveAllAssets));
+	//
+	//		MenuBuilder.AddMenuEntry(LOCTEXT("RemoveAllAttachedAssets", "Remove All Attached Assets"),
+	//			LOCTEXT("RemoveAllAttachedAssets_ToolTip", "Removes all the attached assets from the skeleton and mesh."),
+	//			FSlateIcon(), RemoveAllAttachedAssets);
+	//
+	//		MenuBuilder.EndSection();
+	//	}
+	//
+	//	// Add an empty section so the menu can be extended when there are no optionally-added entries
+	//	MenuBuilder.BeginSection("SkeletonTreeContextMenu");
+	//	MenuBuilder.EndSection();
+	//}
+	
+	return MenuBuilder.MakeWidget();
 }
 
 void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEditor* const editor)
@@ -1440,10 +1496,11 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 		.SelectionMode(ESelectionMode::Single)
 		.ClearSelectionOnClick(false)		// Don't allow user to select nothing.
 
-		.TreeItemsSource(&m_roots)
+		.TreeItemsSource(&m_root)
 		.OnGenerateRow(this, &FNewtonModelPhysicsTree::OnGenerateRow)
 		.OnGetChildren(this, &FNewtonModelPhysicsTree::OnGetChildren)
 		.OnSelectionChanged(this, &FNewtonModelPhysicsTree::OnSelectionChanged)
+		.OnContextMenuOpening(this, &FNewtonModelPhysicsTree::CreateContextMenu)
 		.HeaderRow(treeHeaderRow)
 	;
 
@@ -1494,27 +1551,83 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 	BuildTree();
 }
 
+void FNewtonModelPhysicsTree::RefreshView()
+{
+	if (m_treeView.IsValid())
+	{
+		for (const TPair<FNewtonModelPhysicsTreeItem*, TSharedPtr<FNewtonModelPhysicsTreeItem>>& pair : m_items)
+		{
+			m_treeView->SetItemExpansion(pair.Value, true);
+		}
+
+		m_treeView->RequestTreeRefresh();
+	}
+}
+
+void FNewtonModelPhysicsTree::BuildAcyclicTree()
+{
+	check(m_root.Num() == 1);
+	check(m_root[0].IsValid());
+	check(m_root[0]->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBodyRoot")));
+	
+	if (m_acyclicGraph)
+	{
+		check(0);
+		delete m_acyclicGraph;
+	}
+	
+	int stack = 1;
+	FNewtonModelPhysicsTreeItemAcyclicGraph* stackPool[TREE_STACK_DEPTH];
+	m_acyclicGraph = new FNewtonModelPhysicsTreeItemAcyclicGraph(m_root[0], nullptr);
+	stackPool[0] = m_acyclicGraph;
+	
+	while (stack)
+	{
+		stack--;
+		FNewtonModelPhysicsTreeItemAcyclicGraph* const node = stackPool[stack];
+	
+		const TSharedPtr<FNewtonModelPhysicsTreeItem> parent(node->m_item);
+		for (const TPair<FNewtonModelPhysicsTreeItem*, TSharedPtr<FNewtonModelPhysicsTreeItem>>& pair : m_items)
+		{
+			TSharedPtr<FNewtonModelPhysicsTreeItem> item(pair.Value);
+			if (item->m_parent == parent)
+			{
+				new FNewtonModelPhysicsTreeItemAcyclicGraph(item, node);
+			}
+		}
+	
+		for (int i = 0; i < node->m_children.Num(); ++i)
+		{
+			stackPool[stack] = node->m_children[i];
+			stack++;
+		}
+	}
+}
+
 void FNewtonModelPhysicsTree::BuildTree()
 {
-	m_items.Empty();
-	m_roots.Empty();
-
-	UNewtonModelNode* nodeStack[512];
-	TSharedPtr<FNewtonModelPhysicsTreeItem> parentStack[512];
-
+	if (m_acyclicGraph)
+	{
+		delete m_acyclicGraph;
+	}
+	check(m_items.IsEmpty());
+	
+	UNewtonModelNode* nodeStack[TREE_STACK_DEPTH];
+	TSharedPtr<FNewtonModelPhysicsTreeItem> parentStack[TREE_STACK_DEPTH];
+	
 	const UNewtonModel* const model = m_editor->GetNewtonModel();
 	if (!model->RootBody)
 	{
 		return;
 	}
-
+	
 	check(Cast<UNewtonModelNodeRigidBodyRoot>(model->RootBody));
 	
 	TSet<FName> uniqueNames;
 	
 	int stack = 1;
 	int labelId = 0;
-
+	
 	parentStack[0] = nullptr;
 	nodeStack[0] = model->RootBody;
 	
@@ -1535,30 +1648,30 @@ void FNewtonModelPhysicsTree::BuildTree()
 	
 		if (Cast<UNewtonModelNodeRigidBodyRoot>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(nullptr, node->Name)));
-			m_items.Add(item);
-			m_roots.Add(item);
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBodyRoot(nullptr, node->Name)));
+			m_root.Push(item);
+			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeRigidBody>(node))
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(parent, node->Name)));
-			m_items.Add(item);
+			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeJoint>(node))
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJoint(parent, node->Name)));
-			m_items.Add(item);
+			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeCollision>(node))
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShape(parent, node->Name)));
-			m_items.Add(item);
+			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else
@@ -1573,18 +1686,9 @@ void FNewtonModelPhysicsTree::BuildTree()
 			stack++;
 		}
 	}
-
-	//Refresh
-	if (m_treeView.IsValid())
-	{
-		for (int i = 0; i < m_items.Num(); ++i)
-		{
-			TSharedPtr<FNewtonModelPhysicsTreeItem>& item = m_items[i];
-			m_treeView->SetItemExpansion(item, true);
-		}
-
-		m_treeView->RequestTreeRefresh();
-	}
+	
+	BuildAcyclicTree();
+	RefreshView();
 }
 
 #endif

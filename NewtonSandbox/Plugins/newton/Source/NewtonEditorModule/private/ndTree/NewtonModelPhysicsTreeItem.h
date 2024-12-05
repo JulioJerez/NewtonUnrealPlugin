@@ -4,11 +4,16 @@
 
 #include "CoreMinimal.h"
 
+#include "NewtonModelEditorCommon.h"
+
 class FNewtonModelPhysicsTree;
+class FNewtonModelPhysicsTreeItemAcyclicGraph;
 
 class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTreeItem>
 {
 	public:
+	NEWTON_INIT_RTTI(FNewtonModelPhysicsTreeItem)
+
 	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName);
 	virtual ~FNewtonModelPhysicsTreeItem();
 	
@@ -22,16 +27,35 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	// Display name of the category
 	FName m_displayName;
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
+	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
 	friend class FNewtonModelPhysicsTree;
+	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;
 };
-
 
 class FNewtonModelPhysicsTreeItemBody : public FNewtonModelPhysicsTreeItem
 {
 	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBody, FNewtonModelPhysicsTreeItem)
+
 	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
 		:FNewtonModelPhysicsTreeItem(parentNode, displayName)
+	{
+	}
+
+	virtual FName BrushName() const override
+	{
+		return TEXT("bodyIcon.png");
+	}
+};
+
+class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBody
+{
+	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBodyRoot, FNewtonModelPhysicsTreeItemBody)
+
+	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
+		:FNewtonModelPhysicsTreeItemBody(parentNode, displayName)
 	{
 	}
 
@@ -44,6 +68,8 @@ class FNewtonModelPhysicsTreeItemBody : public FNewtonModelPhysicsTreeItem
 class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 {
 	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShape, FNewtonModelPhysicsTreeItem)
+
 	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
 		:FNewtonModelPhysicsTreeItem(parentNode, displayName)
 	{
