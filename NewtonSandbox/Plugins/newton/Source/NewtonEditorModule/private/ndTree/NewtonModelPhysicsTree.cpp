@@ -95,61 +95,6 @@ class FNewtonModelPhysicsTree::FNewtonModelPhysicsTreeView : public STreeView<It
 };
 
 
-class FNewtonModelPhysicsTree::FScopedSavedSelection
-{
-	public:
-	FScopedSavedSelection(TSharedPtr<FNewtonModelPhysicsTree> tree)
-		: SkeletonTree(tree)
-	{
-		// record selected items
-		if (SkeletonTree.IsValid() && tree->SkeletonTreeView.IsValid())
-		{
-			TArray<TSharedPtr<INewtonModelPhysicsTreeItem>> SelectedItems = tree->SkeletonTreeView->GetSelectedItems();
-			for (const TSharedPtr<INewtonModelPhysicsTreeItem>& SelectedItem : SelectedItems)
-			{
-				check(0);
-				//SavedSelections.Add({ SelectedItem->GetRowItemName(), SelectedItem->GetTypeName(), SelectedItem->GetObject() });
-			}
-		}
-	}
-
-	~FScopedSavedSelection()
-	{
-		if (SkeletonTree.IsValid() && SkeletonTree->SkeletonTreeView.IsValid())
-		{
-			// restore selection
-			for (const TSharedPtr<INewtonModelPhysicsTreeItem>& Item : SkeletonTree->LinearItems)
-			{
-				if (Item->GetFilterResult() != Hidden)
-				{
-					for (FSavedSelection& SavedSelection : SavedSelections)
-					{
-						if (Item->GetRowItemName() == SavedSelection.ItemName && Item->GetTypeName() == SavedSelection.ItemType && Item->GetObject() == SavedSelection.ItemObject)
-						{
-							SkeletonTree->SkeletonTreeView->SetItemSelection(Item, true);
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	struct FSavedSelection
-	{
-		/** Name of the selected item */
-		FName ItemName;
-	
-		/** Type of the selected item */
-		FName ItemType;
-	
-		/** Object of selected item */
-		UObject* ItemObject;
-	};
-	
-	TArray<FSavedSelection> SavedSelections;
-	TSharedPtr<FNewtonModelPhysicsTree> SkeletonTree;
-};
 
 FNewtonModelPhysicsTree::FNewtonModelPhysicsTree()
 	:SCompoundWidget()
@@ -1047,7 +992,7 @@ void FNewtonModelPhysicsTree::CreateTreeColumns()
 	//HiddenColumnsList.Add(ISkeletonTree::Columns::BlendProfile);
 	//HiddenColumnsList.Add(ISkeletonTree::Columns::DebugVisualization);
 
-	TSharedRef<SHeaderRow> TreeHeaderRow =
+	TSharedRef<SHeaderRow> treeHeaderRow =
 		SNew(SHeaderRow)
 		.CanSelectGeneratedColumn(true)
 		.HiddenColumnsList(HiddenColumnsList)
@@ -1122,7 +1067,7 @@ void FNewtonModelPhysicsTree::CreateTreeColumns()
 			.HighlightParentNodesForSelection(true)
 			.HeaderRow
 			(
-				TreeHeaderRow
+				treeHeaderRow
 			);
 		
 			TreeHolder->ClearChildren();
@@ -1204,17 +1149,79 @@ void FNewtonModelPhysicsTree::CreateFromSkeleton()
 
 #include "SPositiveActionButton.h"
 #include "UICommandList_Pinnable.h"
+#include "Widgets/Views/STableRow.h"
 
 #include "NewtonModelEditor.h"
 #include "IPinnedCommandList.h"
 #include "NewtonModelEditorCommon.h"
 #include "ndTree/NewtonModelPhysicsTreeItem.h"
+#include "ndTree/NewtonModelPhysicsTreeItemRow.h"
 #include "ndTree/NewtonModelPhysicsTreeCommands.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
 
+FName FNewtonModelPhysicsTree::m_treeColumnName(TEXT("node name"));
 FName FNewtonModelPhysicsTree::m_menuName(TEXT("NewtonModelPhysicsTreeMenu"));
 FName FNewtonModelPhysicsTree::m_contextName(TEXT("NewtonModelPhysicsTreeMenuItem"));
+
+
+class FNewtonModelPhysicsTree::FScopedSavedSelection
+{
+	public:
+	FScopedSavedSelection(TSharedPtr<FNewtonModelPhysicsTree> tree)
+		:SkeletonTree(tree)
+	{
+		// record selected items
+		if (SkeletonTree.IsValid() && tree->m_treeView.IsValid())
+		{
+			TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>> SelectedItems = tree->m_treeView->GetSelectedItems();
+			for (const TSharedPtr<FNewtonModelPhysicsTreeItem>& SelectedItem : SelectedItems)
+			{
+				check(0);
+				//SavedSelections.Add({ SelectedItem->GetRowItemName(), SelectedItem->GetTypeName(), SelectedItem->GetObject() });
+			}
+		}
+	}
+
+	~FScopedSavedSelection()
+	{
+		if (SkeletonTree.IsValid() && SkeletonTree->m_treeView.IsValid())
+		{
+			// restore selection
+			for (const TSharedPtr<FNewtonModelPhysicsTreeItem>& Item : SkeletonTree->m_items)
+			{
+				check(0);
+				//if (Item->GetFilterResult() != Hidden)
+				//{
+				//	for (FSavedSelection& SavedSelection : SavedSelections)
+				//	{
+				//		if (Item->GetRowItemName() == SavedSelection.ItemName && Item->GetTypeName() == SavedSelection.ItemType && Item->GetObject() == SavedSelection.ItemObject)
+				//		{
+				//			SkeletonTree->SkeletonTreeView->SetItemSelection(Item, true);
+				//			break;
+				//		}
+				//	}
+				//}
+			}
+		}
+	}
+
+	struct FSavedSelection
+	{
+		/** Name of the selected item */
+		FName ItemName;
+
+		/** Type of the selected item */
+		FName ItemType;
+
+		/** Object of selected item */
+		UObject* ItemObject;
+	};
+
+	TArray<FSavedSelection> SavedSelections;
+	TSharedPtr<FNewtonModelPhysicsTree> SkeletonTree;
+};
+
 
 FNewtonModelPhysicsTree::FNewtonModelPhysicsTree()
 {
@@ -1233,12 +1240,15 @@ TSharedRef<ITableRow> FNewtonModelPhysicsTree::OnGenerateRow(TSharedPtr<FNewtonM
 {
 	if (!item.IsValid())
 	{
-		return SNew(STableRow<TSharedPtr<FNewtonModelPhysicsTreeItem>>, ownerTable)
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString(TEXT("THIS WAS NULL SOMEHOW")))
-		];
+		UE_LOG(LogTemp, Warning, TEXT("TODO: some is wrong function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+		//return SNew(STableRow<TSharedPtr<FNewtonModelPhysicsTreeItem>>, ownerTable)
+		//[
+		//	SNew(STextBlock)
+		//	.Text(FText::FromString(TEXT("some when wrong ")))
+		//];
 	}
+
+#if 0
 	return SNew(STableRow<TSharedPtr<FNewtonModelPhysicsTreeItem>>, ownerTable)
 	[
 		SNew(STextBlock)
@@ -1248,6 +1258,10 @@ TSharedRef<ITableRow> FNewtonModelPhysicsTree::OnGenerateRow(TSharedPtr<FNewtonM
 		.ShadowColorAndOpacity(FLinearColor::Black)
 		.ShadowOffset(FIntPoint(-2, 2))
 	];
+#else
+	return SNew(SNewtonModelPhysicsTreeItemRow, ownerTable)
+		.m_item(item);
+#endif
 }
 
 TSharedRef< SWidget > FNewtonModelPhysicsTree::OnCreateNewMenuWidget()
@@ -1360,8 +1374,66 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 	BindCommands();
 	RegisterNewMenu();
 
+	TArray<FName> HiddenColumnsList;
+	TSharedRef<SHeaderRow> treeHeaderRow
+	(
+		SNew(SHeaderRow)
+		.CanSelectGeneratedColumn(true)
+		.HiddenColumnsList(HiddenColumnsList)
 
-	BuildTree();
+		+ SHeaderRow::Column(m_treeColumnName)
+		.ShouldGenerateWidget(true)
+		.DefaultLabel(LOCTEXT("NodeNameLabel", "Name"))
+		.FillWidth(0.5f)
+
+		//+ SHeaderRow::Column(ISkeletonTree::Columns::Retargeting)
+		//.DefaultLabel(LOCTEXT("SkeletonBoneTranslationRetargetingLabel", "Translation Retargeting"))
+		//.FillWidth(0.25f)
+		//
+		//+ SHeaderRow::Column(ISkeletonTree::Columns::DebugVisualization)
+		//.DefaultLabel(LOCTEXT("SkeletonBoneDebugVisualizationLabel", "Debug"))
+		//.FillWidth(0.25f)
+		//
+		//+ SHeaderRow::Column(ISkeletonTree::Columns::BlendProfile)
+		//.DefaultLabel(LOCTEXT("BlendProfile", "Blend Profile"))
+		//.FillWidth(0.25f)
+		//.OnGetMenuContent(this, &FNewtonModelPhysicsTree::GetBlendProfileColumnMenuContent)
+		//.HeaderContent()
+		//[
+		//	SNew(SBox)
+		//	.HeightOverride(24.f)
+		//	.HAlign(HAlign_Left)
+		//	[
+		//		SAssignNew(BlendProfileHeader, SInlineEditableTextBlock)
+		//		.Text_Lambda([this]() -> FText
+		//		{
+		//			FName CurrentProfile = BlendProfilePicker->GetSelectedBlendProfileName();
+		//			return (CurrentProfile != NAME_None) ? FText::FromName(CurrentProfile) : LOCTEXT("NoBlendProfile", "NoBlend");
+		//		})
+		//		.OnTextCommitted_Lambda([this](const FText& InText, ETextCommit::Type InCommitType)
+		//		{
+		//			if (bIsCreateNewBlendProfile)
+		//			{
+		//				BlendProfilePicker->OnCreateNewProfileComitted(InText, InCommitType, NewBlendProfileMode);
+		//				bIsCreateNewBlendProfile = false;
+		//			}
+		//			else if (BlendProfilePicker->GetSelectedBlendProfileName() != NAME_None)
+		//			{
+		//				if (UBlendProfile* Profile = EditableSkeleton.Pin()->RenameBlendProfile(BlendProfilePicker->GetSelectedBlendProfileName(), FName(InText.ToString())))
+		//				{
+		//					BlendProfilePicker->SetSelectedProfile(Profile);
+		//				}
+		//			}
+		//		})
+		//		.OnVerifyTextChanged_Lambda([](const FText& InNewText, FText& OutErrorMessage) -> bool
+		//		{
+		//			return FName::IsValidXName(InNewText.ToString(), INVALID_OBJECTNAME_CHARACTERS INVALID_LONGPACKAGE_CHARACTERS, &OutErrorMessage);
+		//		})
+		//		.IsReadOnly(true)
+		//	]
+		//]
+	);
+
 	m_treeView =
 		SNew(STreeView<TSharedPtr<FNewtonModelPhysicsTreeItem>>)
 
@@ -1373,6 +1445,7 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 		.OnGenerateRow(this, &FNewtonModelPhysicsTree::OnGenerateRow)
 		.OnGetChildren(this, &FNewtonModelPhysicsTree::OnGetChildren)
 		.OnSelectionChanged(this, &FNewtonModelPhysicsTree::OnSelectionChanged)
+		.HeaderRow(treeHeaderRow)
 	;
 
 	ChildSlot
@@ -1418,6 +1491,9 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 			]
 		]
 	];
+
+	BuildTree();
+	//CreateTreeColumns();
 }
 
 void FNewtonModelPhysicsTree::BuildTree()
@@ -1461,30 +1537,29 @@ void FNewtonModelPhysicsTree::BuildTree()
 	
 		if (Cast<UNewtonModelNodeRigidBodyRoot>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItem(nullptr, node->Name)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(nullptr, node->Name)));
 			m_items.Add(item);
 			m_roots.Add(item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeRigidBody>(node))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-	
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItem(parent, node->Name)));
+			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(parent, node->Name)));
 			m_items.Add(item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeJoint>(node))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItem(parent, node->Name)));
+			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJoint(parent, node->Name)));
 			m_items.Add(item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeCollision>(node))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItem(parent, node->Name)));
+			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShape(parent, node->Name)));
 			m_items.Add(item);
 			parent = item;
 		}

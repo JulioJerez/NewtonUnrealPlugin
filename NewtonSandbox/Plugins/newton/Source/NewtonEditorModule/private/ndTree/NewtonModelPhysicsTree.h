@@ -198,14 +198,14 @@ class FNewtonModelPhysicsTreeItem;
 
 class FNewtonModelPhysicsTree : public SCompoundWidget
 {
+	class FScopedSavedSelection;
+
 	public:
-	//I gave not idea what this moronic shit is
+	//I have no idea what this moronic shit is for
 	SLATE_BEGIN_ARGS(FNewtonModelPhysicsTree)
 	{
 	}
-
 	SLATE_END_ARGS()
-
 
 	FNewtonModelPhysicsTree();
 	~FNewtonModelPhysicsTree();
@@ -249,6 +249,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	static FName m_menuName;
 	static FName m_contextName;
+	static FName m_treeColumnName;
 };
 
 

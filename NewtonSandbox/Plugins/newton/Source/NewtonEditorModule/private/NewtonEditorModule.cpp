@@ -95,19 +95,32 @@ void FNewtonEditorModule::CreateIcons()
 	const FString resourceDir(plugin->GetBaseDir() / TEXT("Resources"));
 	m_styleSet->SetContentRoot(resourceDir);
 
-	const FVector2D iconSize(16.0f, 16.0f);
-	const FString iconPath(m_styleSet->RootToContentDir(TEXT("ndModelIcon.png")));
-	FSlateImageBrush* const newtonIcon = new FSlateImageBrush(iconPath, iconSize);
-	FSlateImageBrush* const nodeAddPinIcon = new FSlateImageBrush(iconPath, iconSize);
-	FSlateImageBrush* const nodeDeletePinIcon = new FSlateImageBrush(iconPath, iconSize);
-	FSlateImageBrush* const nodeDeleteNodeIcon = new FSlateImageBrush(iconPath, iconSize);
-	FSlateImageBrush* const newtonThumbnail = new FSlateImageBrush(iconPath, iconSize);
 
-	m_styleSet->Set(TEXT("ClassIcon.NewtonModel"), newtonIcon);
-	m_styleSet->Set(TEXT("ClassThumbnail.NewtonModel"), newtonThumbnail);
-	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
-	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeletePinIcon"), nodeDeletePinIcon);
-	m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
+	auto LoadIcon = [this](const FName iconName)
+	{
+		const FVector2D iconSize(16.0f, 16.0f);
+		//const FString iconName(name.ToString() + ".icon");
+		const FString iconPath(m_styleSet->RootToContentDir(iconName.ToString()));
+		FSlateImageBrush* const icon = new FSlateImageBrush(iconPath, iconSize);
+		m_styleSet->Set(iconName, icon);
+	};
+
+	LoadIcon(TEXT("bodyIcon.png"));
+	LoadIcon(TEXT("jointIcon.png"));
+	LoadIcon(TEXT("shapeIcon.png"));
+
+	//const FString iconPath(m_styleSet->RootToContentDir(TEXT("ndModelIcon.png")));
+	//FSlateImageBrush* const newtonIcon = new FSlateImageBrush(iconPath, iconSize);
+	//FSlateImageBrush* const nodeAddPinIcon = new FSlateImageBrush(iconPath, iconSize);
+	//FSlateImageBrush* const nodeDeletePinIcon = new FSlateImageBrush(iconPath, iconSize);
+	//FSlateImageBrush* const nodeDeleteNodeIcon = new FSlateImageBrush(iconPath, iconSize);
+	//FSlateImageBrush* const newtonThumbnail = new FSlateImageBrush(iconPath, iconSize);
+	//
+	//m_styleSet->Set(TEXT("ClassIcon.NewtonModel"), newtonIcon);
+	//m_styleSet->Set(TEXT("ClassThumbnail.NewtonModel"), newtonThumbnail);
+	//m_styleSet->Set(TEXT("FNewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
+	//m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeletePinIcon"), nodeDeletePinIcon);
+	//m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*m_styleSet);
 }
@@ -125,7 +138,7 @@ void FNewtonEditorModule::UnreagiterIcons()
 void FNewtonEditorModule::RegisterNewtonModelEditor()
 {
 	// register the asset icon
-	//CreateIcons();
+	CreateIcons();
 
 	// register the asset menu item entry
 	IAssetTools& assetTools = IAssetTools::Get();
@@ -156,4 +169,10 @@ void FNewtonEditorModule::UnregisterNewtonModelEditor()
 
 	//IAssetTools& assetTools = IAssetTools::Get();
 	//assetTools.UnregisterAssetTypeActions(m_newtonModelAction.ToSharedRef());
+}
+
+const FSlateBrush* FNewtonEditorModule::GetBrush(const FName propertyName) const
+{
+	const FSlateBrush* const brush = m_styleSet->GetBrush(propertyName);
+	return brush;
 }

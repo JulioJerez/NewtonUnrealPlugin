@@ -15,6 +15,8 @@ class FNewtonEditorModule : public FDefaultModuleImpl
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
+	const FSlateBrush* GetBrush(const FName propertyName) const;
+
 	private:
 	void CreateIcons();
 	void RegisterMenus();

@@ -46,10 +46,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 
 	// to be removed 
 	UPROPERTY()
-	UGraphTestGraph* Graph;
-
-	// to be removed 
-	UPROPERTY()
 	UNewtonModelNodeRigidBodyRoot* RootBody;
 
 	//private:

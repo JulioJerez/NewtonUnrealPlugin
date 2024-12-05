@@ -29,7 +29,6 @@
 UNewtonModel::UNewtonModel()
 	:Super()
 {
-	Graph = nullptr;
 	RootBody = nullptr;
 	SkeletalMeshAsset = nullptr;
 }

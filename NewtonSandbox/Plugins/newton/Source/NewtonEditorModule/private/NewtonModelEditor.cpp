@@ -478,12 +478,12 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	//{
 	//	PostInitDelegate.ExecuteIfBound(SharedThis<ISkeletalMeshEditor>(this));
 	//}
-	
+
+#ifdef ND_INCLUDE_GRAPH_EDITOR
 	if (m_newtonModel->Graph)
 	{
 		//check(0);
 		UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-		#ifdef ND_INCLUDE_GRAPH_EDITOR
 		//create the editor graph from the the NewtonModel
 		TMap<const UNewtonModelPin*, UEdGraphPin*> pinMap;
 		UGraphTestGraph* const graph = m_newtonModel->Graph;
@@ -539,7 +539,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 				}
 			}
 		}
-		#endif
 	}
+#endif
 	m_modelChange = false;
 }
