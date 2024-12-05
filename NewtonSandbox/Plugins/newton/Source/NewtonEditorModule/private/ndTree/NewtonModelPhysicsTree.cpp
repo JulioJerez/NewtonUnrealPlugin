@@ -984,7 +984,6 @@ void FNewtonModelPhysicsTree::SetTreeItemExpansionRecursive(TSharedPtr<INewtonMo
 //	return MenuBuilder.MakeWidget();
 //}
 
-
 void FNewtonModelPhysicsTree::CreateTreeColumns()
 {
 	TArray<FName> HiddenColumnsList;
@@ -1493,7 +1492,6 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 	];
 
 	BuildTree();
-	//CreateTreeColumns();
 }
 
 void FNewtonModelPhysicsTree::BuildTree()
@@ -1579,6 +1577,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 	//Refresh
 	if (m_treeView.IsValid())
 	{
+		for (int i = 0; i < m_items.Num(); ++i)
+		{
+			TSharedPtr<FNewtonModelPhysicsTreeItem>& item = m_items[i];
+			m_treeView->SetItemExpansion(item, true);
+		}
+
 		m_treeView->RequestTreeRefresh();
 	}
 }
