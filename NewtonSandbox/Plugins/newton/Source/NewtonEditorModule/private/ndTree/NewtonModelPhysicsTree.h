@@ -15,7 +15,6 @@ class FNewtonModelPhysicsTreeItemAcyclicGraph;
 
 class FNewtonModelPhysicsTree : public SCompoundWidget
 {
-	//class FScopedSavedSelection;
 	public:
 	SLATE_BEGIN_ARGS(FNewtonModelPhysicsTree)
 	{
@@ -41,13 +40,17 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void BuildAcyclicTree();
 
 	// delegates
-	void OnCreateItemBodyRoot();
-	void OnCreateItemBodyLink();
-	void OnCreateItemShapeBox();
-	void OnCreateItemShapeShere();
-	void OnCreateItemJointHinge();
-	void OnDeleteSelectedRows();
-	bool CanDeleteSelectedRows() const;
+	bool OnCanAddShapeRow() const;
+	bool OnCanAddJointRow() const;
+	bool CanDeleteSelectedRow() const;
+
+	void OnAddShapeBoxRow();
+	void OnAddJointHingeRow();
+	void OnAddShapeSphereRow();
+	void OnDeleteSelectedRow();
+	void OnToggleShapeVisibility();
+	void OnToggleJointVisibility();
+
 
 	TSharedRef<SWidget> OnCreateNewMenuWidget();
 	
@@ -70,6 +73,9 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	// Pinned commands panel
 	TSharedPtr<IPinnedCommandList> PinnedCommands;
+
+	bool m_hideShapes;
+	bool m_hideJoints;
 
 	static FName m_menuName;
 	static FName m_contextName;

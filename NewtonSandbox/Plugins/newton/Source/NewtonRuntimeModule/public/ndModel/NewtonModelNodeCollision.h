@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonModelNode.h"
+#include "ndModel/NewtonModelNode.h"
 #include "NewtonModelNodeCollision.generated.h"
 
 /**

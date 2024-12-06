@@ -41,7 +41,6 @@ class IDetailLayoutBuilder;
 class FObjectPreSaveContext;
 class FNewtonModelPhysicsTree;
 class FNewtonModelEditorBinding;
-class FNewtonModelPhysicsTreeEditableSkeleton;
 
 class INewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
 {
@@ -58,8 +57,8 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	~FNewtonModelEditor();
 
 	// editor methods
-	void BuildGraphEditorAsset();
 	void BindCommands();
+	void BuildGraphEditorAsset();
 	void CreateSkeletalMeshEditor();
 	UNewtonModel* GetNewtonModel() const;
 	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
@@ -102,13 +101,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	
-
-
-
-	//TSharedRef< SWidget > XXXXXXX();
-
-
-
 	protected:
 	UPROPERTY()
 	UNewtonModel* m_newtonModel;
@@ -122,39 +114,33 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	TObjectPtr<USkeletalMesh> m_skeletalMeshAsset;
 	TSharedPtr<IDetailsView> m_selectedNodeDetailView;
 
-	/** Skeleton tree */
+	// Skeleton tree
 	TSharedPtr<ISkeletonTree> SkeletonTree;
 
-	/** Skeleton physics tree */
+	// Skeleton physics tree
 	TSharedPtr<FNewtonModelPhysicsTree> SkeletonPhysicsTree;
 
-	/** not caching editable skeleton tree */
-	TSharedPtr<FNewtonModelPhysicsTreeEditableSkeleton> EditableSkeletonPhysicsTree;
-
-
-	/** The builder we use to construct the tree */
-	TSharedPtr<class FNewtonModelPhysicsTreeBuilder> Builder;
-
-
-	/** Viewport */
+	// Viewport
 	TSharedPtr<class IPersonaViewport> Viewport;
 
-	//** PreviewScene
+	/// PreviewScene
 	TSharedPtr<IPersonaPreviewScene> PreviewScene;
 
-	/** Persona toolkit */
+	// Persona toolkit
 	TSharedPtr<IPersonaToolkit> PersonaToolkit;
 
 	// Binding to send/receive skeletal mesh modifications
 	TSharedPtr<FNewtonModelEditorBinding> Binding;
 
-	/** Pinned commands panel */
+	// Pinned commands panel
 	TSharedPtr<IPinnedCommandList> PinnedCommands;
 
-         /** save model when closing editor*/
+	// save model when closing editor
 	FDelegateHandle m_onCloseHandle;
 
 	bool m_modelChange;
 	static FName m_identifier;
+
+	friend class FNewtonModelPhysicsTree;
 };
 

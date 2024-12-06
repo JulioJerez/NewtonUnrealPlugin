@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NewtonModelNodeJoint.h"
+#include "ndModel/NewtonModelNodeJoint.h"
 
 
 UNewtonModelNodeJoint::UNewtonModelNodeJoint()

@@ -9,6 +9,7 @@
 FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
+	m_isHidden = false;
 	m_parent = parentNode;
 	m_acyclicGraph = nullptr;
 	m_displayName = displayName;

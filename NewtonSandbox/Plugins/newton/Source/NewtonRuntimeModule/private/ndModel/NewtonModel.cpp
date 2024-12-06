@@ -20,7 +20,7 @@
 */
 
 
-#include "NewtonModel.h"
+#include "ndModel/NewtonModel.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include "GraphTestGraph.h"

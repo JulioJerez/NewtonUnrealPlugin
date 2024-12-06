@@ -29,6 +29,8 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
+	bool m_isHidden;
+
 	friend class FNewtonModelPhysicsTree;
 	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;
 };
@@ -84,6 +86,7 @@ class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 {
 	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJoint, FNewtonModelPhysicsTreeItem)
 	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
 		:FNewtonModelPhysicsTreeItem(parentNode, displayName)
 	{

@@ -296,7 +296,7 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 }
 
 	
-#include "NewtonModel.h"
+//#include "NewtonModel.h"
 void ANewtonSceneActor::DebugNewonModel()
 {
 	//TArray<TObjectPtr<USceneComponent>> stack;

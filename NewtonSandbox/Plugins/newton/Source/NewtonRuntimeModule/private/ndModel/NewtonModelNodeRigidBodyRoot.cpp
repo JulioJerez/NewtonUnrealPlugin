@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NewtonModelNodeRigidBodyRoot.h"
+#include "ndModel/NewtonModelNodeRigidBodyRoot.h"
 
 
 UNewtonModelNodeRigidBodyRoot::UNewtonModelNodeRigidBodyRoot()

@@ -57,18 +57,15 @@ UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParen
 
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember to remove this:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 	newtonModel->RootBody = NewObject<UNewtonModelNodeRigidBodyRoot>(newtonModel);
+	newtonModel->RootBody->AttachNode(NewObject<UNewtonModelNodeCollisionBox>(newtonModel->RootBody));
+	newtonModel->RootBody->AttachNode(NewObject<UNewtonModelNodeCollisionSphere>(newtonModel->RootBody));
 
-
-	UNewtonModelNodeJoint* const hinge = NewObject<UNewtonModelNodeJoint>(newtonModel->RootBody);
+	UNewtonModelNodeJoint* const hinge = NewObject<UNewtonModelNodeJointHinge>(newtonModel->RootBody);
 	newtonModel->RootBody->AttachNode(hinge);
 
 	UNewtonModelNodeRigidBody* const body = NewObject<UNewtonModelNodeRigidBody>(hinge);
+	body->AttachNode(NewObject<UNewtonModelNodeCollisionBox>(body));
 	hinge->AttachNode (body);
-
-
-	body->AttachNode (NewObject<UNewtonModelNodeCollision>(body));
-	newtonModel->RootBody->AttachNode(NewObject<UNewtonModelNodeCollision>(newtonModel->RootBody));
-	newtonModel->RootBody->AttachNode(NewObject<UNewtonModelNodeCollision>(newtonModel->RootBody));
 
 	return newtonModel;
 }

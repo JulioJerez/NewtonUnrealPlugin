@@ -429,10 +429,6 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	{
 		// create a acyclic physics tree widgets for physic model.
-		////TSharedRef<FNewtonModelPhysicsTreeEditableSkeleton> editableTree(MakeShareable(new FNewtonModelPhysicsTreeEditableSkeleton(m_newtonModel->AcyclicGraph)));
-		////TSharedRef<FNewtonModelPhysicsTreeEditableSkeleton> editableTree(MakeShareable(new FNewtonModelPhysicsTreeEditableSkeleton(m_newtonModel)));
-		//EditableSkeletonPhysicsTree = MakeShareable(new FNewtonModelPhysicsTreeEditableSkeleton(m_newtonModel));
-		//SkeletonPhysicsTree = EditableSkeletonPhysicsTree->CreateSkeletonTree(args);
 		SkeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
 	}
 
