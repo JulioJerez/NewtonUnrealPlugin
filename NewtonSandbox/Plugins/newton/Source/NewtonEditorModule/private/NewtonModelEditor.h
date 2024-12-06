@@ -100,7 +100,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
-	
+
 	protected:
 	UPROPERTY()
 	UNewtonModel* m_newtonModel;

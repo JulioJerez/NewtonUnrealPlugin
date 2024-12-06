@@ -16,6 +16,8 @@
 #include "ndTree/NewtonModelPhysicsTreeItem.h"
 #include "ndTree/NewtonModelPhysicsTreeItemRow.h"
 #include "ndTree/NewtonModelPhysicsTreeCommands.h"
+#include "ndTree/NewtonModelPhysicsTreeItemShapeBox.h"
+#include "ndTree/NewtonModelPhysicsTreeItemShapeSphere.h"
 #include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
@@ -27,6 +29,7 @@ FName FNewtonModelPhysicsTree::m_contextName(TEXT("NewtonModelPhysicsTreeMenuIte
 
 FNewtonModelPhysicsTree::FNewtonModelPhysicsTree()
 {
+	m_nameId = 0;
 	m_acyclicGraph = nullptr;
 	m_hideShapes = false;
 	m_hideJoints = false;
@@ -152,14 +155,29 @@ bool FNewtonModelPhysicsTree::OnCanAddJointRow() const
 	return m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody"));
 }
 
+void FNewtonModelPhysicsTree::AddHapeRow(TSharedRef<FNewtonModelPhysicsTreeItem> item)
+{
+	m_items.Add(&item.Get(), item);
+	new FNewtonModelPhysicsTreeItemAcyclicGraph(item, m_selectedItem->m_acyclicGraph);
+
+	m_editor->m_modelChange = true;
+	RefreshView();
+}
+
 void FNewtonModelPhysicsTree::OnAddShapeBoxRow()
 {
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	const FName name (GetUniqueName(TEXT("Box")));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(m_selectedItem, name)));
+
+	AddHapeRow(item);
 }
 
 void FNewtonModelPhysicsTree::OnAddShapeSphereRow()
 {
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	const FName name(GetUniqueName(TEXT("Sphere")));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(m_selectedItem, name)));
+
+	AddHapeRow(item);
 }
 
 void FNewtonModelPhysicsTree::OnAddJointHingeRow()
@@ -200,7 +218,6 @@ void FNewtonModelPhysicsTree::OnDeleteSelectedRow()
 	m_editor->m_modelChange = true;
 	RefreshView();
 }
-
 
 void FNewtonModelPhysicsTree::BindCommands()
 {
@@ -478,6 +495,18 @@ void FNewtonModelPhysicsTree::BuildAcyclicTree()
 	}
 }
 
+FName FNewtonModelPhysicsTree::GetUniqueName(const FName name)
+{
+	FString nodeName(name.ToString());
+	while (m_uniqueNames.Find(FName(*nodeName)))
+	{
+		m_nameId++;
+		nodeName = name.ToString() + "_" + FString::FromInt(m_nameId);
+	}
+	m_uniqueNames.Add(FName(*nodeName));
+	return FName(*nodeName);
+}
+
 void FNewtonModelPhysicsTree::BuildTree()
 {
 	if (m_acyclicGraph)
@@ -497,7 +526,7 @@ void FNewtonModelPhysicsTree::BuildTree()
 	
 	check(Cast<UNewtonModelNodeRigidBodyRoot>(model->RootBody));
 	
-	TSet<FName> uniqueNames;
+	//TSet<FName> uniqueNames;
 	
 	int stack = 1;
 	int labelId = 0;
@@ -511,15 +540,7 @@ void FNewtonModelPhysicsTree::BuildTree()
 		UNewtonModelNode* const node = nodeStack[stack];
 		TSharedPtr<FNewtonModelPhysicsTreeItem> parent(parentStack[stack]);
 	
-		const FString nodeName(node->Name.ToString());
-		while (uniqueNames.Find(node->Name))
-		{
-			labelId++;
-			const FString name(nodeName + "_" + FString::FromInt(labelId));
-			node->Name = FName(*name);
-		}
-		uniqueNames.Add(node->Name);
-	
+		node->Name = GetUniqueName(node->Name);
 		if (Cast<UNewtonModelNodeRigidBodyRoot>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBodyRoot(nullptr, node->Name)));
@@ -541,9 +562,21 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
+		else if (Cast<UNewtonModelNodeCollisionBox>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(parent, node->Name)));
+			m_items.Add(&item.Get(), item);
+			parent = item;
+		}
+		else if (Cast<UNewtonModelNodeCollisionSphere>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(parent, node->Name)));
+			m_items.Add(&item.Get(), item);
+			parent = item;
+		}
 		else if (Cast<UNewtonModelNodeCollision>(node))
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+			UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShape(parent, node->Name)));
 			m_items.Add(&item.Get(), item);
 			parent = item;

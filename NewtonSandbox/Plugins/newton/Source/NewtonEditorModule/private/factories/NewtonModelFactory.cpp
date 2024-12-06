@@ -55,8 +55,9 @@ UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParen
 	newtonModel->SkeletalMeshAsset = NewObject<USkeletalMesh>(newtonModel, FName(TEXT("emptyMesh")));
 	newtonModel->SkeletalMeshAsset->SetSkeleton(NewObject<USkeleton>(newtonModel->SkeletalMeshAsset, FName(TEXT("emptySkeleton"))));
 
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember to remove this:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 	newtonModel->RootBody = NewObject<UNewtonModelNodeRigidBodyRoot>(newtonModel);
+#if 1
+	UE_LOG(LogTemp, Warning, TEXT("TODO: remember to remove this:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 	newtonModel->RootBody->AttachNode(NewObject<UNewtonModelNodeCollisionBox>(newtonModel->RootBody));
 	newtonModel->RootBody->AttachNode(NewObject<UNewtonModelNodeCollisionSphere>(newtonModel->RootBody));
 
@@ -66,6 +67,7 @@ UObject* UNewtonModelFactory::FactoryCreateNew(UClass* inClass, UObject* inParen
 	UNewtonModelNodeRigidBody* const body = NewObject<UNewtonModelNodeRigidBody>(hinge);
 	body->AttachNode(NewObject<UNewtonModelNodeCollisionBox>(body));
 	hinge->AttachNode (body);
+#endif
 
 	return newtonModel;
 }

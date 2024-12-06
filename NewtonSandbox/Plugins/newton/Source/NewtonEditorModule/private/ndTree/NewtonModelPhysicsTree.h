@@ -38,6 +38,8 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void BindCommands();
 	void RegisterNewMenu();
 	void BuildAcyclicTree();
+	FName GetUniqueName(const FName name);
+	void AddHapeRow(TSharedRef<FNewtonModelPhysicsTreeItem> item);
 
 	// delegates
 	bool OnCanAddShapeRow() const;
@@ -51,16 +53,14 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnToggleShapeVisibility();
 	void OnToggleJointVisibility();
 
-
 	TSharedRef<SWidget> OnCreateNewMenuWidget();
-	
-
 	void OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsTreeItem> item, ESelectInfo::Type selectInfo);
 	void OnGetChildren(TSharedPtr<FNewtonModelPhysicsTreeItem>, TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>>& outChildren);
 
 	TSharedPtr< SWidget > CreateContextMenu();
 	TSharedRef<ITableRow> OnGenerateRow(TSharedPtr<FNewtonModelPhysicsTreeItem> item, const TSharedRef<STableViewBase>& ownerTable);
 
+	TSet<FName> m_uniqueNames;
 	FNewtonModelEditor* m_editor;
 	TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>> m_root;
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_selectedItem;
@@ -74,8 +74,11 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	// Pinned commands panel
 	TSharedPtr<IPinnedCommandList> PinnedCommands;
 
+	
+
 	bool m_hideShapes;
 	bool m_hideJoints;
+	int m_nameId;
 
 	static FName m_menuName;
 	static FName m_contextName;
