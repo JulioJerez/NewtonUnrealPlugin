@@ -2,8 +2,12 @@
 
 #include "ndTree/NewtonModelPhysicsTreeItemShapeBox.h"
 
+FNewtonModelPhysicsTreeItemShapeBox::FNewtonModelPhysicsTreeItemShapeBox(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const UNewtonModelNodeCollisionBox* const node)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, node->Name)
+{
+}
+
 FNewtonModelPhysicsTreeItemShapeBox::FNewtonModelPhysicsTreeItemShapeBox(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
 	:FNewtonModelPhysicsTreeItemShape(parentNode, displayName)
 {
 }
-

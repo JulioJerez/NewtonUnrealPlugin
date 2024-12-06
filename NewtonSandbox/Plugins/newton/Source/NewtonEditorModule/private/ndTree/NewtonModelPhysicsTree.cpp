@@ -17,6 +17,7 @@
 #include "ndTree/NewtonModelPhysicsTreeItemRow.h"
 #include "ndTree/NewtonModelPhysicsTreeCommands.h"
 #include "ndTree/NewtonModelPhysicsTreeItemShapeBox.h"
+#include "ndTree/NewtonModelPhysicsTreeItemJointHinge.h"
 #include "ndTree/NewtonModelPhysicsTreeItemShapeSphere.h"
 #include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
@@ -52,15 +53,7 @@ void FNewtonModelPhysicsTree::Tick(const FGeometry& geometry, const double curre
 
 TSharedRef<ITableRow> FNewtonModelPhysicsTree::OnGenerateRow(TSharedPtr<FNewtonModelPhysicsTreeItem> item, const TSharedRef<STableViewBase>& ownerTable)
 {
-	if (!item.IsValid())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TODO: some is wrong function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-		//return SNew(STableRow<TSharedPtr<FNewtonModelPhysicsTreeItem>>, ownerTable)
-		//[
-		//	SNew(STextBlock)
-		//	.Text(FText::FromString(TEXT("some when wrong ")))
-		//];
-	}
+	check(item.IsValid());
 
 #if 0
 	return SNew(STableRow<TSharedPtr<FNewtonModelPhysicsTreeItem>>, ownerTable)
@@ -108,7 +101,6 @@ void FNewtonModelPhysicsTree::OnGetChildren(TSharedPtr<FNewtonModelPhysicsTreeIt
 
 void FNewtonModelPhysicsTree::OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsTreeItem> item, ESelectInfo::Type selectInfo)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 	m_selectedItem = item;
 }
 
@@ -142,20 +134,12 @@ void FNewtonModelPhysicsTree::OnToggleJointVisibility()
 	RefreshView();
 }
 
-
-bool FNewtonModelPhysicsTree::OnCanAddShapeRow() const
+bool FNewtonModelPhysicsTree::OnCanAddChildRow() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 	return m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody"));
 }
 
-bool FNewtonModelPhysicsTree::OnCanAddJointRow() const
-{
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-	return m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody"));
-}
-
-void FNewtonModelPhysicsTree::AddHapeRow(TSharedRef<FNewtonModelPhysicsTreeItem> item)
+void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& item)
 {
 	m_items.Add(&item.Get(), item);
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(item, m_selectedItem->m_acyclicGraph);
@@ -164,25 +148,43 @@ void FNewtonModelPhysicsTree::AddHapeRow(TSharedRef<FNewtonModelPhysicsTreeItem>
 	RefreshView();
 }
 
+void FNewtonModelPhysicsTree::AddJointRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& jointItem)
+{
+	m_items.Add(&jointItem.Get(), jointItem);
+	FNewtonModelPhysicsTreeItemAcyclicGraph* const jointAcyclic = new FNewtonModelPhysicsTreeItemAcyclicGraph(jointItem, m_selectedItem->m_acyclicGraph);
+
+	const FName bodyName(GetUniqueName(TEXT("NewBody")));
+	TSharedRef<FNewtonModelPhysicsTreeItem> bodyItem(MakeShareable(new FNewtonModelPhysicsTreeItemBody(jointItem, bodyName)));
+
+	m_items.Add(&bodyItem.Get(), bodyItem);
+	new FNewtonModelPhysicsTreeItemAcyclicGraph(bodyItem, jointAcyclic);
+
+	m_editor->m_modelChange = true;
+	RefreshView();
+}
+
 void FNewtonModelPhysicsTree::OnAddShapeBoxRow()
 {
-	const FName name (GetUniqueName(TEXT("Box")));
+	const FName name (GetUniqueName(TEXT("NewBox")));
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(m_selectedItem, name)));
 
-	AddHapeRow(item);
+	AddShapeRow(item);
 }
 
 void FNewtonModelPhysicsTree::OnAddShapeSphereRow()
 {
-	const FName name(GetUniqueName(TEXT("Sphere")));
+	const FName name(GetUniqueName(TEXT("NewSphere")));
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(m_selectedItem, name)));
 
-	AddHapeRow(item);
+	AddShapeRow(item);
 }
 
 void FNewtonModelPhysicsTree::OnAddJointHingeRow()
 {
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	const FName name(GetUniqueName(TEXT("NewHinge")));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(m_selectedItem, name)));
+
+	AddJointRow(item);
 }
 
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
@@ -246,15 +248,15 @@ void FNewtonModelPhysicsTree::BindCommands()
 	// add ohysics tree building actions
 	commandList.MapAction(menuActions.AddShapeBox
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeBoxRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddShapeRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 	commandList.MapAction(menuActions.AddShapeSphere
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeSphereRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddShapeRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 	commandList.MapAction(menuActions.AddJointHinge
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointHingeRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddJointRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 	// delete any node action
 	commandList.MapAction(menuActions.DeleteSelectedRow 
@@ -555,27 +557,35 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
-		else if (Cast<UNewtonModelNodeJoint>(node))
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJoint(parent, node->Name)));
-			m_items.Add(&item.Get(), item);
-			parent = item;
-		}
 		else if (Cast<UNewtonModelNodeCollisionBox>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(parent, node->Name)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(parent, Cast<UNewtonModelNodeCollisionBox>(node))));
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeCollisionSphere>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(parent, node->Name)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(parent, Cast<UNewtonModelNodeCollisionSphere>(node))));
+			m_items.Add(&item.Get(), item);
+			parent = item;
+		}
+		else if (Cast<UNewtonModelNodeJointHinge>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(parent, Cast<UNewtonModelNodeJointHinge>(node))));
+			m_items.Add(&item.Get(), item);
+			parent = item;
+		}
+		else if (Cast<UNewtonModelNodeJoint>(node))
+		{
+			check(0);
+			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJoint(parent, node->Name)));
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeCollision>(node))
 		{
+			check(0);
 			UE_LOG(LogTemp, Warning, TEXT("TODO: remember emit body:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShape(parent, node->Name)));
 			m_items.Add(&item.Get(), item);

@@ -39,11 +39,11 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void RegisterNewMenu();
 	void BuildAcyclicTree();
 	FName GetUniqueName(const FName name);
-	void AddHapeRow(TSharedRef<FNewtonModelPhysicsTreeItem> item);
+	void AddShapeRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& item);
+	void AddJointRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& iItem);
 
 	// delegates
-	bool OnCanAddShapeRow() const;
-	bool OnCanAddJointRow() const;
+	bool OnCanAddChildRow() const;
 	bool CanDeleteSelectedRow() const;
 
 	void OnAddShapeBoxRow();

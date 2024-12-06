@@ -12,5 +12,7 @@ class FNewtonModelPhysicsTreeItemShapeSphere : public FNewtonModelPhysicsTreeIte
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeSphere, FNewtonModelPhysicsTreeItemShape)
 
+
 	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName);
+	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const UNewtonModelNodeCollisionSphere* node);
 };
