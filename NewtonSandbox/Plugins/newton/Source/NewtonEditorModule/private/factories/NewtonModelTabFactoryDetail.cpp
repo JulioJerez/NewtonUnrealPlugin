@@ -76,6 +76,7 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 
 	TSharedPtr<IDetailsView> detailView(propertyEditorModule.CreateDetailView(detailArgumnets));
 	detailView->SetObject(editor->GetNewtonModel());
+
 	FOnFinishedChangingProperties& propertyChange = detailView->OnFinishedChangingProperties();
 	propertyChange.AddSP(editor.Get(), &FNewtonModelEditor::OnFinishedChangingProperties);
 
@@ -84,11 +85,11 @@ TSharedRef<SWidget> NewtonModelTabFactoryDetail::CreateTabBody(const FWorkflowTa
 	editor->SetSelectedNodeDetailView(seletedNodeDetailView);
 
 	SVerticalBox::FSlot::FSlotArguments editorArguments(SVerticalBox::Slot());
-	editorArguments.FillHeight(0.25f);
+	editorArguments.FillHeight(0.20f);
 	editorArguments.HAlign(HAlign_Fill)[detailView.ToSharedRef()];
 
 	SVerticalBox::FSlot::FSlotArguments selectedNodeDetailViewArguments(SVerticalBox::Slot());
-	selectedNodeDetailViewArguments.FillHeight(.75f);
+	selectedNodeDetailViewArguments.FillHeight(.80f);
 	selectedNodeDetailViewArguments.HAlign(HAlign_Fill)[seletedNodeDetailView.ToSharedRef()];
 
 	TSharedRef<SWidget> widget(SNew(SVerticalBox) + 

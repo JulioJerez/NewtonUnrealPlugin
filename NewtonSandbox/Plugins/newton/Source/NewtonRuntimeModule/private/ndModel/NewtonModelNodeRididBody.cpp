@@ -7,7 +7,7 @@
 UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 	:Super()
 {
-	Name = TEXT("Body");
+	SetName (TEXT("Body"));
 }
 
 

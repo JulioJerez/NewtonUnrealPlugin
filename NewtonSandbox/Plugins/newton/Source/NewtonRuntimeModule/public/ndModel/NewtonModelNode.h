@@ -15,9 +15,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 	GENERATED_BODY()
 	public:
 	UNewtonModelNode();
-
+	~UNewtonModelNode();
 
 	virtual void AttachNode(UNewtonModelNode* const node);
+
+	void SetName(const TCHAR* const name);
 
 	UPROPERTY(EditAnywhere)
 	FName Name;

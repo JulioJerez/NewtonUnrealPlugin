@@ -43,8 +43,6 @@
 #include "NewtonModelGraphNodeRoot.h"
 #include "NewtonModelEditorBinding.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
-//#include "ndTree/NewtonModelPhysicsTreeEditableSkeleton.h"
-
 
 FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 
@@ -85,7 +83,7 @@ TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
 
 TSharedRef<FNewtonModelPhysicsTree> FNewtonModelEditor::GetNewtonModelPhysicsTree() const
 {
-	return SkeletonPhysicsTree.ToSharedRef();
+	return m_skeletonPhysicsTree.ToSharedRef();
 }
 
 void FNewtonModelEditor::HandleViewportCreated(const TSharedRef<IPersonaViewport>& viewport)
@@ -158,22 +156,6 @@ void FNewtonModelEditor::SetSelectedNodeDetailView(TSharedPtr<IDetailsView> deta
 	m_selectedNodeDetailView->OnFinishedChangingProperties().AddRaw(this, &FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated);
 }
 
-void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event)
-{
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-	if (m_slateGraphUi)
-	{
-		m_modelChange = true;
-		UNewtonModelGraphNode* const selectedNode = GetSelectedNode(m_slateGraphUi->GetSelectedNodes());
-		if (selectedNode)
-		{
-			selectedNode->SyncPinsWithResponses();
-		}
-		m_slateGraphUi->NotifyGraphChanged();
-	}
-#endif
-}
-
 void FNewtonModelEditor::SetNewtonModel(TObjectPtr<UNewtonModel> model)
 {
 	m_newtonModel = model;
@@ -196,6 +178,12 @@ void FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBui
 	//// in mesh editor, we hide preview mesh section and additional mesh section
 	//// sometimes additional meshes are interfering with preview mesh, it is not a great experience
 	//DetailBuilder.HideCategory("Additional Meshes");
+}
+
+void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event)
+{
+	check(m_skeletonPhysicsTree.IsValid());
+	m_skeletonPhysicsTree->DetailViewPropertiesUpdated(event);
 }
 
 void FNewtonModelEditor::HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo)
@@ -429,7 +417,8 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	{
 		// create a acyclic physics tree widgets for physic model.
-		SkeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
+		m_skeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
+		//m_skeletonPhysicsTree->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &FNewtonModelEditor::OnGraphChanged));
 	}
 
 	#ifdef ND_INCLUDE_GRAPH_EDITOR

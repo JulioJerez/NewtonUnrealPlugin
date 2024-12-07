@@ -8,7 +8,7 @@
 UNewtonModelNodeCollisionSphere::UNewtonModelNodeCollisionSphere()
 	:Super()
 {
-	Name = TEXT("Sphere");
+	SetName(TEXT("NewSphere"));
 }
 
 

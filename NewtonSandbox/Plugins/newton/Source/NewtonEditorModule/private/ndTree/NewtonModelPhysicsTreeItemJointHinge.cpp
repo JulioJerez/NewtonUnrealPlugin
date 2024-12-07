@@ -2,12 +2,19 @@
 
 #include "ndTree/NewtonModelPhysicsTreeItemJointHinge.h"
 
-FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const UNewtonModelNodeJoint* const node)
-	:FNewtonModelPhysicsTreeItemJoint(parentNode, node->Name)
+FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(const FNewtonModelPhysicsTreeItemJointHinge& src)
+	:FNewtonModelPhysicsTreeItemJoint(src)
 {
+	check(0);
 }
 
-FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
-	:FNewtonModelPhysicsTreeItemJoint(parentNode, displayName)
+FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+	:FNewtonModelPhysicsTreeItemJoint(parentNode)
 {
+	check(0);
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointHinge::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemJointHinge(*this);
 }

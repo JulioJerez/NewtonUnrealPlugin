@@ -118,7 +118,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	TSharedPtr<ISkeletonTree> SkeletonTree;
 
 	// Skeleton physics tree
-	TSharedPtr<FNewtonModelPhysicsTree> SkeletonPhysicsTree;
+	TSharedPtr<FNewtonModelPhysicsTree> m_skeletonPhysicsTree;
 
 	// Viewport
 	TSharedPtr<class IPersonaViewport> Viewport;

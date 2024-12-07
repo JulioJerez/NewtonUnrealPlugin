@@ -8,7 +8,7 @@
 UNewtonModelNodeCollisionBox::UNewtonModelNodeCollisionBox()
 	:Super()
 {
-	Name = TEXT("Box");
+	SetName(TEXT("NewBox"));
 }
 
 

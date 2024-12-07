@@ -12,7 +12,9 @@ class FNewtonModelPhysicsTreeItemShapeSphere : public FNewtonModelPhysicsTreeIte
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeSphere, FNewtonModelPhysicsTreeItemShape)
 
+	FNewtonModelPhysicsTreeItemShapeSphere(const FNewtonModelPhysicsTreeItemShapeSphere& src);
+	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
 
-	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName);
-	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const UNewtonModelNodeCollisionSphere* node);
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+
 };

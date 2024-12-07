@@ -156,6 +156,7 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	// load dependency modules
 	FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
+	FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 	FModuleManager::LoadModuleChecked<IPinnedCommandListModule>(TEXT("PinnedCommandList"));
 }
 

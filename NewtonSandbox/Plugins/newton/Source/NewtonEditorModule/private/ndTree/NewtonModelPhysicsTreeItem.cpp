@@ -6,22 +6,149 @@
 #include "ndTree/NewtonModelPhysicsTree.h"
 #include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
-FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
+
+FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src)
+	:FNewtonModelPhysicsTreeItem(src)
+{
+}
+
+FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+	:FNewtonModelPhysicsTreeItem(parentNode)
+{
+}
+
+FName FNewtonModelPhysicsTreeItemJoint::BrushName() const
+{
+	return TEXT("jointIcon.png");
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJoint::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemJoint(*this);
+}
+
+
+//***********************************************************************************
+//
+//***********************************************************************************
+FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src)
+	:FNewtonModelPhysicsTreeItem(src)
+{
+}
+
+FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+	:FNewtonModelPhysicsTreeItem(parentNode)
+{
+}
+
+FName FNewtonModelPhysicsTreeItemShape::BrushName() const
+{
+	return TEXT("shapeIcon.png");
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShape::Clone() const
+{
+	check(0);
+	return new FNewtonModelPhysicsTreeItemShape(*this);
+}
+
+
+//***********************************************************************************
+//
+//***********************************************************************************
+FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(const FNewtonModelPhysicsTreeItemBody& src)
+	:FNewtonModelPhysicsTreeItem(src)
+{
+}
+
+FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+	:FNewtonModelPhysicsTreeItem(parentNode)
+{
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemBody::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemBody(*this);
+}
+
+FName FNewtonModelPhysicsTreeItemBody::BrushName() const
+{
+	return TEXT("bodyIcon.png");
+}
+
+//***********************************************************************************
+//
+//***********************************************************************************
+FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src)
+	:FNewtonModelPhysicsTreeItemBody(src)
+{
+}
+
+FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+	:FNewtonModelPhysicsTreeItemBody(parentNode)
+{
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemBodyRoot::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemBodyRoot(*this);
+}
+
+FName FNewtonModelPhysicsTreeItemBodyRoot::BrushName() const
+{
+	return TEXT("bodyIcon.png");
+}
+
+//***********************************************************************************
+//
+//***********************************************************************************
+FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
+	Node = nullptr;
 	m_isHidden = false;
 	m_parent = parentNode;
 	m_acyclicGraph = nullptr;
-	m_displayName = displayName;
+}
+
+FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(const FNewtonModelPhysicsTreeItem& src)
+	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
+{
+	Node = src.Node;
+	m_parent = nullptr;
+	m_isHidden = src.m_isHidden;
+	m_acyclicGraph = src.m_acyclicGraph;
 }
 
 FNewtonModelPhysicsTreeItem::~FNewtonModelPhysicsTreeItem()
 {
 }
 
-const FName& FNewtonModelPhysicsTreeItem::GetDisplayName() const
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItem::Clone() const
 {
-	return m_displayName;
+	return new FNewtonModelPhysicsTreeItem(*this);
+}
+
+FName FNewtonModelPhysicsTreeItem::BrushName() const
+{
+	return TEXT("none");
+}
+
+FString FNewtonModelPhysicsTreeItem::GetReferencerName() const
+{
+	return GetRttiName().ToString();
+}
+
+void FNewtonModelPhysicsTreeItem::AddReferencedObjects(FReferenceCollector& Collector)
+{
+	Collector.AddReferencedObject(Node);
+}
+
+FName FNewtonModelPhysicsTreeItem::GetDisplayName() const
+{
+	check(Node != nullptr);
+	//return *Node->GetName();
+	return Node->Name;
 }
 
 const FSlateBrush* FNewtonModelPhysicsTreeItem::GetIcon() const
@@ -39,7 +166,6 @@ void FNewtonModelPhysicsTreeItem::GenerateWidgetForNameColumn(TSharedPtr<SHorizo
 	.HAlign(HAlign_Center)
 	[
 		SNew(SImage)
-		//.ColorAndOpacity(this, &FNewtonModelPhysicsTreeItemBody::GetBoneTextColor, InIsSelected)
 		.ColorAndOpacity(FLinearColor(0.8, .8, .8, 1))
 		.Image(this, &FNewtonModelPhysicsTreeItem::GetIcon)
 	];
@@ -51,13 +177,13 @@ void FNewtonModelPhysicsTreeItem::GenerateWidgetForNameColumn(TSharedPtr<SHorizo
 	.VAlign(VAlign_Center)
 	[
 		SNew(STextBlock)
-		//.ColorAndOpacity(this, &FNewtonModelPhysicsTreeItemBody::GetBoneTextColor, InIsSelected)
 		.ColorAndOpacity(FLinearColor(0.8, .8, .8, 1))
 		.Text(FText::FromName(GetDisplayName()))
-		//.HighlightText(FilterText)
 		.Font(FSlateFontInfo(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Bold.ttf"), 10))
-		//.ToolTipText(ToolTip)
 		.ShadowColorAndOpacity(FLinearColor::Black)
 		.ShadowOffset(FIntPoint(-2, 2))
 	];
 }
+
+
+

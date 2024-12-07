@@ -2,12 +2,18 @@
 
 #include "ndTree/NewtonModelPhysicsTreeItemShapeSphere.h"
 
-FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const UNewtonModelNodeCollisionSphere* const node)
-	:FNewtonModelPhysicsTreeItemShape(parentNode, node->Name)
+FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(const FNewtonModelPhysicsTreeItemShapeSphere& src)
+	:FNewtonModelPhysicsTreeItemShape(src)
+{
+	check(0);
+}
+
+FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+	:FNewtonModelPhysicsTreeItemShape(parentNode)
 {
 }
 
-FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
-	:FNewtonModelPhysicsTreeItemShape(parentNode, displayName)
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeSphere::Clone() const
 {
+	return new FNewtonModelPhysicsTreeItemShapeSphere(*this);
 }

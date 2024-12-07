@@ -3,17 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Widgets/SWidget.h"
-//#include "Toolkits/AssetEditorToolkit.h"
 #include "WorkflowOrientedApp/WorkflowTabFactory.h"
 
 //class SToolTip;
 class FNewtonModelEditor;
 
-class FNewtonModelTabFactoryPhysicsTree : public FWorkflowTabFactory
+class FNewtonModelPhysicsTreeTabFactory : public FWorkflowTabFactory
 {
 	public:
-	FNewtonModelTabFactoryPhysicsTree(const TSharedPtr<FNewtonModelEditor>& editor);
+	FNewtonModelPhysicsTreeTabFactory(const TSharedPtr<FNewtonModelEditor>& editor);
 
 	/** FWorkflowTabFactory interface */
 	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const;

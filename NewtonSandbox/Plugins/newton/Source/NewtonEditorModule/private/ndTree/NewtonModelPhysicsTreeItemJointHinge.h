@@ -12,6 +12,8 @@ class FNewtonModelPhysicsTreeItemJointHinge : public FNewtonModelPhysicsTreeItem
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointHinge, FNewtonModelPhysicsTreeItemJoint)
 
-	FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName);
-	FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const UNewtonModelNodeJoint* const node);
+	FNewtonModelPhysicsTreeItemJointHinge(const FNewtonModelPhysicsTreeItemJointHinge& src);
+	FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };

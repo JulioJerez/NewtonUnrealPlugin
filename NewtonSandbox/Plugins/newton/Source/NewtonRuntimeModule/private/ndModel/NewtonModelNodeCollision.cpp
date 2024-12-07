@@ -7,7 +7,6 @@
 UNewtonModelNodeCollision::UNewtonModelNodeCollision()
 	:Super()
 {
-	Name = TEXT("Collision");
 }
 
 

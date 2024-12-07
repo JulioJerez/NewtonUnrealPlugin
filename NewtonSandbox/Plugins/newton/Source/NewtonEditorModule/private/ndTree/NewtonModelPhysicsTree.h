@@ -26,18 +26,18 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	// Widget constructor
 	void Construct(const FArguments& args, FNewtonModelEditor* const editor);
-	
-	// Rebuilds the category tree from scratch 
-	void BuildTree();
 
+	void DetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
+	
 	//* SWidget overrides
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
 	private:
+	void BuildTree();
 	void RefreshView();
 	void BindCommands();
 	void RegisterNewMenu();
-	void BuildAcyclicTree();
+	void RebuildAcyclicTree();
 	FName GetUniqueName(const FName name);
 	void AddShapeRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& item);
 	void AddJointRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& iItem);
@@ -60,9 +60,11 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	TSharedPtr< SWidget > CreateContextMenu();
 	TSharedRef<ITableRow> OnGenerateRow(TSharedPtr<FNewtonModelPhysicsTreeItem> item, const TSharedRef<STableViewBase>& ownerTable);
 
+	FName m_oldSelectedName;
 	TSet<FName> m_uniqueNames;
 	FNewtonModelEditor* m_editor;
 	TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>> m_root;
+	
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_selectedItem;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 	TSharedPtr<STreeView<TSharedPtr<FNewtonModelPhysicsTreeItem>>> m_treeView;
@@ -73,7 +75,6 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	// Pinned commands panel
 	TSharedPtr<IPinnedCommandList> PinnedCommands;
-
 	
 
 	bool m_hideShapes;

@@ -13,6 +13,10 @@ UNewtonModelNode::UNewtonModelNode()
 	Parent = nullptr;
 }
 
+UNewtonModelNode::~UNewtonModelNode()
+{
+	// do nothing
+}
 
 void UNewtonModelNode::AttachNode(UNewtonModelNode* const node)
 {
@@ -20,3 +24,7 @@ void UNewtonModelNode::AttachNode(UNewtonModelNode* const node)
 	Children.Push(node);
 }
 
+void UNewtonModelNode::SetName(const TCHAR* const name)
+{
+	Name = FName(name);
+}

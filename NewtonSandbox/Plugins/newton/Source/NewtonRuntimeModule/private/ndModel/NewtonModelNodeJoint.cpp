@@ -7,5 +7,5 @@
 UNewtonModelNodeJoint::UNewtonModelNodeJoint()
 	:Super()
 {
-	Name = TEXT("Joint");
+	//Name = TEXT("Joint");
 }

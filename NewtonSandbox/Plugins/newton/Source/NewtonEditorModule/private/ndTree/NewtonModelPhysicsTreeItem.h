@@ -9,23 +9,29 @@
 class FNewtonModelPhysicsTree;
 class FNewtonModelPhysicsTreeItemAcyclicGraph;
 
-class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTreeItem>
+class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTreeItem>, public FGCObject
 {
 	public:
 	NEWTON_INIT_RTTI(FNewtonModelPhysicsTreeItem)
 
-	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName);
+	FNewtonModelPhysicsTreeItem(const FNewtonModelPhysicsTreeItem& src);
+	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
 	virtual ~FNewtonModelPhysicsTreeItem();
+
+	virtual FNewtonModelPhysicsTreeItem* Clone() const;
 	
+	FName GetDisplayName() const;
 	const FSlateBrush* GetIcon() const;
-	const FName& GetDisplayName() const;
 	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected InIsSelected);
 
 	protected:
-	virtual FName BrushName() const = 0;
+	virtual FName BrushName() const;
+	virtual FString GetReferencerName() const override;
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 
 	// Display name of the category
-	FName m_displayName;
+	TObjectPtr<UNewtonModelNode> Node;
+
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
@@ -40,15 +46,11 @@ class FNewtonModelPhysicsTreeItemBody : public FNewtonModelPhysicsTreeItem
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBody, FNewtonModelPhysicsTreeItem)
 
-	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
-		:FNewtonModelPhysicsTreeItem(parentNode, displayName)
-	{
-	}
+	FNewtonModelPhysicsTreeItemBody(const FNewtonModelPhysicsTreeItemBody& src);
+	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
 
-	virtual FName BrushName() const override
-	{
-		return TEXT("bodyIcon.png");
-	}
+	virtual FName BrushName() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };
 
 class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBody
@@ -56,15 +58,11 @@ class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBo
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBodyRoot, FNewtonModelPhysicsTreeItemBody)
 
-	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
-		:FNewtonModelPhysicsTreeItemBody(parentNode, displayName)
-	{
-	}
+	FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src);
+	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
 
-	virtual FName BrushName() const override
-	{
-		return TEXT("bodyIcon.png");
-	}
+	virtual FName BrushName() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };
 
 class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
@@ -72,28 +70,21 @@ class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShape, FNewtonModelPhysicsTreeItem)
 
-	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
-		:FNewtonModelPhysicsTreeItem(parentNode, displayName)
-	{
-	}
+	FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src);
+	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
 
-	virtual FName BrushName() const override
-	{
-		return TEXT("shapeIcon.png");
-	}
+	virtual FName BrushName() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };
 
 class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 {
 	public:
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJoint, FNewtonModelPhysicsTreeItem)
-	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, const FName& displayName)
-		:FNewtonModelPhysicsTreeItem(parentNode, displayName)
-	{
-	}
 
-	virtual FName BrushName() const override
-	{
-		return TEXT("jointIcon.png");
-	}
+	FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src);
+	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+
+	virtual FName BrushName() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };
