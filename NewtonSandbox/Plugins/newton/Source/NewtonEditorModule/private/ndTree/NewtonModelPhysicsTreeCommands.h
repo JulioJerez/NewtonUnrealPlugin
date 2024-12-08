@@ -24,6 +24,8 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 	TSharedPtr<FUICommandInfo> JointsVisibility;
 	TSharedPtr<FUICommandInfo> CollisionsVisibility;
 
+	TSharedPtr<FUICommandInfo> ResetSelectedBone;
+
 	// create node commands
 	TSharedPtr<FUICommandInfo> AddShapeBox;
 	TSharedPtr<FUICommandInfo> AddShapeSphere;

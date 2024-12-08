@@ -5,10 +5,13 @@
 
 #define TREE_STACK_DEPTH	256
 
-
+#include "ISkeletonTree.h"
+#include "ISkeletonTreeItem.h"
+#include "IEditableSkeleton.h"
 #include "SPositiveActionButton.h"
 #include "UICommandList_Pinnable.h"
 #include "Widgets/Views/STableRow.h"
+
 
 #include "NewtonModelEditor.h"
 #include "IPinnedCommandList.h"
@@ -33,6 +36,7 @@ FNewtonModelPhysicsTree::FNewtonModelPhysicsTree()
 	m_nameId = 0;
 	m_hideShapes = false;
 	m_hideJoints = false;
+	m_modelIsDirty = false;
 	m_acyclicGraph = nullptr;
 }
 
@@ -116,6 +120,17 @@ void FNewtonModelPhysicsTree::OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsT
 	}
 }
 
+void FNewtonModelPhysicsTree::OnResetSelectedBone()
+{
+	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+	{
+		UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)m_selectedItem->Node.Get();
+		bodyNode->BoneIndex = -1;
+		bodyNode->BoneName = TEXT("None");
+		m_modelIsDirty = true;
+	}
+}
+
 void FNewtonModelPhysicsTree::OnToggleShapeVisibility()
 {
 	m_hideShapes = !m_hideShapes;
@@ -156,24 +171,23 @@ void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTr
 	m_items.Add(&item.Get(), item);
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(item, m_selectedItem->m_acyclicGraph);
 
-	m_editor->m_modelChange = true;
+	m_modelIsDirty = true;
 	RefreshView();
 }
 
 void FNewtonModelPhysicsTree::AddJointRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& jointItem)
 {
-	check(0);
-	//m_items.Add(&jointItem.Get(), jointItem);
-	//FNewtonModelPhysicsTreeItemAcyclicGraph* const jointAcyclic = new FNewtonModelPhysicsTreeItemAcyclicGraph(jointItem, m_selectedItem->m_acyclicGraph);
-	//
-	//const FName bodyName(GetUniqueName(TEXT("NewBody")));
-	//TSharedRef<FNewtonModelPhysicsTreeItem> bodyItem(MakeShareable(new FNewtonModelPhysicsTreeItemBody(jointItem, bodyName)));
-	//
-	//m_items.Add(&bodyItem.Get(), bodyItem);
-	//new FNewtonModelPhysicsTreeItemAcyclicGraph(bodyItem, jointAcyclic);
-	//
-	//m_editor->m_modelChange = true;
-	//RefreshView();
+	m_items.Add(&jointItem.Get(), jointItem);
+	FNewtonModelPhysicsTreeItemAcyclicGraph* const jointAcyclic = new FNewtonModelPhysicsTreeItemAcyclicGraph(jointItem, m_selectedItem->m_acyclicGraph);
+
+	TSharedRef<FNewtonModelPhysicsTreeItem> bodyItem(MakeShareable(new FNewtonModelPhysicsTreeItemBody(jointItem)));
+	bodyItem->Node = NewObject<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
+	bodyItem->Node->Name = GetUniqueName(bodyItem->GetDisplayName());
+	m_items.Add(&bodyItem.Get(), bodyItem);
+	new FNewtonModelPhysicsTreeItemAcyclicGraph(bodyItem, jointAcyclic);
+	
+	m_modelIsDirty = true;
+	RefreshView();
 }
 
 void FNewtonModelPhysicsTree::OnAddShapeBoxRow()
@@ -198,9 +212,11 @@ void FNewtonModelPhysicsTree::OnAddShapeSphereRow()
 
 void FNewtonModelPhysicsTree::OnAddJointHingeRow()
 {
-	check(0);
-	//const FName name(GetUniqueName(TEXT("NewHinge")));
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(m_selectedItem)));
+
+	item->Node = NewObject<UNewtonModelNodeJointHinge>(m_selectedItem->Node);
+	item->Node->Name = GetUniqueName(item->GetDisplayName());
+
 	AddJointRow(item);
 }
 
@@ -237,7 +253,7 @@ void FNewtonModelPhysicsTree::OnDeleteSelectedRow()
 	m_selectedItem->m_acyclicGraph->m_parent->RemoveChild(m_selectedItem->m_acyclicGraph);
 	delete m_selectedItem->m_acyclicGraph;
 
-	m_editor->m_modelChange = true;
+	m_modelIsDirty = true;
 	RefreshView();
 }
 
@@ -261,9 +277,12 @@ void FNewtonModelPhysicsTree::BindCommands()
 		//,FIsActionChecked::CreateSP(this, &FNewtonModelPhysicsTree::OnGetShapeVisibleRowsState));
 
 	commandList.MapAction(menuActions.JointsVisibility
-		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnToggleJointVisibility)
-		, FCanExecuteAction()
-		, FIsActionChecked::CreateLambda([this]() { return m_hideJoints; }));
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnToggleJointVisibility)
+		,FCanExecuteAction()
+		,FIsActionChecked::CreateLambda([this]() { return m_hideJoints; }));
+
+	commandList.MapAction(menuActions.ResetSelectedBone
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnResetSelectedBone));
 
 	// add ohysics tree building actions
 	commandList.MapAction(menuActions.AddShapeBox
@@ -304,6 +323,7 @@ void FNewtonModelPhysicsTree::RegisterNewMenu()
 	//MenuBuilder.EndSection();
 
 	FToolMenuSection& rootSection = menu->AddSection("options0", LOCTEXT("options1", "options2"));
+	rootSection.AddMenuEntry(menuActions.ResetSelectedBone);
 	rootSection.AddMenuEntry(menuActions.JointsVisibility);
 	rootSection.AddMenuEntry(menuActions.CollisionsVisibility);
 }
@@ -518,38 +538,56 @@ void FNewtonModelPhysicsTree::RebuildAcyclicTree()
 	RefreshView();
 }
 
+void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISkeletonTreeItem>& item)
+{
+	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+		const TSharedRef<IEditableSkeleton> editSkeleton(item->GetSkeletonTree()->GetEditableSkeleton());
+		const FReferenceSkeleton& referenceSkeleton = editSkeleton->GetSkeleton().GetReferenceSkeleton();
+		const TArray<FMeshBoneInfo>& bonesInfo = referenceSkeleton.GetRefBoneInfo();
+
+		const FName boneName (item->GetAttachName());
+		for (int i = 0; i < bonesInfo.Num(); ++i)
+		{
+			const FMeshBoneInfo& info = bonesInfo[i];
+			if (info.Name == boneName)
+			{
+				for (const TPair<FNewtonModelPhysicsTreeItem*, TSharedPtr<FNewtonModelPhysicsTreeItem>>& pair : m_items)
+				{
+					TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem(pair.Value);
+					if (bodyItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+					{
+						UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)bodyItem->Node.Get();
+						if (bodyNode->BoneIndex == i)
+						{
+							return;
+						}
+					}
+				}
+
+				UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)m_selectedItem->Node.Get();
+				bodyNode->BoneIndex = i;
+				bodyNode->BoneName = boneName;
+				m_modelIsDirty = true;
+				break;
+			}
+		}
+	}
+}
+
 void FNewtonModelPhysicsTree::DetailViewPropertiesUpdated(const FPropertyChangedEvent& event)
 {
 	check(m_selectedItem.IsValid());
-	m_editor->m_modelChange = true;
+	m_modelIsDirty = true;
 	FProperty* const property = event.Property;
 	if (property->GetName() == TEXT("Name"))
 	{
-		TObjectPtr<UNewtonModelNode> node(m_selectedItem->Node);
 		m_uniqueNames.Remove(m_oldSelectedName);
-
-		FName newName(GetUniqueName(node->Name));
-		node->SetName(*newName.ToString());
-
-		TSharedPtr<FNewtonModelPhysicsTreeItem> item(m_selectedItem->Clone());
-		if (m_selectedItem == m_root[0])
-		{
-			m_selectedItem->m_acyclicGraph = nullptr;
-			for (int i = 0; i < item->m_acyclicGraph->m_children.Num(); ++i)
-			{
-				FNewtonModelPhysicsTreeItemAcyclicGraph* const child = item->m_acyclicGraph->m_children[i];
-				child->m_item->m_parent = item;
-			}
-			m_root[0] = item;
-		}
-		else
-		{
-			check(0);
-		}
+		FName newName(GetUniqueName(m_selectedItem->Node->Name));
+		m_selectedItem->Node->SetName(*newName.ToString());
 		
-		m_items.Add(item.Get(), item);
-		m_items.FindAndRemoveChecked(m_selectedItem.Get());
-		
+		m_treeView->RebuildList();
 		m_treeView->RequestTreeRefresh();
 	}
 }
@@ -564,6 +602,54 @@ FName FNewtonModelPhysicsTree::GetUniqueName(const FName name)
 	}
 	m_uniqueNames.Add(FName(*nodeName));
 	return FName(*nodeName);
+}
+
+void FNewtonModelPhysicsTree::SaveModel()
+{
+	bool modelIsDirty = m_modelIsDirty;
+	m_modelIsDirty = false;
+
+	if (!modelIsDirty || !m_acyclicGraph)
+	{
+		return;
+	}
+
+	int stack = 1;
+	UNewtonModelNode* parentNode[TREE_STACK_DEPTH];
+	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
+
+	UNewtonModel* const model = m_editor->GetNewtonModel();
+
+	parentNode[0] = nullptr;
+	nodeStack[0] = m_acyclicGraph;
+	while (stack)
+	{
+		stack--;
+		UNewtonModelNode* const parent = parentNode[stack];
+		const FNewtonModelPhysicsTreeItemAcyclicGraph* const root = nodeStack[stack];
+		const TSharedPtr<FNewtonModelPhysicsTreeItem>& item = root->m_item;
+
+		UNewtonModelNode* modelNode = nullptr;
+		if (Cast<UNewtonModelNodeRigidBodyRoot>(item->Node))
+		{
+			modelNode = DuplicateObject(item->Node, model);
+			model->RootBody = Cast<UNewtonModelNodeRigidBodyRoot>(modelNode);
+		}
+		else
+		{
+			modelNode = DuplicateObject(item->Node, parent);
+			modelNode->Parent = parent;
+			parent->Children.Push(modelNode);
+		}
+		modelNode->Children.Empty();
+
+		for (int i = 0; i < root->m_children.Num(); ++i)
+		{
+			parentNode[stack] = modelNode;
+			nodeStack[stack] = root->m_children[i];
+			stack++;
+		}
+	}
 }
 
 void FNewtonModelPhysicsTree::BuildTree()
@@ -594,7 +680,8 @@ void FNewtonModelPhysicsTree::BuildTree()
 		TSharedPtr<FNewtonModelPhysicsTreeItem> parent(parentStack[stack]);
 	
 		TObjectPtr<UNewtonModelNode> proxyNode(DuplicateObject(node, nullptr));
-		node->Name = GetUniqueName(node->Name);
+		check(!m_uniqueNames.Find(proxyNode->Name));
+		GetUniqueName(proxyNode->Name);
 
 		if (Cast<UNewtonModelNodeRigidBodyRoot>(node))
 		{
@@ -606,10 +693,17 @@ void FNewtonModelPhysicsTree::BuildTree()
 		}
 		else if (Cast<UNewtonModelNodeRigidBody>(node))
 		{
-			check(0);
-			//TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(parent, proxyNode)));
-			//m_items.Add(&item.Get(), item);
-			//parent = item;
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(parent)));
+			item->Node = proxyNode;
+			m_items.Add(&item.Get(), item);
+			parent = item;
+		}
+		else if (Cast<UNewtonModelNodeJointHinge>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(parent)));
+			item->Node = proxyNode;
+			m_items.Add(&item.Get(), item);
+			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeCollisionBox>(node))
 		{
@@ -625,27 +719,20 @@ void FNewtonModelPhysicsTree::BuildTree()
 			//m_items.Add(&item.Get(), item);
 			//parent = item;
 		}
-		else if (Cast<UNewtonModelNodeJointHinge>(node))
-		{
-			check(0);
-			//TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(parent, Cast<UNewtonModelNodeJointHinge>(node))));
-			//m_items.Add(&item.Get(), item);
-			//parent = item;
-		}
-		else if (Cast<UNewtonModelNodeJoint>(node))
-		{
-			check(0);
-			//TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJoint(parent, node->Name)));
-			//m_items.Add(&item.Get(), item);
-			//parent = item;
-		}
-		else if (Cast<UNewtonModelNodeCollision>(node))
-		{
-			check(0);
-			//TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShape(parent, node->Name)));
-			//m_items.Add(&item.Get(), item);
-			//parent = item;
-		}
+		//else if (Cast<UNewtonModelNodeJoint>(node))
+		//{
+		//	check(0);
+		//	//TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJoint(parent, node->Name)));
+		//	//m_items.Add(&item.Get(), item);
+		//	//parent = item;
+		//}
+		//else if (Cast<UNewtonModelNodeCollision>(node))
+		//{
+		//	check(0);
+		//	//TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShape(parent, node->Name)));
+		//	//m_items.Add(&item.Get(), item);
+		//	//parent = item;
+		//}
 		else
 		{
 			check(0);

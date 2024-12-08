@@ -23,4 +23,10 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNod
 	GENERATED_BODY()
 	public:
 	UNewtonModelNodeRigidBody();
+
+	UPROPERTY(VisibleAnywhere)
+	FName BoneName;
+
+	UPROPERTY(VisibleAnywhere)
+	int BoneIndex;
 };

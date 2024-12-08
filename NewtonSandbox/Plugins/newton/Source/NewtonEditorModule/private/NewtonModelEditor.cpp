@@ -49,17 +49,11 @@ FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 FNewtonModelEditor::FNewtonModelEditor()
 	:INewtonModelEditor()
 {
-	m_modelChange = false;
 	SkeletonTree = nullptr;
 	m_newtonModel = nullptr;
 	PersonaToolkit = nullptr;
 	m_skeletalMeshAsset = nullptr;
 	m_selectedNodeDetailView = nullptr;
-
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-	m_graphEditor = nullptr;
-	m_slateGraphUi = nullptr;
-#endif
 }
 
 FNewtonModelEditor::~FNewtonModelEditor()
@@ -138,18 +132,6 @@ UNewtonModel* FNewtonModelEditor::GetNewtonModel() const
 	return m_newtonModel;
 }
 
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-UEdGraph* FNewtonModelEditor::GetGraphEditor() const
-{
-	return m_graphEditor;
-}
-
-void FNewtonModelEditor::SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph)
-{
-	m_slateGraphUi = workingGraph;
-}
-#endif
-
 void FNewtonModelEditor::SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData)
 {
 	m_selectedNodeDetailView = detailData;
@@ -186,29 +168,13 @@ void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChange
 	m_skeletonPhysicsTree->DetailViewPropertiesUpdated(event);
 }
 
-void FNewtonModelEditor::HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo)
+void FNewtonModelEditor::HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& selectedItem, ESelectInfo::Type InSelectInfo)
 {
-	check(0);
-	//if (DetailsView.IsValid())
-	//{
-	//	TArray<UObject*> Objects;
-	//	Algo::TransformIf(InSelectedItems, Objects, [](const TSharedPtr<ISkeletonTreeItem>& InItem) { return InItem->GetObject() != nullptr; }, [](const TSharedPtr<ISkeletonTreeItem>& InItem) { return InItem->GetObject(); });
-	//	DetailsView->SetObjects(Objects);
-	//
-	//	if (Binding.IsValid())
-	//	{
-	//		TArray<FName> BoneSelection;
-	//		Algo::TransformIf(InSelectedItems, BoneSelection,
-	//			[](const TSharedPtr<ISkeletonTreeItem>& InItem)
-	//			{
-	//				const bool bIsBoneType = InItem->IsOfTypeByName("FSkeletonTreeBoneItem");
-	//				const bool bIsNotNone = InItem->GetRowItemName() != NAME_None;
-	//				return bIsBoneType && bIsNotNone;
-	//			},
-	//			[](const TSharedPtr<ISkeletonTreeItem>& InItem) { return InItem->GetRowItemName(); });
-	//		Binding->GetNotifier().Notify(BoneSelection, ESkeletalMeshNotifyType::BonesSelected);
-	//	}
-	//}
+	check(m_skeletonPhysicsTree.IsValid());
+	if (selectedItem[0].IsValid())
+	{
+		m_skeletonPhysicsTree->DetailViewBoneSelectedUpdated(selectedItem[0]);
+	}
 }
 
 void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent)
@@ -251,92 +217,38 @@ void FNewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& 
 	}
 }
 
-void FNewtonModelEditor::BuildGraphEditorAsset()
-{
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-	if (m_modelChange && m_graphEditor && m_graphEditor->Nodes.Num() && m_newtonModel)
-	{
-		m_newtonModel->Graph = NewObject<UGraphTestGraph>(m_newtonModel);
-
-		TMap<const UEdGraphPin*, UNewtonModelPin*> pinMap;
-		UGraphTestGraph* const newtonModelGraph = m_newtonModel->Graph;
-		for (int i = 0; i < m_graphEditor->Nodes.Num(); ++i)
-		{
-			const UNewtonModelGraphNode* const graphNode = Cast<UNewtonModelGraphNode>(m_graphEditor->Nodes[i]);
-			auto MakeNewtomModelNode = [this, &pinMap, graphNode, newtonModelGraph]()
-			{
-				const TArray<UEdGraphPin*>& graphPins = graphNode->GetAllPins();
-				if (Cast<UNewtonModelGraphNodeRoot>(graphNode))
-				{
-					UNewtonModelNode* const newtonModelNode = NewObject<UNewtonModelNodeRoot>(newtonModelGraph);
-					newtonModelNode->Initialize(graphNode->GetNodeInfo());
-					pinMap.Add(graphPins[0], newtonModelNode->GetOuputPin());
-					return newtonModelNode;
-				}
-
-				UNewtonModelNode* const newtonModelNode = NewObject<UNewtonModelNode>(newtonModelGraph);
-				newtonModelNode->Initialize(graphNode->GetNodeInfo());
-				pinMap.Add(graphPins[0], newtonModelNode->GetInputPin());
-				pinMap.Add(graphPins[1], newtonModelNode->GetOuputPin());
-				return newtonModelNode;
-			};
-			UNewtonModelNode* const node = MakeNewtomModelNode();
-			node->Posit = FVector2D(graphNode->NodePosX, graphNode->NodePosY);
-			newtonModelGraph->NodesArray.Push(node);
-		}
-
-		for (int i = 0; i < m_graphEditor->Nodes.Num(); ++i)
-		{
-			const UNewtonModelGraphNode* const graphNode = Cast<UNewtonModelGraphNode>(m_graphEditor->Nodes[i]);
-
-			const TArray<UEdGraphPin*>& graphPins = graphNode->GetAllPins();
-			for (int j = 0; j < graphPins.Num(); ++j)
-			{
-				UEdGraphPin* const sourcePin = graphPins[j];
-				UNewtonModelPin* const modelSourcePin = *pinMap.Find(sourcePin);
-				for (int k = 0; k < sourcePin->LinkedTo.Num(); ++k)
-				{
-					UEdGraphPin* const targetPin = sourcePin->LinkedTo[k];
-					UNewtonModelPin* const modelTargetPin = *pinMap.Find(targetPin);
-					modelSourcePin->Connections.Push(modelTargetPin);
-				}
-			}
-		}
-	}
-#endif
-	m_modelChange = false;
-}
-
 void FNewtonModelEditor::OnClose()
 {
+	m_skeletonPhysicsTree->SaveModel();
+
 	FCoreUObjectDelegates::OnObjectPreSave.Remove(m_onCloseHandle);
 	FPersonaAssetEditorToolkit::OnClose();
 }
-
-bool FNewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
+void FNewtonModelEditor::OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext)
 {
-	BuildGraphEditorAsset();
-	return FPersonaAssetEditorToolkit::OnRequestClose(closeReason);
+	m_skeletonPhysicsTree->SaveModel();
+	//BuildGraphEditorAsset();
 }
 
-void FNewtonModelEditor::OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext)
-{
-	BuildGraphEditorAsset();
-}
+//bool FNewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
+//{
+//	check(0);
+//	//BuildGraphEditorAsset();
+//	return FPersonaAssetEditorToolkit::OnRequestClose(closeReason);
+//}
 
-void FNewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
-{
-	m_modelChange = true;
-}
-
+//void FNewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
+//{
+//	m_modelChange = true;
+//}
 
 void FNewtonModelEditor::CreateSkeletalMeshEditor()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 
-	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
-	m_modelChange = true;
 
+	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
+	//m_modelChange = true;
 
 	//NotifyPreChange(const FString & PropertyName);
 	
@@ -370,27 +282,8 @@ void FNewtonModelEditor::BindCommands()
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 }
 
-
-//TSharedRef< SWidget > XXXXXXX()
-//{
-//	//FToolMenuContext MenuContext(UICommandList, Extenders);
-//	//USkeletonTreeMenuContext* SkeletonTreeMenuContext = NewObject<USkeletonTreeMenuContext>();
-//	//SkeletonTreeMenuContext->SkeletonTree = SharedThis(this);
-//	//MenuContext.AddObject(SkeletonTreeMenuContext);
-//	//return UToolMenus::Get()->GenerateWidget("SkeletonTree.NewMenu", MenuContext);
-//
-//	check(0);
-//	return TSharedRef<SWidget>
-//	(
-//		SNew(SVerticalBox) +
-//		SVerticalBox::Slot().FillHeight(1.0f).HAlign(HAlign_Fill)
-//		[SNew(STextBlock).Text(FText::FromString(TEXT("xxxxx")))]
-//	);
-//}
-
 void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
-	m_modelChange = false;
 	m_newtonModel = newtonModel;
 	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
 
@@ -418,16 +311,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	{
 		// create a acyclic physics tree widgets for physic model.
 		m_skeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
-		//m_skeletonPhysicsTree->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &FNewtonModelEditor::OnGraphChanged));
 	}
-
-	#ifdef ND_INCLUDE_GRAPH_EDITOR
-	{
-		//Create a graph schematic editor
-		m_graphEditor = FBlueprintEditorUtils::CreateNewGraph(m_newtonModel, TEXT("NewtonModelGraph"), UEdGraph::StaticClass(), UNewtonModelGraphSchema::StaticClass());
-		m_graphEditor->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &FNewtonModelEditor::OnGraphChanged));
-	}
-	#endif
 
 	FAssetEditorToolkit::InitAssetEditor(mode, initToolkitHost, m_identifier, FTabManager::FLayout::NullLayout, true, true, m_newtonModel);
 
@@ -439,92 +323,6 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	SetCurrentMode(NewtonModelEditorMode::m_editorModelName);
 	
-	// register callback for rebuild model when 
-	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSaved);
-
-
-	//FName ParentName;
-	//const FName MenuName = GetToolMenuToolbarName(ParentName);
-	//UToolMenu* ToolBar = UToolMenus::Get()->RegisterMenu(MenuName, ParentName, EMultiBoxType::ToolBar);
-	
-	//check(0);
-	//ExtendMenu();
-	//ExtendToolbar();
-	//RegenerateMenusAndToolbars();
-	//
-	//// Set up mesh click selection
-	//PreviewScene->RegisterOnMeshClick(FOnMeshClick::CreateSP(this, &FSkeletalMeshEditor::HandleMeshClick));
-	//PreviewScene->SetAllowMeshHitProxies(true);
-	//
-	//// run attached post-init delegates
-	//ISkeletalMeshEditorModule& SkeletalMeshEditorModule = FModuleManager::GetModuleChecked<ISkeletalMeshEditorModule>("SkeletalMeshEditor");
-	//const TArray<ISkeletalMeshEditorModule::FOnSkeletalMeshEditorInitialized>& PostInitDelegates = SkeletalMeshEditorModule.GetPostEditorInitDelegates();
-	//for (const auto& PostInitDelegate : PostInitDelegates)
-	//{
-	//	PostInitDelegate.ExecuteIfBound(SharedThis<ISkeletalMeshEditor>(this));
-	//}
-
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-	if (m_newtonModel->Graph)
-	{
-		//check(0);
-		UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-		//create the editor graph from the the NewtonModel
-		TMap<const UNewtonModelPin*, UEdGraphPin*> pinMap;
-		UGraphTestGraph* const graph = m_newtonModel->Graph;
-		for (int i = 0; i < graph->NodesArray.Num(); ++i)
-		{
-			const UNewtonModelNode* const newtonModelNode = graph->NodesArray[i];
-			auto MakeGraphNode = [this, &pinMap, newtonModelNode]()
-			{
-				if (Cast<UNewtonModelNodeRoot>(newtonModelNode))
-				{
-					UNewtonModelGraphNode* const graphNode = NewObject<UNewtonModelGraphNodeRoot>(m_graphEditor);
-					graphNode->Initialize(newtonModelNode->Info);
-					pinMap.Add(newtonModelNode->GetOuputPin(), graphNode->GetOutputPin());
-					return graphNode;
-				}
-
-				UNewtonModelGraphNode* const graphNode = NewObject<UNewtonModelGraphNode>(m_graphEditor);
-				graphNode->Initialize(newtonModelNode->Info);
-				pinMap.Add(newtonModelNode->GetInputPin(), graphNode->GetInputPin());
-				pinMap.Add(newtonModelNode->GetOuputPin(), graphNode->GetOutputPin());
-				return graphNode;
-			};
-			UNewtonModelGraphNode* const graphNode = MakeGraphNode();
-
-			graphNode->CreateNewGuid();
-			graphNode->NodePosX = newtonModelNode->Posit.X;
-			graphNode->NodePosY = newtonModelNode->Posit.Y;
-			check(newtonModelNode->Info);
-			m_graphEditor->AddNode(graphNode, true, true);
-		}
-
-		for (int i = 0; i < graph->NodesArray.Num(); ++i)
-		{
-			UNewtonModelNode* const newtonModelNode = graph->NodesArray[i];
-
-			if (newtonModelNode->GetInputPin())
-			{
-				UEdGraphPin* const input = *pinMap.Find(newtonModelNode->GetInputPin());
-				for (int j = 0; j < newtonModelNode->GetInputPin()->Connections.Num(); ++j)
-				{
-					UEdGraphPin* const target = *pinMap.Find(newtonModelNode->GetInputPin()->Connections[j]);
-					input->LinkedTo.Add(target);
-				}
-			}
-
-			if (newtonModelNode->GetOuputPin())
-			{
-				UEdGraphPin* const output = *pinMap.Find(newtonModelNode->GetOuputPin());
-				for (int j = 0; j < newtonModelNode->GetOuputPin()->Connections.Num(); ++j)
-				{
-					UEdGraphPin* const target = *pinMap.Find(newtonModelNode->GetOuputPin()->Connections[j]);
-					output->LinkedTo.Add(target);
-				}
-			}
-		}
-	}
-#endif
-	m_modelChange = false;
+	// register callback for rebuild model when click save button
+	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSave);
 }

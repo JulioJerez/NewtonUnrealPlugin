@@ -15,7 +15,4 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeJointHinge : public UNewtonModelNo
 	GENERATED_BODY()
 	public:
 	UNewtonModelNodeJointHinge();
-	
-	
-	
 };

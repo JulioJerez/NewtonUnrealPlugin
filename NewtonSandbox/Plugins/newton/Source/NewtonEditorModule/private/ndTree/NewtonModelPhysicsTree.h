@@ -7,6 +7,7 @@
 #include "Widgets/SCompoundWidget.h"
 
 
+class ISkeletonTreeItem;
 class FNewtonModelEditor;
 class IPinnedCommandList;
 class FUICommandList_Pinnable;
@@ -27,7 +28,9 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	// Widget constructor
 	void Construct(const FArguments& args, FNewtonModelEditor* const editor);
 
+	void SaveModel();
 	void DetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
+	void DetailViewBoneSelectedUpdated(const TSharedPtr<ISkeletonTreeItem>& item);
 	
 	//* SWidget overrides
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
@@ -50,6 +53,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnAddJointHingeRow();
 	void OnAddShapeSphereRow();
 	void OnDeleteSelectedRow();
+	void OnResetSelectedBone();
 	void OnToggleShapeVisibility();
 	void OnToggleJointVisibility();
 
@@ -79,6 +83,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	bool m_hideShapes;
 	bool m_hideJoints;
+	bool m_modelIsDirty;
 	int m_nameId;
 
 	static FName m_menuName;

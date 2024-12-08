@@ -7,7 +7,9 @@
 UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 	:Super()
 {
-	SetName (TEXT("Body"));
+	SetName (TEXT("NewBody"));
+
+	BoneIndex = -1;
 }
 
 

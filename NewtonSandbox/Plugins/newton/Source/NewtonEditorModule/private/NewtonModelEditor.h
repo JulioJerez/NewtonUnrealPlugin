@@ -58,7 +58,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 
 	// editor methods
 	void BindCommands();
-	void BuildGraphEditorAsset();
 	void CreateSkeletalMeshEditor();
 	UNewtonModel* GetNewtonModel() const;
 	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
@@ -78,11 +77,11 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 #endif
 
 	// Delegates
-	void OnGraphChanged(const FEdGraphEditAction& action);
+	//void OnGraphChanged(const FEdGraphEditAction& action);
 	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
 	void HandleViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
+	void OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
-	void OnObjectSaved(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& betailBuilder);
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
 	void HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
@@ -94,7 +93,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
-	virtual bool OnRequestClose(EAssetEditorCloseReason InCloseReason) override;
+	//virtual bool OnRequestClose(EAssetEditorCloseReason InCloseReason) override;
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
 	
@@ -138,7 +137,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	// save model when closing editor
 	FDelegateHandle m_onCloseHandle;
 
-	bool m_modelChange;
+	//bool m_modelChange;
 	static FName m_identifier;
 
 	friend class FNewtonModelPhysicsTree;

@@ -7,5 +7,5 @@
 UNewtonModelNodeJointHinge::UNewtonModelNodeJointHinge()
 	:Super()
 {
-	SetName(TEXT("Hinge"));
+	SetName(TEXT("NewHinge"));
 }
