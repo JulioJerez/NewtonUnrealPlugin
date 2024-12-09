@@ -604,6 +604,32 @@ FName FNewtonModelPhysicsTree::GetUniqueName(const FName name)
 	return FName(*nodeName);
 }
 
+void FNewtonModelPhysicsTree::ResetSkeletalMesh()
+{
+	m_nameId = 0;
+	m_modelIsDirty = true;
+
+	check(m_root[0].IsValid());
+
+	if (m_acyclicGraph)
+	{
+		delete m_acyclicGraph;
+	}
+	m_acyclicGraph = nullptr;
+
+	m_root.Empty();
+	m_uniqueNames.Empty();
+	m_oldSelectedName = TEXT("None");
+	m_selectedItem = nullptr;
+	m_items.Empty();
+
+	UNewtonModel* const model = m_editor->GetNewtonModel();
+	model->RootBody = nullptr;
+	model->RootBody = NewObject<UNewtonModelNodeRigidBodyRoot>(model);
+
+	BuildTree();
+}
+
 void FNewtonModelPhysicsTree::SaveModel()
 {
 	bool modelIsDirty = m_modelIsDirty;

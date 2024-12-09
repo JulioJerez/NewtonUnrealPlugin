@@ -58,7 +58,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 
 	// editor methods
 	void BindCommands();
-	void CreateSkeletalMeshEditor();
 	UNewtonModel* GetNewtonModel() const;
 	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
 	TSharedRef<ISkeletonTree> GetSkeletonTree() const;
@@ -70,11 +69,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() override;
 	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
-
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-	UEdGraph* GetGraphEditor() const;
-	void SetWorkingGraphUi(TSharedPtr<SGraphEditor> workingGraph);
-#endif
 
 	// Delegates
 	//void OnGraphChanged(const FEdGraphEditAction& action);
@@ -101,17 +95,11 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 
 	protected:
-	UPROPERTY()
+	//UPROPERTY()
 	UNewtonModel* m_newtonModel;
-
-#ifdef ND_INCLUDE_GRAPH_EDITOR
-	UPROPERTY()
-	UEdGraph* m_graphEditor;
-	TSharedPtr<SGraphEditor> m_slateGraphUi;
-#endif
-
-	TObjectPtr<USkeletalMesh> m_skeletalMeshAsset;
+	
 	TSharedPtr<IDetailsView> m_selectedNodeDetailView;
+	TObjectPtr<USkeletalMesh> m_skeletalMeshAssetCached;
 
 	// Skeleton tree
 	TSharedPtr<ISkeletonTree> SkeletonTree;
@@ -119,14 +107,10 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	// Skeleton physics tree
 	TSharedPtr<FNewtonModelPhysicsTree> m_skeletonPhysicsTree;
 
-	// Viewport
-	TSharedPtr<class IPersonaViewport> Viewport;
-
-	/// PreviewScene
-	TSharedPtr<IPersonaPreviewScene> PreviewScene;
-
-	// Persona toolkit
+	// Persona tollkid stuff 
+	TSharedPtr<IPersonaViewport> Viewport;
 	TSharedPtr<IPersonaToolkit> PersonaToolkit;
+	TSharedPtr<IPersonaPreviewScene> PreviewScene;
 
 	// Binding to send/receive skeletal mesh modifications
 	TSharedPtr<FNewtonModelEditorBinding> Binding;

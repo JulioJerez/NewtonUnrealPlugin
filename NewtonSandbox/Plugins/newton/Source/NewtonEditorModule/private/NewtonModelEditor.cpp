@@ -44,6 +44,8 @@
 #include "NewtonModelEditorBinding.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
 
+#define LOCTEXT_NAMESPACE "FNewtonModelEditor"
+
 FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 
 FNewtonModelEditor::FNewtonModelEditor()
@@ -52,8 +54,8 @@ FNewtonModelEditor::FNewtonModelEditor()
 	SkeletonTree = nullptr;
 	m_newtonModel = nullptr;
 	PersonaToolkit = nullptr;
-	m_skeletalMeshAsset = nullptr;
 	m_selectedNodeDetailView = nullptr;
+	m_skeletalMeshAssetCached = nullptr;
 }
 
 FNewtonModelEditor::~FNewtonModelEditor()
@@ -171,7 +173,7 @@ void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChange
 void FNewtonModelEditor::HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& selectedItem, ESelectInfo::Type InSelectInfo)
 {
 	check(m_skeletonPhysicsTree.IsValid());
-	if (selectedItem[0].IsValid())
+	if (selectedItem.Num() && selectedItem[0].IsValid())
 	{
 		m_skeletonPhysicsTree->DetailViewBoneSelectedUpdated(selectedItem[0]);
 	}
@@ -179,15 +181,53 @@ void FNewtonModelEditor::HandleSkeletalMeshSelectionChanged(const TArrayView<TSh
 
 void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent)
 {
-	for (int i = 0; i < propertyChangedEvent.GetNumObjectsBeingEdited(); ++i)
+	FProperty* const property = propertyChangedEvent.Property;
+	if (property->GetName() == TEXT("SkeletalMeshAsset"))
 	{
-		const UNewtonModel* const newtonModel = Cast<UNewtonModel>(propertyChangedEvent.GetObjectBeingEdited(i));
-		if (newtonModel && (newtonModel->SkeletalMeshAsset != m_skeletalMeshAsset.Get()))
+		for (int i = 0; i < propertyChangedEvent.GetNumObjectsBeingEdited(); ++i)
 		{
-			check(m_newtonModel == newtonModel);
-			CreateSkeletalMeshEditor();
-			break;
+			const UNewtonModel* const newtonModel = Cast<UNewtonModel>(propertyChangedEvent.GetObjectBeingEdited(i));
+			if (newtonModel)
+			{
+				if (m_skeletalMeshAssetCached != m_newtonModel->SkeletalMeshAsset)
+				{
+					m_skeletalMeshAssetCached = m_newtonModel->SkeletalMeshAsset;
+					m_skeletonPhysicsTree->ResetSkeletalMesh();
+
+					FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("CloseAndReopenEditor", "you need to close and reopen the physics editor for this change to take place. All the Physics Tree data will be loss"));
+
+					//SkeletonTree->SetSkeletalMesh(m_skeletalMeshAssetCached);
+					//PersonaToolkit->SetMesh(m_skeletalMeshAssetCached);
+					//
+					//FPersonaToolkitArgs personaToolkitArgs;
+					//personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
+					//PersonaToolkit->Initialize(m_skeletalMeshAssetCached, personaToolkitArgs);
+					//PersonaToolkit->Initialize(USkeleton * InSkeleton, personaToolkitArgs)
+
+					//FPersonaToolkitArgs personaToolkitArgs;
+					//personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
+					//FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
+					//PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
+					//PersonaToolkit->GetPreviewScene()->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
+					//personaModule.RecordAssetOpened(FAssetData(m_newtonModel));
+					//PreviewScene = PersonaToolkit->GetPreviewScene();
+					//{
+					//	// create a skeleton tree widgets for visualization.
+					//	FSkeletonTreeArgs skeletonTreeArgs;
+					//	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSkeletalMeshSelectionChanged);
+					//	skeletonTreeArgs.PreviewScene = PreviewScene;
+					//	skeletonTreeArgs.ContextName = GetToolkitFName();
+					//	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
+					//	SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
+					//}
+				}
+				break;
+			}
 		}
+	}
+	else
+	{
+		check(0);
 	}
 }
 
@@ -230,53 +270,6 @@ void FNewtonModelEditor::OnObjectSave(UObject* savedObject, FObjectPreSaveContex
 	//BuildGraphEditorAsset();
 }
 
-//bool FNewtonModelEditor::OnRequestClose(EAssetEditorCloseReason closeReason)
-//{
-//	check(0);
-//	//BuildGraphEditorAsset();
-//	return FPersonaAssetEditorToolkit::OnRequestClose(closeReason);
-//}
-
-//void FNewtonModelEditor::OnGraphChanged(const FEdGraphEditAction& action)
-//{
-//	m_modelChange = true;
-//}
-
-void FNewtonModelEditor::CreateSkeletalMeshEditor()
-{
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-
-
-	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
-	//m_modelChange = true;
-
-	//NotifyPreChange(const FString & PropertyName);
-	
-	//FPersonaToolkitArgs personaToolkitArgs;
-	//personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
-	//
-	//FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
-	//PersonaToolkit = personaModule.CreatePersonaToolkit(m_newtonModel->SkeletalMeshAsset, personaToolkitArgs);
-	//
-	//PersonaToolkit->GetPreviewScene()->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
-	//
-	//personaModule.RecordAssetOpened(FAssetData(m_newtonModel));
-	//
-	//TSharedPtr<IPersonaPreviewScene> previewScene(PersonaToolkit->GetPreviewScene());
-	//
-	//FSkeletonTreeArgs skeletonTreeArgs;
-	//skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSkeletalMeshSelectionChanged);
-	//skeletonTreeArgs.PreviewScene = previewScene;
-	//skeletonTreeArgs.ContextName = GetToolkitFName();
-	//
-	//ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
-	//SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
-	//
-	//AddApplicationMode(
-	//	NewtonModelEditorMode::m_editorModelName,
-	//	MakeShareable(new NewtonModelEditorMode(SharedThis(this), SkeletonTree.ToSharedRef())));
-}
-
 void FNewtonModelEditor::BindCommands()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
@@ -285,13 +278,13 @@ void FNewtonModelEditor::BindCommands()
 void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
 	m_newtonModel = newtonModel;
-	m_skeletalMeshAsset = m_newtonModel->SkeletalMeshAsset;
+	m_skeletalMeshAssetCached = m_newtonModel->SkeletalMeshAsset;
 
 	FPersonaToolkitArgs personaToolkitArgs;
 	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
 
 	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
-	PersonaToolkit = personaModule.CreatePersonaToolkit(m_newtonModel->SkeletalMeshAsset, personaToolkitArgs);
+	PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
 
 	PersonaToolkit->GetPreviewScene()->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
 
@@ -326,3 +319,5 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	// register callback for rebuild model when click save button
 	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSave);
 }
+
+#undef LOCTEXT_NAMESPACE

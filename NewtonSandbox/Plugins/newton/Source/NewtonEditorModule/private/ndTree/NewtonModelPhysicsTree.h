@@ -29,6 +29,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void Construct(const FArguments& args, FNewtonModelEditor* const editor);
 
 	void SaveModel();
+	void ResetSkeletalMesh();
 	void DetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
 	void DetailViewBoneSelectedUpdated(const TSharedPtr<ISkeletonTreeItem>& item);
 	
@@ -61,7 +62,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsTreeItem> item, ESelectInfo::Type selectInfo);
 	void OnGetChildren(TSharedPtr<FNewtonModelPhysicsTreeItem>, TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>>& outChildren);
 
-	TSharedPtr< SWidget > CreateContextMenu();
+	TSharedPtr<SWidget> CreateContextMenu();
 	TSharedRef<ITableRow> OnGenerateRow(TSharedPtr<FNewtonModelPhysicsTreeItem> item, const TSharedRef<STableViewBase>& ownerTable);
 
 	FName m_oldSelectedName;

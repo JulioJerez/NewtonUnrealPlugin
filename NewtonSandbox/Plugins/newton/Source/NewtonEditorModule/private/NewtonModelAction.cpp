@@ -24,6 +24,7 @@
 
 #include "NewtonModelEditor.h"
 #include "NewtonModelEditorCommon.h"
+#include "Rendering/SkeletalMeshRenderData.h"
 
 NewtonModelAction::NewtonModelAction(EAssetTypeCategories::Type assetCategory)
 	:FAssetTypeActions_Base()
@@ -67,11 +68,18 @@ void NewtonModelAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TShar
 	
 	for (int i = 0; i < inObjects.Num(); ++i)
 	{
-		UNewtonModel* const mesh = Cast<UNewtonModel>(inObjects[i]);
-		if (mesh)
+		UNewtonModel* const newtonModel = Cast<UNewtonModel>(inObjects[i]);
+		if (newtonModel)
 		{
+			FSkeletalMeshRenderData* const renderData = newtonModel->SkeletalMeshAsset->GetResourceForRendering();
+			if (renderData && (renderData->LODRenderData.Num() == 0))
+			{
+				newtonModel->SkeletalMeshAsset = NewObject<USkeletalMesh>(newtonModel, FName(TEXT("emptyMesh")));
+				newtonModel->SkeletalMeshAsset->SetSkeleton(NewObject<USkeleton>(newtonModel->SkeletalMeshAsset, FName(TEXT("emptySkeleton"))));
+			}
 			TSharedRef<FNewtonModelEditor> editor(new FNewtonModelEditor());
-			editor->InitEditor(mode, editWithinLevelEditor, mesh);
+			editor->InitEditor(mode, editWithinLevelEditor, newtonModel);
+			break;
 		}
 	}
 }
