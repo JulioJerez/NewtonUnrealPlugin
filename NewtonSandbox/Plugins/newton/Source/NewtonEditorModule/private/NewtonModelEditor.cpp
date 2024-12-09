@@ -34,6 +34,7 @@
 #include "UObject/ObjectSaveContext.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
+#include "Animation/DebugSkelMeshComponent.h"
 
 
 #include "NewtonModelGraphNode.h"
@@ -82,7 +83,7 @@ TSharedRef<FNewtonModelPhysicsTree> FNewtonModelEditor::GetNewtonModelPhysicsTre
 	return m_skeletonPhysicsTree.ToSharedRef();
 }
 
-void FNewtonModelEditor::HandleViewportCreated(const TSharedRef<IPersonaViewport>& viewport)
+void FNewtonModelEditor::OnViewportCreated(const TSharedRef<IPersonaViewport>& viewport)
 {
 	Viewport = viewport;
 
@@ -154,7 +155,7 @@ void FNewtonModelEditor::UnregisterTabSpawners(const TSharedRef<class FTabManage
 {
 }
 
-void FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& detailBuilder)
+void FNewtonModelEditor::OnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& detailBuilder)
 {
 	check(0);
 	//DetailBuilder.HideCategory("Mesh");
@@ -170,7 +171,7 @@ void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChange
 	m_skeletonPhysicsTree->DetailViewPropertiesUpdated(event);
 }
 
-void FNewtonModelEditor::HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& selectedItem, ESelectInfo::Type InSelectInfo)
+void FNewtonModelEditor::OnSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& selectedItem, ESelectInfo::Type InSelectInfo)
 {
 	check(m_skeletonPhysicsTree.IsValid());
 	if (selectedItem.Num() && selectedItem[0].IsValid())
@@ -194,32 +195,10 @@ void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEven
 					m_skeletalMeshAssetCached = m_newtonModel->SkeletalMeshAsset;
 					m_skeletonPhysicsTree->ResetSkeletalMesh();
 
+					// the person plugin doe no suppor recreation the viewport, nor it support chnaging the skeletal mesh,
+					// or skeleton, In fact almos nothong can be modifies afte the Parson tollkid is iniitialized, 
+					// the only solution to chnage the skeletan mesh, is to just close and re-open th eeditor
 					FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("CloseAndReopenEditor", "you need to close and reopen the physics editor for this change to take place. All the Physics Tree data will be loss"));
-
-					//SkeletonTree->SetSkeletalMesh(m_skeletalMeshAssetCached);
-					//PersonaToolkit->SetMesh(m_skeletalMeshAssetCached);
-					//
-					//FPersonaToolkitArgs personaToolkitArgs;
-					//personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
-					//PersonaToolkit->Initialize(m_skeletalMeshAssetCached, personaToolkitArgs);
-					//PersonaToolkit->Initialize(USkeleton * InSkeleton, personaToolkitArgs)
-
-					//FPersonaToolkitArgs personaToolkitArgs;
-					//personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
-					//FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
-					//PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
-					//PersonaToolkit->GetPreviewScene()->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
-					//personaModule.RecordAssetOpened(FAssetData(m_newtonModel));
-					//PreviewScene = PersonaToolkit->GetPreviewScene();
-					//{
-					//	// create a skeleton tree widgets for visualization.
-					//	FSkeletonTreeArgs skeletonTreeArgs;
-					//	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSkeletalMeshSelectionChanged);
-					//	skeletonTreeArgs.PreviewScene = PreviewScene;
-					//	skeletonTreeArgs.ContextName = GetToolkitFName();
-					//	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
-					//	SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
-					//}
 				}
 				break;
 			}
@@ -275,13 +254,14 @@ void FNewtonModelEditor::BindCommands()
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 }
 
+#include "Components\BoxComponent.h"
 void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
 	m_newtonModel = newtonModel;
 	m_skeletalMeshAssetCached = m_newtonModel->SkeletalMeshAsset;
 
 	FPersonaToolkitArgs personaToolkitArgs;
-	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::HandleOnPreviewSceneSettingsCustomized);
+	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneSettingsCustomized);
 
 	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
@@ -292,9 +272,21 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	PreviewScene = PersonaToolkit->GetPreviewScene();
 	{
+		AActor* xxx_actor = PreviewScene->GetActor();
+		UDebugSkelMeshComponent* xxx_comp = PreviewScene->GetPreviewMeshComponent();
+		check(xxx_comp->GetOwner() == xxx_actor);
+		//PreviewScene->SetPreviewMeshComponent(xxx);
+		//UBoxComponent * xxxxx1 = NewObject<UBoxComponent>(xxx->GetOwner(), FName(TEXT("xxxx")));
+		//USceneComponent* const child = Cast<USceneComponent>(xxx_actor->AddComponentByClass(UBoxComponent::StaticClass(), false, FTransform(), false));
+
+		FTransform transform(FVector(100.0, 0.0, 100.0f));
+		UBoxComponent* const child = Cast<UBoxComponent>(xxx_actor->AddComponentByClass(UBoxComponent::StaticClass(), false, transform, false));
+		child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
+		bool xxxxxxxxx = xxx_comp->AttachToComponent(xxx_comp, FAttachmentTransformRules::KeepRelativeTransform);
+
 		// create a skeleton tree widgets for visualization.
 		FSkeletonTreeArgs skeletonTreeArgs;
-		skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::HandleSkeletalMeshSelectionChanged);
+		skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::OnSkeletalMeshSelectionChanged);
 		skeletonTreeArgs.PreviewScene = PreviewScene;
 		skeletonTreeArgs.ContextName = GetToolkitFName();
 		ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));

@@ -71,14 +71,13 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
 
 	// Delegates
-	//void OnGraphChanged(const FEdGraphEditAction& action);
 	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
-	void HandleViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
+	void OnViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
 	void OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
-	void HandleOnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& betailBuilder);
+	void OnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& detailBuilder);
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
-	void HandleSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
+	void OnSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
 
 
 	// Toolkit methods
@@ -87,7 +86,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
-	//virtual bool OnRequestClose(EAssetEditorCloseReason InCloseReason) override;
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
 	

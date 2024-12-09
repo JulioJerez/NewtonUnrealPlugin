@@ -50,7 +50,7 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplicat
 
 	FPersonaViewportArgs viewportArgs(editor->GetPersonaToolkit()->GetPreviewScene());
 	viewportArgs.ContextName = TEXT("NewtonModelEditor.Viewport");
-	viewportArgs.OnViewportCreated = FOnViewportCreated::CreateSP(editor, &FNewtonModelEditor::HandleViewportCreated);
+	viewportArgs.OnViewportCreated = FOnViewportCreated::CreateSP(editor, &FNewtonModelEditor::OnViewportCreated);
 	personaModule.RegisterPersonaViewportTabFactories(m_tabs, editor, viewportArgs);
 
 	m_tabs.RegisterFactory(detailTab);
