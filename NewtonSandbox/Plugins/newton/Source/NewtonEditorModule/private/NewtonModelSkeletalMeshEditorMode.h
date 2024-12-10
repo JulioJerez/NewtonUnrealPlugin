@@ -23,21 +23,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WorkflowOrientedApp/WorkflowTabFactory.h"
+//#include "Tools/DefaultEdMode.h"
+#include "Tools/LegacyEdModeWidgetHelpers.h"
+#include "NewtonModelSkeletalMeshEditorMode.generated.h"
 
-//class SToolTip;
-class FNewtonModelEditor;
 
-class FNewtonModelPhysicsTreeTabFactory : public FWorkflowTabFactory
+UCLASS(Transient, MinimalAPI)
+class UNewtonModelSkeletalMeshEditorMode: public UBaseLegacyWidgetEdMode
 {
+	class ModeWidgetHelper;
+
+	GENERATED_BODY()
 	public:
-	FNewtonModelPhysicsTreeTabFactory(const TSharedPtr<FNewtonModelEditor>& editor);
 
-	/** FWorkflowTabFactory interface */
-	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const;
-	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;
-	//virtual TSharedPtr<SToolTip> CreateTabToolTipWidget(const FWorkflowTabSpawnInfo& Info) const override;
+	UNewtonModelSkeletalMeshEditorMode();
 
-	/** Reference to our skeleton tree */
-	TWeakPtr<FNewtonModelEditor> m_editor;
+	virtual TSharedRef<FLegacyEdModeWidgetHelper> CreateWidgetHelper() override;
+
+	static FEditorModeID m_id;
 };

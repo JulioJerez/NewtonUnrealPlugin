@@ -26,6 +26,7 @@
 #include "IPersonaToolkit.h"
 #include "EdGraphUtilities.h"
 #include "IPersonaViewport.h"
+#include "EditorModeManager.h"
 #include "Engine/SkeletalMesh.h"
 #include "IPersonaPreviewScene.h"
 #include "ISkeletonEditorModule.h"
@@ -37,6 +38,7 @@
 #include "Animation/DebugSkelMeshComponent.h"
 
 
+#include "NewtonEditorModule.h"
 #include "NewtonModelGraphNode.h"
 #include "NewtonModelEditorMode.h"
 #include "NewtonModelGraphSchema.h"
@@ -44,13 +46,17 @@
 #include "NewtonModelGraphNodeRoot.h"
 #include "NewtonModelEditorBinding.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
+#include "NewtonModelSkeletalMeshEditorMode.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelEditor"
 
+FEditorModeID FNewtonModelEditor::m_id(FName(TEXT("FNewtonModelEditor")));
 FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 
 FNewtonModelEditor::FNewtonModelEditor()
-	:INewtonModelEditor()
+	//:INewtonModelEditor()
+	:FPersonaAssetEditorToolkit()
+	,IHasPersonaToolkit()
 {
 	SkeletonTree = nullptr;
 	m_newtonModel = nullptr;
@@ -180,6 +186,80 @@ void FNewtonModelEditor::OnSkeletalMeshSelectionChanged(const TArrayView<TShared
 	}
 }
 
+#include "Components\BoxComponent.h"
+#include "AnimationEditorPreviewActor.h"
+void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewScene>& personaPreviewScene)
+{
+	personaPreviewScene->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
+
+	AAnimationEditorPreviewActor* const actor = personaPreviewScene->GetWorld()->SpawnActor<AAnimationEditorPreviewActor>(AAnimationEditorPreviewActor::StaticClass(), FTransform::Identity);
+	personaPreviewScene->SetActor(actor);
+
+	// Create the preview component
+	UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
+	skeletalMeshComponent->SetSkeletalMesh(m_skeletalMeshAssetCached);
+	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);
+
+	personaPreviewScene->AddComponent(skeletalMeshComponent, FTransform::Identity);
+	personaPreviewScene->SetPreviewMeshComponent(skeletalMeshComponent);
+	actor->SetRootComponent(skeletalMeshComponent);
+
+	// add a cube for testing.
+	FTransform transform(FVector(100.0, 0.0, 100.0f));
+	//UBoxComponent* const child = Cast<UBoxComponent>(actor->AddComponentByClass(UBoxComponent::StaticClass(), false, transform, false));
+	UBoxComponent* const child = NewObject<UBoxComponent>(actor);
+	child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
+	//child->AttachToComponent(skeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	personaPreviewScene->AddComponent(child, transform);
+
+
+	child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
+#if 0
+	// Create the preview component
+	//SharedData->EditorSkelComp = NewObject<UPhysicsAssetEditorSkeletalMeshComponent>(Actor);
+	//SharedData->EditorSkelComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//SharedData->EditorSkelComp->SharedData = SharedData.Get();
+	//SharedData->EditorSkelComp->SetSkeletalMesh(SharedData->PhysicsAsset->GetPreviewMesh());
+	//SharedData->EditorSkelComp->SetPhysicsAsset(SharedData->PhysicsAsset, true);
+	//SharedData->EditorSkelComp->SetDisablePostProcessBlueprint(true);
+
+	personaPreviewScene->SetPreviewMeshComponent(SharedData->EditorSkelComp);
+	personaPreviewScene->AddComponent(SharedData->EditorSkelComp, FTransform::Identity);
+	personaPreviewScene->SetAdditionalMeshesSelectable(false);
+	// set root component, so we can attach to it. 
+	Actor->SetRootComponent(SharedData->EditorSkelComp);
+
+	SharedData->EditorSkelComp->Stop();
+
+	SharedData->PhysicalAnimationComponent = NewObject<UPhysicalAnimationComponent>(Actor);
+	SharedData->PhysicalAnimationComponent->SetSkeletalMeshComponent(SharedData->EditorSkelComp);
+	personaPreviewScene->AddComponent(SharedData->PhysicalAnimationComponent, FTransform::Identity);
+
+	SharedData->ResetTM = SharedData->EditorSkelComp->GetComponentToWorld();
+
+	// Register handle component
+	SharedData->MouseHandle->RegisterComponentWithWorld(personaPreviewScene->GetWorld());
+
+	SharedData->EnableSimulation(false);
+
+	// we need to make sure we monitor any change to the PhysicsState being recreated, as this can happen from path that is external to this class
+	// (example: setting a property on a body that is type "simulated" will recreate the state from USkeletalBodySetup::PostEditChangeProperty and let the body simulating (UE-107308)
+	SharedData->EditorSkelComp->RegisterOnPhysicsCreatedDelegate(FOnSkelMeshPhysicsCreated::CreateLambda([this]()
+		{
+			// let's make sure nothing is simulating and that all necessary state are in proper order
+			SharedData->EnableSimulation(false);
+		}));
+
+	// Make sure the floor mesh has collision (BlockAllDynamic may have been overriden)
+	static FName CollisionProfileName(TEXT("PhysicsActor"));
+	UStaticMeshComponent* FloorMeshComponent = const_cast<UStaticMeshComponent*>(personaPreviewScene->GetFloorMeshComponent());
+	FloorMeshComponent->SetCollisionProfileName(CollisionProfileName);
+	FloorMeshComponent->RecreatePhysicsState();
+#endif
+
+	
+}
+
 void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent)
 {
 	FProperty* const property = propertyChangedEvent.Property;
@@ -223,6 +303,11 @@ UNewtonModelGraphNode* FNewtonModelEditor::GetSelectedNode(const FGraphPanelSele
 	return nullptr;
 }
 
+void FNewtonModelEditor::OnMeshClick(HActor* hitProxy, const FViewportClick& click)
+{
+	check(0);
+}
+
 void FNewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& selectionSet)
 {
 	UNewtonModelGraphNode* const selectedNode = GetSelectedNode(selectionSet);
@@ -254,52 +339,42 @@ void FNewtonModelEditor::BindCommands()
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 }
 
-#include "Components\BoxComponent.h"
 void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel)
 {
 	m_newtonModel = newtonModel;
 	m_skeletalMeshAssetCached = m_newtonModel->SkeletalMeshAsset;
 
-	FPersonaToolkitArgs personaToolkitArgs;
-	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneSettingsCustomized);
-
 	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
-	PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
-
-	PersonaToolkit->GetPreviewScene()->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
+	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
 
 	personaModule.RecordAssetOpened(FAssetData(m_newtonModel));
 
+	FPersonaToolkitArgs personaToolkitArgs;
+	personaToolkitArgs.bPreviewMeshCanUseDifferentSkeleton = false;
+	personaToolkitArgs.OnPreviewSceneCreated = FOnPreviewSceneCreated::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneCreated);
+	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneSettingsCustomized);
+	PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
 	PreviewScene = PersonaToolkit->GetPreviewScene();
-	{
-		AActor* xxx_actor = PreviewScene->GetActor();
-		UDebugSkelMeshComponent* xxx_comp = PreviewScene->GetPreviewMeshComponent();
-		check(xxx_comp->GetOwner() == xxx_actor);
-		//PreviewScene->SetPreviewMeshComponent(xxx);
-		//UBoxComponent * xxxxx1 = NewObject<UBoxComponent>(xxx->GetOwner(), FName(TEXT("xxxx")));
-		//USceneComponent* const child = Cast<USceneComponent>(xxx_actor->AddComponentByClass(UBoxComponent::StaticClass(), false, FTransform(), false));
 
-		FTransform transform(FVector(100.0, 0.0, 100.0f));
-		UBoxComponent* const child = Cast<UBoxComponent>(xxx_actor->AddComponentByClass(UBoxComponent::StaticClass(), false, transform, false));
-		child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
-		bool xxxxxxxxx = xxx_comp->AttachToComponent(xxx_comp, FAttachmentTransformRules::KeepRelativeTransform);
+	// create a skeleton tree widgets for visualization.
+	FSkeletonTreeArgs skeletonTreeArgs;
+	skeletonTreeArgs.PreviewScene = PreviewScene;
+	skeletonTreeArgs.ContextName = GetToolkitFName();
 
-		// create a skeleton tree widgets for visualization.
-		FSkeletonTreeArgs skeletonTreeArgs;
-		skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::OnSkeletalMeshSelectionChanged);
-		skeletonTreeArgs.PreviewScene = PreviewScene;
-		skeletonTreeArgs.ContextName = GetToolkitFName();
-		ISkeletonEditorModule& skeletonEditorModule = FModuleManager::GetModuleChecked<ISkeletonEditorModule>(TEXT("SkeletonEditor"));
-		SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
-	}
-
-	{
-		// create a acyclic physics tree widgets for physic model.
-		m_skeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
-	}
-
+	//skeletonTreeArgs.bHideBonesByDefault = true;
+	skeletonTreeArgs.bAllowMeshOperations = false;
+	skeletonTreeArgs.bAllowMeshOperations = false;
+	skeletonTreeArgs.bAllowSkeletonOperations = false;
+	skeletonTreeArgs.bShowDebugVisualizationOptions = true;
+	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::OnSkeletalMeshSelectionChanged);
+	SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
+	
+	// create a acyclic physics tree widgets for physic model.
+	m_skeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
+	
 	FAssetEditorToolkit::InitAssetEditor(mode, initToolkitHost, m_identifier, FTabManager::FLayout::NullLayout, true, true, m_newtonModel);
 
+	//FPhysicsAssetEditorCommands::Register();
 	BindCommands();
 
 	AddApplicationMode(
@@ -310,6 +385,14 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	
 	// register callback for rebuild model when click save button
 	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSave);
+
+	PreviewScene->RegisterOnMeshClick(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
+	PreviewScene->SetAllowMeshHitProxies(true);
+
+	// this shit enable the transform tool bar. 
+	// why unreal does this crap is beyond reprehensible. 
+	FEditorModeTools& editorModeManager = GetEditorModeManager();
+	editorModeManager.ActivateMode(UNewtonModelSkeletalMeshEditorMode::m_id, true);
 }
 
 #undef LOCTEXT_NAMESPACE

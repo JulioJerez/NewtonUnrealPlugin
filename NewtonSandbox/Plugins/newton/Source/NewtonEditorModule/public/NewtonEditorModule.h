@@ -33,6 +33,6 @@ class FNewtonEditorModule : public FDefaultModuleImpl
 	int m_toobarCount;
 
 	TSharedPtr<FSlateStyleSet> m_styleSet;
-	TSharedPtr<FNewtonModelPinFactory> m_customPinFactory;
 	TSharedPtr<NewtonModelAction> m_newtonModelAction;
+	TSharedPtr<FNewtonModelPinFactory> m_customPinFactory;
 };

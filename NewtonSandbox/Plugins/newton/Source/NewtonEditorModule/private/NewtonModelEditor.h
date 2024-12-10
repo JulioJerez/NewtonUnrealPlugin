@@ -31,6 +31,7 @@
 class UNewtonModel;
 class UNewtonModelGraphNode;
 
+struct HActor;
 class ISkeletonTree;
 class IPersonaToolkit;
 class IPersonaViewport;
@@ -42,15 +43,8 @@ class FObjectPreSaveContext;
 class FNewtonModelPhysicsTree;
 class FNewtonModelEditorBinding;
 
-class INewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
-{
-	public:
-	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() = 0;
-};
 
-
-
-class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
+class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
 {
 	public:
 	FNewtonModelEditor();
@@ -65,18 +59,22 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
 	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
 	
+	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding();
 	void SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData);
-	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding() override;
 	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
 
 	// Delegates
+	void OnMeshClick(HActor* hitProxy, const FViewportClick& click);
 	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
 	void OnViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
 	void OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
 	void OnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& detailBuilder);
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
+	
+	void OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewScene>& personaPreviewScene);
+	
 	void OnSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
 
 
@@ -88,6 +86,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
+	
 	
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
@@ -121,7 +120,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public INewtonModelEditor
 
 	//bool m_modelChange;
 	static FName m_identifier;
-
+	static FEditorModeID m_id;
 	friend class FNewtonModelPhysicsTree;
 };
 

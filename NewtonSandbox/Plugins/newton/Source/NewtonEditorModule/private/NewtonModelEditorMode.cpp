@@ -44,19 +44,22 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplicat
 	FPersonaModule& personaModule = FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	ISkeletonEditorModule& skeletonEditorModule = FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
 
+	FPersonaViewportArgs viewportArgs(editor->GetPersonaToolkit()->GetPreviewScene());
+	viewportArgs.bShowStats = false;
+	viewportArgs.bShowTurnTable = false;
+	viewportArgs.bAlwaysShowTransformToolbar = true;
+	viewportArgs.ContextName = TEXT("NewtonModelEditor.Viewport");
+	viewportArgs.OnViewportCreated = FOnViewportCreated::CreateSP(editor, &FNewtonModelEditor::OnViewportCreated);
+
+	TSharedRef<FWorkflowTabFactory> viewportTab(personaModule.CreatePersonaViewportTabFactory(editor, viewportArgs));
 	TSharedRef<FWorkflowTabFactory> detailTab(MakeShareable(new NewtonModelTabFactoryDetail(editor)));
 	TSharedRef<FWorkflowTabFactory> physicsTreeTab(MakeShareable(new FNewtonModelPhysicsTreeTabFactory(editor)));
 	TSharedRef<FWorkflowTabFactory> skeletalTreeTab(skeletonEditorModule.CreateSkeletonTreeTabFactory(editor, skeletonTree));
 
-	FPersonaViewportArgs viewportArgs(editor->GetPersonaToolkit()->GetPreviewScene());
-	viewportArgs.ContextName = TEXT("NewtonModelEditor.Viewport");
-	viewportArgs.OnViewportCreated = FOnViewportCreated::CreateSP(editor, &FNewtonModelEditor::OnViewportCreated);
-	personaModule.RegisterPersonaViewportTabFactories(m_tabs, editor, viewportArgs);
-
+	m_tabs.RegisterFactory(viewportTab);
 	m_tabs.RegisterFactory(detailTab);
 	m_tabs.RegisterFactory(physicsTreeTab);
 	m_tabs.RegisterFactory(skeletalTreeTab);
-
 
 	auto MakeArea = [](FName identifier)
 	{
