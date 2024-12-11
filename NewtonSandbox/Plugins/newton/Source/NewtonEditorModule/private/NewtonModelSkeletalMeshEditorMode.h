@@ -23,10 +23,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Tools/DefaultEdMode.h"
 #include "Tools/LegacyEdModeWidgetHelpers.h"
 #include "NewtonModelSkeletalMeshEditorMode.generated.h"
 
+class FNewtonModelEditor;
 
 UCLASS(Transient, MinimalAPI)
 class UNewtonModelSkeletalMeshEditorMode: public UBaseLegacyWidgetEdMode
@@ -40,5 +40,8 @@ class UNewtonModelSkeletalMeshEditorMode: public UBaseLegacyWidgetEdMode
 
 	virtual TSharedRef<FLegacyEdModeWidgetHelper> CreateWidgetHelper() override;
 
+	void SetEditor(FNewtonModelEditor* const editor);
+
+	FNewtonModelEditor* m_editor;
 	static FEditorModeID m_id;
 };

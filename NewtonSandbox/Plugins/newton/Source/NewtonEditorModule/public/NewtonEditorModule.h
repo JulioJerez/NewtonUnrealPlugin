@@ -34,5 +34,4 @@ class FNewtonEditorModule : public FDefaultModuleImpl
 
 	TSharedPtr<FSlateStyleSet> m_styleSet;
 	TSharedPtr<NewtonModelAction> m_newtonModelAction;
-	TSharedPtr<FNewtonModelPinFactory> m_customPinFactory;
 };

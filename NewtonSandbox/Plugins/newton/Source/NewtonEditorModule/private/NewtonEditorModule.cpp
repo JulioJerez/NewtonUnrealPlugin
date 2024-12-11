@@ -13,7 +13,7 @@
 #include "testButtonCommands.h"
 
 #include "NewtonModelAction.h"
-#include "factories/NewtonModelPinFactory.h"
+
 
 IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
 
@@ -150,9 +150,6 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	m_newtonModelAction = MakeShareable(new NewtonModelAction(assetType));
 	assetTools.RegisterAssetTypeActions(m_newtonModelAction.ToSharedRef());
 
-	m_customPinFactory = MakeShareable(new FNewtonModelPinFactory());
-	FEdGraphUtilities::RegisterVisualPinFactory(m_customPinFactory);
-
 	// load dependency modules
 	FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
 	FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
@@ -163,10 +160,6 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 void FNewtonEditorModule::UnregisterNewtonModelEditor()
 {
 	UnreagiterIcons();
-
-	FEdGraphUtilities::UnregisterVisualPinFactory(m_customPinFactory);
-	ensure(m_customPinFactory.IsUnique());
-	m_customPinFactory.Reset();
 
 	//IAssetTools& assetTools = IAssetTools::Get();
 	//assetTools.UnregisterAssetTypeActions(m_newtonModelAction.ToSharedRef());

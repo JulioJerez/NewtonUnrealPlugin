@@ -29,7 +29,6 @@
 #include "NewtonModelEditorCommon.h"
 
 class UNewtonModel;
-class UNewtonModelGraphNode;
 
 struct HActor;
 class ISkeletonTree;
@@ -42,6 +41,7 @@ class IDetailLayoutBuilder;
 class FObjectPreSaveContext;
 class FNewtonModelPhysicsTree;
 class FNewtonModelEditorBinding;
+
 
 
 class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorToolkit, public IHasPersonaToolkit
@@ -58,15 +58,14 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	TSharedRef<IPersonaToolkit> GetPersonaToolkit() const;
 	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
 	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
+	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 	
 	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding();
 	void SetSelectedNodeDetailView(TSharedPtr<IDetailsView> detailData);
-	UNewtonModelGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& selections);
 	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& initToolkitHost, class UNewtonModel* const newtonModel);
 
 	// Delegates
 	void OnMeshClick(HActor* hitProxy, const FViewportClick& click);
-	void OnGraphSelectionChanged(const FGraphPanelSelectionSet& selection);
 	void OnViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
 	void OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);

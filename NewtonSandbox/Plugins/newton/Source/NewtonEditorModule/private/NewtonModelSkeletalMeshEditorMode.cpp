@@ -235,6 +235,8 @@ private:
 	virtual bool HandleClick(FEditorViewportClient* viewportClient, HHitProxy* hitProxy, const FViewportClick& click) override;
 
 	virtual void Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI) override;
+
+	FNewtonModelEditor* m_editor;
 #endif
 
 };
@@ -251,14 +253,21 @@ UNewtonModelSkeletalMeshEditorMode::UNewtonModelSkeletalMeshEditorMode()
 		false);
 
 	Toolkit = nullptr;
-
 }
 
 TSharedRef<FLegacyEdModeWidgetHelper> UNewtonModelSkeletalMeshEditorMode::CreateWidgetHelper()
 {
-	return MakeShared<ModeWidgetHelper>();
+	TSharedRef<FLegacyEdModeWidgetHelper> helper(MakeShared<ModeWidgetHelper>());
+	return helper;
 }
 
+void UNewtonModelSkeletalMeshEditorMode::SetEditor(FNewtonModelEditor* const editor)
+{
+	m_editor = editor;
+
+	ModeWidgetHelper* const helper = (ModeWidgetHelper*)WidgetHelper.Get();
+	helper->m_editor = m_editor;
+}
 
 //**********************************************************************************************
 //
@@ -396,8 +405,10 @@ bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::HandleClick(FEditorVi
 	return false;
 }
 
-void UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI)
+void UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::Render(const FSceneView* view, FViewport* viewport, FPrimitiveDrawInterface* pdi)
 {
+	check(m_editor);
+
 	//EPhysicsAssetEditorMeshViewMode MeshViewMode = SharedData->GetCurrentMeshViewMode(SharedData->bRunningSimulation);
 	//
 	//if (MeshViewMode != EPhysicsAssetEditorMeshViewMode::None)

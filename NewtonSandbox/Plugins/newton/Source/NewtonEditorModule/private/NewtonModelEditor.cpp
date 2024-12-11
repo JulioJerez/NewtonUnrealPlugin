@@ -37,16 +37,14 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Animation/DebugSkelMeshComponent.h"
 
-
 #include "NewtonEditorModule.h"
-#include "NewtonModelGraphNode.h"
 #include "NewtonModelEditorMode.h"
-#include "NewtonModelGraphSchema.h"
 #include "NewtonModelEditorCommon.h"
-#include "NewtonModelGraphNodeRoot.h"
 #include "NewtonModelEditorBinding.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
 #include "NewtonModelSkeletalMeshEditorMode.h"
+#include "NewtonModelEditorSkeletalMeshComponent.h"
+
 
 #define LOCTEXT_NAMESPACE "FNewtonModelEditor"
 
@@ -196,7 +194,7 @@ void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewS
 	personaPreviewScene->SetActor(actor);
 
 	// Create the preview component
-	UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
+	UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UNewtonModelEditorSkeletalMeshComponent>(actor);
 	skeletalMeshComponent->SetSkeletalMesh(m_skeletalMeshAssetCached);
 	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);
 
@@ -290,35 +288,9 @@ void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEven
 	}
 }
 
-UNewtonModelGraphNode* FNewtonModelEditor::GetSelectedNode(const FGraphPanelSelectionSet& selectionSet)
-{
-	for (UObject* object : selectionSet)
-	{
-		UNewtonModelGraphNode* const node = Cast<UNewtonModelGraphNode>(object);
-		if (node)
-		{
-			return node;
-		}
-	}
-	return nullptr;
-}
-
 void FNewtonModelEditor::OnMeshClick(HActor* hitProxy, const FViewportClick& click)
 {
 	check(0);
-}
-
-void FNewtonModelEditor::OnGraphSelectionChanged(const FGraphPanelSelectionSet& selectionSet)
-{
-	UNewtonModelGraphNode* const selectedNode = GetSelectedNode(selectionSet);
-	if (selectedNode)
-	{
-		m_selectedNodeDetailView->SetObject(selectedNode->GetNodeInfo());
-	}
-	else
-	{
-		m_selectedNodeDetailView->SetObject(nullptr);
-	}
 }
 
 void FNewtonModelEditor::OnClose()
@@ -393,6 +365,17 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	// why unreal does this crap is beyond reprehensible. 
 	FEditorModeTools& editorModeManager = GetEditorModeManager();
 	editorModeManager.ActivateMode(UNewtonModelSkeletalMeshEditorMode::m_id, true);
+	UNewtonModelSkeletalMeshEditorMode* const editorMode = Cast<UNewtonModelSkeletalMeshEditorMode>(editorModeManager.GetActiveScriptableMode(UNewtonModelSkeletalMeshEditorMode::m_id));
+	editorMode->SetEditor(this);
+}
+
+void FNewtonModelEditor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+{
+	AAnimationEditorPreviewActor* const actor = Cast<AAnimationEditorPreviewActor> (PreviewScene->GetActor());
+	check(actor);
+	UNewtonModelEditorSkeletalMeshComponent* const rootComponet = Cast<UNewtonModelEditorSkeletalMeshComponent>(PreviewScene->GetPreviewMeshComponent());
+	check(rootComponet);
+	rootComponet->DebugDraw(view, viewport, pdi);
 }
 
 #undef LOCTEXT_NAMESPACE
