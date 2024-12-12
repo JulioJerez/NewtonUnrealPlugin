@@ -53,7 +53,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
-	bool m_isHidden;
+	//bool m_isHidden;
 
 	friend class FNewtonModelPhysicsTree;
 	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;

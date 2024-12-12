@@ -42,5 +42,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 
 	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
+
+	UPROPERTY()
+	bool m_hideShapes;
+
+	UPROPERTY()
+	bool m_hideJoints;
+
 };
 

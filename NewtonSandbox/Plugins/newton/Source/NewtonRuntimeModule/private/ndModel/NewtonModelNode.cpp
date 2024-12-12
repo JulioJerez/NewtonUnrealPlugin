@@ -31,11 +31,8 @@ UNewtonModelNode::UNewtonModelNode()
 	:Super()
 {
 	Parent = nullptr;
-}
 
-UNewtonModelNode::~UNewtonModelNode()
-{
-	// do nothing
+	m_hidden = false;
 }
 
 void UNewtonModelNode::AttachNode(UNewtonModelNode* const node)

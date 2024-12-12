@@ -53,16 +53,15 @@ UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 
 void UNewtonModelNodeRigidBody::DebugCenterOfMass(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	if (ShowCenterOfMass)
+	if (ShowCenterOfMass && (BoneIndex >= 0))
 	{
-		// remember to get the com form the collsion shspe if there are some 
+		// remember to get the com form the collision shape if there are some 
 		FTransform com(Transform);
 	
-		//DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale, false);
 		const FVector position (com.GetLocation());
-		const FVector xAxis = com.GetUnitAxis(EAxis::X);
-		const FVector yAxis = com.GetUnitAxis(EAxis::Y);
-		const FVector zAxis = com.GetUnitAxis(EAxis::Z);
+		const FVector xAxis (com.GetUnitAxis(EAxis::X));
+		const FVector yAxis (com.GetUnitAxis(EAxis::Y));
+		const FVector zAxis (com.GetUnitAxis(EAxis::Z));
 		
 		float thickness = 0.2f;
 		float size = DebugScale * 25.0f;

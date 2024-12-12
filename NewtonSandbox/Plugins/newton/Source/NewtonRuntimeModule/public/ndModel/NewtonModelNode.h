@@ -35,7 +35,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 	GENERATED_BODY()
 	public:
 	UNewtonModelNode();
-	~UNewtonModelNode();
 
 	virtual void AttachNode(UNewtonModelNode* const node);
 	virtual void DebugCenterOfMass(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
@@ -50,4 +49,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 
 	UPROPERTY()
 	TArray<UNewtonModelNode*> Children;
+
+	UPROPERTY()
+	bool m_hidden;
 };

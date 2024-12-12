@@ -55,8 +55,10 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	UNewtonModel* GetNewtonModel() const;
 	TSharedRef<ISkeletonTree> GetSkeletonTree() const;
 	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
+	UDebugSkelMeshComponent* GetSkelMeshComponent() const;
 	TSharedRef<IPersonaToolkit> GetPersonaToolkit() const;
 	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
+	
 	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
 	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 	

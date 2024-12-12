@@ -81,6 +81,12 @@ TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
 	return SkeletonTree.ToSharedRef(); 
 }
 
+UDebugSkelMeshComponent* FNewtonModelEditor::GetSkelMeshComponent() const
+{
+	check(PreviewScene.IsValid());
+	return PreviewScene->GetPreviewMeshComponent();
+}
+
 TSharedRef<FNewtonModelPhysicsTree> FNewtonModelEditor::GetNewtonModelPhysicsTree() const
 {
 	return m_skeletonPhysicsTree.ToSharedRef();

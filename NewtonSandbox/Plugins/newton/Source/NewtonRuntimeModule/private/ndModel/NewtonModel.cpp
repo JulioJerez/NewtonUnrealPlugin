@@ -31,5 +31,8 @@ UNewtonModel::UNewtonModel()
 {
 	RootBody = nullptr;
 	SkeletalMeshAsset = nullptr;
+
+	m_hideShapes = false;
+	m_hideJoints = false;
 }
 

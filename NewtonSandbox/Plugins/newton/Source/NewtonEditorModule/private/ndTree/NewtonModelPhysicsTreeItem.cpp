@@ -79,7 +79,6 @@ FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModel
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
 	Node = nullptr;
-	m_isHidden = false;
 	m_parent = parentNode;
 	m_acyclicGraph = nullptr;
 }
@@ -89,7 +88,6 @@ FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(const FNewtonModelPhysi
 {
 	Node = src.Node;
 	m_parent = nullptr;
-	m_isHidden = src.m_isHidden;
 	m_acyclicGraph = src.m_acyclicGraph;
 }
 
