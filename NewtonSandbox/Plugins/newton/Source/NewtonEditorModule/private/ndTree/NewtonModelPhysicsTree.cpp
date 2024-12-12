@@ -1,5 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/* Copyright (c) <2024-2024> <Julio Jerez, Newton Game Dynamics>
+*
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+*
+* 1. The origin of this software must not be misrepresented; you must not
+* claim that you wrote the original software. If you use this software
+* in a product, an acknowledgment in the product documentation would be
+* appreciated but is not required.
+*
+* 2. Altered source versions must be plainly marked as such, and must not be
+* misrepresented as being the original software.
+*
+* 3. This notice may not be removed or altered from any source distribution.
+*/
 
 #include "ndTree/NewtonModelPhysicsTree.h"
 
@@ -8,6 +26,7 @@
 #include "ISkeletonTree.h"
 #include "ISkeletonTreeItem.h"
 #include "IEditableSkeleton.h"
+#include "UObject/SavePackage.h"
 #include "SPositiveActionButton.h"
 #include "UICommandList_Pinnable.h"
 #include "Widgets/Views/STableRow.h"
@@ -19,6 +38,7 @@
 #include "ndTree/NewtonModelPhysicsTreeItem.h"
 #include "ndTree/NewtonModelPhysicsTreeItemRow.h"
 #include "ndTree/NewtonModelPhysicsTreeCommands.h"
+#include "ndTree/NewtonModelPhysicsTreeItemBody.h"
 #include "ndTree/NewtonModelPhysicsTreeItemShapeBox.h"
 #include "ndTree/NewtonModelPhysicsTreeItemJointHinge.h"
 #include "ndTree/NewtonModelPhysicsTreeItemShapeSphere.h"
@@ -124,7 +144,8 @@ void FNewtonModelPhysicsTree::OnResetSelectedBone()
 {
 	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
 	{
-		UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)m_selectedItem->Node.Get();
+		//UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)m_selectedItem->Node.Get();
+		UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
 		bodyNode->BoneIndex = -1;
 		bodyNode->BoneName = TEXT("None");
 		m_modelIsDirty = true;
@@ -181,7 +202,7 @@ void FNewtonModelPhysicsTree::AddJointRow(const TSharedRef<FNewtonModelPhysicsTr
 	FNewtonModelPhysicsTreeItemAcyclicGraph* const jointAcyclic = new FNewtonModelPhysicsTreeItemAcyclicGraph(jointItem, m_selectedItem->m_acyclicGraph);
 
 	TSharedRef<FNewtonModelPhysicsTreeItem> bodyItem(MakeShareable(new FNewtonModelPhysicsTreeItemBody(jointItem)));
-	bodyItem->Node = NewObject<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
+	bodyItem->Node = NewObject<UNewtonModelNodeRigidBody>();
 	bodyItem->Node->Name = GetUniqueName(bodyItem->GetDisplayName());
 	m_items.Add(&bodyItem.Get(), bodyItem);
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(bodyItem, jointAcyclic);
@@ -194,7 +215,7 @@ void FNewtonModelPhysicsTree::OnAddShapeBoxRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(m_selectedItem)));
 
-	item->Node = NewObject<UNewtonModelNodeCollisionBox>(m_selectedItem->Node);
+	item->Node = NewObject<UNewtonModelNodeCollisionBox>();
 	item->Node->Name = GetUniqueName(item->GetDisplayName());
 	
 	AddShapeRow(item);
@@ -204,7 +225,7 @@ void FNewtonModelPhysicsTree::OnAddShapeSphereRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(m_selectedItem)));
 
-	item->Node = NewObject<UNewtonModelNodeCollisionSphere>(m_selectedItem->Node);
+	item->Node = NewObject<UNewtonModelNodeCollisionSphere>();
 	item->Node->Name = GetUniqueName(item->GetDisplayName());
 
 	AddShapeRow(item);
@@ -214,7 +235,7 @@ void FNewtonModelPhysicsTree::OnAddJointHingeRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(m_selectedItem)));
 
-	item->Node = NewObject<UNewtonModelNodeJointHinge>(m_selectedItem->Node);
+	item->Node = NewObject<UNewtonModelNodeJointHinge>();
 	item->Node->Name = GetUniqueName(item->GetDisplayName());
 
 	AddJointRow(item);
@@ -558,7 +579,8 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 					TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem(pair.Value);
 					if (bodyItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
 					{
-						UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)bodyItem->Node.Get();
+						//UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)bodyItem->Node.Get();
+						UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(bodyItem->Node);
 						if (bodyNode->BoneIndex == i)
 						{
 							return;
@@ -566,7 +588,8 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 					}
 				}
 
-				UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)m_selectedItem->Node.Get();
+				//UNewtonModelNodeRigidBody* const bodyNode = (UNewtonModelNodeRigidBody*)m_selectedItem->Node.Get();
+				UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
 				bodyNode->BoneIndex = i;
 				bodyNode->BoneName = boneName;
 				m_modelIsDirty = true;
@@ -624,65 +647,16 @@ void FNewtonModelPhysicsTree::ResetSkeletalMesh()
 	m_items.Empty();
 
 	UNewtonModel* const model = m_editor->GetNewtonModel();
-	model->RootBody = nullptr;
 	model->RootBody = NewObject<UNewtonModelNodeRigidBodyRoot>(model);
 
 	BuildTree();
-}
-
-void FNewtonModelPhysicsTree::SaveModel()
-{
-	bool modelIsDirty = m_modelIsDirty;
-	m_modelIsDirty = false;
-
-	if (!modelIsDirty || !m_acyclicGraph)
-	{
-		return;
-	}
-
-	int stack = 1;
-	UNewtonModelNode* parentNode[TREE_STACK_DEPTH];
-	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
-
-	UNewtonModel* const model = m_editor->GetNewtonModel();
-
-	parentNode[0] = nullptr;
-	nodeStack[0] = m_acyclicGraph;
-	while (stack)
-	{
-		stack--;
-		UNewtonModelNode* const parent = parentNode[stack];
-		const FNewtonModelPhysicsTreeItemAcyclicGraph* const root = nodeStack[stack];
-		const TSharedPtr<FNewtonModelPhysicsTreeItem>& item = root->m_item;
-
-		UNewtonModelNode* modelNode = nullptr;
-		if (Cast<UNewtonModelNodeRigidBodyRoot>(item->Node))
-		{
-			modelNode = DuplicateObject(item->Node, model);
-			model->RootBody = Cast<UNewtonModelNodeRigidBodyRoot>(modelNode);
-		}
-		else
-		{
-			modelNode = DuplicateObject(item->Node, parent);
-			modelNode->Parent = parent;
-			parent->Children.Push(modelNode);
-		}
-		modelNode->Children.Empty();
-
-		for (int i = 0; i < root->m_children.Num(); ++i)
-		{
-			parentNode[stack] = modelNode;
-			nodeStack[stack] = root->m_children[i];
-			stack++;
-		}
-	}
 }
 
 void FNewtonModelPhysicsTree::BuildTree()
 {
 	check(m_items.IsEmpty());
 	
-	UNewtonModelNode* nodeStack[TREE_STACK_DEPTH];
+	const UNewtonModelNode* nodeStack[TREE_STACK_DEPTH];
 	TSharedPtr<FNewtonModelPhysicsTreeItem> parentStack[TREE_STACK_DEPTH];
 	
 	const UNewtonModel* const model = m_editor->GetNewtonModel();
@@ -702,7 +676,7 @@ void FNewtonModelPhysicsTree::BuildTree()
 	while (stack)
 	{
 		stack--;
-		UNewtonModelNode* const node = nodeStack[stack];
+		const UNewtonModelNode* const node = nodeStack[stack];
 		TSharedPtr<FNewtonModelPhysicsTreeItem> parent(parentStack[stack]);
 	
 		TObjectPtr<UNewtonModelNode> proxyNode(DuplicateObject(node, nullptr));
@@ -773,6 +747,91 @@ void FNewtonModelPhysicsTree::BuildTree()
 	}
 	
 	RebuildAcyclicTree();
+}
+
+void FNewtonModelPhysicsTree::SaveModel()
+{
+	bool modelIsDirty = m_modelIsDirty;
+	m_modelIsDirty = false;
+
+	if (!modelIsDirty || !m_acyclicGraph)
+	{
+		return;
+	}
+
+	int stack = 1;
+	UNewtonModelNode* parentNode[TREE_STACK_DEPTH];
+	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
+
+	UNewtonModel* const model = m_editor->GetNewtonModel();
+
+	parentNode[0] = nullptr;
+	nodeStack[0] = m_acyclicGraph;
+	while (stack)
+	{
+		stack--;
+		UNewtonModelNode* const parent = parentNode[stack];
+		const FNewtonModelPhysicsTreeItemAcyclicGraph* const root = nodeStack[stack];
+		const TSharedPtr<FNewtonModelPhysicsTreeItem>& item = root->m_item;
+
+		UNewtonModelNode* modelNode = nullptr;
+		if (Cast<UNewtonModelNodeRigidBodyRoot>(item->Node))
+		{
+			modelNode = DuplicateObject(item->Node, model);
+			model->RootBody = Cast<UNewtonModelNodeRigidBodyRoot>(modelNode);
+		}
+		else
+		{
+			modelNode = DuplicateObject(item->Node, parent);
+			modelNode->Parent = parent;
+			parent->Children.Push(modelNode);
+		}
+		modelNode->Children.Empty();
+		
+		for (int i = 0; i < root->m_children.Num(); ++i)
+		{
+			parentNode[stack] = modelNode;
+			nodeStack[stack] = root->m_children[i];
+			stack++;
+		}
+	}
+
+	UPackage* const package = model->GetPackage();
+	const FString packageName (package->GetName());
+	const FString packageFileName (FPackageName::LongPackageNameToFilename(packageName, FPackageName::GetAssetPackageExtension()));
+
+	FSavePackageArgs saveArgs;
+	saveArgs.SaveFlags = SAVE_NoError;
+	saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+	UPackage::SavePackage(package, nullptr, *packageFileName, saveArgs);
+}
+
+void FNewtonModelPhysicsTree::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+{
+	check(m_acyclicGraph);
+
+	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
+
+	int stack = 1;
+	nodeStack[0] = m_acyclicGraph;
+	while (stack)
+	{
+		stack--;
+		const FNewtonModelPhysicsTreeItemAcyclicGraph* const root = nodeStack[stack];
+		const TSharedPtr<FNewtonModelPhysicsTreeItem>& item = root->m_item;
+		if (!item->m_isHidden)
+		{
+			//TObjectPtr<UNewtonModelNode>& node = item->Node;
+			UNewtonModelNode* const node = item->Node;
+			node->DebugCenterOfMass(view, viewport, pdi);
+		}
+
+		for (int i = 0; i < root->m_children.Num(); ++i)
+		{
+			nodeStack[stack] = root->m_children[i];
+			stack++;
+		}
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

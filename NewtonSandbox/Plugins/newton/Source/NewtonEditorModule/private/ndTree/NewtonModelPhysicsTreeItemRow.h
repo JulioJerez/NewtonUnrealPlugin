@@ -37,14 +37,12 @@
 #include "Widgets/Views/SListView.h"
 #include "Widgets/Views/STableRow.h"
 
-//#include "NewtonModelPhysicsTreeItem.h"
-
+class SWidget;
+struct FMargin;
+struct FGeometry;
+struct FPointerEvent;
 class FDragDropEvent;
 class STableViewBase;
-class SWidget;
-struct FGeometry;
-struct FMargin;
-struct FPointerEvent;
 class FNewtonModelPhysicsTreeItem;
 
 DECLARE_DELEGATE_RetVal_TwoParams(FReply, FOnDraggingTreeItem, const FGeometry&, const FPointerEvent&);

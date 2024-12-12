@@ -33,6 +33,7 @@
 #include "Widgets/SCompoundWidget.h"
 #include "AssetRegistry/AssetData.h"
 #include "UObject/ObjectSaveContext.h"
+#include "AnimationEditorPreviewActor.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Animation/DebugSkelMeshComponent.h"
@@ -43,7 +44,6 @@
 #include "NewtonModelEditorBinding.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
 #include "NewtonModelSkeletalMeshEditorMode.h"
-#include "NewtonModelEditorSkeletalMeshComponent.h"
 
 
 #define LOCTEXT_NAMESPACE "FNewtonModelEditor"
@@ -52,7 +52,6 @@ FEditorModeID FNewtonModelEditor::m_id(FName(TEXT("FNewtonModelEditor")));
 FName FNewtonModelEditor::m_identifier(FName(TEXT("FNewtonModelEditor")));
 
 FNewtonModelEditor::FNewtonModelEditor()
-	//:INewtonModelEditor()
 	:FPersonaAssetEditorToolkit()
 	,IHasPersonaToolkit()
 {
@@ -184,8 +183,6 @@ void FNewtonModelEditor::OnSkeletalMeshSelectionChanged(const TArrayView<TShared
 	}
 }
 
-#include "Components\BoxComponent.h"
-#include "AnimationEditorPreviewActor.h"
 void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewScene>& personaPreviewScene)
 {
 	personaPreviewScene->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
@@ -194,7 +191,7 @@ void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewS
 	personaPreviewScene->SetActor(actor);
 
 	// Create the preview component
-	UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UNewtonModelEditorSkeletalMeshComponent>(actor);
+	UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
 	skeletalMeshComponent->SetSkeletalMesh(m_skeletalMeshAssetCached);
 	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);
 
@@ -202,60 +199,13 @@ void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewS
 	personaPreviewScene->SetPreviewMeshComponent(skeletalMeshComponent);
 	actor->SetRootComponent(skeletalMeshComponent);
 
-	// add a cube for testing.
-	FTransform transform(FVector(100.0, 0.0, 100.0f));
-	//UBoxComponent* const child = Cast<UBoxComponent>(actor->AddComponentByClass(UBoxComponent::StaticClass(), false, transform, false));
-	UBoxComponent* const child = NewObject<UBoxComponent>(actor);
-	child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
-	//child->AttachToComponent(skeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	personaPreviewScene->AddComponent(child, transform);
-
-
-	child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
-#if 0
-	// Create the preview component
-	//SharedData->EditorSkelComp = NewObject<UPhysicsAssetEditorSkeletalMeshComponent>(Actor);
-	//SharedData->EditorSkelComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//SharedData->EditorSkelComp->SharedData = SharedData.Get();
-	//SharedData->EditorSkelComp->SetSkeletalMesh(SharedData->PhysicsAsset->GetPreviewMesh());
-	//SharedData->EditorSkelComp->SetPhysicsAsset(SharedData->PhysicsAsset, true);
-	//SharedData->EditorSkelComp->SetDisablePostProcessBlueprint(true);
-
-	personaPreviewScene->SetPreviewMeshComponent(SharedData->EditorSkelComp);
-	personaPreviewScene->AddComponent(SharedData->EditorSkelComp, FTransform::Identity);
-	personaPreviewScene->SetAdditionalMeshesSelectable(false);
-	// set root component, so we can attach to it. 
-	Actor->SetRootComponent(SharedData->EditorSkelComp);
-
-	SharedData->EditorSkelComp->Stop();
-
-	SharedData->PhysicalAnimationComponent = NewObject<UPhysicalAnimationComponent>(Actor);
-	SharedData->PhysicalAnimationComponent->SetSkeletalMeshComponent(SharedData->EditorSkelComp);
-	personaPreviewScene->AddComponent(SharedData->PhysicalAnimationComponent, FTransform::Identity);
-
-	SharedData->ResetTM = SharedData->EditorSkelComp->GetComponentToWorld();
-
-	// Register handle component
-	SharedData->MouseHandle->RegisterComponentWithWorld(personaPreviewScene->GetWorld());
-
-	SharedData->EnableSimulation(false);
-
-	// we need to make sure we monitor any change to the PhysicsState being recreated, as this can happen from path that is external to this class
-	// (example: setting a property on a body that is type "simulated" will recreate the state from USkeletalBodySetup::PostEditChangeProperty and let the body simulating (UE-107308)
-	SharedData->EditorSkelComp->RegisterOnPhysicsCreatedDelegate(FOnSkelMeshPhysicsCreated::CreateLambda([this]()
-		{
-			// let's make sure nothing is simulating and that all necessary state are in proper order
-			SharedData->EnableSimulation(false);
-		}));
-
-	// Make sure the floor mesh has collision (BlockAllDynamic may have been overriden)
-	static FName CollisionProfileName(TEXT("PhysicsActor"));
-	UStaticMeshComponent* FloorMeshComponent = const_cast<UStaticMeshComponent*>(personaPreviewScene->GetFloorMeshComponent());
-	FloorMeshComponent->SetCollisionProfileName(CollisionProfileName);
-	FloorMeshComponent->RecreatePhysicsState();
-#endif
-
-	
+	//// add a cube for testing.
+	//FTransform transform(FVector(100.0, 0.0, 100.0f));
+	//UBoxComponent* const child = NewObject<UBoxComponent>(actor);
+	//child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
+	////child->AttachToComponent(skeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	//personaPreviewScene->AddComponent(child, transform);
+	//child->SetBoxExtent(FVector(40.0, 60.0, 50.0f));
 }
 
 void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent)
@@ -371,11 +321,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 void FNewtonModelEditor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	AAnimationEditorPreviewActor* const actor = Cast<AAnimationEditorPreviewActor> (PreviewScene->GetActor());
-	check(actor);
-	UNewtonModelEditorSkeletalMeshComponent* const rootComponet = Cast<UNewtonModelEditorSkeletalMeshComponent>(PreviewScene->GetPreviewMeshComponent());
-	check(rootComponet);
-	rootComponet->DebugDraw(view, viewport, pdi);
+	m_skeletonPhysicsTree->DebugDraw(view, viewport, pdi);
 }
 
 #undef LOCTEXT_NAMESPACE

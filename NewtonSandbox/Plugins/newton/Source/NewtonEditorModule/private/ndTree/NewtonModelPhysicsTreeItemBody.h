@@ -19,26 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WorkflowOrientedApp/WorkflowTabFactory.h"
 
-class FNewtonModelEditor;
+#include "ndTree/NewtonModelPhysicsTreeItem.h"
 
-//This is the primary tab
 
-/**
- * 
- */
-class NEWTONEDITORMODULE_API NewtonModelTabFactoryGraph: public FWorkflowTabFactory
+class FNewtonModelPhysicsTreeItemBody : public FNewtonModelPhysicsTreeItem
 {
 	public:
-	NewtonModelTabFactoryGraph(const TSharedPtr<FNewtonModelEditor>& editor);
-	~NewtonModelTabFactoryGraph();
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBody, FNewtonModelPhysicsTreeItem)
 
-	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const;
-	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;
+	FNewtonModelPhysicsTreeItemBody(const FNewtonModelPhysicsTreeItemBody& src);
+	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
 
-	TWeakPtr<FNewtonModelEditor> m_editor;
+	virtual FName BrushName() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+};
+
+class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBody
+{
+	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBodyRoot, FNewtonModelPhysicsTreeItemBody)
+
+	FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src);
+	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };

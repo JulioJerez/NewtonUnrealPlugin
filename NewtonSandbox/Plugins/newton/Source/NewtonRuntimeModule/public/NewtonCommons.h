@@ -26,11 +26,8 @@
 #define UNREAL_INV_UNIT_SYSTEM		ndFloat32 (1.0f / UNREAL_UNIT_SYSTEM)
 #define ND_RIGID_BODIES_EVENT_NAME "OnNewtonForceAndTorque"
 
-//#define ND_INCLUDE_GRAPH_EDITOR
-
 #include "Engine/Texture.h"
 #include "Engine/Texture2DArray.h"
-
 
 class ndShape;
 class ndMatrix;

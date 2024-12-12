@@ -49,9 +49,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	virtual FString GetReferencerName() const override;
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 
-	// Display name of the category
 	TObjectPtr<UNewtonModelNode> Node;
-
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
@@ -59,30 +57,6 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 
 	friend class FNewtonModelPhysicsTree;
 	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;
-};
-
-class FNewtonModelPhysicsTreeItemBody : public FNewtonModelPhysicsTreeItem
-{
-	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBody, FNewtonModelPhysicsTreeItem)
-
-	FNewtonModelPhysicsTreeItemBody(const FNewtonModelPhysicsTreeItemBody& src);
-	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
-
-	virtual FName BrushName() const override;
-	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
-};
-
-class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBody
-{
-	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBodyRoot, FNewtonModelPhysicsTreeItemBody)
-
-	FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src);
-	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
-
-	virtual FName BrushName() const override;
-	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };
 
 class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem

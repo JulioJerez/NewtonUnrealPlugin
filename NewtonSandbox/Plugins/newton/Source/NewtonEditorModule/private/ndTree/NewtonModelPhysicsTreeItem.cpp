@@ -72,53 +72,6 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShape::Clone() const
 	return new FNewtonModelPhysicsTreeItemShape(*this);
 }
 
-
-//***********************************************************************************
-//
-//***********************************************************************************
-FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(const FNewtonModelPhysicsTreeItemBody& src)
-	:FNewtonModelPhysicsTreeItem(src)
-{
-}
-
-FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItem(parentNode)
-{
-}
-
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemBody::Clone() const
-{
-	return new FNewtonModelPhysicsTreeItemBody(*this);
-}
-
-FName FNewtonModelPhysicsTreeItemBody::BrushName() const
-{
-	return TEXT("bodyIcon.png");
-}
-
-//***********************************************************************************
-//
-//***********************************************************************************
-FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src)
-	:FNewtonModelPhysicsTreeItemBody(src)
-{
-}
-
-FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItemBody(parentNode)
-{
-}
-
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemBodyRoot::Clone() const
-{
-	return new FNewtonModelPhysicsTreeItemBodyRoot(*this);
-}
-
-FName FNewtonModelPhysicsTreeItemBodyRoot::BrushName() const
-{
-	return TEXT("bodyIcon.png");
-}
-
 //***********************************************************************************
 //
 //***********************************************************************************

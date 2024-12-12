@@ -23,7 +23,6 @@
 
 #include "CoreMinimal.h"
 
-//#include <functional>
 #include "UObject/Object.h"
 #include "NewtonCommons.h"
 #include "NewtonModel.generated.h"
@@ -38,17 +37,10 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 	public:
 	UNewtonModel();
 
-	//virtual void PreSave(FObjectPreSaveContext saveContext) override;
-	//void SetPreSaveListeners(std::function<void()> onPreSaveListener);
-
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
-
-	// to be removed 
 	UPROPERTY()
 	UNewtonModelNodeRigidBodyRoot* RootBody;
 
-	//private:
-	//std::function<void()> m_onPresaveListener;
+	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
 };
 

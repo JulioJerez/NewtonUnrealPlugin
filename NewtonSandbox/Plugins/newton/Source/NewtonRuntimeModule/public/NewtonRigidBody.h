@@ -34,7 +34,7 @@ class ANewtonWorldActor;
 
 
 USTRUCT()
-struct FInertiaStruct
+struct FNewtonRigidBodyInertia
 {
 	GENERATED_BODY();
 
@@ -151,7 +151,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	float Mass;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	FInertiaStruct Inertia;
+	FNewtonRigidBodyInertia Inertia;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 1.0f))
 	float LinearDamp;

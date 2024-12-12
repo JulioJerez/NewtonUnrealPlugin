@@ -28,6 +28,7 @@
 #include "IPersonaPreviewScene.h"
 #include "AssetEditorModeManager.h"
 
+#include "NewtonModelEditor.h"
 
 #define LOCTEXT_NAMESPACE "NewtonModelSkeletalMeshEditorMode"
 
@@ -431,6 +432,8 @@ void UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::Render(const FSceneVi
 
 	// Draw phat skeletal component.
 	//SharedData->EditorSkelComp->DebugDraw(View, PDI);
+
+	m_editor->DebugDraw(view, viewport, pdi);
 
 }
 

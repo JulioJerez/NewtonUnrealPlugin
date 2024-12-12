@@ -53,8 +53,8 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	// editor methods
 	void BindCommands();
 	UNewtonModel* GetNewtonModel() const;
-	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
 	TSharedRef<ISkeletonTree> GetSkeletonTree() const;
+	void SetNewtonModel(TObjectPtr<UNewtonModel> model);
 	TSharedRef<IPersonaToolkit> GetPersonaToolkit() const;
 	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
 	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
