@@ -26,6 +26,8 @@
 #include "ndModel/NewtonModelNode.h"
 #include "NewtonModelNodeCollision.generated.h"
 
+class ndShapeInstance;
+
 /**
  * 
  */
@@ -33,8 +35,17 @@ UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonModelNodeCollision : public UNewtonModelNode
 {
 	GENERATED_BODY()
+
+	//class GetShapeWireFrame;
 	public: 
 	UNewtonModelNodeCollision();
-	
-	
+
+	virtual void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const;
+
+	protected:
+	void BuildDebugMesh(TArray<FVector>& wireFrameMesh, const ndShapeInstance& instance) const;
+
+	public:
+	UPROPERTY(EditAnywhere)
+	FTransform Transform;
 };

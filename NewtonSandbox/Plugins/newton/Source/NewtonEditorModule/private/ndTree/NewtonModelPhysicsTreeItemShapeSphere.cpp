@@ -28,8 +28,8 @@ FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(c
 	check(0);
 }
 
-FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItemShape(parentNode)
+FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode)
 {
 }
 

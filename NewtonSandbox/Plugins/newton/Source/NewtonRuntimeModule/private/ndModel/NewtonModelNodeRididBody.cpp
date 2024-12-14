@@ -24,7 +24,6 @@
 UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 	:Super()
 	,Transform()
-	,ShowDebug(false)
 	,ShowCenterOfMass(false)
 	,AutoSleepMode(true)
 	,DebugScale(1.0f)
@@ -49,24 +48,4 @@ UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 
 	float inertia = (2.0f / 5.0f) * 0.5f * 0.5f;
 	Inertia.PrincipalInertia = FVector(inertia, inertia, inertia);
-}
-
-void UNewtonModelNodeRigidBody::DebugCenterOfMass(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
-{
-	if (ShowCenterOfMass && (BoneIndex >= 0))
-	{
-		// remember to get the com form the collision shape if there are some 
-		FTransform com(Transform);
-	
-		const FVector position (com.GetLocation());
-		const FVector xAxis (com.GetUnitAxis(EAxis::X));
-		const FVector yAxis (com.GetUnitAxis(EAxis::Y));
-		const FVector zAxis (com.GetUnitAxis(EAxis::Z));
-		
-		float thickness = 0.2f;
-		float size = DebugScale * 25.0f;
-		pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
-		pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
-		pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
-	}
 }

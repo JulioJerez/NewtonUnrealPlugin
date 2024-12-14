@@ -29,6 +29,18 @@ UNewtonModelNodeCollisionBox::UNewtonModelNodeCollisionBox()
 	:Super()
 {
 	SetName(TEXT("NewBox"));
+
+	SizeX = 100.0f;
+	SizeY = 100.0f;
+	SizeZ = 100.0f;
 }
 
+void UNewtonModelNodeCollisionBox::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
+{
+	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
+	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
+	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
 
+	ndShapeInstance instance(new ndShapeBox(x, y, z));
+	BuildDebugMesh(wireFrameMesh, instance);
+}

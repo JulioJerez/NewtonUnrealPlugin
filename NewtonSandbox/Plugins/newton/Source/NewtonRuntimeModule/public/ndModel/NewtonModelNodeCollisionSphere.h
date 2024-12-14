@@ -34,4 +34,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeCollisionSphere : public UNewtonMo
 {
 	GENERATED_BODY()
 	UNewtonModelNodeCollisionSphere();
+
+	//virtual void CreateInstance() override;
 };

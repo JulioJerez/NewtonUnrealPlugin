@@ -55,6 +55,7 @@ FNewtonModelEditor::FNewtonModelEditor()
 	:FPersonaAssetEditorToolkit()
 	,IHasPersonaToolkit()
 {
+	m_modelSaved = false;
 	SkeletonTree = nullptr;
 	m_newtonModel = nullptr;
 	PersonaToolkit = nullptr;
@@ -189,21 +190,31 @@ void FNewtonModelEditor::OnSkeletalMeshSelectionChanged(const TArrayView<TShared
 	}
 }
 
+// for some reason this doesn't fucking works. 
+// there are so many delegates and flags in the persona system that changing anything, 
+// the chances to get it work correctly, is near zero. (tried for weeks an only got bad outcomes)
+// My solution is to just keep a separate data structure bind to the skeleton bone by bone.
 void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewScene>& personaPreviewScene)
 {
 	personaPreviewScene->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
 
-	AAnimationEditorPreviewActor* const actor = personaPreviewScene->GetWorld()->SpawnActor<AAnimationEditorPreviewActor>(AAnimationEditorPreviewActor::StaticClass(), FTransform::Identity);
-	personaPreviewScene->SetActor(actor);
+	//AAnimationEditorPreviewActor* const actor = personaPreviewScene->GetWorld()->SpawnActor<AAnimationEditorPreviewActor>(AAnimationEditorPreviewActor::StaticClass(), FTransform::Identity);
+	//personaPreviewScene->SetActor(actor);
+	AActor* const actor = personaPreviewScene->GetActor();
 
 	// Create the preview component
-	UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
-	skeletalMeshComponent->SetSkeletalMesh(m_skeletalMeshAssetCached);
+	//UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
+	UDebugSkelMeshComponent* const skeletalMeshComponent = personaPreviewScene->GetPreviewMeshComponent();
+	USkeletalMesh* XXX0 = m_skeletalMeshAssetCached;
+	USkeletalMesh* XXX1 = skeletalMeshComponent->GetSkeletalMeshAsset();
+	check(XXX0 == XXX1);
+
+	//skeletalMeshComponent->SetSkeletalMesh(m_skeletalMeshAssetCached);
 	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);
 
-	personaPreviewScene->AddComponent(skeletalMeshComponent, FTransform::Identity);
-	personaPreviewScene->SetPreviewMeshComponent(skeletalMeshComponent);
-	actor->SetRootComponent(skeletalMeshComponent);
+	//personaPreviewScene->AddComponent(skeletalMeshComponent, FTransform::Identity);
+	//personaPreviewScene->SetPreviewMeshComponent(skeletalMeshComponent);
+	//actor->SetRootComponent(skeletalMeshComponent);
 
 	//// add a cube for testing.
 	//FTransform transform(FVector(100.0, 0.0, 100.0f));
@@ -251,15 +262,20 @@ void FNewtonModelEditor::OnMeshClick(HActor* hitProxy, const FViewportClick& cli
 
 void FNewtonModelEditor::OnClose()
 {
-	m_skeletonPhysicsTree->SaveModel();
-
 	FCoreUObjectDelegates::OnObjectPreSave.Remove(m_onCloseHandle);
+	m_skeletonPhysicsTree->SaveModel();
+	
 	FPersonaAssetEditorToolkit::OnClose();
 }
 void FNewtonModelEditor::OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext)
 {
-	m_skeletonPhysicsTree->SaveModel();
-	//BuildGraphEditorAsset();
+	if (!m_modelSaved)
+	{
+		// avoid recursion when saving model
+		m_modelSaved = true;
+		m_skeletonPhysicsTree->SaveModel();
+		m_modelSaved = false;
+	}
 }
 
 void FNewtonModelEditor::BindCommands()
@@ -279,17 +295,21 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	FPersonaToolkitArgs personaToolkitArgs;
 	personaToolkitArgs.bPreviewMeshCanUseDifferentSkeleton = false;
-	personaToolkitArgs.OnPreviewSceneCreated = FOnPreviewSceneCreated::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneCreated);
+	//personaToolkitArgs.OnPreviewSceneCreated = FOnPreviewSceneCreated::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneCreated);
 	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneSettingsCustomized);
 	PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
 	PreviewScene = PersonaToolkit->GetPreviewScene();
+	PreviewScene->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
+
+	UDebugSkelMeshComponent* const skeletalMeshComponent = PreviewScene->GetPreviewMeshComponent();
+	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);
+	check(m_skeletalMeshAssetCached == skeletalMeshComponent->GetSkeletalMeshAsset());
+
 
 	// create a skeleton tree widgets for visualization.
 	FSkeletonTreeArgs skeletonTreeArgs;
 	skeletonTreeArgs.PreviewScene = PreviewScene;
 	skeletonTreeArgs.ContextName = GetToolkitFName();
-
-	//skeletonTreeArgs.bHideBonesByDefault = true;
 	skeletonTreeArgs.bAllowMeshOperations = false;
 	skeletonTreeArgs.bAllowMeshOperations = false;
 	skeletonTreeArgs.bAllowSkeletonOperations = false;
@@ -328,6 +348,16 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 void FNewtonModelEditor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
 	m_skeletonPhysicsTree->DebugDraw(view, viewport, pdi);
+}
+
+FMatrix FNewtonModelEditor::GetWidgetMatrix() const
+{
+	return m_skeletonPhysicsTree->GetWidgetMatrix();
+}
+
+bool FNewtonModelEditor::ShouldDrawWidget() const
+{
+	return m_skeletonPhysicsTree->ShouldDrawWidget();
 }
 
 #undef LOCTEXT_NAMESPACE

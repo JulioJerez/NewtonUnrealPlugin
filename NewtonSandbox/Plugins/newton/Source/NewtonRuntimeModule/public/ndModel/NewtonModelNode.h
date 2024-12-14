@@ -36,10 +36,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 	public:
 	UNewtonModelNode();
 
-	virtual void AttachNode(UNewtonModelNode* const node);
-	virtual void DebugCenterOfMass(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
-
 	void SetName(const TCHAR* const name);
+	virtual void AttachNode(UNewtonModelNode* const node);
 
 	UPROPERTY(EditAnywhere)
 	FName Name;
@@ -49,6 +47,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNode : public UObject
 
 	UPROPERTY()
 	TArray<UNewtonModelNode*> Children;
+
+	UPROPERTY(EditAnywhere)
+	bool ShowDebug;
 
 	UPROPERTY()
 	bool m_hidden;

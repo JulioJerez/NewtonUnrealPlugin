@@ -27,6 +27,7 @@
 #include "Widgets/SCompoundWidget.h"
 
 
+#define TREE_STACK_DEPTH	256
 class ISkeletonTreeItem;
 class FNewtonModelEditor;
 class IPinnedCommandList;
@@ -64,6 +65,8 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void DetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
 	void DetailViewBoneSelectedUpdated(const TSharedPtr<ISkeletonTreeItem>& item);
 
+	bool ShouldDrawWidget() const;
+	FMatrix GetWidgetMatrix() const;
 	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 	
 	//* SWidget overrides

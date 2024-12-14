@@ -27,12 +27,26 @@ FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(con
 {
 }
 
-FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItemJoint(parentNode)
+FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode)
 {
 }
 
 FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointHinge::Clone() const
 {
 	return new FNewtonModelPhysicsTreeItemJointHinge(*this);
+}
+
+
+void FNewtonModelPhysicsTreeItemJointHinge::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+{
+	const UNewtonModelNodeJointHinge* const jointNode = Cast<UNewtonModelNodeJointHinge>(Node);
+	check(jointNode);
+
+	if (jointNode->m_hidden)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
 }

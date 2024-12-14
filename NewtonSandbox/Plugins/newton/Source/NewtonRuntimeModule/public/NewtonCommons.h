@@ -22,8 +22,8 @@
 
 #pragma once
 
-#define UNREAL_UNIT_SYSTEM			ndFloat32 (100.0f)
-#define UNREAL_INV_UNIT_SYSTEM		ndFloat32 (1.0f / UNREAL_UNIT_SYSTEM)
+#define UNREAL_UNIT_SYSTEM			float (100.0f)
+#define UNREAL_INV_UNIT_SYSTEM		float (1.0f / UNREAL_UNIT_SYSTEM)
 #define ND_RIGID_BODIES_EVENT_NAME "OnNewtonForceAndTorque"
 
 #include "Engine/Texture.h"

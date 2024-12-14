@@ -31,7 +31,7 @@ class FNewtonModelEditor;
 UCLASS(Transient, MinimalAPI)
 class UNewtonModelSkeletalMeshEditorMode: public UBaseLegacyWidgetEdMode
 {
-	class ModeWidgetHelper;
+	class FSkeletonSelectionEditMode;
 
 	GENERATED_BODY()
 	public:

@@ -33,10 +33,12 @@ class FNewtonModelPhysicsTreeItemBody : public FNewtonModelPhysicsTreeItem
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBody, FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItemBody(const FNewtonModelPhysicsTreeItemBody& src);
-	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 
 	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+
+	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 };
 
 class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBody
@@ -45,6 +47,6 @@ class FNewtonModelPhysicsTreeItemBodyRoot : public FNewtonModelPhysicsTreeItemBo
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemBodyRoot, FNewtonModelPhysicsTreeItemBody)
 
 	FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src);
-	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };

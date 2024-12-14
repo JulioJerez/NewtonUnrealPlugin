@@ -28,8 +28,8 @@ FNewtonModelPhysicsTreeItemShapeBox::FNewtonModelPhysicsTreeItemShapeBox(const F
 	check(0);
 }
 
-FNewtonModelPhysicsTreeItemShapeBox::FNewtonModelPhysicsTreeItemShapeBox(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItemShape(parentNode)
+FNewtonModelPhysicsTreeItemShapeBox::FNewtonModelPhysicsTreeItemShapeBox(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode)
 {
 }
 

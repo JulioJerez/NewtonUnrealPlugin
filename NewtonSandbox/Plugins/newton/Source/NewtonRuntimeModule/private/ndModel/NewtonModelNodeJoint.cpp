@@ -27,5 +27,5 @@
 UNewtonModelNodeJoint::UNewtonModelNodeJoint()
 	:Super()
 {
-	//Name = TEXT("Joint");
 }
+

@@ -31,4 +31,3 @@ UNewtonModelNodeCollisionSphere::UNewtonModelNodeCollisionSphere()
 	SetName(TEXT("NewSphere"));
 }
 
-

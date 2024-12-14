@@ -27,8 +27,8 @@ FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const F
 {
 }
 
-FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItemBody(parentNode)
+FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItemBody(parentNode, modelNode)
 {
 }
 
@@ -46,8 +46,8 @@ FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(const FNewtonMo
 {
 }
 
-FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItem(parentNode)
+FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItem(parentNode, modelNode)
 {
 }
 
@@ -59,4 +59,40 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemBody::Clone() const
 FName FNewtonModelPhysicsTreeItemBody::BrushName() const
 {
 	return TEXT("bodyIcon.png");
+}
+
+
+void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+{
+	const UNewtonModelNodeRigidBody* const body = Cast<UNewtonModelNodeRigidBody>(Node);
+	check(body);
+
+	if (body->ShowCenterOfMass && (body->BoneIndex >= 0))
+	{
+		// remember to get the com form the collision shape if there are some 
+		FTransform com(body->Transform);
+	
+		const FVector position (com.GetLocation());
+		const FVector xAxis (com.GetUnitAxis(EAxis::X));
+		const FVector yAxis (com.GetUnitAxis(EAxis::Y));
+		const FVector zAxis (com.GetUnitAxis(EAxis::Z));
+	
+		float thickness = 0.2f;
+		float size = body->DebugScale * 25.0f;
+		pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
+		pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
+		pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
+	}
+
+	//const TSharedPtr<FNewtonModelPhysicsTreeItem>& item = m_item;
+//if (item->Node->m_hidden)
+//{
+//	return;
+//}
+//
+//UNewtonModelNode* const node = item->Node;
+//	check(0);
+//	//node->DebugDraw(view, viewport, pdi);
+//}
+
 }

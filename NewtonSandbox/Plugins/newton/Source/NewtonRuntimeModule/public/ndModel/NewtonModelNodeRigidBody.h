@@ -27,9 +27,7 @@
 #include "NewtonModelNodeRigidBody.generated.h"
 
 
-/**
- * 
- */
+
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNode
 {
@@ -37,13 +35,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNod
 	public:
 	UNewtonModelNodeRigidBody();
 
-	virtual void DebugCenterOfMass(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
+	//virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 
-	UPROPERTY(EditAnywhere)
+	//UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	FTransform Transform;
-
-	UPROPERTY(EditAnywhere)
-	bool ShowDebug;
 
 	UPROPERTY(EditAnywhere)
 	bool ShowCenterOfMass;
@@ -77,7 +73,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNod
 
 	UPROPERTY(EditAnywhere)
 	FVector Gravity;
-
 
 	UPROPERTY(VisibleAnywhere)
 	FName BoneName;

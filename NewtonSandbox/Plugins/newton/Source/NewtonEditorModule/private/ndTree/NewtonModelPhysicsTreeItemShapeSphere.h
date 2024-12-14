@@ -33,7 +33,7 @@ class FNewtonModelPhysicsTreeItemShapeSphere : public FNewtonModelPhysicsTreeIte
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeSphere, FNewtonModelPhysicsTreeItemShape)
 
 	FNewtonModelPhysicsTreeItemShapeSphere(const FNewtonModelPhysicsTreeItemShapeSphere& src);
-	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 

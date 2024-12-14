@@ -33,7 +33,7 @@ class FNewtonModelPhysicsTreeItemShapeBox : public FNewtonModelPhysicsTreeItemSh
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeBox, FNewtonModelPhysicsTreeItemShape)
 
 	FNewtonModelPhysicsTreeItemShapeBox(const FNewtonModelPhysicsTreeItemShapeBox& src);
-	FNewtonModelPhysicsTreeItemShapeBox(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItemShapeBox(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };

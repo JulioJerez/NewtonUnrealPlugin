@@ -10,20 +10,17 @@ public class NewtonRuntimeModule: ModuleRules
         PrivateDefinitions.Add("_D_NEWTON_DLL");
         PrivateDefinitions.Add("_D_COLLISION_DLL");
 
-        PrivateIncludePaths.AddRange(
-            new string[] 
-            {
-                "ThirdParty/newtonLibrary/Public/dCore/",
-                "ThirdParty/newtonLibrary/Public/dNewton/",
-                "ThirdParty/newtonLibrary/Public/dCollision/",
-                "ThirdParty/newtonLibrary/Public/thirdParty/",
-                "ThirdParty/newtonLibrary/Public/dNewton/dJoints/",
-                "ThirdParty/newtonLibrary/Public/dNewton/dModels/",
-                "ThirdParty/newtonLibrary/Public/dNewton/dIkSolver/",
-                "ThirdParty/newtonLibrary/Public/dNewton/dModels/dVehicle/"
-            }
-        );
-
+        PrivateIncludePaths.AddRange(new string[] 
+        {
+            "ThirdParty/newtonLibrary/Public/dCore/",
+            "ThirdParty/newtonLibrary/Public/dNewton/",
+            "ThirdParty/newtonLibrary/Public/dCollision/",
+            "ThirdParty/newtonLibrary/Public/thirdParty/",
+            "ThirdParty/newtonLibrary/Public/dNewton/dJoints/",
+            "ThirdParty/newtonLibrary/Public/dNewton/dModels/",
+            "ThirdParty/newtonLibrary/Public/dNewton/dIkSolver/",
+            "ThirdParty/newtonLibrary/Public/dNewton/dModels/dVehicle/"
+        });
 
         PrivateDependencyModuleNames.AddRange(new string[] 
         {

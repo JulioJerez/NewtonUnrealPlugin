@@ -34,98 +34,11 @@
 
 FEditorModeID UNewtonModelSkeletalMeshEditorMode::m_id("NewtonModelSkeletalMeshEditorMode");
 
-#if 0
-class UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper : public FLegacyEdModeWidgetHelper
+
+class UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode : public IPersonaEditMode
 {
 	public:
-	ModeWidgetHelper()
-		:FLegacyEdModeWidgetHelper()
-	{
-	}
-
-	FVector GetWidgetLocation() const
-	{
-		if (const AActor* SelectedActor = GetCurrentSelectedActor())
-		{
-			return SelectedActor->GetActorLocation();
-		}
-		else
-		{
-			return FLegacyEdModeWidgetHelper::GetWidgetLocation();
-		}
-	}
-
-	AActor* GetCurrentSelectedActor() const
-	{
-		if (!ensure(Owner))
-		{
-			return nullptr;
-		}
-		
-		if (USelection* currentSelection = Owner->GetSelectedActors())
-		{
-		//	ensureMsgf(CurrentSelection->Num() < 2, TEXT("CVD does not support multi selection yet"));
-		//
-		//	return CurrentSelection->GetTop<AActor>();
-		}
-
-		return nullptr;
-	}
-
-	bool InputDelta(FEditorViewportClient* InViewportClient, FViewport* InViewport, FVector& InDrag, FRotator& InRot, FVector& InScale)
-	{
-		check(0);
-		bool bHandled = false;
-		//if (InViewportClient->bWidgetAxisControlledByDrag)
-		//{
-		//	if (AActor* SelectedActor = GetCurrentSelectedActor())
-		//	{
-		//
-		//		FActorElementEditorViewportInteractionCustomization::ApplyDeltaToActor(
-		//			SelectedActor, true, &InDrag,
-		//			&InRot, &InScale, SelectedActor->GetActorLocation(), FInputDeviceState());
-		//
-		//		bHandled = true;
-		//	}
-		//}
-		//
-		//if (bHandled)
-		//{
-		//	return true;
-		//}
-		//else
-		//{
-		//	return FLegacyEdModeWidgetHelper::InputDelta(InViewportClient, InViewport, InDrag, InRot, InScale);
-		//}
-		return bHandled;
-	}
-
-	bool UsesTransformWidget(UE::Widget::EWidgetMode CheckMode) const
-	{
-		return UsesTransformWidget();
-	}
-
-	bool UsesTransformWidget() const
-	{
-		if (const AActor* selectedActor = GetCurrentSelectedActor())
-		{
-		//	// Particle Actors cannot be moved
-		//	return !SelectedActor->IsA(AChaosVDParticleActor::StaticClass());
-		}
-		check(0);
-		return false;
-	}
-};
-#else
-
-
-class UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper : public IPersonaEditMode
-{
-public:
-//	static FName ModeName;
-
-	ModeWidgetHelper();
-
+	FSkeletonSelectionEditMode();
 
 #if 0
 	void SetSharedData(const TSharedRef<FPhysicsAssetEditor>& InPhysicsAssetEditor, FPhysicsAssetEditorSharedData& InSharedData) { PhysicsAssetEditorPtr = InPhysicsAssetEditor;  SharedData = &InSharedData; };
@@ -143,8 +56,7 @@ public:
 	virtual void Tick(FEditorViewportClient* ViewportClient, float DeltaTime) override;
 	virtual void DrawHUD(FEditorViewportClient* ViewportClient, FViewport* Viewport, const FSceneView* View, FCanvas* Canvas) override;
 	virtual bool AllowWidgetMove() override;
-	virtual FVector GetWidgetLocation() const override;
-	virtual bool GetCustomDrawingCoordinateSystem(FMatrix& InMatrix, void* InData) override;
+	
 	virtual bool GetCustomInputCoordinateSystem(FMatrix& InMatrix, void* InData) override;
 	virtual bool IsCompatibleWith(FEditorModeID OtherModeID) const override { return true; }
 	virtual bool ReceivedFocus(FEditorViewportClient* ViewportClient, FViewport* Viewport);
@@ -228,23 +140,26 @@ private:
 	TWeakPtr<FPhysicsAssetEditor> PhysicsAssetEditorPtr;
 #else
 
-	virtual class IPersonaPreviewScene& GetAnimPreviewScene() const override;
-
 	bool ShouldDrawWidget() const override;
 	virtual bool UsesTransformWidget() const override;
+	virtual IPersonaPreviewScene& GetAnimPreviewScene() const override;
 	virtual bool UsesTransformWidget(UE::Widget::EWidgetMode CheckMode) const override;
 	virtual bool HandleClick(FEditorViewportClient* viewportClient, HHitProxy* hitProxy, const FViewportClick& click) override;
 
-	virtual void Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI) override;
+	virtual FVector GetWidgetLocation() const override;
+	virtual bool GetCustomDrawingCoordinateSystem(FMatrix& matrix, void*) override;
 
+
+	virtual void Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI) override;
 	FNewtonModelEditor* m_editor;
 #endif
 
 };
 
-#endif
-
-
+//************************************************************************************************
+//
+//
+//************************************************************************************************
 UNewtonModelSkeletalMeshEditorMode::UNewtonModelSkeletalMeshEditorMode()
 	:Super()
 {
@@ -258,7 +173,7 @@ UNewtonModelSkeletalMeshEditorMode::UNewtonModelSkeletalMeshEditorMode()
 
 TSharedRef<FLegacyEdModeWidgetHelper> UNewtonModelSkeletalMeshEditorMode::CreateWidgetHelper()
 {
-	TSharedRef<FLegacyEdModeWidgetHelper> helper(MakeShared<ModeWidgetHelper>());
+	TSharedRef<FLegacyEdModeWidgetHelper> helper(MakeShared<FSkeletonSelectionEditMode>());
 	return helper;
 }
 
@@ -266,30 +181,24 @@ void UNewtonModelSkeletalMeshEditorMode::SetEditor(FNewtonModelEditor* const edi
 {
 	m_editor = editor;
 
-	ModeWidgetHelper* const helper = (ModeWidgetHelper*)WidgetHelper.Get();
+	FSkeletonSelectionEditMode* const helper = (FSkeletonSelectionEditMode*)WidgetHelper.Get();
 	helper->m_editor = m_editor;
 }
 
 //**********************************************************************************************
 //
 //**********************************************************************************************
-UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::ModeWidgetHelper()
+UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::FSkeletonSelectionEditMode()
 	:IPersonaEditMode()
 {
 }
 
-bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::ShouldDrawWidget() const
-{
-	//return !SharedData->bRunningSimulation && (SharedData->GetSelectedBody() || SharedData->GetSelectedConstraint() || SharedData->GetSelectedCoM());
-	return true;
-}
-
-bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::UsesTransformWidget() const
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::UsesTransformWidget() const
 {
 	return ShouldDrawWidget();
 }
 
-bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::UsesTransformWidget(UE::Widget::EWidgetMode CheckMode) const
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::UsesTransformWidget(UE::Widget::EWidgetMode CheckMode) const
 {
 	//if (SharedData->GetSelectedConstraint() && CheckMode == UE::Widget::WM_Scale)
 	//{
@@ -308,12 +217,12 @@ bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::UsesTransformWidget(U
 	return ShouldDrawWidget() && traformTest;
 }
 
-IPersonaPreviewScene& UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::GetAnimPreviewScene() const
+IPersonaPreviewScene& UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::GetAnimPreviewScene() const
 {
 	return *static_cast<IPersonaPreviewScene*>(static_cast<FAssetEditorModeManager*>(Owner)->GetPreviewScene());
 }
 
-bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::HandleClick(FEditorViewportClient* viewportClient, HHitProxy* hitProxy, const FViewportClick& click)
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::HandleClick(FEditorViewportClient* viewportClient, HHitProxy* hitProxy, const FViewportClick& click)
 {
 	if (click.GetKey() == EKeys::LeftMouseButton)
 	{
@@ -406,7 +315,7 @@ bool UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::HandleClick(FEditorVi
 	return false;
 }
 
-void UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::Render(const FSceneView* view, FViewport* viewport, FPrimitiveDrawInterface* pdi)
+void UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::Render(const FSceneView* view, FViewport* viewport, FPrimitiveDrawInterface* pdi)
 {
 	check(m_editor);
 
@@ -429,14 +338,32 @@ void UNewtonModelSkeletalMeshEditorMode::ModeWidgetHelper::Render(const FSceneVi
 	//{
 	//	SharedData->EditorSkelComp->SetVisibility(false);
 	//}
-
+	//
 	// Draw phat skeletal component.
 	//SharedData->EditorSkelComp->DebugDraw(View, PDI);
 
+	IPersonaEditMode::Render(view, viewport, pdi);
 	m_editor->DebugDraw(view, viewport, pdi);
-
 }
 
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::ShouldDrawWidget() const
+{
+	check(m_editor);
+	return m_editor->ShouldDrawWidget();
+}
 
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::GetCustomDrawingCoordinateSystem(FMatrix& matrix, void*)
+{
+	check(m_editor);
+	matrix = m_editor->GetWidgetMatrix();
+	matrix.SetOrigin(FVector(0.0, 0.0, 0.0));
+	return true;
+}
+
+FVector UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::GetWidgetLocation() const
+{
+	FMatrix matrix(m_editor->GetWidgetMatrix());
+	return matrix.GetOrigin();
+}
 
 #undef LOCTEXT_NAMESPACE

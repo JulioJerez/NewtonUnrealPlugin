@@ -75,8 +75,6 @@ NewtonModelEditorMode::NewtonModelEditorMode(TSharedRef<FWorkflowCentricApplicat
 
 	TSharedRef<FTabManager::FSplitter> viewportArea(MakeArea(TEXT("Viewport")));
 	TSharedRef<FTabManager::FSplitter> detailArea(MakeArea(detailTab->GetIdentifier()));
-	//TSharedRef<FTabManager::FSplitter> skeletonArea(MakeArea(skeletalTreeTab->GetIdentifier()));
-	//TSharedRef<FTabManager::FSplitter> physicsTreeArea(MakeArea(skeletalTreeTab->GetIdentifier()));
 
 	TSharedRef<FTabManager::FSplitter> explorerArea(FTabManager::NewSplitter());
 	{

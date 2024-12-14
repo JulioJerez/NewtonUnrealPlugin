@@ -24,61 +24,13 @@
 
 #include "NewtonEditorModule.h"
 #include "ndTree/NewtonModelPhysicsTree.h"
+#include "ndTree/NewtonModelPhysicsTreeItemBody.h"
 #include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
-
-FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src)
-	:FNewtonModelPhysicsTreeItem(src)
-{
-}
-
-FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItem(parentNode)
-{
-}
-
-FName FNewtonModelPhysicsTreeItemJoint::BrushName() const
-{
-	return TEXT("jointIcon.png");
-}
-
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJoint::Clone() const
-{
-	return new FNewtonModelPhysicsTreeItemJoint(*this);
-}
-
-
-//***********************************************************************************
-//
-//***********************************************************************************
-FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src)
-	:FNewtonModelPhysicsTreeItem(src)
-{
-}
-
-FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
-	:FNewtonModelPhysicsTreeItem(parentNode)
-{
-}
-
-FName FNewtonModelPhysicsTreeItemShape::BrushName() const
-{
-	return TEXT("shapeIcon.png");
-}
-
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShape::Clone() const
-{
-	check(0);
-	return new FNewtonModelPhysicsTreeItemShape(*this);
-}
-
-//***********************************************************************************
-//
-//***********************************************************************************
-FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode)
+FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
-	Node = nullptr;
+	Node = modelNode;
 	m_parent = parentNode;
 	m_acyclicGraph = nullptr;
 }
@@ -118,7 +70,6 @@ void FNewtonModelPhysicsTreeItem::AddReferencedObjects(FReferenceCollector& Coll
 FName FNewtonModelPhysicsTreeItem::GetDisplayName() const
 {
 	check(Node != nullptr);
-	//return *Node->GetName();
 	return Node->Name;
 }
 
@@ -156,5 +107,132 @@ void FNewtonModelPhysicsTreeItem::GenerateWidgetForNameColumn(TSharedPtr<SHorizo
 	];
 }
 
+bool FNewtonModelPhysicsTreeItem::ShouldDrawWidget() const
+{
+	return false;
+}
+
+FMatrix FNewtonModelPhysicsTreeItem::GetWidgetMatrix() const
+{
+	return FMatrix::Identity;
+}
+
+void FNewtonModelPhysicsTreeItem::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+{
+	check(0);
+}
+
+//***********************************************************************************
+//
+//***********************************************************************************
+FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src)
+	:FNewtonModelPhysicsTreeItem(src)
+{
+}
+
+FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItem(parentNode, modelNode)
+{
+	UNewtonModelNodeCollision* const shapeNodeInfo = Cast<UNewtonModelNodeCollision>(Node);
+	check(shapeNodeInfo);
+	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
+}
+
+FName FNewtonModelPhysicsTreeItemShape::BrushName() const
+{
+	return TEXT("shapeIcon.png");
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShape::Clone() const
+{
+	check(0);
+	return new FNewtonModelPhysicsTreeItemShape(*this);
+}
+
+void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+{
+	const UNewtonModelNodeCollision* const shapeNode = Cast<UNewtonModelNodeCollision>(Node);
+	check(shapeNode);
+
+	if (shapeNode->m_hidden || !shapeNode->ShowDebug)
+	{
+		return;
+	}
+
+	check(m_parent->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+	const UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(m_parent->Node);
+	check(bodyNode);
+	if (bodyNode->BoneIndex < 0)
+	{
+		return;
+	}
+
+	float thickness = 0.2f;
+	//FTransform tranform(shapeNode->Transform * bodyNode->Transform);
+	const FTransform tranform(shapeNode->Transform);
+	for (int i = m_wireFrameMesh.Num() - 2; i >= 0; i -= 2)
+	{
+		FVector4 p0(tranform.TransformFVector4(m_wireFrameMesh[i + 0]));
+		FVector4 p1(tranform.TransformFVector4(m_wireFrameMesh[i + 1]));
+		pdi->DrawLine(p0, p1, FColor::Blue, SDPG_Foreground, thickness);
+	}
+}
+
+bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
+{
+	const UNewtonModelNodeCollision* const shapeNode = Cast<UNewtonModelNodeCollision>(Node);
+	check(shapeNode);
+	return shapeNode->ShowDebug;
+}
+
+FMatrix FNewtonModelPhysicsTreeItemShape::GetWidgetMatrix() const
+{
+	const UNewtonModelNodeCollision* const shapeNode = Cast<UNewtonModelNodeCollision>(Node);
+	check(shapeNode);
+	return shapeNode->Transform.ToMatrixNoScale();
+}
 
 
+//***********************************************************************************
+//
+//***********************************************************************************
+FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src)
+	:FNewtonModelPhysicsTreeItem(src)
+{
+}
+
+FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode)
+	:FNewtonModelPhysicsTreeItem(parentNode, modelNode)
+{
+}
+
+FName FNewtonModelPhysicsTreeItemJoint::BrushName() const
+{
+	return TEXT("jointIcon.png");
+}
+
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJoint::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemJoint(*this);
+}
+
+bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
+{
+	const UNewtonModelNodeJoint* const jointNode = Cast<UNewtonModelNodeJoint>(Node);
+	check(jointNode);
+	return jointNode->ShowDebug;
+}
+
+FMatrix FNewtonModelPhysicsTreeItemJoint::GetWidgetMatrix() const
+{
+	//const UNewtonModelNodeJoint* const jointNode = Cast<UNewtonModelNodeJoint>(Node);
+	//check(jointNode);
+
+	check(m_acyclicGraph);
+	check(m_acyclicGraph->m_children.Num() == 1);
+	const FNewtonModelPhysicsTreeItemAcyclicGraph* const childBodyNode = m_acyclicGraph->m_children[0];
+	check(childBodyNode->m_item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+	const UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(childBodyNode->m_item->Node);
+	check(bodyNode);
+	return bodyNode->Transform.ToMatrixNoScale();
+}

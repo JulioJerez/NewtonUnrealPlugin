@@ -33,9 +33,10 @@ UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonModelNodeJoint : public UNewtonModelNode
 {
 	GENERATED_BODY()
+
 	public:
 	UNewtonModelNodeJoint();
-	
-	
-	
+
+	UPROPERTY(EditAnywhere)
+	FTransform Transform;
 };

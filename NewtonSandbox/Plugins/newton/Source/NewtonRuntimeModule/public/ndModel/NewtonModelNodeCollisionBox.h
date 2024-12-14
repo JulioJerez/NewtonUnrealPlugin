@@ -33,5 +33,18 @@ UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonModelNodeCollisionBox : public UNewtonModelNodeCollision
 {
 	GENERATED_BODY()
+
+	public:
 	UNewtonModelNodeCollisionBox();
+
+	virtual void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const override;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	float SizeX;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	float SizeY;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	float SizeZ;
 };

@@ -35,7 +35,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	NEWTON_INIT_RTTI(FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItem(const FNewtonModelPhysicsTreeItem& src);
-	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 	virtual ~FNewtonModelPhysicsTreeItem();
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const;
@@ -43,6 +43,10 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	FName GetDisplayName() const;
 	const FSlateBrush* GetIcon() const;
 	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected InIsSelected);
+
+	virtual bool ShouldDrawWidget() const;
+	virtual FMatrix GetWidgetMatrix() const;
+	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 
 	protected:
 	virtual FName BrushName() const;
@@ -53,9 +57,9 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
-	//bool m_isHidden;
-
 	friend class FNewtonModelPhysicsTree;
+	friend class FNewtonModelPhysicsTreeItemJoint;
+	friend class FNewtonModelPhysicsTreeItemShape;
 	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;
 };
 
@@ -65,10 +69,16 @@ class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShape, FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src);
-	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 
 	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+
+	virtual bool ShouldDrawWidget() const override;
+	virtual FMatrix GetWidgetMatrix() const override;
+	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
+
+	TArray<FVector> m_wireFrameMesh;
 };
 
 class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
@@ -77,8 +87,11 @@ class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJoint, FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src);
-	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode);
+	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 
 	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+
+	virtual bool ShouldDrawWidget() const override;
+	virtual FMatrix GetWidgetMatrix() const override;
 };

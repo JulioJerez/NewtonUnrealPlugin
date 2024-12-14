@@ -19,13 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-
 #include "ndModel/NewtonModelNodeJointHinge.h"
 
+#include "ndModel/NewtonModelNodeRigidBody.h"
 
 UNewtonModelNodeJointHinge::UNewtonModelNodeJointHinge()
 	:Super()
 {
 	SetName(TEXT("NewHinge"));
 }
+

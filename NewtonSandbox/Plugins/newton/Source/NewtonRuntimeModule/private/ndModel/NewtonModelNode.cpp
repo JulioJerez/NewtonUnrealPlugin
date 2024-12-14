@@ -33,6 +33,7 @@ UNewtonModelNode::UNewtonModelNode()
 	Parent = nullptr;
 
 	m_hidden = false;
+	ShowDebug = false;
 }
 
 void UNewtonModelNode::AttachNode(UNewtonModelNode* const node)
@@ -41,11 +42,22 @@ void UNewtonModelNode::AttachNode(UNewtonModelNode* const node)
 	Children.Push(node);
 }
 
-void UNewtonModelNode::DebugCenterOfMass(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
-{
-}
-
 void UNewtonModelNode::SetName(const TCHAR* const name)
 {
 	Name = FName(name);
 }
+
+//bool UNewtonModelNode::ShouldDrawWidget() const
+//{
+//	return false;
+//}
+//
+//FMatrix UNewtonModelNode::GetWidgetMatrix() const
+//{
+//	return FMatrix::Identity;
+//}
+//
+//void UNewtonModelNode::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+//{
+//}
+

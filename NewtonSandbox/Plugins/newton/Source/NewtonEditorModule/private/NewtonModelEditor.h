@@ -60,6 +60,9 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	TSharedRef<IPersonaPreviewScene> GetPreviewScene() const;
 	
 	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
+
+	bool ShouldDrawWidget() const;
+	FMatrix GetWidgetMatrix() const;
 	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 	
 	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding();
@@ -119,7 +122,7 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	// save model when closing editor
 	FDelegateHandle m_onCloseHandle;
 
-	//bool m_modelChange;
+	bool m_modelSaved;
 	static FName m_identifier;
 	static FEditorModeID m_id;
 	friend class FNewtonModelPhysicsTree;
