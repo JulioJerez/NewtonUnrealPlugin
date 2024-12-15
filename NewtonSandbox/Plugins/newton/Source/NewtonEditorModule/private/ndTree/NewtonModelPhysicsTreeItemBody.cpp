@@ -61,38 +61,84 @@ FName FNewtonModelPhysicsTreeItemBody::BrushName() const
 	return TEXT("bodyIcon.png");
 }
 
-
 void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonModelNodeRigidBody* const body = Cast<UNewtonModelNodeRigidBody>(Node);
-	check(body);
+	const UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(Node);
+	check(bodyNode);
 
-	if (body->ShowCenterOfMass && (body->BoneIndex >= 0))
+	if (bodyNode->BoneIndex >= 0)
 	{
-		// remember to get the com form the collision shape if there are some 
-		FTransform com(body->Transform);
-	
-		const FVector position (com.GetLocation());
-		const FVector xAxis (com.GetUnitAxis(EAxis::X));
-		const FVector yAxis (com.GetUnitAxis(EAxis::Y));
-		const FVector zAxis (com.GetUnitAxis(EAxis::Z));
-	
-		float size = body->DebugScale * 25.0f;
-		float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
-		pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
-		pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
-		pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
+		if (bodyNode->ShowCenterOfMass)
+		{
+			// remember to get the com form the collision shape if there are some 
+			FTransform com(bodyNode->Transform);
+
+			const FVector position(com.GetLocation());
+			const FVector xAxis(com.GetUnitAxis(EAxis::X));
+			const FVector yAxis(com.GetUnitAxis(EAxis::Y));
+			const FVector zAxis(com.GetUnitAxis(EAxis::Z));
+
+			float size = bodyNode->DebugScale * 25.0f;
+			float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
+			pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
+			pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
+			pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
+		}
+	}
+	else
+	{
+		check(0);
 	}
 
-	//const TSharedPtr<FNewtonModelPhysicsTreeItem>& item = m_item;
-//if (item->Node->m_hidden)
-//{
-//	return;
-//}
-//
-//UNewtonModelNode* const node = item->Node;
-//	check(0);
-//	//node->DebugDraw(view, viewport, pdi);
-//}
+}
 
+bool FNewtonModelPhysicsTreeItemBody::HaveSelection() const
+{
+	const UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(Node);
+	check(bodyNode);
+	return bodyNode->ShowDebug;
+}
+
+bool FNewtonModelPhysicsTreeItemBody::ShouldDrawWidget() const
+{
+	const UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(Node);
+	check(bodyNode);
+	return bodyNode->ShowDebug && (bodyNode->Inertia.ShowPrincipalAxis ^ bodyNode->ShowCenterOfMass);
+}
+
+FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
+{
+	UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(Node);
+	check(bodyNode);
+
+	TArray<const UNewtonModelNodeCollision*> childenShapes;
+	FMatrix matrix (bodyNode->Transform.ToMatrixNoScale());
+	if (bodyNode->ShowCenterOfMass)
+	{
+		const FVector com(bodyNode->CalculateLocalCenterOfMass(childenShapes) + bodyNode->CenterOfMass);
+		matrix.SetOrigin(matrix.TransformFVector4(com));
+	}
+	else
+	{
+		check(0);
+		check(bodyNode->Inertia.ShowPrincipalAxis);
+		matrix.SetOrigin(matrix.TransformFVector4(bodyNode->CenterOfMass));
+	}
+
+	return matrix;
+}
+
+void FNewtonModelPhysicsTreeItemBody::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
+{
+	UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(Node);
+	check(bodyNode);
+	if (bodyNode->ShowCenterOfMass)
+	{
+		bodyNode->CenterOfMass += inDrag;
+	}
+	else
+	{
+		check(0);
+		check(bodyNode->Inertia.ShowPrincipalAxis);
+	}
 }

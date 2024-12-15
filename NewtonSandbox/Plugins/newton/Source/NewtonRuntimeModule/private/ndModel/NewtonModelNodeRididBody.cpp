@@ -21,6 +21,8 @@
 
 #include "ndModel/NewtonModelNodeRigidBody.h"
 
+#include "ndModel/NewtonModelNodeCollision.h"
+
 UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 	:Super()
 	,Transform()
@@ -34,18 +36,16 @@ UNewtonModelNodeRigidBody::UNewtonModelNodeRigidBody()
 	,InitialOmega(0.0f, 0.0f, 0.0f)
 	,CenterOfMass(0.0f, 0.0f, 0.0f)
 	,Gravity(0.0f, 0.0f, -980.0f)
-	//,m_localScale(1.0f, 1.0f, 1.0f)
-	//,m_globalScale(1.0f, 1.0f, 1.0f)
-	//,m_localTransform()
-	//,m_globalTransform()
-	//,m_body(nullptr)
-	//,m_newtonWorld(nullptr)
-	//,m_sleeping(true)
-	//,m_propertyChanged(true)
 {
 	SetName (TEXT("NewBody"));
 	BoneIndex = -1;
 
 	float inertia = (2.0f / 5.0f) * 0.5f * 0.5f;
 	Inertia.PrincipalInertia = FVector(inertia, inertia, inertia);
+}
+
+
+FVector UNewtonModelNodeRigidBody::CalculateLocalCenterOfMass(const TArray<const UNewtonModelNodeCollision*>& childen) const
+{
+	return FVector(0.0f, -50.0f, 25.0f);
 }

@@ -26,7 +26,7 @@
 #include "NewtonRigidBody.h"
 #include "NewtonModelNodeRigidBody.generated.h"
 
-
+class UNewtonModelNodeCollision;
 
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNode
@@ -35,11 +35,13 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNod
 	public:
 	UNewtonModelNodeRigidBody();
 
-	//virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
+	FVector CalculateLocalCenterOfMass(const TArray<const UNewtonModelNodeCollision*>& childenShapes) const;
 
-	//UPROPERTY(EditAnywhere)
 	UPROPERTY(VisibleAnywhere)
 	FTransform Transform;
+
+	UPROPERTY(EditAnywhere)
+	FVector CenterOfMass;
 
 	UPROPERTY(EditAnywhere)
 	bool ShowCenterOfMass;
@@ -67,9 +69,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeRigidBody : public UNewtonModelNod
 
 	UPROPERTY(EditAnywhere)
 	FVector InitialOmega;
-
-	UPROPERTY(EditAnywhere)
-	FVector CenterOfMass;
 
 	UPROPERTY(EditAnywhere)
 	FVector Gravity;
