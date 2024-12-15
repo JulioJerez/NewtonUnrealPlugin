@@ -43,7 +43,7 @@ void FNewtonModelPhysicsTreeItemJointHinge::DebugDraw(const FSceneView* const vi
 	const UNewtonModelNodeJointHinge* const jointNode = Cast<UNewtonModelNodeJointHinge>(Node);
 	check(jointNode);
 
-	if (jointNode->m_hidden)
+	if (jointNode->m_hidden || !jointNode->ShowDebug)
 	{
 		return;
 	}
