@@ -38,7 +38,6 @@ class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 	virtual bool HaveSelection() const override;
 	virtual bool ShouldDrawWidget() const override;
 	virtual FMatrix GetWidgetMatrix() const override;
-
 	void DrawCone(FPrimitiveDrawInterface* const pdi, const FMatrix& matrix, const FColor& color) const;
-
+	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) override;
 };

@@ -99,3 +99,21 @@ void FNewtonModelPhysicsTreeItemJoint::DrawCone(FPrimitiveDrawInterface* const p
 		p0 = base[i];
 	}
 }
+
+
+void FNewtonModelPhysicsTreeItemJoint::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
+{
+	UNewtonModelNodeJoint* const jointNode = Cast<UNewtonModelNodeJoint>(Node);
+	check(jointNode);
+
+	// only allow rotation around teh bone pivot. 
+	//jointNode->Transform.SetLocation(jointNode->Transform.GetLocation() + inDrag);
+
+	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
+	{
+		const FQuat deltaRot(inRot.Quaternion());
+		FQuat rotation(deltaRot * jointNode->Transform.GetRotation());
+		rotation.Normalize();
+		jointNode->Transform.SetRotation(rotation);
+	}
+}
