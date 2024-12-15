@@ -612,9 +612,20 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 				bodyNodeInfo->BoneName = boneName;
 				bodyNodeInfo->BoneIndex = boneIndex;
 
+
+				if (m_selectedItem->m_acyclicGraph->m_parent)
+				{
+					TSharedPtr<FNewtonModelPhysicsTreeItem> parentItem(m_selectedItem->m_acyclicGraph->m_parent->m_item);
+					check (parentItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemJoint")));
+					UNewtonModelNodeJoint* const jointNodeInfo = Cast<UNewtonModelNodeJoint>(parentItem->Node);
+					check(jointNodeInfo);
+					jointNodeInfo->Transform = bodyNodeInfo->Transform;
+					jointNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+				}
+
 				for (int i = m_selectedItem->m_acyclicGraph->m_children.Num() - 1; i >= 0; --i)
 				{
-					TSharedPtr<FNewtonModelPhysicsTreeItem> childItem = m_selectedItem->m_acyclicGraph->m_children[i]->m_item;
+					TSharedPtr<FNewtonModelPhysicsTreeItem> childItem (m_selectedItem->m_acyclicGraph->m_children[i]->m_item);
 					if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
 					{
 						UNewtonModelNodeCollision* const shapeNodeInfo = Cast<UNewtonModelNodeCollision>(childItem->Node);
@@ -622,20 +633,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 						shapeNodeInfo->Transform = bodyNodeInfo->Transform;
 						shapeNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 					}
-					else if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemJoint")))
-					{
-						UNewtonModelNodeJoint* const jointNodeInfo = Cast<UNewtonModelNodeJoint>(childItem->Node);
-						check(jointNodeInfo);
-						jointNodeInfo->Transform = bodyNodeInfo->Transform;
-						jointNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
-					}
-					else
-					{
-						// something is wrong
-						check(0);
-					}
 				}
-
 				break;
 			}
 		}
@@ -713,7 +711,6 @@ void FNewtonModelPhysicsTree::BuildTree()
 		if (Cast<UNewtonModelNodeRigidBodyRoot>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBodyRoot(nullptr, proxyNode)));
-			//item->Node = proxyNode;
 			m_root.Push(item);
 			m_items.Add(&item.Get(), item);
 			parent = item;
@@ -721,21 +718,18 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonModelNodeRigidBody>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemBody(parent, proxyNode)));
-			//item->Node = proxyNode;
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeJointHinge>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(parent, proxyNode)));
-			//item->Node = proxyNode;
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}
 		else if (Cast<UNewtonModelNodeCollisionBox>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(parent, proxyNode)));
-			//item->Node = proxyNode;
 			m_items.Add(&item.Get(), item);
 			parent = item;
 		}

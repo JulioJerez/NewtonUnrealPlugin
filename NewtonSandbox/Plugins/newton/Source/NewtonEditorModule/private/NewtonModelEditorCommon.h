@@ -35,6 +35,8 @@
 #include "ndModel/NewtonModelNodeCollisionSphere.h"
 
 
+#define NEWTON_EDITOR_DEBUG_THICKENESS  0.2f
+
 #define NEWTON_INIT_RTTI(RTTI)									\
 	static const FName& GetRtti()								\
 	{															\

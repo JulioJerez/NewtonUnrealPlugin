@@ -22,9 +22,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-#include "ndTree/NewtonModelPhysicsTreeItem.h"
+#include "ndTree/NewtonModelPhysicsTreeItemShape.h"
 
 
 class FNewtonModelPhysicsTreeItemShapeSphere : public FNewtonModelPhysicsTreeItemShape

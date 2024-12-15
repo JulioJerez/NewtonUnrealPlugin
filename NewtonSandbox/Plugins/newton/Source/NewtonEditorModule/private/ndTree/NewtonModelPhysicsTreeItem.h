@@ -65,37 +65,3 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;
 };
 
-class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
-{
-	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShape, FNewtonModelPhysicsTreeItem)
-
-	FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src);
-	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
-
-	virtual FName BrushName() const override;
-	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
-
-	virtual bool HaveSelection() const override;
-	virtual bool ShouldDrawWidget() const override;
-	virtual FMatrix GetWidgetMatrix() const override;
-	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) override;
-	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
-
-	TArray<FVector> m_wireFrameMesh;
-};
-
-class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
-{
-	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJoint, FNewtonModelPhysicsTreeItem)
-
-	FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src);
-	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
-
-	virtual FName BrushName() const override;
-	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
-
-	virtual bool ShouldDrawWidget() const override;
-	virtual FMatrix GetWidgetMatrix() const override;
-};

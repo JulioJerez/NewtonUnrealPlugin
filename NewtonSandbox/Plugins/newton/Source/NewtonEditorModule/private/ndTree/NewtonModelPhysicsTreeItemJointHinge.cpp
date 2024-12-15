@@ -48,5 +48,17 @@ void FNewtonModelPhysicsTreeItemJointHinge::DebugDraw(const FSceneView* const vi
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
+	FMatrix matrix(GetWidgetMatrix());
+	float scale = jointNode->DebugScale;
+	const FColor pinColor(255.0f, 255.0f, 0.0f);
+
+	const FVector pinDir(matrix.GetUnitAxis(EAxis::X));
+	const FVector pingStart(matrix.GetOrigin());
+	const FVector pingEnd(pingStart + pinDir * (scale * 0.9f * 100.0f));
+
+	FMatrix coneMatrix(matrix);
+	coneMatrix.SetOrigin(pingEnd);
+	DrawCone(pdi, coneMatrix, pinColor);
+	pdi->DrawLine(pingStart, pingEnd, pinColor, SDPG_Foreground, thickness);
 }

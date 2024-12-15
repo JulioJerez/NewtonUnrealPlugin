@@ -77,8 +77,8 @@ void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FV
 		const FVector yAxis (com.GetUnitAxis(EAxis::Y));
 		const FVector zAxis (com.GetUnitAxis(EAxis::Z));
 	
-		float thickness = 0.2f;
 		float size = body->DebugScale * 25.0f;
+		float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
 		pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
 		pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
 		pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);

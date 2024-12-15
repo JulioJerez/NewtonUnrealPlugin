@@ -22,17 +22,24 @@
 
 #pragma once
 
-#include "ndTree/NewtonModelPhysicsTreeItemJoint.h"
+#include "ndTree/NewtonModelPhysicsTreeItem.h"
 
-class FNewtonModelPhysicsTreeItemJointHinge : public FNewtonModelPhysicsTreeItemJoint
+class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 {
 	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointHinge, FNewtonModelPhysicsTreeItemJoint)
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShape, FNewtonModelPhysicsTreeItem)
 
-	FNewtonModelPhysicsTreeItemJointHinge(const FNewtonModelPhysicsTreeItemJointHinge& src);
-	FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
+	FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src);
+	FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
 
+	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
+	virtual bool HaveSelection() const override;
+	virtual bool ShouldDrawWidget() const override;
+	virtual FMatrix GetWidgetMatrix() const override;
+	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) override;
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
+
+	TArray<FVector> m_wireFrameMesh;
 };

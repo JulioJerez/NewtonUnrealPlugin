@@ -39,4 +39,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeJoint : public UNewtonModelNode
 
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;
+
+	UPROPERTY(EditAnywhere)
+	float DebugScale;
 };

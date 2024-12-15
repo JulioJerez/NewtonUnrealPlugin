@@ -20,13 +20,25 @@
 */
 
 
+#pragma once
 
-#include "ndModel/NewtonModelNodeJoint.h"
+#include "ndTree/NewtonModelPhysicsTreeItem.h"
 
-
-UNewtonModelNodeJoint::UNewtonModelNodeJoint()
-	:Super()
+class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 {
-	DebugScale = 1.0f;
-}
+	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJoint, FNewtonModelPhysicsTreeItem)
 
+	FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src);
+	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonModelNode> modelNode);
+
+	virtual FName BrushName() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+
+	virtual bool HaveSelection() const override;
+	virtual bool ShouldDrawWidget() const override;
+	virtual FMatrix GetWidgetMatrix() const override;
+
+	void DrawCone(FPrimitiveDrawInterface* const pdi, const FMatrix& matrix, const FColor& color) const;
+
+};
