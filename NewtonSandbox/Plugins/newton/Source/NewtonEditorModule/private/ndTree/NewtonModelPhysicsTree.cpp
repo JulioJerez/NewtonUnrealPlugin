@@ -862,4 +862,17 @@ FMatrix FNewtonModelPhysicsTree::GetWidgetMatrix() const
 	return matrix;
 }
 
+void FNewtonModelPhysicsTree::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) const
+{
+	if (m_selectedItem.IsValid())
+	{
+		m_selectedItem->ApplyDeltaTransform(inDrag, inRot, inScale);
+	}
+}
+
+bool FNewtonModelPhysicsTree::HaveSelection() const
+{
+	return m_selectedItem.IsValid() && m_selectedItem->HaveSelection();
+}
+
 #undef LOCTEXT_NAMESPACE

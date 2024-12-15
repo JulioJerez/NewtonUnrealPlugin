@@ -44,8 +44,10 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	const FSlateBrush* GetIcon() const;
 	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected InIsSelected);
 
+	virtual bool HaveSelection() const;
 	virtual bool ShouldDrawWidget() const;
 	virtual FMatrix GetWidgetMatrix() const;
+	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale);
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 
 	protected:
@@ -74,8 +76,10 @@ class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
+	virtual bool HaveSelection() const override;
 	virtual bool ShouldDrawWidget() const override;
 	virtual FMatrix GetWidgetMatrix() const override;
+	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) override;
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 
 	TArray<FVector> m_wireFrameMesh;

@@ -340,9 +340,23 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	// this shit enable the transform tool bar. 
 	// why unreal does this crap is beyond reprehensible. 
 	FEditorModeTools& editorModeManager = GetEditorModeManager();
+	// make sure SkeletonSelection is active when toggling the mode, as they are compatible.
+	if (!editorModeManager.IsModeActive(FPersonaEditModes::SkeletonSelection))
+	{
+		editorModeManager.ActivateMode(FPersonaEditModes::SkeletonSelection);
+	}
 	editorModeManager.ActivateMode(UNewtonModelSkeletalMeshEditorMode::m_id, true);
 	UNewtonModelSkeletalMeshEditorMode* const editorMode = Cast<UNewtonModelSkeletalMeshEditorMode>(editorModeManager.GetActiveScriptableMode(UNewtonModelSkeletalMeshEditorMode::m_id));
 	editorMode->SetEditor(this);
+
+
+	//FNewtonEditorModule& module = FModuleManager::GetModuleChecked<FNewtonEditorModule>("NewtonEditorModule");
+	//const TArray<FNewtonEditorModule::FOnSkeletalMeshEditorInitialized>& PostInitDelegates = SkeletalMeshEditorModule.GetPostEditorInitDelegates();
+	//for (const auto& PostInitDelegate : PostInitDelegates)
+	//{
+	//	PostInitDelegate.ExecuteIfBound(SharedThis<ISkeletalMeshEditor>(this));
+	//}
+
 }
 
 void FNewtonModelEditor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
@@ -355,9 +369,19 @@ FMatrix FNewtonModelEditor::GetWidgetMatrix() const
 	return m_skeletonPhysicsTree->GetWidgetMatrix();
 }
 
+void FNewtonModelEditor::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) const
+{
+	m_skeletonPhysicsTree->ApplyDeltaTransform(inDrag, inRot, inScale);
+}
+
 bool FNewtonModelEditor::ShouldDrawWidget() const
 {
 	return m_skeletonPhysicsTree->ShouldDrawWidget();
+}
+
+bool FNewtonModelEditor::HaveSelection() const
+{
+	return m_skeletonPhysicsTree->HaveSelection();
 }
 
 #undef LOCTEXT_NAMESPACE

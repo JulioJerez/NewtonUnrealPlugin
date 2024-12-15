@@ -42,6 +42,10 @@ class UNewtonModelSkeletalMeshEditorMode: public UBaseLegacyWidgetEdMode
 
 	void SetEditor(FNewtonModelEditor* const editor);
 
+	virtual bool StartTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport) override;
+	virtual bool EndTracking(FEditorViewportClient* InViewportClient, FViewport* InViewport) override;
+
+
 	FNewtonModelEditor* m_editor;
 	static FEditorModeID m_id;
 };

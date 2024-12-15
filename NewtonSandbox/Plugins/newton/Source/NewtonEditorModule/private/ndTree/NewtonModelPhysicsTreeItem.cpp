@@ -117,9 +117,20 @@ FMatrix FNewtonModelPhysicsTreeItem::GetWidgetMatrix() const
 	return FMatrix::Identity;
 }
 
+void FNewtonModelPhysicsTreeItem::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
+{
+	check(0);
+}
+
 void FNewtonModelPhysicsTreeItem::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
 	check(0);
+}
+
+bool FNewtonModelPhysicsTreeItem::HaveSelection() const
+{
+	check(0);
+	return false;
 }
 
 //***********************************************************************************
@@ -178,6 +189,13 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 	}
 }
 
+bool FNewtonModelPhysicsTreeItemShape::HaveSelection() const
+{
+	const UNewtonModelNodeCollision* const shapeNode = Cast<UNewtonModelNodeCollision>(Node);
+	check(shapeNode);
+	return shapeNode->ShowDebug;
+}
+
 bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
 {
 	const UNewtonModelNodeCollision* const shapeNode = Cast<UNewtonModelNodeCollision>(Node);
@@ -192,6 +210,26 @@ FMatrix FNewtonModelPhysicsTreeItemShape::GetWidgetMatrix() const
 	return shapeNode->Transform.ToMatrixNoScale();
 }
 
+void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
+{
+	UNewtonModelNodeCollision* const shapeNode = Cast<UNewtonModelNodeCollision>(Node);
+	check(shapeNode);
+
+	shapeNode->Transform.SetLocation(shapeNode->Transform.GetLocation() + inDrag);
+
+	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
+	{
+		const FQuat deltaRot(inRot.Quaternion());
+		const FQuat rotation(shapeNode->Transform.GetRotation());
+		shapeNode->Transform.SetRotation(deltaRot * rotation);
+	}
+
+	FVector scale(shapeNode->Transform.GetScale3D() + inScale);
+	scale.X = (scale.X < 0.1f) ? 0.1f : scale.X;
+	scale.Y = (scale.Y < 0.1f) ? 0.1f : scale.Y;
+	scale.Z = (scale.Z < 0.1f) ? 0.1f : scale.Z;
+	shapeNode->Transform.SetScale3D(scale);
+}
 
 //***********************************************************************************
 //

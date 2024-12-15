@@ -61,8 +61,10 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	
 	TSharedRef<FNewtonModelPhysicsTree> GetNewtonModelPhysicsTree() const;
 
+	bool HaveSelection() const;
 	bool ShouldDrawWidget() const;
 	FMatrix GetWidgetMatrix() const;
+	void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) const;
 	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 	
 	virtual TSharedPtr<FNewtonModelEditorBinding> GetBinding();

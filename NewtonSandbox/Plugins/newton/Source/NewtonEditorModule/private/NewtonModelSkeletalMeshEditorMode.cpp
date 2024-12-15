@@ -48,11 +48,9 @@ class UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode : public IP
 	virtual void GetOnScreenDebugInfo(TArray<FText>& OutDebugInfo) const override;
 
 	/** FEdMode interface */
-	virtual bool StartTracking(FEditorViewportClient* InViewportClient, FViewport* InViewport) override;
-	virtual bool EndTracking(FEditorViewportClient* InViewportClient, FViewport* InViewport) override;
 	virtual bool InputKey(FEditorViewportClient* ViewportClient, FViewport* Viewport, FKey Key, EInputEvent Event) override;
-	virtual bool InputAxis(FEditorViewportClient* InViewportClient, FViewport* Viewport, int32 ControllerId, FKey Key, float Delta, float DeltaTime) override;
-	virtual bool InputDelta(FEditorViewportClient* InViewportClient, FViewport* InViewport, FVector& InDrag, FRotator& InRot, FVector& InScale) override;
+	virtual bool InputAxis(FEditorViewportClient* inViewportClient, FViewport* Viewport, int32 ControllerId, FKey Key, float Delta, float DeltaTime) override;
+	
 	virtual void Tick(FEditorViewportClient* ViewportClient, float DeltaTime) override;
 	virtual void DrawHUD(FEditorViewportClient* ViewportClient, FViewport* Viewport, const FSceneView* View, FCanvas* Canvas) override;
 	virtual bool AllowWidgetMove() override;
@@ -69,11 +67,11 @@ class UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode : public IP
 
 private:
 	/** Simulation mouse forces */
-	bool SimMousePress(FEditorViewportClient* InViewportClient, FKey Key);
-	void SimMouseMove(FEditorViewportClient* InViewportClient, float DeltaX, float DeltaY);
+	bool SimMousePress(FEditorViewportClient* inViewportClient, FKey Key);
+	void SimMouseMove(FEditorViewportClient* inViewportClient, float DeltaX, float DeltaY);
 	bool SimMouseRelease();
-	bool SimMouseWheelUp(FEditorViewportClient* InViewportClient);
-	bool SimMouseWheelDown(FEditorViewportClient* InViewportClient);
+	bool SimMouseWheelUp(FEditorViewportClient* inViewportClient);
+	bool SimMouseWheelDown(FEditorViewportClient* inViewportClient);
 
 	/** Changes the orientation of a constraint */
 	void CycleSelectedConstraintOrientation();
@@ -82,22 +80,22 @@ private:
 	void ModifyPrimitiveSize(int32 BodyIndex, EAggCollisionShape::Type PrimType, int32 PrimIndex, FVector DeltaSize);
 
 	/** Called when no scene proxy is hit, deselects everything */
-	void HitNothing(FEditorViewportClient* InViewportClient);
+	void HitNothing(FEditorViewportClient* inViewportClient);
 
 	void CycleTransformMode();
 
-	void OpenBodyMenu(FEditorViewportClient* InViewportClient);
+	void OpenBodyMenu(FEditorViewportClient* inViewportClient);
 
-	void OpenConstraintMenu(FEditorViewportClient* InViewportClient);
+	void OpenConstraintMenu(FEditorViewportClient* inViewportClient);
 
-	void OpenSelectionMenu(FEditorViewportClient* InViewportClient);
+	void OpenSelectionMenu(FEditorViewportClient* inViewportClient);
 
 	/** Returns the identifier for the constraint frame (child or parent) in which the manipulator widget should be drawn. */
 	EConstraintFrame::Type GetConstraintFrameForWidget() const;
 
 	// Manage the start and end of a transform action in the viewport.
 	bool HandleBeginTransform();
-	bool HandleEndTransform(FEditorViewportClient* InViewportClient) const;
+	bool HandleEndTransform(FEditorViewportClient* inViewportClient) const;
 
 	// Update the Center of Mass position after body transforms have been manipulated in the view port.
 	void UpdateCoM();
@@ -149,9 +147,14 @@ private:
 	virtual FVector GetWidgetLocation() const override;
 	virtual bool GetCustomDrawingCoordinateSystem(FMatrix& matrix, void*) override;
 
+	virtual bool StartTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport) override;
+	virtual bool EndTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport) override;
+	virtual bool InputDelta(FEditorViewportClient* inViewportClient, FViewport* inViewport, FVector& inDrag, FRotator& inRot, FVector& inScale) override;
 
 	virtual void Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI) override;
 	FNewtonModelEditor* m_editor;
+
+	bool m_inTransaction;
 #endif
 
 };
@@ -179,10 +182,26 @@ TSharedRef<FLegacyEdModeWidgetHelper> UNewtonModelSkeletalMeshEditorMode::Create
 
 void UNewtonModelSkeletalMeshEditorMode::SetEditor(FNewtonModelEditor* const editor)
 {
-	m_editor = editor;
-
 	FSkeletonSelectionEditMode* const helper = (FSkeletonSelectionEditMode*)WidgetHelper.Get();
+	check(helper);
+
+	m_editor = editor;
 	helper->m_editor = m_editor;
+	helper->m_inTransaction = false;
+}
+
+bool UNewtonModelSkeletalMeshEditorMode::StartTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport)
+{
+	FSkeletonSelectionEditMode* const helper = (FSkeletonSelectionEditMode*)WidgetHelper.Get();
+	check(helper);
+	return helper->StartTracking(inViewportClient, inViewport);
+}
+
+bool UNewtonModelSkeletalMeshEditorMode::EndTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport)
+{
+	FSkeletonSelectionEditMode* const helper = (FSkeletonSelectionEditMode*)WidgetHelper.Get();
+	check(helper);
+	return helper->EndTracking(inViewportClient, inViewport);
 }
 
 //**********************************************************************************************
@@ -191,6 +210,8 @@ void UNewtonModelSkeletalMeshEditorMode::SetEditor(FNewtonModelEditor* const edi
 UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::FSkeletonSelectionEditMode()
 	:IPersonaEditMode()
 {
+	m_editor = nullptr;
+	m_inTransaction = false;
 }
 
 bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::UsesTransformWidget() const
@@ -226,90 +247,13 @@ bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::HandleClick
 {
 	if (click.GetKey() == EKeys::LeftMouseButton)
 	{
-		check(0);
-		//if (hitProxy && hitProxy->IsA(HPhysicsAssetEditorEdBoneProxy::StaticGetType()))
-		//{
-		//	HPhysicsAssetEditorEdBoneProxy* BoneProxy = (HPhysicsAssetEditorEdBoneProxy*)hitProxy;
-		//
-		//	SharedData->HitBone(BoneProxy->BodyIndex, BoneProxy->PrimType, BoneProxy->PrimIndex, InViewportClient->IsCtrlPressed() || InViewportClient->IsShiftPressed());
-		//	return true;
-		//}
-		//else if (hitProxy && hitProxy->IsA(HPhysicsAssetEditorEdConstraintProxy::StaticGetType()))
-		//{
-		//	HPhysicsAssetEditorEdConstraintProxy* ConstraintProxy = (HPhysicsAssetEditorEdConstraintProxy*)hitProxy;
-		//
-		//	SharedData->HitConstraint(ConstraintProxy->ConstraintIndex, InViewportClient->IsCtrlPressed() || InViewportClient->IsShiftPressed());
-		//	return true;
-		//}
-		//else if (hitProxy && hitProxy->IsA(HPhysicsAssetEditorEdCoMProxy::StaticGetType()))
-		//{
-		//	HPhysicsAssetEditorEdCoMProxy* CoMProxy = (HPhysicsAssetEditorEdCoMProxy*)hitProxy;
-		//
-		//	SharedData->HitCoM(CoMProxy->BodyIndex, InViewportClient->IsCtrlPressed() || InViewportClient->IsShiftPressed());
-		//	return true;
-		//}
-		//else
-		//{
-		//	HitNothing(InViewportClient);
-		//}
+		UE_LOG(LogTemp, Warning, TEXT("xxxxxxxxx"));
+		UE_LOG(LogTemp, Warning, TEXT("function:%s line:%d"), TEXT(__FUNCTION__), __LINE__);
 	}
 	else if (click.GetKey() == EKeys::RightMouseButton)
 	{
-		check(0);
-		//if (hitProxy && hitProxy->IsA(HPhysicsAssetEditorEdBoneProxy::StaticGetType()))
-		//{
-		//	HPhysicsAssetEditorEdBoneProxy* BoneProxy = (HPhysicsAssetEditorEdBoneProxy*)hitProxy;
-		//
-		//	// Select body under cursor if not already selected	(if ctrl is held down we only add, not remove)
-		//	FPhysicsAssetEditorSharedData::FSelection Selection(BoneProxy->BodyIndex, BoneProxy->PrimType, BoneProxy->PrimIndex);
-		//	if (!SharedData->IsBodySelected(Selection))
-		//	{
-		//		if (!InViewportClient->IsCtrlPressed())
-		//		{
-		//			SharedData->ClearSelectedBody();
-		//			SharedData->ClearSelectedConstraints();
-		//		}
-		//
-		//		SharedData->SetSelectedBody(Selection, true);
-		//	}
-		//
-		//	// Pop up menu, if we have a body selected.
-		//	if (SharedData->GetSelectedBody())
-		//	{
-		//		OpenBodyMenu(InViewportClient);
-		//	}
-		//
-		//	return true;
-		//}
-		//else if (hitProxy && hitProxy->IsA(HPhysicsAssetEditorEdConstraintProxy::StaticGetType()))
-		//{
-		//	HPhysicsAssetEditorEdConstraintProxy* ConstraintProxy = (HPhysicsAssetEditorEdConstraintProxy*)hitProxy;
-		//
-		//	// Select constraint under cursor if not already selected (if ctrl is held down we only add, not remove)
-		//	if (!SharedData->IsConstraintSelected(ConstraintProxy->ConstraintIndex))
-		//	{
-		//		if (!InViewportClient->IsCtrlPressed())
-		//		{
-		//			SharedData->ClearSelectedBody();
-		//			SharedData->ClearSelectedConstraints();
-		//		}
-		//
-		//		SharedData->SetSelectedConstraint(ConstraintProxy->ConstraintIndex, true);
-		//	}
-		//
-		//	// Pop up menu, if we have a constraint selected.
-		//	if (SharedData->GetSelectedConstraint())
-		//	{
-		//		OpenConstraintMenu(InViewportClient);
-		//	}
-		//
-		//	return true;
-		//}
-		//else
-		//{
-		//	OpenSelectionMenu(InViewportClient);
-		//	return true;
-		//}
+		UE_LOG(LogTemp, Warning, TEXT("xxxxxxxxx"));
+		UE_LOG(LogTemp, Warning, TEXT("function:%s line:%d"), TEXT(__FUNCTION__), __LINE__);
 	}
 
 	return false;
@@ -364,6 +308,62 @@ FVector UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::GetWidge
 {
 	FMatrix matrix(m_editor->GetWidgetMatrix());
 	return matrix.GetOrigin();
+}
+
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::StartTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport)
+{
+	check(m_editor);
+	if (m_editor->HaveSelection())
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("function:%s line:%d"), TEXT(__FUNCTION__), __LINE__);
+		const UE::Widget::EWidgetMode widgetMode = inViewportClient->GetWidgetMode();
+
+		if (widgetMode == UE::Widget::WM_Rotate)
+		{
+			GEditor->BeginTransaction(LOCTEXT("AnimationEditorViewport_RotateBone", "Rotate Bone"));
+		}
+		else
+		{
+			GEditor->BeginTransaction(LOCTEXT("AnimationEditorViewport_TranslateBone", "Translate Bone"));
+		}
+		m_inTransaction = true;
+		return true;
+	}
+
+	return false;
+}
+
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::EndTracking(FEditorViewportClient* inViewportClient, FViewport* inViewport)
+{
+	check(m_editor);
+	if (m_inTransaction)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("function:%s line:%d"), TEXT(__FUNCTION__), __LINE__);
+		m_inTransaction = false;
+		GEditor->EndTransaction();
+		return true;
+	}
+
+	return false;
+}
+
+bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::InputDelta(FEditorViewportClient* inViewportClient, FViewport* inViewport, FVector& inDrag, FRotator& inRot, FVector& inScale)
+{
+	const EAxisList::Type currentAxis = inViewportClient->GetCurrentWidgetAxis();
+	const UE::Widget::EWidgetMode widgetMode = inViewportClient->GetWidgetMode();
+	const ECoordSystem coordSystem = inViewportClient->GetWidgetCoordSystemSpace();
+
+	bool bHandled = false;
+	if (m_inTransaction && (currentAxis != EAxisList::None))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("function:%s line:%d"), TEXT(__FUNCTION__), __LINE__);
+		bHandled = true;
+
+		m_editor->ApplyDeltaTransform(inDrag, inRot, inScale);
+		inViewport->Invalidate();
+	}
+
+	return bHandled;
 }
 
 #undef LOCTEXT_NAMESPACE
