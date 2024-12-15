@@ -35,4 +35,13 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeJointHinge : public UNewtonModelNo
 	GENERATED_BODY()
 	public:
 	UNewtonModelNodeJointHinge();
+
+	UPROPERTY(EditAnywhere)
+	bool EnableLimits;
+
+	UPROPERTY(EditAnywhere)
+	float MinAngle;
+
+	UPROPERTY(EditAnywhere)
+	float MaxAngle;
 };

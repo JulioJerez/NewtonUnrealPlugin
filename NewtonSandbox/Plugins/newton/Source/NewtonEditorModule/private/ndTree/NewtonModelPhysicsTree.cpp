@@ -580,61 +580,64 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 {
 	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-		const TSharedRef<IEditableSkeleton> editSkeleton(item->GetSkeletonTree()->GetEditableSkeleton());
-		const FReferenceSkeleton& referenceSkeleton = editSkeleton->GetSkeleton().GetReferenceSkeleton();
-		const TArray<FMeshBoneInfo>& bonesInfo = referenceSkeleton.GetRefBoneInfo();
-
-		const FName boneName (item->GetAttachName());
-		for (int boneIndex = 0; boneIndex < bonesInfo.Num(); ++boneIndex)
+		UNewtonModelNodeRigidBody* const selectedNodyNode = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
+		check(selectedNodyNode);
+		if (selectedNodyNode->BoneIndex < 0)
 		{
-			const FMeshBoneInfo& info = bonesInfo[boneIndex];
-			if (info.Name == boneName)
+			//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+			const TSharedRef<IEditableSkeleton> editSkeleton(item->GetSkeletonTree()->GetEditableSkeleton());
+			const FReferenceSkeleton& referenceSkeleton = editSkeleton->GetSkeleton().GetReferenceSkeleton();
+			const TArray<FMeshBoneInfo>& bonesInfo = referenceSkeleton.GetRefBoneInfo();
+
+			const FName boneName (item->GetAttachName());
+			for (int boneIndex = 0; boneIndex < bonesInfo.Num(); ++boneIndex)
 			{
-				for (const TPair<FNewtonModelPhysicsTreeItem*, TSharedPtr<FNewtonModelPhysicsTreeItem>>& pair : m_items)
+				const FMeshBoneInfo& info = bonesInfo[boneIndex];
+				if (info.Name == boneName)
 				{
-					TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem(pair.Value);
-					if (bodyItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+					for (const TPair<FNewtonModelPhysicsTreeItem*, TSharedPtr<FNewtonModelPhysicsTreeItem>>& pair : m_items)
 					{
-						UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(bodyItem->Node);
-						if (bodyNode->BoneIndex == boneIndex)
+						TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem(pair.Value);
+						if (bodyItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
 						{
-							return;
+							UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(bodyItem->Node);
+							if (bodyNode->BoneIndex == boneIndex)
+							{
+								return;
+							}
 						}
 					}
-				}
 
-				UDebugSkelMeshComponent* const meshComponent = m_editor->GetSkelMeshComponent();
-				UNewtonModelNodeRigidBody* const bodyNodeInfo = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
-				FTransform boneTM(meshComponent->GetBoneTransform(boneIndex));
+					UDebugSkelMeshComponent* const meshComponent = m_editor->GetSkelMeshComponent();
+					UNewtonModelNodeRigidBody* const bodyNodeInfo = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
+					FTransform boneTM(meshComponent->GetBoneTransform(boneIndex));
 
-				bodyNodeInfo->Transform = boneTM;
-				bodyNodeInfo->BoneName = boneName;
-				bodyNodeInfo->BoneIndex = boneIndex;
-
-
-				if (m_selectedItem->m_acyclicGraph->m_parent)
-				{
-					TSharedPtr<FNewtonModelPhysicsTreeItem> parentItem(m_selectedItem->m_acyclicGraph->m_parent->m_item);
-					check (parentItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemJoint")));
-					UNewtonModelNodeJoint* const jointNodeInfo = Cast<UNewtonModelNodeJoint>(parentItem->Node);
-					check(jointNodeInfo);
-					jointNodeInfo->Transform = bodyNodeInfo->Transform;
-					jointNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
-				}
-
-				for (int i = m_selectedItem->m_acyclicGraph->m_children.Num() - 1; i >= 0; --i)
-				{
-					TSharedPtr<FNewtonModelPhysicsTreeItem> childItem (m_selectedItem->m_acyclicGraph->m_children[i]->m_item);
-					if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
+					bodyNodeInfo->Transform = boneTM;
+					bodyNodeInfo->BoneName = boneName;
+					bodyNodeInfo->BoneIndex = boneIndex;
+					if (m_selectedItem->m_acyclicGraph->m_parent)
 					{
-						UNewtonModelNodeCollision* const shapeNodeInfo = Cast<UNewtonModelNodeCollision>(childItem->Node);
-						check(shapeNodeInfo);
-						shapeNodeInfo->Transform = bodyNodeInfo->Transform;
-						shapeNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+						TSharedPtr<FNewtonModelPhysicsTreeItem> parentItem(m_selectedItem->m_acyclicGraph->m_parent->m_item);
+						check(parentItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemJoint")));
+						UNewtonModelNodeJoint* const jointNodeInfo = Cast<UNewtonModelNodeJoint>(parentItem->Node);
+						check(jointNodeInfo);
+						jointNodeInfo->Transform = bodyNodeInfo->Transform;
+						jointNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 					}
+
+					for (int i = m_selectedItem->m_acyclicGraph->m_children.Num() - 1; i >= 0; --i)
+					{
+						TSharedPtr<FNewtonModelPhysicsTreeItem> childItem(m_selectedItem->m_acyclicGraph->m_children[i]->m_item);
+						if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
+						{
+							UNewtonModelNodeCollision* const shapeNodeInfo = Cast<UNewtonModelNodeCollision>(childItem->Node);
+							check(shapeNodeInfo);
+							shapeNodeInfo->Transform = bodyNodeInfo->Transform;
+							shapeNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+						}
+					}
+					break;
 				}
-				break;
 			}
 		}
 	}

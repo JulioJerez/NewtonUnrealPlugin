@@ -27,5 +27,9 @@ UNewtonModelNodeJointHinge::UNewtonModelNodeJointHinge()
 	:Super()
 {
 	SetName(TEXT("NewHinge"));
+
+	EnableLimits = false;
+	MinAngle = -45.0f;
+	MaxAngle = 45.0f;
 }
 

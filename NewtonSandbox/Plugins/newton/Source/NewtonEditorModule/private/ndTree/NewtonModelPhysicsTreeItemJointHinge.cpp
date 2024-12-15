@@ -55,10 +55,51 @@ void FNewtonModelPhysicsTreeItemJointHinge::DebugDraw(const FSceneView* const vi
 
 	const FVector pinDir(matrix.GetUnitAxis(EAxis::X));
 	const FVector pingStart(matrix.GetOrigin());
-	const FVector pingEnd(pingStart + pinDir * (scale * 0.9f * 100.0f));
+	const FVector pingEnd(pingStart + pinDir * (scale * 0.5f * 100.0f));
 
 	FMatrix coneMatrix(matrix);
 	coneMatrix.SetOrigin(pingEnd);
 	DrawCone(pdi, coneMatrix, pinColor);
 	pdi->DrawLine(pingStart, pingEnd, pinColor, SDPG_Foreground, thickness);
+
+	if (jointNode->EnableLimits)
+	{
+		const int numSides = 16;
+		const float size = scale * 25.0f;
+		const float degToRad = PI / 180.0f;
+		const float angle = jointNode->MinAngle * degToRad;
+		const float deltaAngle = degToRad * (jointNode->MaxAngle - jointNode->MinAngle) / numSides;
+		const float sinAngle = FMath::Sin(angle);
+		const float cosAngle = FMath::Cos(angle);
+
+		FMatrix localRotation(FMatrix::Identity);
+		localRotation.M[1][1] = cosAngle;
+		localRotation.M[1][2] = sinAngle;
+		localRotation.M[2][2] = cosAngle;
+		localRotation.M[2][1] = -sinAngle;
+		FVector point(localRotation.TransformFVector4(FVector(0.0f, size, 0.0f)));
+
+		const float deltaSinAngle = FMath::Sin(deltaAngle);
+		const float deltaCosAngle = FMath::Cos(deltaAngle);
+		localRotation.M[1][1] = deltaCosAngle;
+		localRotation.M[1][2] = deltaSinAngle;
+		localRotation.M[2][2] = deltaCosAngle;
+		localRotation.M[2][1] = -deltaSinAngle;
+
+		FVector base[numSides + 1];
+
+		const FVector origin(matrix.GetOrigin());
+		for (int32 i = 0; i <= numSides; ++i)
+		{
+			FVector p(matrix.TransformFVector4(point));
+			base[i] = p;
+			pdi->DrawLine(origin, p, pinColor, SDPG_Foreground, thickness);
+			point = localRotation.TransformFVector4(point);
+		}
+
+		for (int32 i = 0; i < numSides; ++i)
+		{
+			pdi->DrawLine(base[i], base[i + 1], pinColor, SDPG_Foreground, thickness);
+		}
+	}
 }
