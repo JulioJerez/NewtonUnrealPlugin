@@ -36,16 +36,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeCollision : public UNewtonModelNod
 {
 	GENERATED_BODY()
 
-	//class GetShapeWireFrame;
 	public: 
 	UNewtonModelNodeCollision();
 
-	virtual void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const;
+	virtual ndShapeInstance CreateInstance() const;
+	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const;
 
-	protected:
-	void BuildDebugMesh(TArray<FVector>& wireFrameMesh, const ndShapeInstance& instance) const;
-
-	public:
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;
 };

@@ -37,7 +37,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelNodeCollisionBox : public UNewtonModel
 	public:
 	UNewtonModelNodeCollisionBox();
 
-	virtual void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const override;
+	ndShapeInstance CreateInstance() const override;
+	//virtual void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const override;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
 	float SizeX;

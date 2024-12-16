@@ -60,6 +60,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
 	friend class FNewtonModelPhysicsTree;
+	friend class FNewtonModelPhysicsTreeItemBody;
 	friend class FNewtonModelPhysicsTreeItemJoint;
 	friend class FNewtonModelPhysicsTreeItemShape;
 	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;

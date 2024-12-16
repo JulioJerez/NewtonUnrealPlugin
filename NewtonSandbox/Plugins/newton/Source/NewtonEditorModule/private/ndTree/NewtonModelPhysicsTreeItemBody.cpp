@@ -21,6 +21,7 @@
 
 
 #include "ndTree/NewtonModelPhysicsTreeItemBody.h"
+#include "ndTree/NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src)
 	:FNewtonModelPhysicsTreeItemBody(src)
@@ -111,11 +112,21 @@ FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
 	UNewtonModelNodeRigidBody* const bodyNode = Cast<UNewtonModelNodeRigidBody>(Node);
 	check(bodyNode);
 
-	TArray<const UNewtonModelNodeCollision*> childenShapes;
+	TArray<const UNewtonModelNodeCollision*> childrenShapes;
+	for (int i = m_acyclicGraph->m_children.Num() - 1; i >= 0; --i)
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> childItem(m_acyclicGraph->m_children[i]->m_item);
+		if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
+		{
+			childrenShapes.Push(Cast<UNewtonModelNodeCollision>(childItem->Node));
+		}
+	}
+
+
 	FMatrix matrix (bodyNode->Transform.ToMatrixNoScale());
 	if (bodyNode->ShowCenterOfMass)
 	{
-		const FVector com(bodyNode->CalculateLocalCenterOfMass(childenShapes) + bodyNode->CenterOfMass);
+		const FVector com(bodyNode->CalculateLocalCenterOfMass(childrenShapes) + bodyNode->CenterOfMass);
 		matrix.SetOrigin(matrix.TransformFVector4(com));
 	}
 	else

@@ -35,12 +35,20 @@ UNewtonModelNodeCollisionBox::UNewtonModelNodeCollisionBox()
 	SizeZ = 100.0f;
 }
 
-void UNewtonModelNodeCollisionBox::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
+//void UNewtonModelNodeCollisionBox::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
+//{
+//	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
+//	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
+//	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
+//
+//	ndShapeInstance instance(new ndShapeBox(x, y, z));
+//	BuildDebugMesh(wireFrameMesh, instance);
+//}
+
+ndShapeInstance UNewtonModelNodeCollisionBox::CreateInstance() const
 {
 	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
 	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
 	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
-
-	ndShapeInstance instance(new ndShapeBox(x, y, z));
-	BuildDebugMesh(wireFrameMesh, instance);
+	return ndShapeInstance (new ndShapeBox(x, y, z));
 }

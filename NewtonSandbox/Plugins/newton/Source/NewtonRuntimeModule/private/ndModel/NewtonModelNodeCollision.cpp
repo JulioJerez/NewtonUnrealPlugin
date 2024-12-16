@@ -31,12 +31,6 @@ UNewtonModelNodeCollision::UNewtonModelNodeCollision()
 
 void UNewtonModelNodeCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
 {
-	check(0);
-	//wireFrameMesh.Empty();
-}
-
-void UNewtonModelNodeCollision::BuildDebugMesh(TArray<FVector>& wireFrameMesh, const ndShapeInstance& instance) const
-{
 	class DebugWireframeMeshBuilder : public ndShapeDebugNotify
 	{
 		public:
@@ -46,12 +40,12 @@ void UNewtonModelNodeCollision::BuildDebugMesh(TArray<FVector>& wireFrameMesh, c
 		{
 			m_wireFrameMesh.Empty();
 		}
-	
+
 		void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
 		{
 			const ndVector q0(faceArray[vertexCount - 1].Scale(UNREAL_UNIT_SYSTEM));
 
-			FVector p0(float (q0.m_x), float(q0.m_y), float(q0.m_z));
+			FVector p0(float(q0.m_x), float(q0.m_y), float(q0.m_z));
 			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
 				const ndVector q(faceArray[i].Scale(UNREAL_UNIT_SYSTEM));
@@ -66,7 +60,49 @@ void UNewtonModelNodeCollision::BuildDebugMesh(TArray<FVector>& wireFrameMesh, c
 		TArray<FVector>& m_wireFrameMesh;
 	};
 
+	ndShapeInstance instance(CreateInstance());
 	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
 	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
 }
 
+//void UNewtonModelNodeCollision::BuildDebugMesh(TArray<FVector>& wireFrameMesh, const ndShapeInstance& instance) const
+//{
+//	class DebugWireframeMeshBuilder : public ndShapeDebugNotify
+//	{
+//		public:
+//		DebugWireframeMeshBuilder(TArray<FVector>& wireFrameMesh)
+//			:ndShapeDebugNotify()
+//			,m_wireFrameMesh(wireFrameMesh)
+//		{
+//			m_wireFrameMesh.Empty();
+//		}
+//	
+//		void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
+//		{
+//			const ndVector q0(faceArray[vertexCount - 1].Scale(UNREAL_UNIT_SYSTEM));
+//
+//			FVector p0(float (q0.m_x), float(q0.m_y), float(q0.m_z));
+//			for (ndInt32 i = 0; i < vertexCount; ++i)
+//			{
+//				const ndVector q(faceArray[i].Scale(UNREAL_UNIT_SYSTEM));
+//				const FVector p(float(q.m_x), float(q.m_y), float(q.m_z));
+//
+//				m_wireFrameMesh.Push(p);
+//				m_wireFrameMesh.Push(p0);
+//				p0 = p;
+//			}
+//		}
+//
+//		TArray<FVector>& m_wireFrameMesh;
+//	};
+//
+//	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
+//	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
+//}
+
+ndShapeInstance UNewtonModelNodeCollision::CreateInstance() const
+{
+	check(0);
+	ndShapeInstance instance(ndShapeInstance(new ndShapeNull()));
+	return instance;
+}
