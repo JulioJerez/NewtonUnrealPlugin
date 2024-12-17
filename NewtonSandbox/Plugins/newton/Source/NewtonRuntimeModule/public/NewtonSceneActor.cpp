@@ -296,16 +296,16 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 }
 
 	
-//#include "NewtonModel.h"
+//#include "NewtonLink.h"
 void ANewtonSceneActor::DebugNewonModel()
 {
 	//TArray<TObjectPtr<USceneComponent>> stack;
-	//TArray<TObjectPtr<UNewtonModel>> meshAsset;
+	//TArray<TObjectPtr<UNewtonAsset>> meshAsset;
 	//stack.Push(TObjectPtr<USceneComponent>(GetRootComponent()));
 	//while (stack.Num())
 	//{
 	//	TObjectPtr<USceneComponent> component(stack.Pop());
-	//	TObjectPtr<UNewtonModel> mesh(Cast<UNewtonModel>(component));
+	//	TObjectPtr<UNewtonAsset> mesh(Cast<UNewtonAsset>(component));
 	//	if (mesh)
 	//	{
 	//		meshAsset.Push(mesh);
@@ -318,7 +318,7 @@ void ANewtonSceneActor::DebugNewonModel()
 	//}
 	//if (meshAsset.Num())
 	//{
-	//	UNewtonModel* const xxx0 = meshAsset[0];
-	//	UNewtonModel* const xxx1 = meshAsset[0];
+	//	UNewtonAsset* const xxx0 = meshAsset[0];
+	//	UNewtonAsset* const xxx1 = meshAsset[0];
 	//}
 }
