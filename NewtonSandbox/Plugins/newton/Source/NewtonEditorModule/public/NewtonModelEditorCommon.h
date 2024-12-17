@@ -24,14 +24,14 @@
 
 #include "CoreMinimal.h"
 
-#include "ndModel/NewtonLink.h"
-#include "ndModel/NewtonAsset.h"
-#include "ndModel/NewtonLinkJoint.h"
-#include "ndModel/NewtonLinkCollision.h"
-#include "ndModel/NewtonLinkJointHinge.h"
-#include "ndModel/NewtonLinkCollisionBox.h"
-#include "ndModel/NewtonLinkRigidBodyRoot.h"
-#include "ndModel/NewtonLinkCollisionSphere.h"
+#include "NewtonLink.h"
+#include "NewtonAsset.h"
+#include "NewtonLinkJoint.h"
+#include "NewtonLinkCollision.h"
+#include "NewtonLinkJointHinge.h"
+#include "NewtonLinkCollisionBox.h"
+#include "NewtonLinkRigidBodyRoot.h"
+#include "NewtonLinkCollisionSphere.h"
 
 
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.2f
