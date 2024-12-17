@@ -581,7 +581,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 	{
 		UNewtonModelNodeRigidBody* const selectedNodyNode = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
 		check(selectedNodyNode);
-		if (selectedNodyNode->BoneIndex < 0)
+		if (selectedNodyNode->BoneIndex >= 0)
 		{
 			return;
 		}
@@ -684,6 +684,10 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 				UDebugSkelMeshComponent* const meshComponent = m_editor->GetSkelMeshComponent();
 				UNewtonModelNodeRigidBody* const bodyNodeInfo = Cast<UNewtonModelNodeRigidBody>(m_selectedItem->Node);
 				FTransform boneTM(meshComponent->GetBoneTransform(boneIndex));
+
+				bodyNodeInfo->Transform = boneTM;
+				bodyNodeInfo->BoneIndex = boneIndex;
+				bodyNodeInfo->BoneName = item->GetAttachName();
 
 				if (m_selectedItem->m_acyclicGraph->m_parent)
 				{

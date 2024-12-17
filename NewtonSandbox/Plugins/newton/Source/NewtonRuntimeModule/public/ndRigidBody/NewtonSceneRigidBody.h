@@ -22,33 +22,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ndRigidBody/NewtonRigidBody.h"
+#include "NewtonSceneRigidBody.generated.h"
 
-#include "UObject/Object.h"
-#include "NewtonCommons.h"
-#include "NewtonModel.generated.h"
-
-class UNewtonModelNodeRigidBodyRoot;
-
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
-class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
+/**
+ * 
+ */
+UCLASS(ClassGroup = NewtonScene, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+class NEWTONRUNTIMEMODULE_API UNewtonSceneRigidBody : public UNewtonRigidBody
 {
 	GENERATED_BODY()
+
 	public:
-	UNewtonModel();
+	UNewtonSceneRigidBody();
 
-	virtual void Serialize(FArchive& ar) override;
-
-	UPROPERTY()
-	UNewtonModelNodeRigidBodyRoot* RootBody;
-
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
-
-	UPROPERTY()
-	bool m_hideShapes;
-
-	UPROPERTY()
-	bool m_hideJoints;
-
+	void RemoveAllCollisions();
+	virtual ndShapeInstance* CreateCollision(const ndMatrix& bodyMatrix) const override;
 };
-

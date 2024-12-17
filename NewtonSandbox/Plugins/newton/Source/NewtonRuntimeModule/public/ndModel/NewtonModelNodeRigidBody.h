@@ -22,8 +22,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonModelNode.h"
-#include "NewtonRigidBody.h"
+#include "ndModel/NewtonModelNode.h"
+#include "ndRigidBody/NewtonRigidBody.h"
 #include "NewtonModelNodeRigidBody.generated.h"
 
 class UNewtonModelNodeCollision;

@@ -24,7 +24,6 @@
 
 #include "CoreMinimal.h"
 
-#include "GraphTestGraph.h"
 #include "ndModel/NewtonModel.h"
 #include "ndModel/NewtonModelNode.h"
 #include "ndModel/NewtonModelNodeJoint.h"

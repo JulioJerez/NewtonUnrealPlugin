@@ -19,36 +19,37 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#pragma once
 
-#include "CoreMinimal.h"
 
-#include "UObject/Object.h"
+#include "ndModel/NewtonModelNodeCollisionBox.h"
+
 #include "NewtonCommons.h"
-#include "NewtonModel.generated.h"
+#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-class UNewtonModelNodeRigidBodyRoot;
-
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
-class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
+UNewtonModelNodeCollisionBox::UNewtonModelNodeCollisionBox()
+	:Super()
 {
-	GENERATED_BODY()
-	public:
-	UNewtonModel();
+	SetName(TEXT("NewBox"));
 
-	virtual void Serialize(FArchive& ar) override;
+	SizeX = 100.0f;
+	SizeY = 100.0f;
+	SizeZ = 100.0f;
+}
 
-	UPROPERTY()
-	UNewtonModelNodeRigidBodyRoot* RootBody;
+//void UNewtonModelNodeCollisionBox::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
+//{
+//	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
+//	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
+//	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
+//
+//	ndShapeInstance instance(new ndShapeBox(x, y, z));
+//	BuildDebugMesh(wireFrameMesh, instance);
+//}
 
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
-
-	UPROPERTY()
-	bool m_hideShapes;
-
-	UPROPERTY()
-	bool m_hideJoints;
-
-};
-
+ndShapeInstance UNewtonModelNodeCollisionBox::CreateInstance() const
+{
+	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
+	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
+	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
+	return ndShapeInstance (new ndShapeBox(x, y, z));
+}

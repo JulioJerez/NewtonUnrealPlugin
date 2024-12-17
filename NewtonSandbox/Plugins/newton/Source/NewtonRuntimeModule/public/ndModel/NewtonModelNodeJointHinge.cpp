@@ -19,36 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#pragma once
+#include "ndModel/NewtonModelNodeJointHinge.h"
 
-#include "CoreMinimal.h"
-
-#include "UObject/Object.h"
 #include "NewtonCommons.h"
-#include "NewtonModel.generated.h"
+#include "ndModel/NewtonModelNodeRigidBody.h"
+#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-class UNewtonModelNodeRigidBodyRoot;
-
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
-class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
+UNewtonModelNodeJointHinge::UNewtonModelNodeJointHinge()
+	:Super()
 {
-	GENERATED_BODY()
-	public:
-	UNewtonModel();
+	SetName(TEXT("NewHinge"));
 
-	virtual void Serialize(FArchive& ar) override;
-
-	UPROPERTY()
-	UNewtonModelNodeRigidBodyRoot* RootBody;
-
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
-
-	UPROPERTY()
-	bool m_hideShapes;
-
-	UPROPERTY()
-	bool m_hideJoints;
-
-};
+	EnableLimits = false;
+	MinAngle = -45.0f;
+	MaxAngle = 45.0f;
+}
 

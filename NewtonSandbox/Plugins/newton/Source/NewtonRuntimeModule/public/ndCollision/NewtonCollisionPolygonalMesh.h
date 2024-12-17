@@ -22,33 +22,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ndCollision/NewtonCollision.h"
+#include "NewtonCollisionPolygonalMesh.generated.h"
 
-#include "UObject/Object.h"
-#include "NewtonCommons.h"
-#include "NewtonModel.generated.h"
 
-class UNewtonModelNodeRigidBodyRoot;
-
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
-class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
+/**
+ * 
+ */
+UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
+class UNewtonCollisionPolygonalMesh : public UNewtonCollision
 {
 	GENERATED_BODY()
+
+	class ndShapeStatic;
+	
 	public:
-	UNewtonModel();
+	// Sets default values for this component's properties
+	UNewtonCollisionPolygonalMesh();
+	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
-	virtual void Serialize(FArchive& ar) override;
+	protected:
+	virtual void Serialize(FArchive& Ar) override;
 
-	UPROPERTY()
-	UNewtonModelNodeRigidBodyRoot* RootBody;
+	virtual void ApplyPropertyChanges();
+	virtual ndShape* CreateShape() const;
+	virtual long long CalculateHash() const;
+	virtual ndShapeInstance* CreateInstanceShape() const;
+	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
 
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
-
-	UPROPERTY()
-	bool m_hideShapes;
-
-	UPROPERTY()
-	bool m_hideJoints;
-
+	TArray<int> m_indexData;
+	TArray<FVector3f> m_vetexData;
 };
-

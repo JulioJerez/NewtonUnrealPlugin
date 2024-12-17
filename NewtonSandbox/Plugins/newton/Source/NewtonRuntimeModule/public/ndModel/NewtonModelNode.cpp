@@ -19,36 +19,45 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#pragma once
 
-#include "CoreMinimal.h"
 
-#include "UObject/Object.h"
-#include "NewtonCommons.h"
-#include "NewtonModel.generated.h"
+#include "ndModel/NewtonModelNode.h"
 
-class UNewtonModelNodeRigidBodyRoot;
 
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
-class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
+#include "ndModel/NewtonModel.h"
+#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+
+UNewtonModelNode::UNewtonModelNode()
+	:Super()
 {
-	GENERATED_BODY()
-	public:
-	UNewtonModel();
+	Parent = nullptr;
 
-	virtual void Serialize(FArchive& ar) override;
+	m_hidden = false;
+	ShowDebug = true;
+}
 
-	UPROPERTY()
-	UNewtonModelNodeRigidBodyRoot* RootBody;
+void UNewtonModelNode::AttachNode(UNewtonModelNode* const node)
+{
+	node->Parent = this;
+	Children.Push(node);
+}
 
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
+void UNewtonModelNode::SetName(const TCHAR* const name)
+{
+	Name = FName(name);
+}
 
-	UPROPERTY()
-	bool m_hideShapes;
-
-	UPROPERTY()
-	bool m_hideJoints;
-
-};
+//bool UNewtonModelNode::ShouldDrawWidget() const
+//{
+//	return false;
+//}
+//
+//FMatrix UNewtonModelNode::GetWidgetMatrix() const
+//{
+//	return FMatrix::Identity;
+//}
+//
+//void UNewtonModelNode::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+//{
+//}
 

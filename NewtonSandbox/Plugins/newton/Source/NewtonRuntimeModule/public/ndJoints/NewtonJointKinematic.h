@@ -22,33 +22,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ndJoints/NewtonJoint.h"
+#include "NewtonJointKinematic.generated.h"
 
-#include "UObject/Object.h"
-#include "NewtonCommons.h"
-#include "NewtonModel.generated.h"
-
-class UNewtonModelNodeRigidBodyRoot;
-
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
-class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
+class ndWorld;
+class ANewtonWorldActor;
+/**
+ * 
+ */
+UCLASS(ClassGroup=(NewtonJoints), meta=(BlueprintSpawnableComponent))
+class UNewtonJointKinematic : public UNewtonJoint
 {
 	GENERATED_BODY()
+	
 	public:
-	UNewtonModel();
+	// Sets default values for this component's properties
+	UNewtonJointKinematic();
 
-	virtual void Serialize(FArchive& ar) override;
-
-	UPROPERTY()
-	UNewtonModelNodeRigidBodyRoot* RootBody;
-
-	UPROPERTY(EditAnywhere, Category = NewtonModel, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
-
-	UPROPERTY()
-	bool m_hideShapes;
-
-	UPROPERTY()
-	bool m_hideJoints;
-
+	protected:
+	virtual void DrawGizmo(float timestep) const override;
+	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
 };
-

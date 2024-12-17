@@ -22,7 +22,7 @@
 
 #include "FollowCameraComponent.h"
 
-#include "NewtonRigidBody.h"
+#include "ndRigidBody/NewtonRigidBody.h"
 
 
 void UFollowCameraComponent::PostLoad()
