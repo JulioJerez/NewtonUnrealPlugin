@@ -23,7 +23,14 @@
 #include "ndModel/NewtonModel.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include "GraphTestGraph.h"
+#if WITH_EDITOR
+#include "Editor.h"
+#include "ObjectTools.h"
+#include "UnrealEdGlobals.h"
+#include "Editor/UnrealEdEngine.h"
+#include "Rendering/SkeletalMeshRenderData.h"
+#endif
+
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonModel::UNewtonModel()
@@ -36,3 +43,20 @@ UNewtonModel::UNewtonModel()
 	m_hideJoints = false;
 }
 
+void UNewtonModel::Serialize(FArchive& ar)
+{
+	Super::Serialize(ar);
+
+#if WITH_EDITOR
+	// this is another moronic unreal quirk.
+	// force the Thumbnail module to render this thumbnail, so that I can be display on the asset browser.
+	if (SkeletalMeshAsset)
+	{
+		FSkeletalMeshRenderData* const renderData = SkeletalMeshAsset->GetResourceForRendering();
+		if (renderData && renderData->LODRenderData.Num())
+		{
+			ThumbnailTools::GenerateThumbnailForObjectToSaveToDisk(this);
+		}
+	}
+#endif
+}

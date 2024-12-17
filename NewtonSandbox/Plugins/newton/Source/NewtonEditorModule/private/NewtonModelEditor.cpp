@@ -240,9 +240,9 @@ void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEven
 					m_skeletalMeshAssetCached = m_newtonModel->SkeletalMeshAsset;
 					m_skeletonPhysicsTree->ResetSkeletalMesh();
 
-					// the person plugin doe no suppor recreation the viewport, nor it support chnaging the skeletal mesh,
-					// or skeleton, In fact almos nothong can be modifies afte the Parson tollkid is iniitialized, 
-					// the only solution to chnage the skeletan mesh, is to just close and re-open th eeditor
+					// persona plugin does not support recreation the viewport, nor it supports changing the skeletal mesh,
+					// or skeleton, In fact almost nothing can be modified after Parsona tollkid is initialized. 
+					// The only solution is to change the skeletal mesh, is to just close and re-open the editor.
 					FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("CloseAndReopenEditor", "you need to close and reopen the physics editor for this change to take place. All the Physics Tree data will be loss"));
 				}
 				break;

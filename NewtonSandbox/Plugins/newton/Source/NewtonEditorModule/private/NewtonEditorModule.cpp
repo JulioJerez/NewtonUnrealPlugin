@@ -13,6 +13,8 @@
 #include "testButtonCommands.h"
 
 #include "NewtonModelAction.h"
+#include "NewtonModelEditorCommon.h"
+#include "NewtonModelThumbnailRenderer.h"
 
 
 IMPLEMENT_MODULE(FNewtonEditorModule, NewtonEditorModule);
@@ -109,13 +111,15 @@ void FNewtonEditorModule::CreateIcons()
 	LoadIcon(TEXT("jointIcon.png"));
 	LoadIcon(TEXT("shapeIcon.png"));
 
+
+	//const FVector2D iconSize(16.0f, 16.0f);
 	//const FString iconPath(m_styleSet->RootToContentDir(TEXT("ndModelIcon.png")));
 	//FSlateImageBrush* const newtonIcon = new FSlateImageBrush(iconPath, iconSize);
 	//FSlateImageBrush* const nodeAddPinIcon = new FSlateImageBrush(iconPath, iconSize);
 	//FSlateImageBrush* const nodeDeletePinIcon = new FSlateImageBrush(iconPath, iconSize);
 	//FSlateImageBrush* const nodeDeleteNodeIcon = new FSlateImageBrush(iconPath, iconSize);
 	//FSlateImageBrush* const newtonThumbnail = new FSlateImageBrush(iconPath, iconSize);
-	//
+	
 	//m_styleSet->Set(TEXT("ClassIcon.NewtonModel"), newtonIcon);
 	//m_styleSet->Set(TEXT("ClassThumbnail.NewtonModel"), newtonThumbnail);
 	//m_styleSet->Set(TEXT("FNewtonModelEditor.NodeAddPinIcon"), nodeAddPinIcon);
@@ -123,6 +127,7 @@ void FNewtonEditorModule::CreateIcons()
 	//m_styleSet->Set(TEXT("FNewtonModelEditor.NodeDeleteNodeIcon"), nodeDeleteNodeIcon);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*m_styleSet);
+	UThumbnailManager::Get().RegisterCustomRenderer(UNewtonModel::StaticClass(), UNewtonModelThumbnailRenderer::StaticClass());
 }
 
 void FNewtonEditorModule::UnreagiterIcons()
@@ -133,10 +138,22 @@ void FNewtonEditorModule::UnreagiterIcons()
 		ensure(m_styleSet.IsUnique());
 		m_styleSet.Reset();
 	}
+
+	if (UObjectInitialized())
+	{
+		UThumbnailManager::Get().UnregisterCustomRenderer(UNewtonModelThumbnailRenderer::StaticClass());
+	}
 }
 
 void FNewtonEditorModule::RegisterNewtonModelEditor()
 {
+	// load dependency modules
+	FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
+	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+	FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
+	FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
+	FModuleManager::LoadModuleChecked<IPinnedCommandListModule>(TEXT("PinnedCommandList"));
+
 	// register the asset icon
 	CreateIcons();
 
@@ -150,11 +167,6 @@ void FNewtonEditorModule::RegisterNewtonModelEditor()
 	m_newtonModelAction = MakeShareable(new NewtonModelAction(assetType));
 	assetTools.RegisterAssetTypeActions(m_newtonModelAction.ToSharedRef());
 
-	// load dependency modules
-	FModuleManager::LoadModuleChecked<FPersonaModule>("Persona");
-	FModuleManager::LoadModuleChecked<ISkeletonEditorModule>("SkeletonEditor");
-	FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
-	FModuleManager::LoadModuleChecked<IPinnedCommandListModule>(TEXT("PinnedCommandList"));
 }
 
 void FNewtonEditorModule::UnregisterNewtonModelEditor()

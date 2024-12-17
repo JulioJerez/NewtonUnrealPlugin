@@ -37,6 +37,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UObject
 	public:
 	UNewtonModel();
 
+	virtual void Serialize(FArchive& ar) override;
+
 	UPROPERTY()
 	UNewtonModelNodeRigidBodyRoot* RootBody;
 

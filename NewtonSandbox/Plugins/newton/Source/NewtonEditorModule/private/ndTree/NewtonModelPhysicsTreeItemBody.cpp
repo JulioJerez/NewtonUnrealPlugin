@@ -85,12 +85,11 @@ void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FV
 			pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
 			pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
 		}
+		else if (bodyNode->Inertia.ShowPrincipalAxis)
+		{
+			check(0);
+		}
 	}
-	else
-	{
-		check(0);
-	}
-
 }
 
 bool FNewtonModelPhysicsTreeItemBody::HaveSelection() const

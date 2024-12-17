@@ -59,7 +59,6 @@ UClass* NewtonModelAction::GetSupportedClass() const
 
 void NewtonModelAction::GetActions(const TArray<UObject*>& InObjects, struct FToolMenuSection& Section)
 {
-
 }
 
 void NewtonModelAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TSharedPtr<class IToolkitHost> editWithinLevelEditor)
