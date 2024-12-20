@@ -54,9 +54,6 @@ class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
 	void GenerateLandScapeCollision(const ALandscapeProxy* const landscape);
 	void CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMeshComponent> staticComponent);
 
-
-	void DebugNewonModel();
-
 	bool m_propertyChanged;
 	friend class FNewtonRuntimeModule;
 };

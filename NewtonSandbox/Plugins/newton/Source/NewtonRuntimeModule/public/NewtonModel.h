@@ -23,21 +23,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ThumbnailHelpers.h"
-#include "ThumbnailRendering/ThumbnailRenderer.h"
-#include "NewtonModelThumbnailRenderer.generated.h"
+#include "Components/ActorComponent.h"
+#include "NewtonModel.generated.h"
 
-UCLASS()
-class UNewtonModelThumbnailRenderer : public UThumbnailRenderer
+class UNewtonAsset;
+
+UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 	public:
+	UNewtonModel();
 
-	virtual void BeginDestroy() override;
-	virtual bool CanVisualizeAsset(UObject* Object) override;
-	virtual EThumbnailRenderFrequency GetThumbnailRenderFrequency(UObject* Object) const override;
-	virtual void Draw(UObject* object, int32 x, int32 y, uint32 width, uint32 height, FRenderTarget* renderTarget, FCanvas* canvas, bool additionalViewFamily) override;
+	UPROPERTY(EditAnywhere, Category = Newton)
+	bool RegenerateBluePrint;
 
-	protected:
-	TObjectInstanceThumbnailScene<FSkeletalMeshThumbnailScene, 128> thumbnailSceneCache;
+	UPROPERTY(EditAnywhere, Category = Newton)
+	UNewtonAsset* NewtonAsset;
 };

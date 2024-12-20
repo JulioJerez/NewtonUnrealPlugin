@@ -26,9 +26,9 @@
 #include "UObject/NoExportTypes.h"
 #include "NewtonLink.generated.h"
 
-/**
- * 
- */
+
+class UNewtonModel;
+
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 {
@@ -38,6 +38,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 
 	void SetName(const TCHAR* const name);
 	virtual void AttachNode(UNewtonLink* const node);
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy();
 
 	UPROPERTY(EditAnywhere)
 	FName Name;

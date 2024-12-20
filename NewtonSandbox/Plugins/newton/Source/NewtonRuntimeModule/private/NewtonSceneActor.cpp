@@ -224,8 +224,6 @@ void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
 
 void ANewtonSceneActor::ApplyPropertyChanges()
 {
-	DebugNewonModel();
-
 	if (!m_propertyChanged)
 	{
 		return;
@@ -247,7 +245,13 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	FFolder folder(GetFolder());
 	if (folder.IsNone())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NewtonSceneActor must be child of an oulier folder filder"));
+		//const FName msg(TEXT("NewtonSceneActor must be child of a filter folder in the level editor outliner"));
+		//const FString msg(TEXT("NewtonSceneActor must be child of a filter folder in the level editor outliner"));
+		//const TCHAR* const msg = TEXT("NewtonSceneActor must be child of a filter folder in the level editor outliner");
+		#define msg TEXT("NewtonSceneActor must be child of a filter folder in the level editor outliner")
+
+		UE_LOG(LogTemp, Warning, msg);
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(msg));
 		return;
 	}
 	
@@ -293,32 +297,4 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 			GenerateStaticMeshCollision(sceneActor);
 		}
 	}
-}
-
-	
-//#include "NewtonLink.h"
-void ANewtonSceneActor::DebugNewonModel()
-{
-	//TArray<TObjectPtr<USceneComponent>> stack;
-	//TArray<TObjectPtr<UNewtonAsset>> meshAsset;
-	//stack.Push(TObjectPtr<USceneComponent>(GetRootComponent()));
-	//while (stack.Num())
-	//{
-	//	TObjectPtr<USceneComponent> component(stack.Pop());
-	//	TObjectPtr<UNewtonAsset> mesh(Cast<UNewtonAsset>(component));
-	//	if (mesh)
-	//	{
-	//		meshAsset.Push(mesh);
-	//	}
-	//	const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
-	//	for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-	//	{
-	//		stack.Push(children[i].Get());
-	//	}
-	//}
-	//if (meshAsset.Num())
-	//{
-	//	UNewtonAsset* const xxx0 = meshAsset[0];
-	//	UNewtonAsset* const xxx1 = meshAsset[0];
-	//}
 }

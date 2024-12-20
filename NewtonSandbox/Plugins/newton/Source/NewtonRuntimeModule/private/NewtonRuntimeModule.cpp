@@ -34,18 +34,15 @@
 #include "Interfaces/IPluginManager.h"
 #include "Components/LineBatchComponent.h"
 
-
-#include "NewtonSceneActor.h"
-#include "NewtonWorldActor.h"
+#include "NewtonModel.h"
 #include "NewtonJoint.h"
 #include "NewtonCollision.h"
 #include "NewtonRigidBody.h"
+#include "NewtonSceneActor.h"
+#include "NewtonWorldActor.h"
+#include "NewtonModelBlueprintBuilder.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-// there is a very serious bug in unreal build system that for some reason without 
-// the #undef UpdateResource is generates: 
-// error C3668: 'UTexture2DArray::UpdateResourceW': method with override specifier 
-//#undef UpdateResource
 IMPLEMENT_MODULE(FNewtonRuntimeModule, NewtonRuntimeModule);
 
 
@@ -362,6 +359,13 @@ void FNewtonRuntimeModule::UpdatePropertyChanges(const UWorld* const world) cons
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
+
+		UNewtonModel* const model = Cast<UNewtonModel>(actor->FindComponentByClass(UNewtonModel::StaticClass()));
+		if (model && model->RegenerateBluePrint)
+		{
+			UNewtonModelBlueprintBuilder::BuildModel(model);
+		}
+
 		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
 		{
 			bool propertyChange = false;
@@ -524,22 +528,21 @@ bool FNewtonRuntimeModule::Tick(float timestep)
 	else
 	{
 		#if WITH_EDITOR
-		const TIndirectArray<FWorldContext>& contexts = GEngine->GetWorldContexts();
+			const TIndirectArray<FWorldContext>& contexts = GEngine->GetWorldContexts();
 
-		//float persitentTimestep = timestep * 1.5f;
-		float persitentTimestep = ndClamp(timestep * 1.5f, 0.0f, 1.0f);
-		for (ndInt32 i = contexts.Num() - 1; i >= 0; --i)
-		{
-			const FWorldContext& context = contexts[i];
-			if (context.WorldType != EWorldType::PIE)
+			float persitentTimestep = ndClamp(timestep * 1.5f, 0.0f, 1.0f);
+			for (ndInt32 i = contexts.Num() - 1; i >= 0; --i)
 			{
-				UWorld* const world = context.World();
+				const FWorldContext& context = contexts[i];
+				if (context.WorldType != EWorldType::PIE)
+				{
+					UWorld* const world = context.World();
 
-				UpdatePropertyChanges(world);
-				CleanupDebugLines(world, timestep);
-				DrawGizmos(world, persitentTimestep);
+					UpdatePropertyChanges(world);
+					CleanupDebugLines(world, timestep);
+					DrawGizmos(world, persitentTimestep);
+				}
 			}
-		}
 		#endif
 	}
 

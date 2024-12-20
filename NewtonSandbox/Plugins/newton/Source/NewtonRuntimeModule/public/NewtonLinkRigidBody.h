@@ -35,6 +35,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkRigidBody : public UNewtonLink
 	public:
 	UNewtonLinkRigidBody();
 
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() override;
 	FVector CalculateLocalCenterOfMass(const TArray<const UNewtonLinkCollision*>& childenShapes) const;
 
 	UPROPERTY(VisibleAnywhere)

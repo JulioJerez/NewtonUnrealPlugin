@@ -20,9 +20,7 @@
 */
 
 
-
 #include "NewtonLink.h"
-
 
 #include "NewtonAsset.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
@@ -47,17 +45,9 @@ void UNewtonLink::SetName(const TCHAR* const name)
 	Name = FName(name);
 }
 
-//bool UNewtonLink::ShouldDrawWidget() const
-//{
-//	return false;
-//}
-//
-//FMatrix UNewtonLink::GetWidgetMatrix() const
-//{
-//	return FMatrix::Identity;
-//}
-//
-//void UNewtonLink::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
-//{
-//}
 
+TObjectPtr<USceneComponent> UNewtonLink::CreateBlueprintProxy()
+{
+	check(0);
+	return nullptr;
+}

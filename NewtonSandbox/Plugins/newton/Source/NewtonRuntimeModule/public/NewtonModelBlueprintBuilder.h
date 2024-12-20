@@ -23,21 +23,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ThumbnailHelpers.h"
-#include "ThumbnailRendering/ThumbnailRenderer.h"
-#include "NewtonModelThumbnailRenderer.generated.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "NewtonModelBlueprintBuilder.generated.h"
+
+
+class USCS_Node;
+class UNewtonModel;
 
 UCLASS()
-class UNewtonModelThumbnailRenderer : public UThumbnailRenderer
+class NEWTONRUNTIMEMODULE_API UNewtonModelBlueprintBuilder : public UBlueprintFunctionLibrary
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+	
 	public:
+	static void BuildModel(UNewtonModel* const model);
 
-	virtual void BeginDestroy() override;
-	virtual bool CanVisualizeAsset(UObject* Object) override;
-	virtual EThumbnailRenderFrequency GetThumbnailRenderFrequency(UObject* Object) const override;
-	virtual void Draw(UObject* object, int32 x, int32 y, uint32 width, uint32 height, FRenderTarget* renderTarget, FCanvas* canvas, bool additionalViewFamily) override;
-
-	protected:
-	TObjectInstanceThumbnailScene<FSkeletalMeshThumbnailScene, 128> thumbnailSceneCache;
+	private:
+	static bool UpdateModel(UNewtonModel* const model);
+	static void BuildHierarchy(UNewtonModel* const model);
+	//static USCS_Node* CreateRootBodyComponent(UNewtonModel* const model);
+	static void AddSkeletalMesh(UNewtonModel* const model, USCS_Node* const parent);
 };

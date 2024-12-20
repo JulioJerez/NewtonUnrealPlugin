@@ -77,8 +77,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonCollision : public UDynamicMeshComponent
 	ndShape* m_shape;
 	TObjectPtr<UMaterial> m_debugMaterial;
 	TSharedPtr<UE::Geometry::FDynamicMesh3> m_visualMesh;
-	bool m_propertyChanged;
+
 	bool m_showDebug;
+	bool m_propertyChanged;
 	bool m_debugVisualIsDirty;
 	friend class UNewtonRigidBody;
 	friend class FNewtonRuntimeModule;

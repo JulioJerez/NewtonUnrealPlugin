@@ -19,25 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "NewtonModel.h"
+#include "GameFramework/Actor.h"
 
-#pragma once
+#include "NewtonAsset.h"
+#include "NewtonModelBlueprintBuilder.h"
+#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-#include "CoreMinimal.h"
-#include "ThumbnailHelpers.h"
-#include "ThumbnailRendering/ThumbnailRenderer.h"
-#include "NewtonModelThumbnailRenderer.generated.h"
 
-UCLASS()
-class UNewtonModelThumbnailRenderer : public UThumbnailRenderer
+UNewtonModel::UNewtonModel()
+	:Super()
 {
-	GENERATED_UCLASS_BODY()
-	public:
+	NewtonAsset = nullptr;
+	RegenerateBluePrint = false;
+}
 
-	virtual void BeginDestroy() override;
-	virtual bool CanVisualizeAsset(UObject* Object) override;
-	virtual EThumbnailRenderFrequency GetThumbnailRenderFrequency(UObject* Object) const override;
-	virtual void Draw(UObject* object, int32 x, int32 y, uint32 width, uint32 height, FRenderTarget* renderTarget, FCanvas* canvas, bool additionalViewFamily) override;
-
-	protected:
-	TObjectInstanceThumbnailScene<FSkeletalMeshThumbnailScene, 128> thumbnailSceneCache;
-};

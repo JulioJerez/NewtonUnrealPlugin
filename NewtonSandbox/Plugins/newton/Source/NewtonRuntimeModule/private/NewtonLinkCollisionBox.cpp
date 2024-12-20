@@ -19,11 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-
 #include "NewtonLinkCollisionBox.h"
 
 #include "NewtonCommons.h"
+#include "NewtonCollisionBox.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkCollisionBox::UNewtonLinkCollisionBox()
@@ -36,20 +35,17 @@ UNewtonLinkCollisionBox::UNewtonLinkCollisionBox()
 	SizeZ = 100.0f;
 }
 
-//void UNewtonLinkCollisionBox::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
-//{
-//	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
-//	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
-//	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
-//
-//	ndShapeInstance instance(new ndShapeBox(x, y, z));
-//	BuildDebugMesh(wireFrameMesh, instance);
-//}
-
 ndShapeInstance UNewtonLinkCollisionBox::CreateInstance() const
 {
 	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
 	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
 	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
 	return ndShapeInstance (new ndShapeBox(x, y, z));
+}
+
+TObjectPtr<USceneComponent> UNewtonLinkCollisionBox::CreateBlueprintProxy()
+{
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonCollisionBox>(UNewtonCollisionBox::StaticClass(), Name, RF_Transient));
+
+	return component;
 }

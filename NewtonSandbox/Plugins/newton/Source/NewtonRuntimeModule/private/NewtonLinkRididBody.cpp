@@ -100,3 +100,11 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const TArray<const UNew
 
 	return com;
 }
+
+
+TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy()
+{
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonRigidBody>(UNewtonRigidBody::StaticClass(), Name, RF_Transient));
+
+	return component;
+}
