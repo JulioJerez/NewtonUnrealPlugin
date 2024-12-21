@@ -51,11 +51,13 @@ bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
 
 FMatrix FNewtonModelPhysicsTreeItemJoint::GetWidgetMatrix() const
 {
-	const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
-	check(jointNode);
-
-	check(jointNode);
-	return jointNode->Transform.ToMatrixNoScale();
+	check(0);
+	return FMatrix::Identity;
+	//const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
+	//check(jointNode);
+	//
+	//check(jointNode);
+	//return jointNode->Transform.ToMatrixNoScale();
 }
 
 bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
@@ -65,22 +67,22 @@ bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
 	return shapeNode->ShowDebug;
 }
 
-
 void FNewtonModelPhysicsTreeItemJoint::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
 	UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
 	check(jointNode);
 
-	// only allow rotation around the bone pivot. 
-	//jointNode->Transform.SetLocation(jointNode->Transform.GetLocation() + inDrag);
-
-	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
-	{
-		const FQuat deltaRot(inRot.Quaternion());
-		FQuat rotation(deltaRot * jointNode->Transform.GetRotation());
-		rotation.Normalize();
-		jointNode->Transform.SetRotation(rotation);
-	}
+	check(0);
+	//// only allow rotation around the bone pivot. 
+	////jointNode->Transform.SetLocation(jointNode->Transform.GetLocation() + inDrag);
+	//
+	//if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
+	//{
+	//	const FQuat deltaRot(inRot.Quaternion());
+	//	FQuat rotation(deltaRot * jointNode->Transform.GetRotation());
+	//	rotation.Normalize();
+	//	jointNode->Transform.SetRotation(rotation);
+	//}
 }
 
 void FNewtonModelPhysicsTreeItemJoint::DrawCone(FPrimitiveDrawInterface* const pdi, const FMatrix& matrix, const FColor& color) const

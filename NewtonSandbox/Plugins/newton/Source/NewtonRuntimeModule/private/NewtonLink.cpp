@@ -51,3 +51,22 @@ TObjectPtr<USceneComponent> UNewtonLink::CreateBlueprintProxy()
 	check(0);
 	return nullptr;
 }
+
+FTransform UNewtonLink::CalculateGlobalTransform() const
+{
+	FTransform transform(Transform);
+	for (UNewtonLink* parent = Parent; parent; parent = parent->Parent)
+	{
+		const FTransform parentTransform(parent->Transform);
+		transform = transform * parentTransform;
+	}
+	return transform;
+}
+
+void UNewtonLink::SetTransform(TObjectPtr<USceneComponent> component)
+{
+	// the object is not attach to the world yet, therefore the relative transform is the global tranform.
+	//component->SetRelativeTransform(Transform);
+	component->SetRelativeTransform(CalculateGlobalTransform());
+	component->UpdateComponentToWorld();
+}

@@ -23,6 +23,7 @@
 
 #include "NewtonCommons.h"
 #include "NewtonCollisionBox.h"
+#include "NewtonLinkRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkCollisionBox::UNewtonLinkCollisionBox()
@@ -45,7 +46,11 @@ ndShapeInstance UNewtonLinkCollisionBox::CreateInstance() const
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionBox::CreateBlueprintProxy()
 {
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonCollisionBox>(UNewtonCollisionBox::StaticClass(), Name, RF_Transient));
+	TObjectPtr<UNewtonCollisionBox> component(NewObject<UNewtonCollisionBox>(UNewtonCollisionBox::StaticClass(), Name, RF_Transient));
+	component->SizeX = SizeX;
+	component->SizeY = SizeY;
+	component->SizeZ = SizeZ;
 
+	SetTransform(component);
 	return component;
 }

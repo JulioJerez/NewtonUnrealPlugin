@@ -38,8 +38,5 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJoint : public UNewtonLink
 	UNewtonLinkJoint();
 
 	UPROPERTY(EditAnywhere)
-	FTransform Transform;
-
-	UPROPERTY(EditAnywhere)
 	float DebugScale;
 };

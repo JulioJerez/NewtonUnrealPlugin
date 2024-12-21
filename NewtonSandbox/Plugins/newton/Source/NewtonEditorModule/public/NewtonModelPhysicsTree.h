@@ -26,8 +26,8 @@
 
 #include "Widgets/SCompoundWidget.h"
 
+#define TREE_STACK_DEPTH	512
 
-#define TREE_STACK_DEPTH	256
 class ISkeletonTreeItem;
 class FNewtonModelEditor;
 class IPinnedCommandList;
@@ -68,8 +68,8 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	bool HaveSelection() const;
 	bool ShouldDrawWidget() const;
 	FMatrix GetWidgetMatrix() const;
-	void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) const;
 	void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
+	void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) const;
 	
 	//* SWidget overrides
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
@@ -107,10 +107,10 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	FNewtonModelEditor* m_editor;
 	TArray<TSharedPtr<FNewtonModelPhysicsTreeItem>> m_root;
 	
+	TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>> m_items;
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_selectedItem;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 	TSharedPtr<STreeView<TSharedPtr<FNewtonModelPhysicsTreeItem>>> m_treeView;
-	TMap<FNewtonModelPhysicsTreeItem*, TSharedPtr<FNewtonModelPhysicsTreeItem>> m_items;
 
 	// Commands that are bound to delegates
 	TSharedPtr<FUICommandList_Pinnable> UICommandList;

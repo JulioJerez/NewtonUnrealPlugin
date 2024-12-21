@@ -41,7 +41,4 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollision : public UNewtonLink
 
 	virtual ndShapeInstance CreateInstance() const;
 	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const;
-
-	UPROPERTY(EditAnywhere)
-	FTransform Transform;
 };

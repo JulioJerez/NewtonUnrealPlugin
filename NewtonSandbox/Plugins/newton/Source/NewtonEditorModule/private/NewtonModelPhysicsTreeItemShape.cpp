@@ -32,6 +32,12 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FN
 {
 	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(Node);
 	check(shapeNodeInfo);
+
+	check(m_parent);
+	const FTransform parentTranform(m_parent->CalculateGlobalTransform());
+	const FVector scale(parentTranform.GetScale3D());
+	shapeNodeInfo->Transform.SetScale3D(FVector(1.0f / scale.X, 1.0f / scale.Y, 1.0f / scale.Z));
+
 	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
 }
 
@@ -62,9 +68,10 @@ bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
 
 FMatrix FNewtonModelPhysicsTreeItemShape::GetWidgetMatrix() const
 {
-	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
-	check(shapeNode);
-	return shapeNode->Transform.ToMatrixNoScale();
+	//const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
+	//check(shapeNode);
+	//return shapeNode->Transform.ToMatrixNoScale();
+	return CalculateGlobalTransform().ToMatrixNoScale();
 }
 
 void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
@@ -72,21 +79,32 @@ void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag
 	UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
 	check(shapeNode);
 
-	shapeNode->Transform.SetLocation(shapeNode->Transform.GetLocation() + inDrag);
+	//UE_LOG(LogTemp, Warning, TEXT("%d %f %f %f"), mode, inDrag.X, inDrag.Y, inDrag.Z);
+	if ((inDrag.X != 0.0f) || (inDrag.Y != 0.0f) || (inDrag.Z != 0.0f))
+	{
+		const FTransform parentTransform(m_parent->CalculateGlobalTransform());
+		FTransform globalTransform(Node->Transform * parentTransform);
 
-	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
+		globalTransform.SetLocation(globalTransform.GetLocation() + inDrag);
+		shapeNode->Transform.SetLocation((globalTransform * parentTransform.Inverse()).GetLocation());
+	}
+
+	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0f) || (inRot.Roll != 0.0f))
 	{
 		const FQuat deltaRot(inRot.Quaternion());
 		FQuat rotation(deltaRot * shapeNode->Transform.GetRotation());
 		rotation.Normalize();
 		shapeNode->Transform.SetRotation(rotation);
 	}
-
-	FVector scale(shapeNode->Transform.GetScale3D() + inScale);
-	scale.X = (scale.X < 0.1f) ? 0.1f : scale.X;
-	scale.Y = (scale.Y < 0.1f) ? 0.1f : scale.Y;
-	scale.Z = (scale.Z < 0.1f) ? 0.1f : scale.Z;
-	shapeNode->Transform.SetScale3D(scale);
+	
+	if ((inScale.X != 0.0f) || (inScale.Y != 0.0f) || (inScale.Z != 0.0f))
+	{
+		FVector scale(shapeNode->Transform.GetScale3D() + inScale);
+		scale.X = (scale.X < 0.01f) ? 0.01f : scale.X;
+		scale.Y = (scale.Y < 0.01f) ? 0.01f : scale.Y;
+		scale.Z = (scale.Z < 0.01f) ? 0.01f : scale.Z;
+		shapeNode->Transform.SetScale3D(scale);
+	}
 }
 
 void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
@@ -108,7 +126,7 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 	}
 
 	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
-	const FTransform tranform(shapeNode->Transform);
+	const FTransform tranform(CalculateGlobalTransform());
 	for (int i = m_wireFrameMesh.Num() - 2; i >= 0; i -= 2)
 	{
 		FVector4 p0(tranform.TransformFVector4(m_wireFrameMesh[i + 0]));

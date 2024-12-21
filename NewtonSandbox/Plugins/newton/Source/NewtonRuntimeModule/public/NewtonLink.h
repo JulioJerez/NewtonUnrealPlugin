@@ -33,6 +33,7 @@ UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 {
 	GENERATED_BODY()
+
 	public:
 	UNewtonLink();
 
@@ -40,8 +41,15 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 	virtual void AttachNode(UNewtonLink* const node);
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy();
 
+	FTransform CalculateGlobalTransform() const;
+	void SetTransform(TObjectPtr<USceneComponent> component);
+
 	UPROPERTY(EditAnywhere)
 	FName Name;
+
+	// local space transform
+	UPROPERTY(EditAnywhere)
+	FTransform Transform;
 
 	UPROPERTY()
 	UNewtonLink* Parent;

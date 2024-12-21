@@ -42,18 +42,21 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	
 	FName GetDisplayName() const;
 	const FSlateBrush* GetIcon() const;
-	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected InIsSelected);
+	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected inIsSelected);
 
 	virtual bool HaveSelection() const;
 	virtual bool ShouldDrawWidget() const;
 	virtual FMatrix GetWidgetMatrix() const;
+
+	FTransform CalculateGlobalTransform() const;
+
 	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale);
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 
 	protected:
 	virtual FName BrushName() const;
 	virtual FString GetReferencerName() const override;
-	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+	virtual void AddReferencedObjects(FReferenceCollector& collector) override;
 
 	TObjectPtr<UNewtonLink> Node;
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;

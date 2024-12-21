@@ -349,16 +349,15 @@ bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::EndTracking
 
 bool UNewtonModelSkeletalMeshEditorMode::FSkeletonSelectionEditMode::InputDelta(FEditorViewportClient* inViewportClient, FViewport* inViewport, FVector& inDrag, FRotator& inRot, FVector& inScale)
 {
-	const EAxisList::Type currentAxis = inViewportClient->GetCurrentWidgetAxis();
-	const UE::Widget::EWidgetMode widgetMode = inViewportClient->GetWidgetMode();
-	const ECoordSystem coordSystem = inViewportClient->GetWidgetCoordSystemSpace();
-
 	bool bHandled = false;
+	const EAxisList::Type currentAxis = inViewportClient->GetCurrentWidgetAxis();
 	if (m_inTransaction && (currentAxis != EAxisList::None))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("function:%s line:%d"), TEXT(__FUNCTION__), __LINE__);
 		bHandled = true;
 
+		//const UE::Widget::EWidgetMode widgetMode = inViewportClient->GetWidgetMode();
+		//const ECoordSystem coordSystem = inViewportClient->GetWidgetCoordSystemSpace();
 		m_editor->ApplyDeltaTransform(inDrag, inRot, inScale);
 		inViewport->Invalidate();
 	}

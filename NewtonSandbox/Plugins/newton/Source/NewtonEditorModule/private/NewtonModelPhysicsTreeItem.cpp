@@ -111,7 +111,19 @@ bool FNewtonModelPhysicsTreeItem::ShouldDrawWidget() const
 
 FMatrix FNewtonModelPhysicsTreeItem::GetWidgetMatrix() const
 {
-	return FMatrix::Identity;
+	check(0);
+	return CalculateGlobalTransform().ToMatrixNoScale();
+}
+
+FTransform FNewtonModelPhysicsTreeItem::CalculateGlobalTransform() const
+{
+	FTransform transform(Node->Transform);
+	for (TSharedPtr<FNewtonModelPhysicsTreeItem> parent(m_parent); parent != nullptr; parent = parent->m_parent)
+	{
+		const FTransform parentTransform(parent->Node->Transform);
+		transform = transform * parentTransform;
+	}
+	return transform;
 }
 
 void FNewtonModelPhysicsTreeItem::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)

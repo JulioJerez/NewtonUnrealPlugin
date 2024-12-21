@@ -54,4 +54,6 @@ class UNewtonCollisionBox : public UNewtonCollision
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
 	float SizeZ;
+
+	friend class UNewtonLinkCollisionBox;
 };

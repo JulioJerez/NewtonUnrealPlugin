@@ -71,14 +71,12 @@ void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FV
 	{
 		if (bodyNode->ShowCenterOfMass)
 		{
-			// remember to get the com form the collision shape if there are some 
-			FTransform com(bodyNode->Transform);
-
+			const FTransform com(CalculateGlobalTransform());
 			const FVector position(com.GetLocation());
 			const FVector xAxis(com.GetUnitAxis(EAxis::X));
 			const FVector yAxis(com.GetUnitAxis(EAxis::Y));
 			const FVector zAxis(com.GetUnitAxis(EAxis::Z));
-
+			
 			float size = bodyNode->DebugScale * 25.0f;
 			float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
 			pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
@@ -108,9 +106,6 @@ bool FNewtonModelPhysicsTreeItemBody::ShouldDrawWidget() const
 
 FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
 {
-	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
-	check(bodyNode);
-
 	TArray<const UNewtonLinkCollision*> childrenShapes;
 	for (int i = m_acyclicGraph->m_children.Num() - 1; i >= 0; --i)
 	{
@@ -121,20 +116,23 @@ FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
 		}
 	}
 
+	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
+	check(bodyNode);
 
-	FMatrix matrix (bodyNode->Transform.ToMatrixNoScale());
+	const FTransform globalTransform(CalculateGlobalTransform());
+	FMatrix matrix (globalTransform.ToMatrixNoScale());
 	if (bodyNode->ShowCenterOfMass)
 	{
-		const FVector com(bodyNode->CalculateLocalCenterOfMass(childrenShapes) + bodyNode->CenterOfMass);
+		const FVector com(bodyNode->CalculateLocalCenterOfMass(globalTransform, childrenShapes) + bodyNode->CenterOfMass);
 		matrix.SetOrigin(matrix.TransformFVector4(com));
 	}
 	else
 	{
-		check(0);
-		check(bodyNode->Inertia.ShowPrincipalAxis);
-		matrix.SetOrigin(matrix.TransformFVector4(bodyNode->CenterOfMass));
+	//	check(0);
+	//	check(bodyNode->Inertia.ShowPrincipalAxis);
+	//	matrix.SetOrigin(matrix.TransformFVector4(bodyNode->CenterOfMass));
 	}
-
+	
 	return matrix;
 }
 
@@ -144,6 +142,7 @@ void FNewtonModelPhysicsTreeItemBody::ApplyDeltaTransform(const FVector& inDrag,
 	check(bodyNode);
 	if (bodyNode->ShowCenterOfMass)
 	{
+		check(0);
 		bodyNode->CenterOfMass += inDrag;
 	}
 	else

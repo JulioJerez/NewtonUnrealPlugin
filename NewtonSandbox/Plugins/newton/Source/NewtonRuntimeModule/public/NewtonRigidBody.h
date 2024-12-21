@@ -189,4 +189,5 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	friend class UNewtonCollision;
 	friend class ANewtonWorldActor;
 	friend class FNewtonRuntimeModule;
+	friend class UNewtonLinkRigidBody;
 };

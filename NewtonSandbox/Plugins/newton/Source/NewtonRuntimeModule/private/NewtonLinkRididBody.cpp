@@ -22,21 +22,20 @@
 #include "NewtonLinkRigidBody.h"
 
 #include "NewtonCommons.h"
+#include "NewtonRigidBody.h"
 #include "NewtonLinkCollision.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 	:Super()
 {
-	//;Transform	
-
 	SetName(TEXT("NewBody"));
 	BoneIndex = -1;
 
 	Mass = 1.0f;
+	DebugScale = 1.0f;
 	LinearDamp = 0.0f;
 	AngularDamp = 0.0f;
-	DebugScale = 1.0f;
 	AutoSleepMode = true;
 	ShowCenterOfMass = true;
 	//InitialVeloc(0.0f, 0.0f, 0.0f)
@@ -48,33 +47,29 @@ UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 	Inertia.PrincipalInertia = FVector(inertia, inertia, inertia);
 }
 
-FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const TArray<const UNewtonLinkCollision*>& childen) const
+FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childen) const
 {
 	FVector com(0.0f, 0.0f, 0.0f);
 	if (childen.Num() == 1)
 	{
 		ndBodyKinematic body;
-		const UNewtonLinkCollision* const shapeNopde = childen[0];
-		ndShapeInstance shape(shapeNopde->CreateInstance());
-
-		const ndMatrix bodyMatrix(ToNewtonMatrix(Transform));
-		const ndMatrix shapeMatrix(ToNewtonMatrix(shapeNopde->Transform));
-		const ndMatrix shapeLocalMatrix(shapeMatrix * bodyMatrix.OrthoInverse());
+		const UNewtonLinkCollision* const shapeNode = childen[0];
+		ndShapeInstance shape(shapeNode->CreateInstance());
+		
+		const ndMatrix bodyMatrix(ToNewtonMatrix(globalTransform));
+		const ndMatrix shapeLocalMatrix(ToNewtonMatrix(shapeNode->Transform));
+		FVector scale(globalTransform.GetScale3D() * shapeNode->Transform.GetScale3D());
 
 		body.SetMatrix(bodyMatrix);
-			
-		//FTransform tranform;
-		//tranform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
-		//const ndMatrix shapeInestiaMatrix(ToNewtonMatrix(tranform));
-		//shape->SetLocalMatrix(shapeInestiaMatrix * shapeLocalMatrix);
 		shape.SetLocalMatrix(shapeLocalMatrix);
-
+		shape.SetScale(ndVector(float(scale.X), float(scale.Y), float(scale.Z), float (1.0f)));
+				
 		bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
 		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
 		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
 		//body.SetIntrinsicMassMatrix(1.0fMass, shape, fullInertia);
 		body.SetIntrinsicMassMatrix(1.0f, shape, fullInertia);
-
+		
 		ndVector centerOfGravity(body.GetCentreOfMass());
 		//centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 		//centerOfGravity = matrix.TransformVector(centerOfGravity);
@@ -83,7 +78,7 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const TArray<const UNew
 		//const FRotator axisRot(tranform.GetRotation());
 		//const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
 		//DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);
-
+		
 		com.X = centerOfGravity.m_x * UNREAL_UNIT_SYSTEM;
 		com.Y = centerOfGravity.m_y * UNREAL_UNIT_SYSTEM;
 		com.Z = centerOfGravity.m_z * UNREAL_UNIT_SYSTEM;
@@ -93,8 +88,8 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const TArray<const UNew
 		check(0);
 		//for (int i = childen.Num() - 1; i >= 0; --i)
 		//{
-		//	const UNewtonLinkCollision* const shapeNopde = childen[i];
-		//	ndShapeInstance instance(shapeNopde->CreateInstance());
+		//	const UNewtonLinkCollision* const shapeNode = childen[i];
+		//	ndShapeInstance instance(shapeNode->CreateInstance());
 		//}
 	}
 
@@ -104,7 +99,10 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const TArray<const UNew
 
 TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy()
 {
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonRigidBody>(UNewtonRigidBody::StaticClass(), Name, RF_Transient));
-
+	TObjectPtr<UNewtonRigidBody> component(NewObject<UNewtonRigidBody>(UNewtonRigidBody::StaticClass(), Name, RF_Transient));
+	
+	component->Mass = Mass;
+	SetTransform(component);
+	
 	return component;
 }
