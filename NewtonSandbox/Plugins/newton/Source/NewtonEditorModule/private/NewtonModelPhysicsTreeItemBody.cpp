@@ -69,24 +69,17 @@ void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FV
 
 	if (bodyNode->BoneIndex >= 0)
 	{
-		if (bodyNode->ShowCenterOfMass)
-		{
-			const FTransform com(CalculateGlobalTransform());
-			const FVector position(com.GetLocation());
-			const FVector xAxis(com.GetUnitAxis(EAxis::X));
-			const FVector yAxis(com.GetUnitAxis(EAxis::Y));
-			const FVector zAxis(com.GetUnitAxis(EAxis::Z));
+		const FTransform com(CalculateGlobalTransform());
+		const FVector position(com.GetLocation());
+		const FVector xAxis(com.GetUnitAxis(EAxis::X));
+		const FVector yAxis(com.GetUnitAxis(EAxis::Y));
+		const FVector zAxis(com.GetUnitAxis(EAxis::Z));
 			
-			float size = bodyNode->DebugScale * 25.0f;
-			float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
-			pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
-			pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
-			pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
-		}
-		else if (bodyNode->Inertia.ShowPrincipalAxis)
-		{
-			check(0);
-		}
+		float size = bodyNode->DebugScale * 25.0f;
+		float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
+		pdi->DrawLine(position, position + size * xAxis, FColor::Red, SDPG_Foreground, thickness);
+		pdi->DrawLine(position, position + size * yAxis, FColor::Green, SDPG_Foreground, thickness);
+		pdi->DrawLine(position, position + size * zAxis, FColor::Blue, SDPG_Foreground, thickness);
 	}
 }
 
@@ -101,7 +94,7 @@ bool FNewtonModelPhysicsTreeItemBody::ShouldDrawWidget() const
 {
 	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
 	check(bodyNode);
-	return bodyNode->ShowDebug && (bodyNode->Inertia.ShowPrincipalAxis ^ bodyNode->ShowCenterOfMass);
+	return bodyNode->ShowDebug;
 }
 
 FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
@@ -120,19 +113,11 @@ FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
 	check(bodyNode);
 
 	const FTransform globalTransform(CalculateGlobalTransform());
-	FMatrix matrix (globalTransform.ToMatrixNoScale());
-	if (bodyNode->ShowCenterOfMass)
-	{
-		const FVector com(bodyNode->CalculateLocalCenterOfMass(globalTransform, childrenShapes) + bodyNode->CenterOfMass);
-		matrix.SetOrigin(matrix.TransformFVector4(com));
-	}
-	else
-	{
-	//	check(0);
-	//	check(bodyNode->Inertia.ShowPrincipalAxis);
-	//	matrix.SetOrigin(matrix.TransformFVector4(bodyNode->CenterOfMass));
-	}
-	
+	const FVector shapeCom(bodyNode->CalculateLocalCenterOfMass(globalTransform, childrenShapes));
+
+	FMatrix matrix(globalTransform.ToMatrixNoScale());
+	//matrix.SetOrigin(matrix.TransformFVector4(shapeCom + bodyNode->CenterOfMass));
+	matrix.SetOrigin(globalTransform.TransformFVector4(shapeCom + bodyNode->CenterOfMass));
 	return matrix;
 }
 
@@ -140,14 +125,12 @@ void FNewtonModelPhysicsTreeItemBody::ApplyDeltaTransform(const FVector& inDrag,
 {
 	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
 	check(bodyNode);
-	if (bodyNode->ShowCenterOfMass)
+
+	if ((inDrag.X != 0.0f) || (inDrag.Y != 0.0f) || (inDrag.Z != 0.0f))
 	{
-		check(0);
-		bodyNode->CenterOfMass += inDrag;
-	}
-	else
-	{
-		check(0);
-		check(bodyNode->Inertia.ShowPrincipalAxis);
+		//bodyNode->CenterOfMass += inDrag;
+		const FTransform globalTransform(CalculateGlobalTransform());
+		const FVector globalCom(globalTransform.TransformFVector4(bodyNode->CenterOfMass));
+		bodyNode->CenterOfMass = globalTransform.InverseTransformPosition(globalCom + inDrag);
 	}
 }

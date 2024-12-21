@@ -38,42 +38,18 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkRigidBody : public UNewtonLink
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() override;
 	FVector CalculateLocalCenterOfMass(const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childenShapes) const;
 
-	UPROPERTY(EditAnywhere)
-	float DebugScale;
-
-	UPROPERTY(EditAnywhere)
-	FVector CenterOfMass;
-
-	UPROPERTY(EditAnywhere)
-	bool ShowCenterOfMass;
-
-	UPROPERTY(EditAnywhere)
-	bool AutoSleepMode;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f))
-	float Mass;
-
-	UPROPERTY(EditAnywhere)
-	FNewtonRigidBodyInertia Inertia;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 1.0f))
-	float LinearDamp;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 1.0f))
-	float AngularDamp;
-
-	UPROPERTY(EditAnywhere)
-	FVector InitialVeloc;
-
-	UPROPERTY(EditAnywhere)
-	FVector InitialOmega;
-
-	UPROPERTY(EditAnywhere)
-	FVector Gravity;
-
 	UPROPERTY(VisibleAnywhere)
 	FName BoneName;
 
 	UPROPERTY(VisibleAnywhere)
 	int BoneIndex;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.1f))
+	float Mass;
+
+	UPROPERTY(EditAnywhere)
+	FVector CenterOfMass;
+
+	UPROPERTY(EditAnywhere)
+	float DebugScale;
 };

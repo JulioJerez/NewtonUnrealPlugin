@@ -34,17 +34,6 @@ UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 
 	Mass = 1.0f;
 	DebugScale = 1.0f;
-	LinearDamp = 0.0f;
-	AngularDamp = 0.0f;
-	AutoSleepMode = true;
-	ShowCenterOfMass = true;
-	//InitialVeloc(0.0f, 0.0f, 0.0f)
-	//InitialOmega(0.0f, 0.0f, 0.0f)
-	//CenterOfMass(0.0f, 0.0f, 0.0f)
-	Gravity = FVector(0.0f, 0.0f, -980.0f);
-
-	float inertia = (2.0f / 5.0f) * 0.5f * 0.5f;
-	Inertia.PrincipalInertia = FVector(inertia, inertia, inertia);
 }
 
 FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childen) const
@@ -63,21 +52,9 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const FTransform& globa
 		body.SetMatrix(bodyMatrix);
 		shape.SetLocalMatrix(shapeLocalMatrix);
 		shape.SetScale(ndVector(float(scale.X), float(scale.Y), float(scale.Z), float (1.0f)));
-				
-		bool fullInertia = ndAbs(Inertia.PrincipalInertiaAxis.Pitch) > 0.1f;
-		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Yaw) > 0.1f);
-		fullInertia = fullInertia || (ndAbs(Inertia.PrincipalInertiaAxis.Roll) > 0.1f);
-		//body.SetIntrinsicMassMatrix(1.0fMass, shape, fullInertia);
-		body.SetIntrinsicMassMatrix(1.0f, shape, fullInertia);
+		body.SetIntrinsicMassMatrix(1.0f, shape);
 		
 		ndVector centerOfGravity(body.GetCentreOfMass());
-		//centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-		//centerOfGravity = matrix.TransformVector(centerOfGravity);
-		//
-		//const FTransform tranform(ToUnRealTransform(matrix));
-		//const FRotator axisRot(tranform.GetRotation());
-		//const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
-		//DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);
 		
 		com.X = centerOfGravity.m_x * UNREAL_UNIT_SYSTEM;
 		com.Y = centerOfGravity.m_y * UNREAL_UNIT_SYSTEM;
@@ -95,7 +72,6 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const FTransform& globa
 
 	return com;
 }
-
 
 TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy()
 {
