@@ -55,8 +55,8 @@ void UNewtonCollisionSphere::InitStaticMeshCompoment(const USceneComponent* cons
 	const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
 	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
 
+	SetRelativeRotation_Direct(localTransform.Rotator());
 	SetRelativeScale3D_Direct(localTransform.GetScale3D());
-	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 	SetRelativeLocation_Direct(localTransform.GetLocation());
 
 	Radio = element.Radius;

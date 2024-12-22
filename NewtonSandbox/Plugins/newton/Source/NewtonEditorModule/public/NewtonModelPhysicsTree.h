@@ -61,6 +61,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void Construct(const FArguments& args, FNewtonModelEditor* const editor);
 
 	void SaveModel();
+	void FreezeBoneScale();
 	void ResetSkeletalMesh();
 	void DetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
 	void DetailViewBoneSelectedUpdated(const TSharedPtr<ISkeletonTreeItem>& item);
@@ -117,6 +118,8 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	// Pinned commands panel
 	TSharedPtr<IPinnedCommandList> PinnedCommands;
+
+	bool m_boneMappingMode;
 
 	static FName m_menuName;
 	static FName m_contextName;

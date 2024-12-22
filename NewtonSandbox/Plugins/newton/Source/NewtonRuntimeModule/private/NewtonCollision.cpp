@@ -99,12 +99,12 @@ UNewtonCollision::UNewtonCollision()
 	:Super()
 {
 	m_hash = 0;
+	BestFit = false;
 	m_shape = nullptr;
 	m_showDebug = false;
 	m_propertyChanged = true;
 	m_debugVisualIsDirty = false;
 
-	BestFit = false;
 	CastShadow = 0;
 	bExplicitShowWireframe = true;
 	m_visualMesh = TSharedPtr<UE::Geometry::FDynamicMesh3>(nullptr);
@@ -113,9 +113,6 @@ UNewtonCollision::UNewtonCollision()
 	m_debugMaterial = Cast<UMaterial>(TexObj.Object);
 	m_debugMaterial->OpacityMaskClipValue = 0.0f;
 
-	//UMaterialInstanceDynamic* const debugMaterialInstance = UMaterialInstanceDynamic::Create(m_debugMaterial, nullptr);
-	//debugMaterialInstance->OpacityMaskClipValue = 0.0f;
-	//SetMaterial(0, debugMaterialInstance);
 	SetMaterial(0, m_debugMaterial);
 }
 
@@ -151,12 +148,12 @@ void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 	const FTransform globalTransform(meshComponent->GetComponentToWorld());
 	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
 
-	SetComponentToWorld(globalTransform);
-
 	// for some reason, this does not work in the unreal editor
+	SetRelativeRotation_Direct(localTransform.Rotator());
 	SetRelativeScale3D_Direct(localTransform.GetScale3D());
-	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 	SetRelativeLocation_Direct(localTransform.GetLocation());
+
+	SetComponentToWorld(globalTransform);
 }
 
 void UNewtonCollision::InitStaticMeshCompoment(const USceneComponent* const meshComponent)

@@ -57,8 +57,8 @@ void UNewtonCollisionBox::InitStaticMeshCompoment(const USceneComponent* const m
 	const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
 	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
 
+	SetRelativeRotation_Direct(localTransform.Rotator());
 	SetRelativeScale3D_Direct(localTransform.GetScale3D());
-	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 	SetRelativeLocation_Direct(localTransform.GetLocation());
 
 	SizeX = element.X;
@@ -86,9 +86,9 @@ void UNewtonCollisionBox::ApplyPropertyChanges()
 	//		//SizeX = ndMax(float(bounds.BoxExtent.X * 2.0f), 2.0f);
 	//		//SizeY = ndMax(float(bounds.BoxExtent.Y * 2.0f), 2.0f);
 	//		//SizeZ = ndMax(float(bounds.BoxExtent.Z * 2.0f), 2.0f);
-	//		//FTransform tranform;
-	//		//tranform.SetLocation(bounds.Origin);
-	//		//SetRelativeTransform(tranform);
+	//		//FTransform transform;
+	//		//transform.SetLocation(bounds.Origin);
+	//		//SetRelativeTransform(transform);
 	//	}
 	//}
 

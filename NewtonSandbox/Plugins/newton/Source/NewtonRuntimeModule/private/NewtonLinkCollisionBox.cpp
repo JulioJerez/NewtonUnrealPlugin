@@ -44,13 +44,17 @@ ndShapeInstance UNewtonLinkCollisionBox::CreateInstance() const
 	return ndShapeInstance (new ndShapeBox(x, y, z));
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkCollisionBox::CreateBlueprintProxy()
+TObjectPtr<USceneComponent> UNewtonLinkCollisionBox::CreateBlueprintProxy() const
 {
 	TObjectPtr<UNewtonCollisionBox> component(NewObject<UNewtonCollisionBox>(UNewtonCollisionBox::StaticClass(), Name, RF_Transient));
-	component->SizeX = SizeX;
-	component->SizeY = SizeY;
-	component->SizeZ = SizeZ;
-
-	SetTransform(component);
 	return component;
+}
+
+void UNewtonLinkCollisionBox::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+{
+	UNewtonCollisionBox* const shape = Cast<UNewtonCollisionBox>(component.Get());
+
+	shape->SizeX = SizeX;
+	shape->SizeY = SizeY;
+	shape->SizeZ = SizeZ;
 }

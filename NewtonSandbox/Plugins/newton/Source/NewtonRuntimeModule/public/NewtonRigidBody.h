@@ -171,8 +171,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
 
-	//void CallBlueprintFunction(float timestep);
-
 	FVector m_localScale;
 	FVector m_globalScale;
 	FTransform m_localTransform;

@@ -38,7 +38,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionBox : public UNewtonLinkCollis
 	UNewtonLinkCollisionBox();
 
 	ndShapeInstance CreateInstance() const override;
-	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() override;
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
 	float SizeX;

@@ -58,10 +58,10 @@ FTransform ToUnRealTransform(const ndMatrix& matrix)
 	return transform;
 }
 
-ndMatrix ToNewtonMatrix(const FTransform& tranform)
+ndMatrix ToNewtonMatrix(const FTransform& transform)
 {
-	const FVector location(tranform.GetLocation());
-	const FQuat rotation(tranform.Rotator().Quaternion());
+	const FVector location(transform.GetLocation());
+	const FQuat rotation(transform.Rotator().Quaternion());
 
 	const ndQuaternion quat(ndFloat32(rotation.X), ndFloat32(rotation.Y), ndFloat32(rotation.Z), ndFloat32(rotation.W));
 	const ndVector posit(UNREAL_INV_UNIT_SYSTEM * ndFloat32(location.X), UNREAL_INV_UNIT_SYSTEM * ndFloat32(location.Y), UNREAL_INV_UNIT_SYSTEM * ndFloat32(location.Z), ndFloat32(1.0f));

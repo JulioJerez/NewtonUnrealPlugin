@@ -49,16 +49,17 @@ bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
 	return jointNode->ShowDebug;
 }
 
-FMatrix FNewtonModelPhysicsTreeItemJoint::GetWidgetMatrix() const
-{
-	check(0);
-	return FMatrix::Identity;
-	//const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
-	//check(jointNode);
-	//
-	//check(jointNode);
-	//return jointNode->Transform.ToMatrixNoScale();
-}
+//FMatrix FNewtonModelPhysicsTreeItemJoint::GetWidgetMatrix() const
+//{
+//	check(0);
+//	return FMatrix::Identity;
+//	//const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
+//	//check(jointNode);
+//	//
+//	//check(jointNode);
+//	//return jointNode->Transform.ToMatrixNoScale();
+//	return CalculateGlobalTransform().ToMatrixNoScale();
+//}
 
 bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
 {

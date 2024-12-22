@@ -67,41 +67,6 @@ void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) c
 	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
 }
 
-//void UNewtonLinkCollision::BuildDebugMesh(TArray<FVector>& wireFrameMesh, const ndShapeInstance& instance) const
-//{
-//	class DebugWireframeMeshBuilder : public ndShapeDebugNotify
-//	{
-//		public:
-//		DebugWireframeMeshBuilder(TArray<FVector>& wireFrameMesh)
-//			:ndShapeDebugNotify()
-//			,m_wireFrameMesh(wireFrameMesh)
-//		{
-//			m_wireFrameMesh.Empty();
-//		}
-//	
-//		void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
-//		{
-//			const ndVector q0(faceArray[vertexCount - 1].Scale(UNREAL_UNIT_SYSTEM));
-//
-//			FVector p0(float (q0.m_x), float(q0.m_y), float(q0.m_z));
-//			for (ndInt32 i = 0; i < vertexCount; ++i)
-//			{
-//				const ndVector q(faceArray[i].Scale(UNREAL_UNIT_SYSTEM));
-//				const FVector p(float(q.m_x), float(q.m_y), float(q.m_z));
-//
-//				m_wireFrameMesh.Push(p);
-//				m_wireFrameMesh.Push(p0);
-//				p0 = p;
-//			}
-//		}
-//
-//		TArray<FVector>& m_wireFrameMesh;
-//	};
-//
-//	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
-//	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
-//}
-
 ndShapeInstance UNewtonLinkCollision::CreateInstance() const
 {
 	check(0);

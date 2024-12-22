@@ -37,7 +37,7 @@ class FNewtonModelPhysicsTreeItemShape : public FNewtonModelPhysicsTreeItem
 
 	virtual bool HaveSelection() const override;
 	virtual bool ShouldDrawWidget() const override;
-	virtual FMatrix GetWidgetMatrix() const override;
+	//virtual FMatrix GetWidgetMatrix() const override;
 	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) override;
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 
