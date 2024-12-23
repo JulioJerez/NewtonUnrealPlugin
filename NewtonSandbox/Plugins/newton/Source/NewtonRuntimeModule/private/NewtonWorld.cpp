@@ -124,26 +124,19 @@ void NewtonWorld::StartGame()
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		const TSet<UActorComponent*>& components = actor->GetComponents();
+		for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
 		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			UNewtonRigidBody* const component = Cast<UNewtonRigidBody>(*it);
+			if (component)
 			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-				if (meshComp)
-				{
-					meshComp->CreateRigidBody(m_owner, m_owner->AutoSleepMode);
-				}
+				component->CreateRigidBody(m_owner, m_owner->AutoSleepMode);
 			}
 		}
-	}
-	
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+
+		for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
 		{
-			UNewtonJoint* const component = Cast<UNewtonJoint>(actor->FindComponentByClass(UNewtonJoint::StaticClass()));
+			UNewtonJoint* const component = Cast<UNewtonJoint>(*it);
 			if (component)
 			{
 				component->CreateJoint(m_owner);
@@ -388,32 +381,26 @@ void NewtonWorld::StartGame()
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		const TSet<UActorComponent*>& components = actor->GetComponents();
+		for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
 		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			UNewtonRigidBody* const component = Cast<UNewtonRigidBody>(*it);
+			if (component)
 			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-				if (meshComp)
-				{
-					meshComp->CreateRigidBody(m_owner, m_owner->AutoSleepMode);
-				}
+				component->CreateRigidBody(m_owner, m_owner->AutoSleepMode);
 			}
 		}
-	}
 
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
 		{
-			UNewtonJoint* const component = Cast<UNewtonJoint>(actor->FindComponentByClass(UNewtonJoint::StaticClass()));
+			UNewtonJoint* const component = Cast<UNewtonJoint>(*it);
 			if (component)
 			{
 				component->CreateJoint(m_owner);
 			}
 		}
 	}
+
 	m_timeAcc.store(0.0f);
 }
 

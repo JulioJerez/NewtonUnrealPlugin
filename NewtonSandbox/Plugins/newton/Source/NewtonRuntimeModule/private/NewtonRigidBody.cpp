@@ -536,7 +536,11 @@ ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) c
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
 		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 		{
-			stack.PushBack(childrenComp[i].Get());
+			USceneComponent* const childComponent = childrenComp[i].Get();
+			if (!(Cast<UNewtonRigidBody>(childComponent) || Cast<UNewtonJoint>(childComponent)))
+			{
+				stack.PushBack(childrenComp[i].Get());
+			}
 		}
 	}
 
