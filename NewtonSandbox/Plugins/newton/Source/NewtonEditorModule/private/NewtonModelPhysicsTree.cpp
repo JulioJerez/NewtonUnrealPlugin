@@ -216,7 +216,6 @@ bool FNewtonModelPhysicsTree::OnCanAddChildRow() const
 
 void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& shapeItem)
 {
-	//m_items.Add(&shapeItem.Get(), shapeItem);
 	m_items.Add(shapeItem);
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(shapeItem, m_selectedItem->m_acyclicGraph);
 
@@ -224,13 +223,7 @@ void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTr
 	check(shapeItem->m_parent->Node->Transform.GetScale3D().X == 1.0f);
 	check(shapeItem->m_parent->Node->Transform.GetScale3D().Y == 1.0f);
 	check(shapeItem->m_parent->Node->Transform.GetScale3D().Z == 1.0f);
-
-	//UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(item->Node);
-	//check(shapeNodeInfo);
-	//UNewtonLinkRigidBody* const bodyNodeInfo = Cast<UNewtonLinkRigidBody>(item->m_parent->Node);
-	//check(bodyNodeInfo);
-	//shapeNodeInfo->Transform = bodyNodeInfo->Transform;
-	//shapeNodeInfo->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+	shapeItem->Node->Transform = FTransform();
 
 	RefreshView();
 }
@@ -748,10 +741,10 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 
 				for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
 				{
-					TSharedPtr<FNewtonModelPhysicsTreeItem> item(*it);
-					if (item->IsOfRttiByName(TEXT("UNewtonLinkRigidBody")))
+					TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
+					if (itemInSet->IsOfRttiByName(TEXT("UNewtonLinkRigidBody")))
 					{
-						UNewtonLinkRigidBody* const node = Cast<UNewtonLinkRigidBody>(item->Node);
+						UNewtonLinkRigidBody* const node = Cast<UNewtonLinkRigidBody>(itemInSet->Node);
 						check(node);
 						if (node->BoneIndex == boneIndex)
 						{

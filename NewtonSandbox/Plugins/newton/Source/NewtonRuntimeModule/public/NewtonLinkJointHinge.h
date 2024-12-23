@@ -33,8 +33,12 @@ UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLinkJointHinge : public UNewtonLinkJoint
 {
 	GENERATED_BODY()
+
 	public:
 	UNewtonLinkJointHinge();
+
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
 
 	UPROPERTY(EditAnywhere)
 	bool EnableLimits;

@@ -22,7 +22,9 @@
 #include "NewtonLinkJointHinge.h"
 
 #include "NewtonCommons.h"
+#include "NewtonJointHinge.h"
 #include "NewtonLinkRigidBody.h"
+
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkJointHinge::UNewtonLinkJointHinge()
@@ -35,3 +37,17 @@ UNewtonLinkJointHinge::UNewtonLinkJointHinge()
 	MaxAngle = 45.0f;
 }
 
+TObjectPtr<USceneComponent> UNewtonLinkJointHinge::CreateBlueprintProxy() const
+{
+	TObjectPtr<UNewtonJointHinge> component(NewObject<UNewtonJointHinge>(UNewtonJointHinge::StaticClass(), Name, RF_Transient));
+	return component;
+}
+
+void UNewtonLinkJointHinge::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+{
+	UNewtonJointHinge* const joint = Cast<UNewtonJointHinge>(component.Get());
+
+	joint->EnableLimits = EnableLimits;
+	joint->MinAngle = MinAngle;
+	joint->MaxAngle = MaxAngle;
+}
