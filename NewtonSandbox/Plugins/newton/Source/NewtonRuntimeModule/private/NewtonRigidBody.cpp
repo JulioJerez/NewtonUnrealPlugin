@@ -171,6 +171,7 @@ UNewtonRigidBody::UNewtonRigidBody()
 	:Super()
 	,ShowDebug(false)
 	,ShowCenterOfMass(false)
+	,SelfSkeletonCollidable(false)
 	,AutoSleepMode(true)
 	,DebugScale(1.0f)
 	,Mass(0.0f)
@@ -484,6 +485,7 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 	m_body->SetCentreOfMass(centerOfGravity);
 
+	m_body->SetSeletonSelfCollision(SelfSkeletonCollidable);
 	m_body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
 	m_body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
 

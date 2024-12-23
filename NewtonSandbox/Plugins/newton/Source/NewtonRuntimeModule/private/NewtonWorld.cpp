@@ -33,6 +33,17 @@ class NewtonWorld::PhysicsEngine : public ndWorld
 	PhysicsEngine()
 		:ndWorld()
 	{
+		m_initiladed = false;
+	}
+
+	void PreUpdate(ndFloat32 timestep) override
+	{
+		ndWorld::PreUpdate(timestep);
+		if (!m_initiladed)
+		{
+			m_initiladed = true;
+			check(ValidateScene());
+		}
 	}
 
 	void UpdateTransforms() override
@@ -54,6 +65,8 @@ class NewtonWorld::PhysicsEngine : public ndWorld
 			}
 		}
 	}
+
+	bool m_initiladed;
 };
 
 #ifndef D_USING_UNREAL_TRHEADS

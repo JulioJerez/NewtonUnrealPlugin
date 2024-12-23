@@ -142,6 +142,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	bool ShowCenterOfMass;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
+	bool SelfSkeletonCollidable;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
 	bool AutoSleepMode;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.1f, ClampMax = 4.0f))

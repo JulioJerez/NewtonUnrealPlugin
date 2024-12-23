@@ -395,7 +395,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
@@ -414,7 +414,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
@@ -436,7 +436,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
@@ -459,7 +459,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
