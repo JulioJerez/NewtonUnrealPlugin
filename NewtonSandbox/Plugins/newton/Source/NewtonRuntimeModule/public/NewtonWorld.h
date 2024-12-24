@@ -28,7 +28,7 @@
 class ndWorld;
 class ANewtonWorldActor;
 
-#define D_USING_UNREAL_TRHEADS
+//#define D_USING_UNREAL_TRHEADS
 
 #ifndef D_USING_UNREAL_TRHEADS
 

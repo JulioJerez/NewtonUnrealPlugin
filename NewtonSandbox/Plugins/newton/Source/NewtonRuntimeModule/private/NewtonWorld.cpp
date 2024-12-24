@@ -44,6 +44,7 @@ class NewtonWorld::PhysicsEngine : public ndWorld
 			m_initiladed = true;
 			check(ValidateScene());
 		}
+		check(ValidateScene());
 	}
 
 	void UpdateTransforms() override

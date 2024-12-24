@@ -1293,20 +1293,12 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable)
 		{
-			bool seflSkelCollidable = body0->GetSeletonSelfCollision() && body1->GetSeletonSelfCollision();
-			if (!seflSkelCollidable)
-			{
-				seflSkelCollidable = true;
-				const ndSkeletonContainer* const skel0 = body0->GetSkeleton();
-				const ndSkeletonContainer* const skel1 = body1->GetSkeleton();
-				if (skel0 == skel1)
-				{
-					
-					seflSkelCollidable = false;
-				}
-			}
+			const ndSkeletonContainer* const skel0 = body0->GetSkeleton();
+			const ndSkeletonContainer* const skel1 = body1->GetSkeleton();
 
-			if (seflSkelCollidable)
+			bool selfSkelCollidable = body0->GetSeletonSelfCollision() && body1->GetSeletonSelfCollision();
+			selfSkelCollidable = selfSkelCollidable || !(skel0 && skel1 && (skel0 == skel1));
+			if (selfSkelCollidable)
 			{
 				ndArray<ndContactPairs>& particalPairs = m_partialNewPairs[threadId];
 				ndContactPairs pair(ndUnsigned32(body0->m_index), ndUnsigned32(body1->m_index));

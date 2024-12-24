@@ -50,7 +50,7 @@ ndBody::ndBody()
 	,m_isConstrained(0)
 	,m_sceneForceUpdate(1)
 	,m_sceneEquilibrium(0)
-	,m_skeletonSelCollision(1)
+	,m_skeletonSelfCollision(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -99,12 +99,12 @@ ndBody::~ndBody()
 
 bool ndBody::GetSeletonSelfCollision() const
 {
-	return m_skeletonSelCollision ? true : false;
+	return m_skeletonSelfCollision ? true : false;
 }
 
 void ndBody::SetSeletonSelfCollision(bool state)
 {
-	m_skeletonSelCollision = state ? 1 : 0;
+	m_skeletonSelfCollision = state ? 1 : 0;
 }
 
 ndUnsigned32 ndBody::GetId() const

@@ -131,7 +131,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndUnsigned8 m_isConstrained;
 	ndUnsigned8 m_sceneForceUpdate;
 	ndUnsigned8 m_sceneEquilibrium;
-	ndUnsigned8 m_skeletonSelCollision;
+	ndUnsigned8 m_skeletonSelfCollision;
 	
 	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 
