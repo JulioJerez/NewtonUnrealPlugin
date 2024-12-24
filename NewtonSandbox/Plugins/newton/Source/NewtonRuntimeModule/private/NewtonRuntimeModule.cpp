@@ -275,7 +275,7 @@ void FNewtonRuntimeModule::DrawGizmos(const UWorld* const world, float timestep)
 				}
 
 				const UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
-				if (joint)
+				if (joint && joint->ShowDebug)
 				{
 					joint->DrawGizmo(timestep);
 				}
