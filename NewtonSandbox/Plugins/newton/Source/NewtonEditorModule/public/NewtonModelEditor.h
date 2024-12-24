@@ -83,7 +83,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	
 	void OnSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& InSelectedItems, ESelectInfo::Type InSelectInfo);
 
-
 	// Toolkit methods
 	virtual void OnClose() override;
 	virtual FName GetToolkitFName() const override;
@@ -92,7 +91,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override;
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override;
-	
 	
 	void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
@@ -105,7 +103,8 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	TObjectPtr<USkeletalMesh> m_skeletalMeshAssetCached;
 
 	// Skeleton tree
-	TSharedPtr<ISkeletonTree> SkeletonTree;
+	TSharedPtr<ISkeletonTree> m_skeletonTree;
+	TSharedPtr<ISkeletonTreeItem> m_selectedBone;
 
 	// Skeleton physics tree
 	TSharedPtr<FNewtonModelPhysicsTree> m_skeletonPhysicsTree;

@@ -32,8 +32,8 @@ UNewtonSceneRigidBody::UNewtonSceneRigidBody()
 {
 	const FTransform transform;
 	SetComponentToWorld(transform);
+	SetRelativeRotation_Direct(transform.Rotator());
 	SetRelativeScale3D_Direct(transform.GetScale3D());
-	SetRelativeRotation_Direct(FRotator(transform.GetRotation()));
 	SetRelativeLocation_Direct(transform.GetLocation());
 }
 

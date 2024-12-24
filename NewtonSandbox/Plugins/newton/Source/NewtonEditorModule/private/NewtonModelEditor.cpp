@@ -56,9 +56,10 @@ FNewtonModelEditor::FNewtonModelEditor()
 	,IHasPersonaToolkit()
 {
 	m_modelSaved = false;
-	SkeletonTree = nullptr;
 	m_newtonModel = nullptr;
 	PersonaToolkit = nullptr;
+	m_skeletonTree = nullptr;
+	m_selectedBone = nullptr;
 	m_selectedNodeDetailView = nullptr;
 	m_skeletalMeshAssetCached = nullptr;
 }
@@ -79,7 +80,7 @@ TSharedPtr<FNewtonModelEditorBinding> FNewtonModelEditor::GetBinding()
 
 TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
 { 
-	return SkeletonTree.ToSharedRef(); 
+	return m_skeletonTree.ToSharedRef(); 
 }
 
 UDebugSkelMeshComponent* FNewtonModelEditor::GetSkelMeshComponent() const
@@ -184,10 +185,12 @@ void FNewtonModelEditor::OnNodeDetailViewPropertiesUpdated(const FPropertyChange
 void FNewtonModelEditor::OnSkeletalMeshSelectionChanged(const TArrayView<TSharedPtr<ISkeletonTreeItem>>& selectedItem, ESelectInfo::Type InSelectInfo)
 {
 	check(m_skeletonPhysicsTree.IsValid());
-	if (selectedItem.Num() && selectedItem[0].IsValid())
-	{
-		m_skeletonPhysicsTree->DetailViewBoneSelectedUpdated(selectedItem[0]);
-	}
+	//if (selectedItem.Num() && selectedItem[0].IsValid())
+	//{
+	//	m_skeletonPhysicsTree->DetailViewBoneSelectedUpdated(selectedItem[0]);
+	//}
+	m_selectedBone = (selectedItem.Num() && selectedItem[0].IsValid()) ? selectedItem[0] : nullptr;
+	m_skeletonPhysicsTree->DetailViewBoneSelectedUpdated(m_selectedBone);
 }
 
 // for some reason this doesn't fucking works. 
@@ -315,7 +318,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	skeletonTreeArgs.bAllowSkeletonOperations = false;
 	skeletonTreeArgs.bShowDebugVisualizationOptions = true;
 	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::OnSkeletalMeshSelectionChanged);
-	SkeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
+	m_skeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
 	
 	// create a acyclic physics tree widgets for physic model.
 	m_skeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
@@ -327,7 +330,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	AddApplicationMode(
 		NewtonModelEditorMode::m_editorModelName,
-		MakeShareable(new NewtonModelEditorMode(SharedThis(this), SkeletonTree.ToSharedRef())));
+		MakeShareable(new NewtonModelEditorMode(SharedThis(this), m_skeletonTree.ToSharedRef())));
 
 	SetCurrentMode(NewtonModelEditorMode::m_editorModelName);
 	

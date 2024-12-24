@@ -111,7 +111,6 @@ bool FNewtonModelPhysicsTreeItem::ShouldDrawWidget() const
 
 FMatrix FNewtonModelPhysicsTreeItem::GetWidgetMatrix() const
 {
-	check(0);
 	return CalculateGlobalTransform().ToMatrixNoScale();
 }
 

@@ -66,13 +66,13 @@ bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
 	return shapeNode->ShowDebug;
 }
 
-FMatrix FNewtonModelPhysicsTreeItemShape::GetWidgetMatrix() const
-{
-	//const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
-	//check(shapeNode);
-	//return shapeNode->Transform.ToMatrixNoScale();
-	return CalculateGlobalTransform().ToMatrixNoScale();
-}
+//FMatrix FNewtonModelPhysicsTreeItemShape::GetWidgetMatrix() const
+//{
+//	//const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
+//	//check(shapeNode);
+//	//return shapeNode->Transform.ToMatrixNoScale();
+//	return CalculateGlobalTransform().ToMatrixNoScale();
+//}
 
 void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
@@ -126,11 +126,11 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 	}
 
 	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
-	const FTransform tranform(CalculateGlobalTransform());
+	const FTransform transform(CalculateGlobalTransform());
 	for (int i = m_wireFrameMesh.Num() - 2; i >= 0; i -= 2)
 	{
-		FVector4 p0(tranform.TransformFVector4(m_wireFrameMesh[i + 0]));
-		FVector4 p1(tranform.TransformFVector4(m_wireFrameMesh[i + 1]));
+		FVector4 p0(transform.TransformFVector4(m_wireFrameMesh[i + 0]));
+		FVector4 p1(transform.TransformFVector4(m_wireFrameMesh[i + 1]));
 		pdi->DrawLine(p0, p1, FColor::Blue, SDPG_Foreground, thickness);
 	}
 }

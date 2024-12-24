@@ -120,8 +120,8 @@ void UNewtonCollisionConvexHull::SetTransform(const USceneComponent* const meshC
 	SetComponentToWorld(meshGlobalTransform);
 
 	// for some reason, this does not work in the unreal editor
+	SetRelativeRotation_Direct(localTransform.Rotator());
 	SetRelativeScale3D_Direct(localTransform.GetScale3D());
-	SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 	SetRelativeLocation_Direct(localTransform.GetLocation());
 }
 
@@ -142,8 +142,8 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 			{
 				const FTransform localTransform;
 				SetComponentToWorld(parent->GetComponentToWorld());
+				SetRelativeRotation_Direct(localTransform.Rotator());
 				SetRelativeScale3D_Direct(localTransform.GetScale3D());
-				SetRelativeRotation_Direct(FRotator(localTransform.GetRotation()));
 				SetRelativeLocation_Direct(localTransform.GetLocation());
 				GenerateMesh(parent);
 			}

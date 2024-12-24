@@ -73,12 +73,22 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const FTransform& globa
 	return com;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy()
+TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy() const
 {
 	TObjectPtr<UNewtonRigidBody> component(NewObject<UNewtonRigidBody>(UNewtonRigidBody::StaticClass(), Name, RF_Transient));
-	
-	component->Mass = Mass;
-	SetTransform(component);
-	
 	return component;
+}
+
+void UNewtonLinkRigidBody::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+{
+	UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component.Get());
+	check(body);
+
+	body->Mass = Mass;
+	body->ApplyPropertyChanges();
+	
+	body->ShowDebug = true;
+	body->AutoSleepMode = true;
+	body->ShowCenterOfMass = true;
+	body->CenterOfMass = CenterOfMass;
 }

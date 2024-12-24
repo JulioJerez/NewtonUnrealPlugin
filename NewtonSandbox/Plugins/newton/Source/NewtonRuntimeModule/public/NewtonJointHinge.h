@@ -39,7 +39,6 @@ class UNewtonJointHinge : public UNewtonJoint
 	// Sets default values for this component's properties
 	UNewtonJointHinge();
 
-	protected:
 	virtual void DrawGizmo(float timestep) const override;
 	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
 

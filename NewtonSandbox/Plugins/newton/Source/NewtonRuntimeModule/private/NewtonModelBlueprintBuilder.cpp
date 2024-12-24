@@ -28,10 +28,16 @@
 #include "NewtonLink.h"
 #include "NewtonModel.h"
 #include "NewtonAsset.h"
+#include "NewtonJoint.h"
+#include "NewtonCollision.h"
 #include "NewtonRigidBody.h"
 #include "NewtonLinkJoint.h"
+#include "NewtonLinkCollision.h"
 #include "NewtonLinkRigidBodyRoot.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+
+#define MAX_MODEL_NODES			2048
+#define MAX_MODEL_STACK_DEPTH	256
 
 void UNewtonModelBlueprintBuilder::BuildModel(UNewtonModel* const model)
 {
@@ -70,26 +76,6 @@ void UNewtonModelBlueprintBuilder::BuildModel(UNewtonModel* const model)
 	FBlueprintEditorUtils::MarkBlueprintAsModified(blueprint);
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
 }
-
-//USCS_Node* UNewtonModelBlueprintBuilder::CreateRootBodyComponent(UNewtonModel* const model)
-//{
-//	AActor* const actor = model->GetOwner();
-//	UBlueprint* const blueprint = Cast<UBlueprint>(actor->GetClass()->ClassGeneratedBy);
-//
-//	TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
-//	const UNewtonAsset* const asset = model->NewtonAsset;
-//	TObjectPtr<USceneComponent> rootComponentProxy(NewObject<UNewtonRigidBody>(GetTransientPackage(), asset->RootBody->Name, RF_Transient));
-//	// set the defualt properties here
-//
-//	// for some reason this moronic function have a dual behavior. 
-//	// it only add root nodes, but if the number of node is 1, it will replace the root node. thsi is just bizzar. 
-//	USCS_Node* const rootBlueprintNode = constructScript->CreateNode(rootComponentProxy->GetClass(), asset->RootBody->Name);
-//	constructScript->AddNode(rootBlueprintNode);
-//	UEditorEngine::CopyPropertiesForUnrelatedObjects(rootComponentProxy, rootBlueprintNode->ComponentTemplate);
-//
-//	AddSkeletalMesh(model, rootBlueprintNode);
-//	return rootBlueprintNode;
-//}
 
 bool UNewtonModelBlueprintBuilder::UpdateModel(UNewtonModel* const model)
 {
@@ -145,19 +131,29 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 
 	TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
 
-	ndFixSizeArray<USCS_Node*, 256> parentPool;
-	ndFixSizeArray<UNewtonLink*, 256> stackPool;
+	ndFixSizeArray<USCS_Node*, MAX_MODEL_STACK_DEPTH> parentPool;
+	ndFixSizeArray<UNewtonLink*, MAX_MODEL_STACK_DEPTH> stackPool;
+	ndFixSizeArray<TObjectPtr<USceneComponent>, MAX_MODEL_NODES> parentProxy;
 
 	parentPool.PushBack(nullptr);
+	parentProxy.PushBack(nullptr);
 	stackPool.PushBack(asset->RootBody);
+
+	ndFixSizeArray<UNewtonLink*, MAX_MODEL_NODES> links;
+	ndFixSizeArray<USCS_Node*, MAX_MODEL_NODES> bluePrintNodes;
+	ndFixSizeArray<TObjectPtr<USceneComponent>, MAX_MODEL_NODES> proxies;
 	while (stackPool.GetCount())
 	{
 		USCS_Node* parent = parentPool.Pop();
 		UNewtonLink* const link = stackPool.Pop();
+		TObjectPtr<USceneComponent> parentComponentProxy = parentProxy.Pop();
 
 		TObjectPtr<USceneComponent> componentProxy(link->CreateBlueprintProxy());
 		USCS_Node* const blueprintNode = constructScript->CreateNode(componentProxy->GetClass(), link->Name);
-		UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
+
+		links.PushBack(link);
+		proxies.PushBack(componentProxy);
+		bluePrintNodes.PushBack(blueprintNode);
 
 		if (!parent)
 		{
@@ -166,13 +162,73 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 		}
 		else
 		{
+			check(parentComponentProxy != nullptr);
 			parent->AddChildNode(blueprintNode);
+			componentProxy->AttachToComponent(parentComponentProxy, FAttachmentTransformRules::KeepRelativeTransform);
+		}
+
+		const FTransform globalTransform(link->CalculateGlobalTransform());
+		componentProxy->SetRelativeRotation_Direct(link->Transform.Rotator());
+		componentProxy->SetRelativeScale3D_Direct(link->Transform.GetScale3D());
+		componentProxy->SetRelativeLocation_Direct(link->Transform.GetTranslation());
+		componentProxy->SetComponentToWorld(globalTransform);
+
+		USceneComponent* const nodeComponent = Cast<USceneComponent>(blueprintNode->ComponentTemplate);
+		if (nodeComponent)
+		{
+			nodeComponent->SetRelativeRotation_Direct(link->Transform.Rotator());
+			nodeComponent->SetRelativeScale3D_Direct(link->Transform.GetScale3D());
+			nodeComponent->SetRelativeLocation_Direct(link->Transform.GetTranslation());
+			nodeComponent->SetComponentToWorld(globalTransform);
 		}
 	
 		for (int i = 0; i < link->Children.Num(); ++i)
 		{
 			parentPool.PushBack(blueprintNode);
+			parentProxy.PushBack(componentProxy);
 			stackPool.PushBack(link->Children[i]);
+		}
+	}
+
+	// initalize shape
+	for (int i = 0; i < links.GetCount(); ++i)
+	{
+		UNewtonLink* const link = links[i];
+		USCS_Node* const blueprintNode = bluePrintNodes[i];
+		TObjectPtr<USceneComponent> componentProxy(proxies[i]);
+
+		if (Cast<UNewtonCollision>(componentProxy))
+		{
+			link->InitBlueprintProxy(componentProxy);
+			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
+		}
+	}
+
+	// initalize rigid bodies
+	for (int i = 0; i < links.GetCount(); ++i)
+	{
+		UNewtonLink* const link = links[i];
+		USCS_Node* const blueprintNode = bluePrintNodes[i];
+		TObjectPtr<USceneComponent> componentProxy(proxies[i]);
+
+		if (Cast<UNewtonRigidBody>(componentProxy))
+		{
+			link->InitBlueprintProxy(componentProxy);
+			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
+		}
+	}
+
+	// initalize joints
+	for (int i = 0; i < links.GetCount(); ++i)
+	{
+		UNewtonLink* const link = links[i];
+		USCS_Node* const blueprintNode = bluePrintNodes[i];
+		TObjectPtr<USceneComponent> componentProxy(proxies[i]);
+
+		if (Cast<UNewtonJoint>(componentProxy))
+		{
+			link->InitBlueprintProxy(componentProxy);
+			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
 		}
 	}
 }
