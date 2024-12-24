@@ -34,6 +34,4 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionSphere : public UNewtonLinkCol
 {
 	GENERATED_BODY()
 	UNewtonLinkCollisionSphere();
-
-	//virtual void CreateInstance() override;
 };

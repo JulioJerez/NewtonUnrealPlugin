@@ -338,6 +338,7 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSave);
 
 	PreviewScene->RegisterOnMeshClick(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
+	//PreviewScene->RegisterOnDeselectAll(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
 	PreviewScene->SetAllowMeshHitProxies(true);
 
 	// this shit enable the transform tool bar. 

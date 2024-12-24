@@ -31,6 +31,7 @@
 #include "NewtonLinkJointHinge.h"
 #include "NewtonLinkCollisionBox.h"
 #include "NewtonLinkRigidBodyRoot.h"
+#include "NewtonLinkCollisionWheel.h"
 #include "NewtonLinkCollisionSphere.h"
 
 

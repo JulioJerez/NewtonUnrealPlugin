@@ -40,7 +40,6 @@ class UNewtonCollisionWheel : public UNewtonCollision
 	// Sets default values for this component's properties
 	UNewtonCollisionWheel();
 
-	protected:
 	virtual void ApplyPropertyChanges();
 	virtual ndShape* CreateShape() const;
 	virtual long long CalculateHash() const;

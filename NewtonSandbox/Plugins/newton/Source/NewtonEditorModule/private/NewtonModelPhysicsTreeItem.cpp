@@ -125,6 +125,10 @@ FTransform FNewtonModelPhysicsTreeItem::CalculateGlobalTransform() const
 	return transform;
 }
 
+void FNewtonModelPhysicsTreeItem::OnPropertiChange(const FPropertyChangedEvent& event)
+{
+}
+
 void FNewtonModelPhysicsTreeItem::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
 	check(0);

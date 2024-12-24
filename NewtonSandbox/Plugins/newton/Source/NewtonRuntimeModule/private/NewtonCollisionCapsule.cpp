@@ -101,15 +101,15 @@ void UNewtonCollisionCapsule::ApplyPropertyChanges()
 ndShapeInstance* UNewtonCollisionCapsule::CreateInstanceShape() const
 {
 	ndShapeInstance* const  instance = Super::CreateInstanceShape();
-	const ndMatrix aligment(ndYawMatrix(ndPi * 0.5f));
-	instance->SetLocalMatrix(aligment * instance->GetLocalMatrix());
+	const ndMatrix alignment(ndYawMatrix(ndPi * 0.5f));
+	instance->SetLocalMatrix(alignment * instance->GetLocalMatrix());
 	return instance;
 }
 
 ndShapeInstance* UNewtonCollisionCapsule::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
 {
 	ndShapeInstance* const instance = Super::CreateBodyInstanceShape(bodyMatrix);
-	const ndMatrix aligment(ndYawMatrix(ndPi * 0.5f));
-	instance->SetLocalMatrix(aligment * instance->GetLocalMatrix());
+	const ndMatrix alignment (ndYawMatrix(ndPi * 0.5f));
+	instance->SetLocalMatrix(alignment * instance->GetLocalMatrix());
 	return instance;
 }

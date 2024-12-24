@@ -22,35 +22,28 @@
 
 #pragma once
 
-#include "Framework/Commands/Commands.h"
-#include "HAL/Platform.h"
-#include "Internationalization/Internationalization.h"
-#include "Styling/AppStyle.h"
-#include "Templates/SharedPointer.h"
-#include "UObject/NameTypes.h"
-#include "UObject/UnrealNames.h"
+#include "CoreMinimal.h"
+#include "NewtonLinkCollision.h"
+#include "NewtonLinkCollisionWheel.generated.h"
 
-class FUICommandInfo;
-
-
-class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTreeCommands>
+/**
+ * 
+ */
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionWheel : public UNewtonLinkCollision
 {
+	GENERATED_BODY()
+
 	public:
-	FNewtonModelPhysicsTreeCommands();
+	UNewtonLinkCollisionWheel();
 
-	//Initialize commands
-	virtual void RegisterCommands() override;
+	ndShapeInstance CreateInstance() const override;
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
 
-	TSharedPtr<FUICommandInfo> JointsVisibility;
-	TSharedPtr<FUICommandInfo> CollisionsVisibility;
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	float Radio;
 
-	TSharedPtr<FUICommandInfo> ResetSelectedBone;
-
-	// create node commands
-	TSharedPtr<FUICommandInfo> AddShapeBox;
-	TSharedPtr<FUICommandInfo> AddShapeWheel;
-	TSharedPtr<FUICommandInfo> AddShapeSphere;
-	TSharedPtr<FUICommandInfo> AddJointHinge;
-
-	TSharedPtr<FUICommandInfo> DeleteSelectedRow;
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	float Width;
 };

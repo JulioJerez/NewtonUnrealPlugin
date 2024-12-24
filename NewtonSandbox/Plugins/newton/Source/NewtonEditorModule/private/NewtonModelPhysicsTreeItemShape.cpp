@@ -66,13 +66,13 @@ bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
 	return shapeNode->ShowDebug;
 }
 
-//FMatrix FNewtonModelPhysicsTreeItemShape::GetWidgetMatrix() const
-//{
-//	//const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
-//	//check(shapeNode);
-//	//return shapeNode->Transform.ToMatrixNoScale();
-//	return CalculateGlobalTransform().ToMatrixNoScale();
-//}
+
+void FNewtonModelPhysicsTreeItemShape::OnPropertiChange(const FPropertyChangedEvent& event)
+{
+	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(Node);
+	check(shapeNodeInfo);
+	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
+}
 
 void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {

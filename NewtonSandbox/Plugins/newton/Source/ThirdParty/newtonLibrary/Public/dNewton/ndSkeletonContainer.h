@@ -37,6 +37,7 @@ class ndSkeletonContainer
 	ndInt32 GetId() const;
 
 	const ndNodeList& GetNodeList() const;
+	ndInt32 FindBoneIndex(const ndBodyKinematic* const body) const;
 
 	protected:
 	class ndOrdinal
@@ -212,20 +213,6 @@ class ndSkeletonContainer
 	friend class ndDynamicsUpdateCuda;
 };
 
-inline ndInt32 ndSkeletonContainer::GetId() const
-{
-	return m_id;
-}
-
-inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
-{
-	return m_skeleton;
-}
-
-inline const ndSkeletonContainer::ndNodeList& ndSkeletonContainer::GetNodeList() const
-{
-	return m_nodeList;
-}
 #endif
 
 

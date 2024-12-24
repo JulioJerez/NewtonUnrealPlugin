@@ -45,21 +45,21 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 
 	FTransform CalculateGlobalTransform() const;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Newton)
 	FName Name;
 
 	// local space transform
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Newton)
 	FTransform Transform;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	bool ShowDebug;
 
 	UPROPERTY()
 	UNewtonLink* Parent;
 
 	UPROPERTY()
 	TArray<UNewtonLink*> Children;
-
-	UPROPERTY(EditAnywhere)
-	bool ShowDebug;
 
 	UPROPERTY()
 	bool m_hidden;

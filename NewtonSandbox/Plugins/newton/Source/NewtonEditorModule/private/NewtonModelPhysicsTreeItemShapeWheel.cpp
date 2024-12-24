@@ -20,37 +20,20 @@
 */
 
 
-#pragma once
+#include "NewtonModelPhysicsTreeItemShapeWheel.h"
 
-#include "Framework/Commands/Commands.h"
-#include "HAL/Platform.h"
-#include "Internationalization/Internationalization.h"
-#include "Styling/AppStyle.h"
-#include "Templates/SharedPointer.h"
-#include "UObject/NameTypes.h"
-#include "UObject/UnrealNames.h"
-
-class FUICommandInfo;
-
-
-class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTreeCommands>
+FNewtonModelPhysicsTreeItemShapeWheel::FNewtonModelPhysicsTreeItemShapeWheel(const FNewtonModelPhysicsTreeItemShapeWheel& src)
+	:FNewtonModelPhysicsTreeItemShape(src)
 {
-	public:
-	FNewtonModelPhysicsTreeCommands();
+	check(0);
+}
 
-	//Initialize commands
-	virtual void RegisterCommands() override;
+FNewtonModelPhysicsTreeItemShapeWheel::FNewtonModelPhysicsTreeItemShapeWheel(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode)
+{
+}
 
-	TSharedPtr<FUICommandInfo> JointsVisibility;
-	TSharedPtr<FUICommandInfo> CollisionsVisibility;
-
-	TSharedPtr<FUICommandInfo> ResetSelectedBone;
-
-	// create node commands
-	TSharedPtr<FUICommandInfo> AddShapeBox;
-	TSharedPtr<FUICommandInfo> AddShapeWheel;
-	TSharedPtr<FUICommandInfo> AddShapeSphere;
-	TSharedPtr<FUICommandInfo> AddJointHinge;
-
-	TSharedPtr<FUICommandInfo> DeleteSelectedRow;
-};
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeWheel::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemShapeWheel(*this);
+}

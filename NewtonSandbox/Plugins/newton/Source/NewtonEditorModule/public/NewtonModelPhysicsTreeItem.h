@@ -50,6 +50,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 
 	FTransform CalculateGlobalTransform() const;
 
+	virtual void OnPropertiChange(const FPropertyChangedEvent& event);
 	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale);
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 
