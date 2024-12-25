@@ -39,8 +39,8 @@ ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance() const
 {
 	ndShapeInstance instance(new ndShapeChamferCylinder(0.5f, 1.0f));
 
-	const ndMatrix alignment (ndYawMatrix(ndPi * 0.5f));
-	instance.SetLocalMatrix(alignment);
+	//const ndMatrix alignment (ndYawMatrix(ndPi * 0.5f));
+	//instance.SetLocalMatrix(alignment);
 	const ndVector scale(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 	instance.SetScale(scale);
 	return instance;

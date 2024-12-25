@@ -70,7 +70,6 @@ void UNewtonModelBlueprintBuilder::BuildModel(UNewtonModel* const model)
 		check((nodes[0] == constructScript->GetDefaultSceneRootNode()) || (nodes[1] == constructScript->GetDefaultSceneRootNode()));
 
 		BuildHierarchy(model);
-		//USCS_Node* const bluePrintRootNode = CreateRootBodyComponent(model);
 	}
 
 	FBlueprintEditorUtils::MarkBlueprintAsModified(blueprint);

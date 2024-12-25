@@ -164,7 +164,7 @@ ndShapeInstance* UNewtonCollisionLandscape::CreateInstanceShape() const
 	origin.m_posit.m_y = ndFloat32(ndFloat32(m_tileSize_y - 1) * m_scale_y * uScale.Y * UNREAL_INV_UNIT_SYSTEM);
 	
 	const ndMatrix alignment (ndPitchMatrix(ndPi * 0.5f));
-	const ndMatrix tileMatrix(alignment   * origin);
+	const ndMatrix tileMatrix(alignment * origin);
 	instance->SetLocalMatrix(tileMatrix);
 	
 	ndMatrix scaleMatrix(ndGetIdentityMatrix());
@@ -186,7 +186,7 @@ ndShapeInstance* UNewtonCollisionLandscape::CreateBodyInstanceShape(const ndMatr
 	origin.m_posit.m_y = ndFloat32(ndFloat32(m_tileSize_y - 1) * m_scale_y * uScale.Y * UNREAL_INV_UNIT_SYSTEM);
 	
 	const ndMatrix alignment (ndPitchMatrix(ndPi * 0.5f));
-	const ndMatrix tileMatrix(alignment   * origin * matrix * bodyMatrix);
+	const ndMatrix tileMatrix(alignment * origin * matrix * bodyMatrix);
 	instance->SetLocalMatrix(tileMatrix);
 	
 	return instance;
