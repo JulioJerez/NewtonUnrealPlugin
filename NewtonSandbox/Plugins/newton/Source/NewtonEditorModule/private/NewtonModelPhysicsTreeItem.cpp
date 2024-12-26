@@ -125,7 +125,7 @@ FTransform FNewtonModelPhysicsTreeItem::CalculateGlobalTransform() const
 	return transform;
 }
 
-void FNewtonModelPhysicsTreeItem::OnPropertiChange(const FPropertyChangedEvent& event)
+void FNewtonModelPhysicsTreeItem::OnPropertyChange(const FPropertyChangedEvent& event)
 {
 }
 

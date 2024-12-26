@@ -22,29 +22,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonCollision.h"
-#include "NewtonCollisionCapsule.generated.h"
-
-class ndShapeInstance;
-class UNewtonRigidBody;
+#include "NewtonLinkCollision.h"
+#include "NewtonLinkCollisionCapsule.generated.h"
 
 /**
- * 
+ *
  */
-UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
-class UNewtonCollisionCapsule : public UNewtonCollision
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionCapsule : public UNewtonLinkCollision
 {
 	GENERATED_BODY()
-	public:
-	// Sets default values for this component's properties
-	UNewtonCollisionCapsule();
-	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
+	UNewtonLinkCollisionCapsule();
 
-	virtual void ApplyPropertyChanges();
-	virtual ndShape* CreateShape() const;
-	virtual long long CalculateHash() const;
-	virtual ndShapeInstance* CreateInstanceShape() const override;
-	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;
+	ndShapeInstance CreateInstance() const override;
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
 	float Radio0;
@@ -54,5 +46,4 @@ class UNewtonCollisionCapsule : public UNewtonCollision
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
 	float Length;
-	
 };

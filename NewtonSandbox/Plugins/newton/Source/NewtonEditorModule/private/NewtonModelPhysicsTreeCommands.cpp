@@ -50,6 +50,7 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 
 	UI_COMMAND(AddShapeBox, "Add Box Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeSphere, "Add Sphere Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeCapsule, "Add Capsule Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeCylinder, "Add Cylinder Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeWheel, "Add Wheel Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 

@@ -19,38 +19,38 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkCollisionCylinder.h"
+#include "NewtonLinkCollisionCapsule.h"
 
 #include "NewtonCommons.h"
-#include "NewtonCollisionCylinder.h"
+#include "NewtonCollisionCapsule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 
-UNewtonLinkCollisionCylinder::UNewtonLinkCollisionCylinder()
+UNewtonLinkCollisionCapsule::UNewtonLinkCollisionCapsule()
 	:Super()
 {
-	SetName(TEXT("NewCylinder"));
+	SetName(TEXT("NewCapsule"));
 
 	Radio0 = 50.0f;
 	Radio1 = 50.0f;
 	Length = 100.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionCylinder::CreateInstance() const
+ndShapeInstance UNewtonLinkCollisionCapsule::CreateInstance() const
 {
-	ndShapeInstance instance(new ndShapeCylinder(Radio0 * UNREAL_INV_UNIT_SYSTEM, Radio1 * UNREAL_INV_UNIT_SYSTEM, Length * UNREAL_INV_UNIT_SYSTEM));
+	ndShapeInstance instance(new ndShapeCapsule(Radio0 * UNREAL_INV_UNIT_SYSTEM, Radio1 * UNREAL_INV_UNIT_SYSTEM, Length * UNREAL_INV_UNIT_SYSTEM));
 	return instance;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkCollisionCylinder::CreateBlueprintProxy() const
+TObjectPtr<USceneComponent> UNewtonLinkCollisionCapsule::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonCollisionCylinder> component(NewObject<UNewtonCollisionCylinder>(UNewtonCollisionCylinder::StaticClass(), Name, RF_Transient));
+	TObjectPtr<UNewtonCollisionCapsule> component(NewObject<UNewtonCollisionCapsule>(UNewtonCollisionCapsule::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
-void UNewtonLinkCollisionCylinder::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionCapsule::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
 {
-	UNewtonCollisionCylinder* const shape = Cast<UNewtonCollisionCylinder>(component.Get());
+	UNewtonCollisionCapsule* const shape = Cast<UNewtonCollisionCapsule>(component.Get());
 
 	shape->Radio0 = Radio0;
 	shape->Radio1 = Radio1;

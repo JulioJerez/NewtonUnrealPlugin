@@ -44,6 +44,7 @@
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
 #include "NewtonModelPhysicsTreeItemShapeSphere.h"
+#include "NewtonModelPhysicsTreeItemShapeCapsule.h"
 #include "NewtonModelPhysicsTreeItemShapeCylinder.h"
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
@@ -287,6 +288,13 @@ void FNewtonModelPhysicsTree::OnAddShapeSphereRow()
 	AddShapeRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddShapeCapsuleRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeCapsule(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkCollisionCapsule>()))));
+	item->Node->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddShapeRow(item);
+}
+
 void FNewtonModelPhysicsTree::OnAddShapeCylinderRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeCylinder(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkCollisionCylinder>()))));
@@ -374,9 +382,13 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeSphereRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddShapeCapsule
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeCapsuleRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddShapeCylinder
-		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeCylinderRow)
-		, FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeCylinderRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 	commandList.MapAction(menuActions.AddShapeWheel
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeWheelRow)
@@ -429,6 +441,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 	MenuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "Add collision shape"));
 		MenuBuilder.AddMenuEntry(actions.AddShapeBox);
 		MenuBuilder.AddMenuEntry(actions.AddShapeSphere);
+		MenuBuilder.AddMenuEntry(actions.AddShapeCapsule);
 		MenuBuilder.AddMenuEntry(actions.AddShapeCylinder);
 		MenuBuilder.AddMenuEntry(actions.AddShapeWheel);
 	MenuBuilder.EndSection();
@@ -859,7 +872,7 @@ void FNewtonModelPhysicsTree::DetailViewPropertiesUpdated(const FPropertyChanged
 	}
 	else
 	{
-		m_selectedItem->OnPropertiChange(event);
+		m_selectedItem->OnPropertyChange(event);
 	}
 }
 
@@ -944,6 +957,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkCollisionSphere>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeSphere(parent, proxyNode)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkCollisionCapsule>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeCapsule(parent, proxyNode)));
 			m_items.Add(item);
 			parent = item;
 		}

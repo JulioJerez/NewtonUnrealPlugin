@@ -19,31 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#pragma once
 
-#include "CoreMinimal.h"
-#include "NewtonLinkCollision.h"
-#include "NewtonLinkCollisionCylinder.generated.h"
+#include "NewtonModelPhysicsTreeItemShapeCapsule.h"
 
-/**
- *
- */
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionCylinder : public UNewtonLinkCollision
+FNewtonModelPhysicsTreeItemShapeCapsule::FNewtonModelPhysicsTreeItemShapeCapsule(const FNewtonModelPhysicsTreeItemShapeCapsule& src)
+	:FNewtonModelPhysicsTreeItemShape(src)
 {
-	GENERATED_BODY()
-	UNewtonLinkCollisionCylinder();
+	check(0);
+}
 
-	ndShapeInstance CreateInstance() const override;
-	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
+FNewtonModelPhysicsTreeItemShapeCapsule::FNewtonModelPhysicsTreeItemShapeCapsule(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode)
+{
+}
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
-	float Radio0;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
-	float Radio1;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
-	float Length;
-};
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeCapsule::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemShapeCapsule(*this);
+}

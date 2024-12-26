@@ -67,7 +67,7 @@ bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
 }
 
 
-void FNewtonModelPhysicsTreeItemShape::OnPropertiChange(const FPropertyChangedEvent& event)
+void FNewtonModelPhysicsTreeItemShape::OnPropertyChange(const FPropertyChangedEvent& event)
 {
 	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(Node);
 	check(shapeNodeInfo);
