@@ -21,36 +21,40 @@
 
 
 
-#include "NewtonLinkCollisionSphere.h"
+#include "NewtonLinkCollisionCylinder.h"
 
 #include "NewtonCommons.h"
-#include "NewtonCollisionSphere.h"
+#include "NewtonCollisionCylinder.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 
-UNewtonLinkCollisionSphere::UNewtonLinkCollisionSphere()
+UNewtonLinkCollisionCylinder::UNewtonLinkCollisionCylinder()
 	:Super()
 {
-	SetName(TEXT("NewSphere"));
+	SetName(TEXT("NewCylinder"));
 
-	Radio = 50.0f;
+	Radio0 = 50.0f;
+	Radio1 = 50.0f;
+	Length = 100.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionSphere::CreateInstance() const
+ndShapeInstance UNewtonLinkCollisionCylinder::CreateInstance() const
 {
-	ndShapeInstance instance(new ndShapeSphere(Radio * UNREAL_INV_UNIT_SYSTEM));
+	ndShapeInstance instance(new ndShapeCylinder(Radio0 * UNREAL_INV_UNIT_SYSTEM, Radio0 * UNREAL_INV_UNIT_SYSTEM, Length * UNREAL_INV_UNIT_SYSTEM));
 	return instance;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkCollisionSphere::CreateBlueprintProxy() const
+TObjectPtr<USceneComponent> UNewtonLinkCollisionCylinder::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonCollisionSphere> component(NewObject<UNewtonCollisionSphere>(UNewtonCollisionSphere::StaticClass(), Name, RF_Transient));
+	TObjectPtr<UNewtonCollisionCylinder> component(NewObject<UNewtonCollisionCylinder>(UNewtonCollisionCylinder::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
-void UNewtonLinkCollisionSphere::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionCylinder::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
 {
-	UNewtonCollisionSphere* const shape = Cast<UNewtonCollisionSphere>(component.Get());
+	UNewtonCollisionCylinder* const shape = Cast<UNewtonCollisionCylinder>(component.Get());
 
-	shape->Radio = Radio;
+	shape->Radio0 = Radio0;
+	shape->Radio1 = Radio1;
+	shape->Length = Length;
 }

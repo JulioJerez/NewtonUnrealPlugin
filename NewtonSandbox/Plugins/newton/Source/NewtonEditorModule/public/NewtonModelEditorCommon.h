@@ -33,7 +33,7 @@
 #include "NewtonLinkRigidBodyRoot.h"
 #include "NewtonLinkCollisionWheel.h"
 #include "NewtonLinkCollisionSphere.h"
-
+#include "NewtonLinkCollisionCylinder.h"
 
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.2f
 

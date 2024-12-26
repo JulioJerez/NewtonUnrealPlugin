@@ -19,32 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#pragma once
 
-#include "CoreMinimal.h"
-#include "NewtonCollision.h"
-#include "NewtonCollisionSphere.generated.h"
+#include "NewtonModelPhysicsTreeItemShapeCylinder.h"
 
-class ndShapeInstance;
-class UNewtonRigidBody;
-
-/**
- * 
- */
-UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
-class UNewtonCollisionSphere : public UNewtonCollision
+FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(const FNewtonModelPhysicsTreeItemShapeCylinder& src)
+	:FNewtonModelPhysicsTreeItemShape(src)
 {
-	GENERATED_BODY()
-	
-	public:
-	// Sets default values for this component's properties
-	UNewtonCollisionSphere();
-	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
+	check(0);
+}
 
-	virtual void ApplyPropertyChanges();
-	virtual ndShape* CreateShape() const;
-	virtual long long CalculateHash() const;
+FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode)
+{
+}
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1.0f))
-	float Radio;
-};
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeCylinder::Clone() const
+{
+	return new FNewtonModelPhysicsTreeItemShapeCylinder(*this);
+}

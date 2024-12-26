@@ -19,33 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonCollision.h"
-#include "NewtonCollisionCylinder.generated.h"
-
-class ndShapeInstance;
-class UNewtonRigidBody;
+#include "NewtonLinkCollision.h"
+#include "NewtonLinkCollisionCylinder.generated.h"
 
 /**
- * 
+ *
  */
-UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
-class UNewtonCollisionCylinder : public UNewtonCollision
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionCylinder : public UNewtonLinkCollision
 {
 	GENERATED_BODY()
-	
-	public:
-	// Sets default values for this component's properties
-	UNewtonCollisionCylinder();
-	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
+	UNewtonLinkCollisionCylinder();
 
-	virtual void ApplyPropertyChanges();
-	virtual ndShape* CreateShape() const;
-	virtual long long CalculateHash() const;
-	virtual ndShapeInstance* CreateInstanceShape() const override;
-	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;
+	ndShapeInstance CreateInstance() const override;
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
 	float Radio0;
