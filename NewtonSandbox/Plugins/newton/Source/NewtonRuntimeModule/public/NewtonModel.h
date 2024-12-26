@@ -39,7 +39,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 	bool RegenerateBluePrint;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	bool HideDebug;
+	bool ShowDebug;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	UNewtonAsset* NewtonAsset;

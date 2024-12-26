@@ -72,7 +72,7 @@ void UNewtonModelBlueprintBuilder::BuildModel(UNewtonModel* const model)
 		BuildHierarchy(model);
 	}
 
-	FBlueprintEditorUtils::MarkBlueprintAsModified(blueprint);
+	//FBlueprintEditorUtils::MarkBlueprintAsModified(blueprint);
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
 }
 
@@ -209,10 +209,13 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 		UNewtonLink* const link = links[i];
 		USCS_Node* const blueprintNode = bluePrintNodes[i];
 		TObjectPtr<USceneComponent> componentProxy(proxies[i]);
-
-		if (Cast<UNewtonRigidBody>(componentProxy))
+		TObjectPtr<UNewtonRigidBody> bodyProxy(Cast<UNewtonRigidBody>(componentProxy));
+		if (bodyProxy)
 		{
 			link->InitBlueprintProxy(componentProxy);
+			bodyProxy->ShowDebug = model->ShowDebug;
+			bodyProxy->ShowCenterOfMass = model->ShowDebug;
+			bodyProxy->Inertia.ShowPrincipalAxis = model->ShowDebug;
 			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
 		}
 	}
@@ -223,10 +226,12 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 		UNewtonLink* const link = links[i];
 		USCS_Node* const blueprintNode = bluePrintNodes[i];
 		TObjectPtr<USceneComponent> componentProxy(proxies[i]);
+		TObjectPtr<UNewtonJoint> jointProxy(Cast<UNewtonJoint>(componentProxy));
 
-		if (Cast<UNewtonJoint>(componentProxy))
+		if (jointProxy)
 		{
 			link->InitBlueprintProxy(componentProxy);
+			jointProxy->ShowDebug = model->ShowDebug;
 			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
 		}
 	}
@@ -234,42 +239,40 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 
 void UNewtonModelBlueprintBuilder::HideDebug(UNewtonModel* const model)
 {
-	AActor* const actor = model->GetOwner();
-	UBlueprint* const blueprint = Cast<UBlueprint>(actor->GetClass()->ClassGeneratedBy);
-	if (!blueprint)
-	{
-		return;
-	}
-
-	TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
-	const TArray<USCS_Node*>& nodes = constructScript->GetAllNodes();
-
-	model->HideDebug = false;
-	for (int i = nodes.Num() - 1; i >= 0; --i)
-	{
-		USCS_Node* const blueprintNode = nodes[i];
-		UNewtonRigidBody* const bodyNode = Cast<UNewtonRigidBody>(blueprintNode->ComponentTemplate);
-		if (bodyNode)
-		{
-			bodyNode->ShowDebug = false;
-			bodyNode->ShowCenterOfMass = false;
-			bodyNode->Inertia.ShowPrincipalAxis = false;
-		}
-		UNewtonJoint* const jointNode = Cast<UNewtonJoint>(blueprintNode->ComponentTemplate);
-		if (jointNode)
-		{
-			jointNode->ShowDebug = false;
-		}
-		UNewtonModel* const modelNode = Cast<UNewtonModel>(blueprintNode->ComponentTemplate);
-		if (modelNode)
-		{
-			modelNode->HideDebug = false;
-		}
-	}
-	FBlueprintEditorUtils::MarkBlueprintAsModified(blueprint);
-	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
+	//AActor* const actor = model->GetOwner();
+	//UBlueprint* const blueprint = Cast<UBlueprint>(actor->GetClass()->ClassGeneratedBy);
+	//if (!blueprint)
+	//{
+	//	return;
+	//}
+	//
+	//TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
+	//const TArray<USCS_Node*>& nodes = constructScript->GetAllNodes();
+	//
+	//model->HideDebug = false;
+	//for (int i = nodes.Num() - 1; i >= 0; --i)
+	//{
+	//	USCS_Node* const blueprintNode = nodes[i];
+	//	UNewtonRigidBody* const bodyNode = Cast<UNewtonRigidBody>(blueprintNode->ComponentTemplate);
+	//	if (bodyNode)
+	//	{
+	//		bodyNode->ShowDebug = false;
+	//		bodyNode->ShowCenterOfMass = false;
+	//		bodyNode->Inertia.ShowPrincipalAxis = false;
+	//	}
+	//	UNewtonJoint* const jointNode = Cast<UNewtonJoint>(blueprintNode->ComponentTemplate);
+	//	if (jointNode)
+	//	{
+	//		jointNode->ShowDebug = false;
+	//	}
+	//	UNewtonModel* const modelNode = Cast<UNewtonModel>(blueprintNode->ComponentTemplate);
+	//	if (modelNode)
+	//	{
+	//		modelNode->HideDebug = false;
+	//	}
+	//}
+	//FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
 }
-
 
 void UNewtonModelBlueprintBuilder::ApplyBlueprintProperties(UNewtonModel* const model)
 {
@@ -277,8 +280,8 @@ void UNewtonModelBlueprintBuilder::ApplyBlueprintProperties(UNewtonModel* const 
 	{
 		BuildModel(model);
 	}
-	if (model->HideDebug)
-	{
-		HideDebug(model);
-	}
+	//if (model->HideDebug)
+	//{
+	//	HideDebug(model);
+	//}
 }
