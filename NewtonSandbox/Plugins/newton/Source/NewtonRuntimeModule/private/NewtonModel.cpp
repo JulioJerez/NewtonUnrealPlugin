@@ -30,6 +30,7 @@
 UNewtonModel::UNewtonModel()
 	:Super()
 {
+	HideDebug = false;
 	NewtonAsset = nullptr;
 	RegenerateBluePrint = false;
 }

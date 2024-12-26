@@ -26,6 +26,8 @@
 #include "NewtonLink.h"
 #include "NewtonLinkJoint.generated.h"
 
+class UNewtonJoint;
+
 /**
  * 
  */
@@ -36,6 +38,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJoint : public UNewtonLink
 
 	public:
 	UNewtonLinkJoint();
+
+	void SetCommonProperties(UNewtonJoint* const joint) const;
 
 	UPROPERTY(EditAnywhere)
 	float DebugScale;

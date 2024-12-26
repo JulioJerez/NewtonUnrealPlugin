@@ -361,9 +361,10 @@ void FNewtonRuntimeModule::UpdatePropertyChanges(const UWorld* const world) cons
 		AActor* const actor = *actorItr;
 
 		UNewtonModel* const model = Cast<UNewtonModel>(actor->FindComponentByClass(UNewtonModel::StaticClass()));
-		if (model && model->RegenerateBluePrint)
+		if (model)
 		{
-			UNewtonModelBlueprintBuilder::BuildModel(model);
+			//UNewtonModelBlueprintBuilder::BuildModel(model);
+			UNewtonModelBlueprintBuilder::ApplyBlueprintProperties(model);
 		}
 
 		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))

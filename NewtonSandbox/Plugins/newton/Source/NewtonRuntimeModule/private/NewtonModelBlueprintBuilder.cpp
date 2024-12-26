@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "NewtonModelBlueprintBuilder.h"
 #include "Engine/SCS_Node.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -34,6 +33,7 @@
 #include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
 #include "NewtonLinkRigidBodyRoot.h"
+#include "NewtonModelSkeletalMesh.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 #define MAX_MODEL_NODES			2048
@@ -114,7 +114,7 @@ void UNewtonModelBlueprintBuilder::AddSkeletalMesh(UNewtonModel* const model, US
 
 	UNewtonAsset* const asset = model->NewtonAsset;
 	
-	TObjectPtr<USkeletalMeshComponent> skeletalMeshComponentProxy(NewObject<USkeletalMeshComponent>(GetTransientPackage(), TEXT("tempMeshComponet"), RF_Transient));
+	TObjectPtr<UNewtonModelSkeletalMesh> skeletalMeshComponentProxy(NewObject<UNewtonModelSkeletalMesh>(GetTransientPackage(), TEXT("tempMeshComponet"), RF_Transient));
 	skeletalMeshComponentProxy->SetSkeletalMeshAsset(asset->SkeletalMeshAsset);
 
 	USCS_Node* const childBlueprintNode = constructScript->CreateNode(skeletalMeshComponentProxy->GetClass(), TEXT("MeshComponet"));
@@ -232,3 +232,53 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 	}
 }
 
+void UNewtonModelBlueprintBuilder::HideDebug(UNewtonModel* const model)
+{
+	AActor* const actor = model->GetOwner();
+	UBlueprint* const blueprint = Cast<UBlueprint>(actor->GetClass()->ClassGeneratedBy);
+	if (!blueprint)
+	{
+		return;
+	}
+
+	TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
+	const TArray<USCS_Node*>& nodes = constructScript->GetAllNodes();
+
+	model->HideDebug = false;
+	for (int i = nodes.Num() - 1; i >= 0; --i)
+	{
+		USCS_Node* const blueprintNode = nodes[i];
+		UNewtonRigidBody* const bodyNode = Cast<UNewtonRigidBody>(blueprintNode->ComponentTemplate);
+		if (bodyNode)
+		{
+			bodyNode->ShowDebug = false;
+			bodyNode->ShowCenterOfMass = false;
+			bodyNode->Inertia.ShowPrincipalAxis = false;
+		}
+		UNewtonJoint* const jointNode = Cast<UNewtonJoint>(blueprintNode->ComponentTemplate);
+		if (jointNode)
+		{
+			jointNode->ShowDebug = false;
+		}
+		UNewtonModel* const modelNode = Cast<UNewtonModel>(blueprintNode->ComponentTemplate);
+		if (modelNode)
+		{
+			modelNode->HideDebug = false;
+		}
+	}
+	FBlueprintEditorUtils::MarkBlueprintAsModified(blueprint);
+	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
+}
+
+
+void UNewtonModelBlueprintBuilder::ApplyBlueprintProperties(UNewtonModel* const model)
+{
+	if (model->RegenerateBluePrint)
+	{
+		BuildModel(model);
+	}
+	if (model->HideDebug)
+	{
+		HideDebug(model);
+	}
+}

@@ -177,49 +177,29 @@ void NewtonWorld::VisualTick()
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		if (actor->GetRootComponent())
 		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			ndFixSizeArray<USceneComponent*, 256> stack;
+			stack.PushBack(actor->GetRootComponent());
+			while (stack.GetCount())
 			{
-				UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(*it);
+				USceneComponent* const component = stack.Pop();
+				UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(component);
 				if (rigidBody)
 				{
 					rigidBody->InterpolateTransform(interpolationParam);
+					rigidBody->CalculateLocalTransform();
 				}
-			}
-		}
-	}
-	
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-				if (meshComp)
-				{
-					meshComp->CalculateLocalTransform();
-				}
-			}
-		}
-	}
-	
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
+				UNewtonJoint* const joint = Cast<UNewtonJoint>(component);
 				if (joint)
 				{
 					joint->UpdateTransform();
+				}
+
+				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+				{
+					stack.PushBack(childrenComp[i].Get());
 				}
 			}
 		}
@@ -426,52 +406,33 @@ void NewtonWorld::Intepolate() const
 	ndFloat32 interpolationParam = ndClamp(timeAccumulator / timestep, ndFloat32(0.0f), ndFloat32(1.0f));
 
 	UWorld* const world = m_owner->GetWorld();
+
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
+		if (actor->GetRootComponent())
 		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			ndFixSizeArray<USceneComponent*, 256> stack;
+			stack.PushBack(actor->GetRootComponent());
+			while (stack.GetCount())
 			{
-				UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(*it);
+				USceneComponent* const component = stack.Pop();
+				UNewtonRigidBody* const rigidBody = Cast<UNewtonRigidBody>(component);
 				if (rigidBody)
 				{
 					rigidBody->InterpolateTransform(interpolationParam);
+					rigidBody->CalculateLocalTransform();
 				}
-			}
-		}
-	}
-
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonRigidBody* const meshComp = Cast<UNewtonRigidBody>(*it);
-				if (meshComp)
-				{
-					meshComp->CalculateLocalTransform();
-				}
-			}
-		}
-	}
-
-	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
-	{
-		AActor* const actor = *actorItr;
-		if (actor->FindComponentByClass(UNewtonRigidBody::StaticClass()))
-		{
-			const TSet<UActorComponent*>& components = actor->GetComponents();
-			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
-			{
-				UNewtonJoint* const joint = Cast<UNewtonJoint>(*it);
+				UNewtonJoint* const joint = Cast<UNewtonJoint>(component);
 				if (joint)
 				{
 					joint->UpdateTransform();
+				}
+
+				const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+				for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+				{
+					stack.PushBack(childrenComp[i].Get());
 				}
 			}
 		}

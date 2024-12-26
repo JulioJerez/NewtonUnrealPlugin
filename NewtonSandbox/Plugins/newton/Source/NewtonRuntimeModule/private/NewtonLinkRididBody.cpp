@@ -84,9 +84,10 @@ void UNewtonLinkRigidBody::InitBlueprintProxy(TObjectPtr<USceneComponent> compon
 	UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component.Get());
 	check(body);
 
-	body->Mass = Mass;
 	body->ApplyPropertyChanges();
-	
+
+	body->Mass = Mass;
+	body->BoneIndex = BoneIndex;
 	body->ShowDebug = true;
 	body->AutoSleepMode = true;
 	body->ShowCenterOfMass = true;

@@ -47,6 +47,8 @@ void UNewtonLinkJointHinge::InitBlueprintProxy(TObjectPtr<USceneComponent> compo
 {
 	UNewtonJointHinge* const joint = Cast<UNewtonJointHinge>(component.Get());
 
+	SetCommonProperties(joint);
+
 	joint->EnableLimits = EnableLimits;
 	joint->MinAngle = MinAngle;
 	joint->MaxAngle = MaxAngle;

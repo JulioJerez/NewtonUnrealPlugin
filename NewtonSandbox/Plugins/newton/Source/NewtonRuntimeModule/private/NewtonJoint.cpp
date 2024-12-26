@@ -30,8 +30,6 @@ UNewtonJoint::UNewtonJoint()
 	:Super()
 	,ShowDebug(false)
 	,DebugScale(1.0f)
-	//,LoopNewtonStaticMesh0()
-	//,LoopNewtonStaticMesh1()
 	,m_joint(nullptr)
 	,m_propertyChanged(true)
 {

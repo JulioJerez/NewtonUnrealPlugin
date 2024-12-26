@@ -59,14 +59,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.1f, ClampMax = 4.0f))
 	float DebugScale;
 
-	///** Pointer to second Actor to constrain. */
-	//UPROPERTY(EditAnywhere, Category = Newton)
-	//FName LoopNewtonStaticMesh0;
-	//
-	///** Pointer to second Actor to constrain. */
-	//UPROPERTY(EditAnywhere, Category = Newton)
-	//FName LoopNewtonStaticMesh1;
-
 	protected:
 	UNewtonRigidBody* FindChild() const;
 	UNewtonRigidBody* FindParent() const;

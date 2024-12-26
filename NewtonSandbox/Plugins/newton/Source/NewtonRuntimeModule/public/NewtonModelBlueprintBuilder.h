@@ -36,9 +36,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelBlueprintBuilder : public UBlueprintFu
 	GENERATED_BODY()
 	
 	public:
-	static void BuildModel(UNewtonModel* const model);
+	static void ApplyBlueprintProperties(UNewtonModel* const model);
 
 	private:
+	static void HideDebug(UNewtonModel* const model);
+	static void BuildModel(UNewtonModel* const model);
 	static bool UpdateModel(UNewtonModel* const model);
 	static void BuildHierarchy(UNewtonModel* const model);
 	//static USCS_Node* CreateRootBodyComponent(UNewtonModel* const model);

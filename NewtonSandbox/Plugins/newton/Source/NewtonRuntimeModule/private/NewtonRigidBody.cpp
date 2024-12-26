@@ -181,6 +181,7 @@ UNewtonRigidBody::UNewtonRigidBody()
 	,InitialOmega(0.0f, 0.0f, 0.0f)
 	,CenterOfMass(0.0f, 0.0f, 0.0f)
 	,Gravity(0.0f, 0.0f, -980.0f)
+	,BoneIndex(-1)
 	,m_localScale(1.0f, 1.0f, 1.0f)
 	,m_globalScale(1.0f, 1.0f, 1.0f)
 	,m_localTransform()
@@ -435,14 +436,18 @@ void UNewtonRigidBody::InterpolateTransform(float param)
 void UNewtonRigidBody::CalculateLocalTransform()
 {
 	check(m_body);
-	FTransform parentTransform;
+	
 	const USceneComponent* const parent = GetAttachParent();
 	if (parent)
 	{
-		parentTransform = parentTransform = parent->GetComponentTransform();;
+		check(Cast<UNewtonJoint>(parent));
+		const FTransform parentTransform(parent->GetComponentTransform());
+		m_localTransform = m_globalTransform * parentTransform.Inverse();
 	}
-
-	m_localTransform = m_globalTransform * parentTransform.Inverse();
+	else
+	{
+		m_localTransform = m_globalTransform;
+	}
 	m_localTransform.SetScale3D(m_localScale);
 }
 
@@ -615,12 +620,12 @@ void UNewtonRigidBody::ApplyPropertyChanges()
 }
 
 // Called every frame
-void UNewtonRigidBody::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UNewtonRigidBody::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* tickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::TickComponent(deltaTime, tickType, tickFunction);
 	if (m_newtonWorld)
 	{
-		DrawGizmo(DeltaTime);
+		DrawGizmo(deltaTime);
 		SetRelativeTransform(m_localTransform);
 		SetComponentToWorld(m_globalTransform);
 	}
@@ -786,4 +791,9 @@ void UNewtonRigidBody::SetTorque(const FVector& torque)
 		//ndVector omega(m_body->GetOmega());
 		//UE_LOG(LogTemp, Display, TEXT("w(%f %f %f) T(%f %f %f)"), omega.m_x, omega.m_y, omega.m_z, tmp.m_x, tmp.m_y, tmp.m_z);
 	}
+}
+
+bool UNewtonRigidBody::GetSleepState() const
+{
+	return m_body ? m_body->GetSleepState() : true;
 }

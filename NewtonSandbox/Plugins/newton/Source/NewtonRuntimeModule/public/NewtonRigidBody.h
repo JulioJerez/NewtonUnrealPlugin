@@ -58,7 +58,6 @@ UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnab
 class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 {
 	GENERATED_BODY()
-	//GENERATED_UCLASS_BODY()
 	class NotifyCallback;
 
 	public:
@@ -114,7 +113,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	UFUNCTION(BlueprintCallable)
 	void SetTorque(const FVector& torque);
 
-	protected:
+	UFUNCTION(BlueprintCallable)
+	bool GetSleepState() const;
+
 	// Called every frame
 	virtual void PostLoad() override;
 	virtual void OnRegister() override;
@@ -122,8 +123,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	virtual void BeginDestroy() override;
 	virtual void OnChildAttached(USceneComponent* ChildComponent);
 	virtual void OnChildDetached(USceneComponent* ChildComponent);
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	void DestroyRigidBody();
 	
@@ -173,6 +174,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
+
+	UPROPERTY()
+	int BoneIndex;
 
 	FVector m_localScale;
 	FVector m_globalScale;

@@ -21,6 +21,7 @@
 
 #include "NewtonLinkJoint.h"
 
+#include "NewtonJoint.h"
 #include "NewtonCommons.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
@@ -30,3 +31,8 @@ UNewtonLinkJoint::UNewtonLinkJoint()
 	DebugScale = 1.0f;
 }
 
+
+void UNewtonLinkJoint::SetCommonProperties(UNewtonJoint* const joint) const
+{
+	joint->ShowDebug = true;
+}
