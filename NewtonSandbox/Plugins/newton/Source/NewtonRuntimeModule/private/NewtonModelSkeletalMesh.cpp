@@ -31,6 +31,8 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 
 	ndFixSizeArray<USceneComponent*, 256> stack;
 	stack.PushBack(owner->GetRootComponent());
+
+	FTransform invTransfrom;
 	while (stack.GetCount())
 	{
 		USceneComponent* const component = stack.Pop();
@@ -39,9 +41,14 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 		{
 			FTransform boneTransform;
 			const USceneComponent* const parent = Cast<UNewtonJoint>(rigidBodyBone->GetAttachParent());
-			if (parent)
+			if (!parent)
 			{
-				boneTransform = rigidBodyBone->GetRelativeTransform() * parent->GetRelativeTransform();
+				invTransfrom = rigidBodyBone->GetComponentToWorld().Inverse();
+			}
+			else
+			{
+				//boneTransform = rigidBodyBone->GetRelativeTransform() * parent->GetRelativeTransform();
+				boneTransform = rigidBodyBone->GetComponentToWorld() * invTransfrom;
 			}
 
 			const FTransform boneTM(GetBoneTransform(rigidBodyBone->BoneIndex));
