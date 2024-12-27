@@ -28,8 +28,8 @@ FNewtonModelPhysicsTreeItemShapeCapsule::FNewtonModelPhysicsTreeItemShapeCapsule
 	check(0);
 }
 
-FNewtonModelPhysicsTreeItemShapeCapsule::FNewtonModelPhysicsTreeItemShapeCapsule(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
-	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode)
+FNewtonModelPhysicsTreeItemShapeCapsule::FNewtonModelPhysicsTreeItemShapeCapsule(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
 {
 }
 

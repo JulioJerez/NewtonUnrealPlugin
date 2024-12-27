@@ -30,7 +30,7 @@ class FNewtonModelPhysicsTreeItemShapeWheel : public FNewtonModelPhysicsTreeItem
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeWheel, FNewtonModelPhysicsTreeItemShape)
 
 	FNewtonModelPhysicsTreeItemShapeWheel(const FNewtonModelPhysicsTreeItemShapeWheel& src);
-	FNewtonModelPhysicsTreeItemShapeWheel(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode);
+	FNewtonModelPhysicsTreeItemShapeWheel(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 };

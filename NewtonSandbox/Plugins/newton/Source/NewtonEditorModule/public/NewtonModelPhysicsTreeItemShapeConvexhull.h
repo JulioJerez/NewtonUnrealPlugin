@@ -20,20 +20,19 @@
 */
 
 
-#include "NewtonModelPhysicsTreeItemShapeCylinder.h"
+#pragma once
 
-FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(const FNewtonModelPhysicsTreeItemShapeCylinder& src)
-	:FNewtonModelPhysicsTreeItemShape(src)
-{
-	check(0);
-}
+#include "NewtonModelPhysicsTreeItemShape.h"
 
-FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
-	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
-{
-}
 
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeCylinder::Clone() const
+class FNewtonModelPhysicsTreeItemShapeConvexhull : public FNewtonModelPhysicsTreeItemShape
 {
-	return new FNewtonModelPhysicsTreeItemShapeCylinder(*this);
-}
+	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeConvexhull, FNewtonModelPhysicsTreeItemShape)
+
+	FNewtonModelPhysicsTreeItemShapeConvexhull(const FNewtonModelPhysicsTreeItemShapeConvexhull& src);
+	FNewtonModelPhysicsTreeItemShapeConvexhull(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
+
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+
+};

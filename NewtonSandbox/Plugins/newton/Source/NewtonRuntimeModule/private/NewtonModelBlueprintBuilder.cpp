@@ -272,7 +272,7 @@ void UNewtonModelBlueprintBuilder::HideDebug(UNewtonModel* const model)
 	//	}
 	//}
 	//FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
-}
+	}
 
 void UNewtonModelBlueprintBuilder::ApplyBlueprintProperties(UNewtonModel* const model)
 {

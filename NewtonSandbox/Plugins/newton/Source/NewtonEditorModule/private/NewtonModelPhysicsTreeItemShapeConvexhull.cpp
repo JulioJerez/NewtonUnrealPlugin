@@ -20,20 +20,20 @@
 */
 
 
-#include "NewtonModelPhysicsTreeItemShapeCylinder.h"
+#include "NewtonModelPhysicsTreeItemShapeConvexhull.h"
 
-FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(const FNewtonModelPhysicsTreeItemShapeCylinder& src)
+FNewtonModelPhysicsTreeItemShapeConvexhull::FNewtonModelPhysicsTreeItemShapeConvexhull(const FNewtonModelPhysicsTreeItemShapeConvexhull& src)
 	:FNewtonModelPhysicsTreeItemShape(src)
 {
 	check(0);
 }
 
-FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemShapeConvexhull::FNewtonModelPhysicsTreeItemShapeConvexhull(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
 {
 }
 
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeCylinder::Clone() const
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeConvexhull::Clone() const
 {
-	return new FNewtonModelPhysicsTreeItemShapeCylinder(*this);
+	return new FNewtonModelPhysicsTreeItemShapeConvexhull(*this);
 }

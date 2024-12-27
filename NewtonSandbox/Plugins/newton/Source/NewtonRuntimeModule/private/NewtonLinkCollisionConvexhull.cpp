@@ -21,35 +21,39 @@
 
 
 
-#include "NewtonLinkCollisionSphere.h"
+#include "NewtonLinkCollisionConvexhull.h"
 
 #include "NewtonCommons.h"
-#include "NewtonCollisionSphere.h"
+#include "NewtonCollisionConvexHull.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 
-UNewtonLinkCollisionSphere::UNewtonLinkCollisionSphere()
+UNewtonLinkCollisionConvexhull::UNewtonLinkCollisionConvexhull()
 	:Super()
 {
-	SetName(TEXT("NewSphere"));
+	SetName(TEXT("NewConvexhull"));
 
 	Radio = 50.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionSphere::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+#include "NewtonCollisionSphere.h"
+ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
+	//ndShapeInstance instance(new ndShapeConvexhull(Radio * UNREAL_INV_UNIT_SYSTEM));
 	ndShapeInstance instance(new ndShapeSphere(Radio * UNREAL_INV_UNIT_SYSTEM));
 	return instance;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkCollisionSphere::CreateBlueprintProxy() const
+TObjectPtr<USceneComponent> UNewtonLinkCollisionConvexhull::CreateBlueprintProxy() const
 {
+	//TObjectPtr<UNewtonCollisionConvexhull> component(NewObject<UNewtonCollisionConvexhull>(UNewtonCollisionConvexhull::StaticClass(), Name, RF_Transient));
 	TObjectPtr<UNewtonCollisionSphere> component(NewObject<UNewtonCollisionSphere>(UNewtonCollisionSphere::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
-void UNewtonLinkCollisionSphere::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
 {
+	//UNewtonCollisionConvexhull* const shape = Cast<UNewtonCollisionConvexhull>(component.Get());
 	UNewtonCollisionSphere* const shape = Cast<UNewtonCollisionSphere>(component.Get());
 	shape->Radio = Radio;
 }

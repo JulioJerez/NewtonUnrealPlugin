@@ -20,20 +20,26 @@
 */
 
 
-#include "NewtonModelPhysicsTreeItemShapeCylinder.h"
+#pragma once
 
-FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(const FNewtonModelPhysicsTreeItemShapeCylinder& src)
-	:FNewtonModelPhysicsTreeItemShape(src)
-{
-	check(0);
-}
+#include "CoreMinimal.h"
+#include "NewtonLinkCollision.h"
+#include "NewtonLinkCollisionConvexhull.generated.h"
 
-FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
-	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
-{
-}
 
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeCylinder::Clone() const
+/**
+ *
+ */
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexhull : public UNewtonLinkCollision
 {
-	return new FNewtonModelPhysicsTreeItemShapeCylinder(*this);
-}
+	GENERATED_BODY()
+	UNewtonLinkCollisionConvexhull();
+
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
+	ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	float Radio;
+};

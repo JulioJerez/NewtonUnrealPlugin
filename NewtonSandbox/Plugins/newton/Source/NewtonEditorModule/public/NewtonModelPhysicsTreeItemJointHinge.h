@@ -30,7 +30,7 @@ class FNewtonModelPhysicsTreeItemJointHinge : public FNewtonModelPhysicsTreeItem
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointHinge, FNewtonModelPhysicsTreeItemJoint)
 
 	FNewtonModelPhysicsTreeItemJointHinge(const FNewtonModelPhysicsTreeItemJointHinge& src);
-	FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode);
+	FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 

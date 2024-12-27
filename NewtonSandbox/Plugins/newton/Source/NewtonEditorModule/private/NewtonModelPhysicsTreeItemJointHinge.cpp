@@ -27,8 +27,8 @@ FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(con
 {
 }
 
-FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
-	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode)
+FNewtonModelPhysicsTreeItemJointHinge::FNewtonModelPhysicsTreeItemJointHinge(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode, editor)
 {
 }
 
@@ -40,7 +40,7 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointHinge::Clone() cons
 
 void FNewtonModelPhysicsTreeItemJointHinge::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonLinkJointHinge* const jointNode = Cast<UNewtonLinkJointHinge>(Node);
+	const UNewtonLinkJointHinge* const jointNode = Cast<UNewtonLinkJointHinge>(m_node);
 	check(jointNode);
 
 	if (jointNode->m_hidden || !jointNode->ShowDebug)

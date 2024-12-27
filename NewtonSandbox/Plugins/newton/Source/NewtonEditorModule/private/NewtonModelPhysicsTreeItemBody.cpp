@@ -21,6 +21,8 @@
 
 
 #include "NewtonModelPhysicsTreeItemBody.h"
+
+#include "NewtonModelEditor.h"
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src)
@@ -28,8 +30,8 @@ FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const F
 {
 }
 
-FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
-	:FNewtonModelPhysicsTreeItemBody(parentNode, modelNode)
+FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+	:FNewtonModelPhysicsTreeItemBody(parentNode, modelNode, editor)
 {
 }
 
@@ -47,8 +49,8 @@ FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(const FNewtonMo
 {
 }
 
-FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
-	:FNewtonModelPhysicsTreeItem(parentNode, modelNode)
+FNewtonModelPhysicsTreeItemBody::FNewtonModelPhysicsTreeItemBody(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+	:FNewtonModelPhysicsTreeItem(parentNode, modelNode, editor)
 {
 }
 
@@ -64,16 +66,17 @@ FName FNewtonModelPhysicsTreeItemBody::BrushName() const
 
 void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
+	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_node);
 	check(bodyNode);
 
 	if (bodyNode->BoneIndex >= 0)
 	{
-		const FTransform com(CalculateGlobalTransform());
-		const FVector position(com.GetLocation());
-		const FVector xAxis(com.GetUnitAxis(EAxis::X));
-		const FVector yAxis(com.GetUnitAxis(EAxis::Y));
-		const FVector zAxis(com.GetUnitAxis(EAxis::Z));
+		const FTransform comTransform(CalculateGlobalTransform());
+
+		const FVector position(comTransform.TransformFVector4(bodyNode->ShapeGeometricCenter + bodyNode->CenterOfMass));
+		const FVector xAxis(comTransform.GetUnitAxis(EAxis::X));
+		const FVector yAxis(comTransform.GetUnitAxis(EAxis::Y));
+		const FVector zAxis(comTransform.GetUnitAxis(EAxis::Z));
 			
 		float size = bodyNode->DebugScale * 25.0f;
 		float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
@@ -85,14 +88,14 @@ void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FV
 
 bool FNewtonModelPhysicsTreeItemBody::HaveSelection() const
 {
-	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
+	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_node);
 	check(bodyNode);
 	return bodyNode->ShowDebug;
 }
 
 bool FNewtonModelPhysicsTreeItemBody::ShouldDrawWidget() const
 {
-	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
+	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_node);
 	check(bodyNode);
 	return bodyNode->ShowDebug;
 }
@@ -105,32 +108,31 @@ FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
 		TSharedPtr<FNewtonModelPhysicsTreeItem> childItem(m_acyclicGraph->m_children[i]->m_item);
 		if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
 		{
-			childrenShapes.Push(Cast<UNewtonLinkCollision>(childItem->Node));
+			childrenShapes.Push(Cast<UNewtonLinkCollision>(childItem->m_node));
 		}
 	}
 
-	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
+	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_node);
 	check(bodyNode);
 
+	const UNewtonAsset* const asset = m_editor->GetNewtonModel();
 	const FTransform globalTransform(CalculateGlobalTransform());
-	const FVector shapeCom(bodyNode->CalculateLocalCenterOfMass(globalTransform, childrenShapes));
+	bodyNode->ShapeGeometricCenter = bodyNode->CalculateLocalCenterOfMass(asset->SkeletalMeshAsset, bodyNode->BoneIndex, globalTransform, childrenShapes);
 
 	FMatrix matrix(globalTransform.ToMatrixNoScale());
-	//matrix.SetOrigin(matrix.TransformFVector4(shapeCom + bodyNode->CenterOfMass));
-	matrix.SetOrigin(globalTransform.TransformFVector4(shapeCom + bodyNode->CenterOfMass));
+	matrix.SetOrigin(globalTransform.TransformFVector4(bodyNode->ShapeGeometricCenter + bodyNode->CenterOfMass));
 	return matrix;
 }
 
 void FNewtonModelPhysicsTreeItemBody::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
-	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(Node);
+	UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_node);
 	check(bodyNode);
 
 	if ((inDrag.X != 0.0f) || (inDrag.Y != 0.0f) || (inDrag.Z != 0.0f))
 	{
-		//bodyNode->CenterOfMass += inDrag;
 		const FTransform globalTransform(CalculateGlobalTransform());
-		const FVector globalCom(globalTransform.TransformFVector4(bodyNode->CenterOfMass));
-		bodyNode->CenterOfMass = globalTransform.InverseTransformPosition(globalCom + inDrag);
+		const FVector globalCom(globalTransform.TransformFVector4(bodyNode->ShapeGeometricCenter + bodyNode->CenterOfMass));
+		bodyNode->CenterOfMass = globalTransform.InverseTransformPosition(globalCom + inDrag) - bodyNode->ShapeGeometricCenter;
 	}
 }

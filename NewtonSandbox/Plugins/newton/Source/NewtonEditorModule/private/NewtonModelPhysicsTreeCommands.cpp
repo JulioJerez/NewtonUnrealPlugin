@@ -53,6 +53,7 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(AddShapeCapsule, "Add Capsule Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeCylinder, "Add Cylinder Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeWheel, "Add Wheel Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeConvexhull, "Add Convexhull Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(DeleteSelectedRow, "Delete", "delete this item and all it children", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
 }

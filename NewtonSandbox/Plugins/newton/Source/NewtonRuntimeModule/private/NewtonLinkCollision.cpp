@@ -22,6 +22,7 @@
 
 #include "NewtonLinkCollision.h"
 
+#include "NewtonModel.h"
 #include "NewtonCommons.h"
 #include "NewtonLinkRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
@@ -31,7 +32,7 @@ UNewtonLinkCollision::UNewtonLinkCollision()
 {
 }
 
-void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
+void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
 	class DebugWireframeMeshBuilder : public ndShapeDebugNotify
 	{
@@ -62,12 +63,12 @@ void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) c
 		TArray<FVector>& m_wireFrameMesh;
 	};
 
-	ndShapeInstance instance(CreateInstance());
+	ndShapeInstance instance(CreateInstance(mesh, boneIndex));
 	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
 	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
 }
 
-ndShapeInstance UNewtonLinkCollision::CreateInstance() const
+ndShapeInstance UNewtonLinkCollision::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
 {
 	check(0);
 	ndShapeInstance instance(ndShapeInstance(new ndShapeNull()));

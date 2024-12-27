@@ -31,7 +31,7 @@ class FNewtonModelPhysicsTreeItemShapeCylinder : public FNewtonModelPhysicsTreeI
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeCylinder, FNewtonModelPhysicsTreeItemShape)
 
 	FNewtonModelPhysicsTreeItemShapeCylinder(const FNewtonModelPhysicsTreeItemShapeCylinder& src);
-	FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode);
+	FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 

@@ -36,7 +36,7 @@ UNewtonLinkCollisionCylinder::UNewtonLinkCollisionCylinder()
 	Length = 100.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionCylinder::CreateInstance() const
+ndShapeInstance UNewtonLinkCollisionCylinder::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
 {
 	ndShapeInstance instance(new ndShapeCylinder(Radio0 * UNREAL_INV_UNIT_SYSTEM, Radio1 * UNREAL_INV_UNIT_SYSTEM, Length * UNREAL_INV_UNIT_SYSTEM));
 	return instance;

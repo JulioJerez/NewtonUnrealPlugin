@@ -26,6 +26,7 @@
 #include "NewtonLink.h"
 #include "NewtonLinkCollision.generated.h"
 
+class UNewtonModel;
 class ndShapeInstance;
 
 /**
@@ -39,6 +40,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollision : public UNewtonLink
 	public: 
 	UNewtonLinkCollision();
 
-	virtual ndShapeInstance CreateInstance() const;
-	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const;
+	virtual ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
+	void CreateWireFrameMesh(TArray<FVector>& wireFrameMeshconst, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
 };

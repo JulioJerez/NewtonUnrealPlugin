@@ -35,7 +35,7 @@ UNewtonLinkCollisionWheel::UNewtonLinkCollisionWheel()
 	Width = 25.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance() const
+ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
 {
 	ndShapeInstance instance(new ndShapeChamferCylinder(0.5f, 1.0f));
 

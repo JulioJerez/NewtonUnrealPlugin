@@ -22,15 +22,17 @@
 
 #include "NewtonModelPhysicsTreeItemShape.h"
 
+#include "NewtonModelEditor.h"
+
 FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src)
 	:FNewtonModelPhysicsTreeItem(src)
 {
 }
 
-FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
-	:FNewtonModelPhysicsTreeItem(parentNode, modelNode)
+FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+	:FNewtonModelPhysicsTreeItem(parentNode, modelNode, editor)
 {
-	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(Node);
+	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNodeInfo);
 
 	check(m_parent);
@@ -38,7 +40,11 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FN
 	const FVector scale(parentTranform.GetScale3D());
 	shapeNodeInfo->Transform.SetScale3D(FVector(1.0f / scale.X, 1.0f / scale.Y, 1.0f / scale.Z));
 
-	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
+	UNewtonLinkRigidBody* const parentNodeInfo = Cast<UNewtonLinkRigidBody>(m_parent->GetNode());
+	check(parentNodeInfo);
+
+	UNewtonAsset* const asset = m_editor->GetNewtonModel();
+	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
 }
 
 FName FNewtonModelPhysicsTreeItemShape::BrushName() const
@@ -54,36 +60,36 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShape::Clone() const
 
 bool FNewtonModelPhysicsTreeItemShape::HaveSelection() const
 {
-	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
+	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNode);
 	return shapeNode->ShowDebug;
 }
 
 bool FNewtonModelPhysicsTreeItemShape::ShouldDrawWidget() const
 {
-	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
+	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNode);
 	return shapeNode->ShowDebug;
 }
 
-
 void FNewtonModelPhysicsTreeItemShape::OnPropertyChange(const FPropertyChangedEvent& event)
 {
-	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(Node);
+	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNodeInfo);
-	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
+	check(0);
+	//shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
 }
 
 void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
-	UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
+	UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNode);
 
 	//UE_LOG(LogTemp, Warning, TEXT("%d %f %f %f"), mode, inDrag.X, inDrag.Y, inDrag.Z);
 	if ((inDrag.X != 0.0f) || (inDrag.Y != 0.0f) || (inDrag.Z != 0.0f))
 	{
 		const FTransform parentTransform(m_parent->CalculateGlobalTransform());
-		FTransform globalTransform(Node->Transform * parentTransform);
+		FTransform globalTransform(m_node->Transform * parentTransform);
 
 		globalTransform.SetLocation(globalTransform.GetLocation() + inDrag);
 		shapeNode->Transform.SetLocation((globalTransform * parentTransform.Inverse()).GetLocation());
@@ -109,7 +115,7 @@ void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag
 
 void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(Node);
+	const UNewtonLinkCollision* const shapeNode = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNode);
 
 	if (shapeNode->m_hidden || !shapeNode->ShowDebug)
@@ -118,7 +124,7 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 	}
 
 	check(m_parent->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
-	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_parent->Node);
+	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_parent->m_node);
 	check(bodyNode);
 	if (bodyNode->BoneIndex < 0)
 	{

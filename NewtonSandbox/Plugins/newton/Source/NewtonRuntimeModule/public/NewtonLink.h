@@ -27,8 +27,6 @@
 #include "NewtonLink.generated.h"
 
 
-class UNewtonModel;
-
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 {

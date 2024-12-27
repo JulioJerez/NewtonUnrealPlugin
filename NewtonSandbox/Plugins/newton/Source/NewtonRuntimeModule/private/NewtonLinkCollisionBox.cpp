@@ -36,7 +36,7 @@ UNewtonLinkCollisionBox::UNewtonLinkCollisionBox()
 	SizeZ = 100.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionBox::CreateInstance() const
+ndShapeInstance UNewtonLinkCollisionBox::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
 {
 	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
 	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;

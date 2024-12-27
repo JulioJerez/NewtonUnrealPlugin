@@ -36,7 +36,7 @@ UNewtonLinkCollisionCapsule::UNewtonLinkCollisionCapsule()
 	Length = 100.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionCapsule::CreateInstance() const
+ndShapeInstance UNewtonLinkCollisionCapsule::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
 {
 	ndShapeInstance instance(new ndShapeCapsule(Radio0 * UNREAL_INV_UNIT_SYSTEM, Radio1 * UNREAL_INV_UNIT_SYSTEM, Length * UNREAL_INV_UNIT_SYSTEM));
 	return instance;

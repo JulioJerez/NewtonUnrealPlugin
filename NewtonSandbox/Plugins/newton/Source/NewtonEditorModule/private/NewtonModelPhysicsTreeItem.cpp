@@ -24,10 +24,11 @@
 
 #include "NewtonEditorModule.h"
 
-FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
+FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
-	Node = modelNode;
+	m_editor = editor;
+	m_node = modelNode;
 	m_parent = parentNode;
 	m_acyclicGraph = nullptr;
 }
@@ -35,8 +36,9 @@ FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModel
 FNewtonModelPhysicsTreeItem::FNewtonModelPhysicsTreeItem(const FNewtonModelPhysicsTreeItem& src)
 	:TSharedFromThis<FNewtonModelPhysicsTreeItem>()
 {
-	Node = src.Node;
 	m_parent = nullptr;
+	m_node = src.m_node;
+	m_editor = src.m_editor;
 	m_acyclicGraph = src.m_acyclicGraph;
 }
 
@@ -49,6 +51,21 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItem::Clone() const
 	return new FNewtonModelPhysicsTreeItem(*this);
 }
 
+TObjectPtr<UNewtonLink> FNewtonModelPhysicsTreeItem::GetNode() const
+{
+	return m_node;
+}
+
+TSharedPtr<FNewtonModelPhysicsTreeItem> FNewtonModelPhysicsTreeItem::GetParent() const
+{
+	return m_parent;
+}
+
+FNewtonModelPhysicsTreeItemAcyclicGraph* FNewtonModelPhysicsTreeItem::GetAcyclicGraph() const
+{
+	return m_acyclicGraph;
+}
+
 FName FNewtonModelPhysicsTreeItem::BrushName() const
 {
 	return TEXT("none");
@@ -59,15 +76,15 @@ FString FNewtonModelPhysicsTreeItem::GetReferencerName() const
 	return GetRttiName().ToString();
 }
 
-void FNewtonModelPhysicsTreeItem::AddReferencedObjects(FReferenceCollector& Collector)
+void FNewtonModelPhysicsTreeItem::AddReferencedObjects(FReferenceCollector& collector)
 {
-	Collector.AddReferencedObject(Node);
+	collector.AddReferencedObject(m_node);
 }
 
 FName FNewtonModelPhysicsTreeItem::GetDisplayName() const
 {
-	check(Node != nullptr);
-	return Node->Name;
+	check(m_node != nullptr);
+	return m_node->Name;
 }
 
 const FSlateBrush* FNewtonModelPhysicsTreeItem::GetIcon() const
@@ -116,10 +133,10 @@ FMatrix FNewtonModelPhysicsTreeItem::GetWidgetMatrix() const
 
 FTransform FNewtonModelPhysicsTreeItem::CalculateGlobalTransform() const
 {
-	FTransform transform(Node->Transform);
+	FTransform transform(m_node->Transform);
 	for (TSharedPtr<FNewtonModelPhysicsTreeItem> parent(m_parent); parent != nullptr; parent = parent->m_parent)
 	{
-		const FTransform parentTransform(parent->Node->Transform);
+		const FTransform parentTransform(parent->m_node->Transform);
 		transform = transform * parentTransform;
 	}
 	return transform;

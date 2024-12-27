@@ -94,6 +94,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnAddShapeSphereRow();
 	void OnAddShapeCapsuleRow();
 	void OnAddShapeCylinderRow();
+	void OnAddShapeConvexhullRow();
 
 	void OnDeleteSelectedRow();
 	void OnResetSelectedBone();

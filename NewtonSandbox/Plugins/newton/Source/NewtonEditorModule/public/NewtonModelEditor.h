@@ -28,9 +28,8 @@
 
 #include "NewtonModelEditorCommon.h"
 
-class UNewtonAsset;
-
 struct HActor;
+class UNewtonAsset;
 class ISkeletonTree;
 class IPersonaToolkit;
 class IPersonaViewport;

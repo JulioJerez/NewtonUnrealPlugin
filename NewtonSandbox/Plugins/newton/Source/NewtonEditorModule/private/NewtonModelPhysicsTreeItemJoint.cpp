@@ -27,8 +27,8 @@ FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(const FNewton
 {
 }
 
-FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode)
-	:FNewtonModelPhysicsTreeItem(parentNode, modelNode)
+FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+	:FNewtonModelPhysicsTreeItem(parentNode, modelNode, editor)
 {
 }
 
@@ -44,7 +44,7 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJoint::Clone() const
 
 bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
 {
-	const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
+	const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(m_node);
 	check(jointNode);
 	return jointNode->ShowDebug;
 }
@@ -63,14 +63,14 @@ bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
 
 bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
 {
-	const UNewtonLinkJoint* const shapeNode = Cast<UNewtonLinkJoint>(Node);
+	const UNewtonLinkJoint* const shapeNode = Cast<UNewtonLinkJoint>(m_node);
 	check(shapeNode);
 	return shapeNode->ShowDebug;
 }
 
 void FNewtonModelPhysicsTreeItemJoint::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
-	UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
+	UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(m_node);
 	check(jointNode);
 
 	check(0);

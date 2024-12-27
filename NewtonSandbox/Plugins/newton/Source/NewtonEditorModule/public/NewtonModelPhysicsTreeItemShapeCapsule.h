@@ -31,7 +31,7 @@ class FNewtonModelPhysicsTreeItemShapeCapsule : public FNewtonModelPhysicsTreeIt
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeCapsule, FNewtonModelPhysicsTreeItemShape)
 
 	FNewtonModelPhysicsTreeItemShapeCapsule(const FNewtonModelPhysicsTreeItemShapeCapsule& src);
-	FNewtonModelPhysicsTreeItemShapeCapsule(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode);
+	FNewtonModelPhysicsTreeItemShapeCapsule(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 

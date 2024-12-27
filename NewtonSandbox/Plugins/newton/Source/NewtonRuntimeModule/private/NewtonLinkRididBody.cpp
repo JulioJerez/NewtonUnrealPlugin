@@ -36,19 +36,20 @@ UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 	DebugScale = 1.0f;
 }
 
-FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childen) const
+FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(TObjectPtr<USkeletalMesh> mesh, int boneIndex,
+	const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childen) const
 {
 	FVector com(0.0f, 0.0f, 0.0f);
 	if (childen.Num() == 1)
 	{
 		ndBodyKinematic body;
 		const UNewtonLinkCollision* const shapeNode = childen[0];
-		ndShapeInstance shape(shapeNode->CreateInstance());
+		ndShapeInstance shape(shapeNode->CreateInstance(mesh, boneIndex));
 		
 		const ndMatrix bodyMatrix(ToNewtonMatrix(globalTransform));
 		const ndMatrix shapeLocalMatrix(ToNewtonMatrix(shapeNode->Transform));
 		FVector scale(globalTransform.GetScale3D() * shapeNode->Transform.GetScale3D());
-
+		
 		body.SetMatrix(bodyMatrix);
 		shape.SetLocalMatrix(shapeLocalMatrix);
 		shape.SetScale(ndVector(float(scale.X), float(scale.Y), float(scale.Z), float (1.0f)));

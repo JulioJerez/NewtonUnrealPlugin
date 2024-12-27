@@ -26,6 +26,7 @@
 
 #include "NewtonModelEditorCommon.h"
 
+class FNewtonModelEditor;
 class FNewtonModelPhysicsTree;
 class FNewtonModelPhysicsTreeItemAcyclicGraph;
 
@@ -35,13 +36,16 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	NEWTON_INIT_RTTI(FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItem(const FNewtonModelPhysicsTreeItem& src);
-	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode);
+	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
 	virtual ~FNewtonModelPhysicsTreeItem();
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const;
-	
+
 	FName GetDisplayName() const;
 	const FSlateBrush* GetIcon() const;
+	TObjectPtr<UNewtonLink> GetNode() const;
+	TSharedPtr<FNewtonModelPhysicsTreeItem> GetParent() const;
+	FNewtonModelPhysicsTreeItemAcyclicGraph* GetAcyclicGraph() const;
 	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected inIsSelected);
 
 	virtual bool HaveSelection() const;
@@ -59,11 +63,12 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	virtual FString GetReferencerName() const override;
 	virtual void AddReferencedObjects(FReferenceCollector& collector) override;
 
-	TObjectPtr<UNewtonLink> Node;
+	TObjectPtr<UNewtonLink> m_node;
+	const FNewtonModelEditor* m_editor;
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
-	friend class FNewtonModelPhysicsTree;
+	//friend class FNewtonModelPhysicsTree;
 	friend class FNewtonModelPhysicsTreeItemBody;
 	friend class FNewtonModelPhysicsTreeItemJoint;
 	friend class FNewtonModelPhysicsTreeItemShape;
