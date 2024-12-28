@@ -68,7 +68,6 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
 
-	//friend class FNewtonModelPhysicsTree;
 	friend class FNewtonModelPhysicsTreeItemBody;
 	friend class FNewtonModelPhysicsTreeItemJoint;
 	friend class FNewtonModelPhysicsTreeItemShape;

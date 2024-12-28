@@ -105,10 +105,17 @@ void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag
 
 	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0f) || (inRot.Roll != 0.0f))
 	{
-		const FQuat deltaRot(inRot.Quaternion());
-		FQuat rotation(deltaRot * shapeNode->Transform.GetRotation());
-		rotation.Normalize();
-		shapeNode->Transform.SetRotation(rotation);
+		//const FQuat deltaRot(inRot.Quaternion());
+		//FQuat rotation(deltaRot * shapeNode->Transform.GetRotation());
+		//rotation.Normalize();
+		//shapeNode->Transform.SetRotation(rotation);
+
+		const FTransform deltaTransform(inRot);
+		const FTransform parentTransform(m_parent->CalculateGlobalTransform());
+		
+		FTransform newTransform(shapeNode->Transform * parentTransform * deltaTransform * parentTransform.Inverse());
+		newTransform.NormalizeRotation();
+		shapeNode->Transform.SetRotation(newTransform.GetRotation());
 	}
 	
 	if ((inScale.X != 0.0f) || (inScale.Y != 0.0f) || (inScale.Z != 0.0f))
