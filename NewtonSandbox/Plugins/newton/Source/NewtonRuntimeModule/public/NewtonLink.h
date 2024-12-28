@@ -39,7 +39,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 	virtual void AttachNode(UNewtonLink* const node);
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const;
-	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const;
 
 	FTransform CalculateGlobalTransform() const;
 

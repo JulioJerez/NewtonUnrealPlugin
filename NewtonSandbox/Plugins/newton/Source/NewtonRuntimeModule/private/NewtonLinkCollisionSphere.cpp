@@ -48,7 +48,7 @@ TObjectPtr<USceneComponent> UNewtonLinkCollisionSphere::CreateBlueprintProxy() c
 	return component;
 }
 
-void UNewtonLinkCollisionSphere::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionSphere::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
 	UNewtonCollisionSphere* const shape = Cast<UNewtonCollisionSphere>(component.Get());
 	shape->Radio = Radio;

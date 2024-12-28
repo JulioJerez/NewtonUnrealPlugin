@@ -80,7 +80,7 @@ TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy() const
 	return component;
 }
 
-void UNewtonLinkRigidBody::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkRigidBody::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
 	UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component.Get());
 	check(body);

@@ -43,7 +43,7 @@ TObjectPtr<USceneComponent> UNewtonLinkJointHinge::CreateBlueprintProxy() const
 	return component;
 }
 
-void UNewtonLinkJointHinge::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkJointHinge::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
 	UNewtonJointHinge* const joint = Cast<UNewtonJointHinge>(component.Get());
 

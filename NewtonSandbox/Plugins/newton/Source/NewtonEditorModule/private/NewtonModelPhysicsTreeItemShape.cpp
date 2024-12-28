@@ -42,9 +42,11 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FN
 
 	UNewtonLinkRigidBody* const parentNodeInfo = Cast<UNewtonLinkRigidBody>(m_parent->GetNode());
 	check(parentNodeInfo);
-
-	UNewtonAsset* const asset = m_editor->GetNewtonModel();
-	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
+	//if (parentNodeInfo->BoneIndex)
+	{
+		UNewtonAsset* const asset = m_editor->GetNewtonModel();
+		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
+	}
 }
 
 FName FNewtonModelPhysicsTreeItemShape::BrushName() const
@@ -76,8 +78,14 @@ void FNewtonModelPhysicsTreeItemShape::OnPropertyChange(const FPropertyChangedEv
 {
 	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNodeInfo);
-	check(0);
-	//shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
+
+	UNewtonLinkRigidBody* const parentNodeInfo = Cast<UNewtonLinkRigidBody>(m_parent->GetNode());
+	check(parentNodeInfo);
+	//if (parentNodeInfo->BoneIndex >= 0)
+	{
+		UNewtonAsset* const asset = m_editor->GetNewtonModel();
+		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
+	}
 }
 
 void FNewtonModelPhysicsTreeItemShape::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)

@@ -20,6 +20,10 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 	Super::TickComponent(deltaTime, tickType, tickFunction);
 
 	const int bonesCount = GetNumBones();
+	if (!bonesCount)
+	{
+		return;
+	}
 	if (bonesCount != m_matrixPallete.Num())
 	{
 		m_matrixPallete.SetNum(bonesCount);

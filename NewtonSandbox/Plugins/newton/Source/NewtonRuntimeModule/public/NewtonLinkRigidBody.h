@@ -36,9 +36,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkRigidBody : public UNewtonLink
 	UNewtonLinkRigidBody();
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
-	FVector CalculateLocalCenterOfMass(TObjectPtr<USkeletalMesh> mesh, int boneIndex,
-		const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childenShapes) const;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+	FVector CalculateLocalCenterOfMass(TObjectPtr<USkeletalMesh> mesh, int boneIndex, const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childenShapes) const;
 
 	UPROPERTY(VisibleAnywhere)
 	FName BoneName;

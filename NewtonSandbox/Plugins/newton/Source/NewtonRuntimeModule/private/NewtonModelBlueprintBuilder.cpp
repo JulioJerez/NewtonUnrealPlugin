@@ -189,6 +189,8 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 		}
 	}
 
+	TObjectPtr<USkeletalMesh> mesh(asset->SkeletalMeshAsset);
+
 	// initalize shape
 	for (int i = 0; i < links.GetCount(); ++i)
 	{
@@ -198,7 +200,7 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 
 		if (Cast<UNewtonCollision>(componentProxy))
 		{
-			link->InitBlueprintProxy(componentProxy);
+			link->InitBlueprintProxy(componentProxy, mesh);
 			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
 		}
 	}
@@ -212,7 +214,7 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 		TObjectPtr<UNewtonRigidBody> bodyProxy(Cast<UNewtonRigidBody>(componentProxy));
 		if (bodyProxy)
 		{
-			link->InitBlueprintProxy(componentProxy);
+			link->InitBlueprintProxy(componentProxy, mesh);
 			bodyProxy->ShowDebug = model->ShowDebug;
 			bodyProxy->ShowCenterOfMass = model->ShowDebug;
 			bodyProxy->Inertia.ShowPrincipalAxis = model->ShowDebug;
@@ -230,7 +232,7 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 
 		if (jointProxy)
 		{
-			link->InitBlueprintProxy(componentProxy);
+			link->InitBlueprintProxy(componentProxy, mesh);
 			jointProxy->ShowDebug = model->ShowDebug;
 			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
 		}

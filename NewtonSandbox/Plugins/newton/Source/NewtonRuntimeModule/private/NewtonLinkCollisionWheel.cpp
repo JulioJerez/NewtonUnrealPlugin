@@ -52,7 +52,7 @@ TObjectPtr<USceneComponent> UNewtonLinkCollisionWheel::CreateBlueprintProxy() co
 	return component;
 }
 
-void UNewtonLinkCollisionWheel::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionWheel::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
 	UNewtonCollisionWheel* const shape = Cast<UNewtonCollisionWheel>(component.Get());
 

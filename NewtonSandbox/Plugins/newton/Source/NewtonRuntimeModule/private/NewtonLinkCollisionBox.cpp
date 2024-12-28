@@ -50,7 +50,7 @@ TObjectPtr<USceneComponent> UNewtonLinkCollisionBox::CreateBlueprintProxy() cons
 	return component;
 }
 
-void UNewtonLinkCollisionBox::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionBox::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
 	UNewtonCollisionBox* const shape = Cast<UNewtonCollisionBox>(component.Get());
 

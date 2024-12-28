@@ -37,9 +37,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexhull : public UNewtonLin
 	UNewtonLinkCollisionConvexhull();
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component) const override;
 	ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
-	float Radio;
+	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 };

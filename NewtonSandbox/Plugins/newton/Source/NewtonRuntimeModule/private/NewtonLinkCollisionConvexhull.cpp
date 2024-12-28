@@ -22,8 +22,10 @@
 
 
 #include "NewtonLinkCollisionConvexhull.h"
+#include "Rendering/SkeletalMeshRenderData.h"
 
 #include "NewtonCommons.h"
+#include "NewtonLinkRigidBody.h"
 #include "NewtonCollisionConvexHull.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
@@ -32,28 +34,139 @@ UNewtonLinkCollisionConvexhull::UNewtonLinkCollisionConvexhull()
 	:Super()
 {
 	SetName(TEXT("NewConvexhull"));
-
-	Radio = 50.0f;
 }
 
-#include "NewtonCollisionSphere.h"
 ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
-	//ndShapeInstance instance(new ndShapeConvexhull(Radio * UNREAL_INV_UNIT_SYSTEM));
-	ndShapeInstance instance(new ndShapeSphere(Radio * UNREAL_INV_UNIT_SYSTEM));
+	ndArray<ndVector> points;
+	if (boneIndex > 0)
+	{
+		USkeletalMesh* const staticMesh = mesh.Get();
+		const FSkeletalMeshRenderData* const resourceData = staticMesh->GetResourceForRendering();
+		const FSkeletalMeshLODRenderData& renderResource = resourceData->LODRenderData[0];
+
+		TArray<FSkinWeightInfo> weights;
+		const FStaticMeshVertexBuffers& vertexBuffer = renderResource.StaticVertexBuffers;
+		const FSkinWeightVertexBuffer& weightBuffer = renderResource.SkinWeightVertexBuffer;
+		weightBuffer.GetSkinWeights(weights);
+
+		const FMatrix refBoneMatrix(staticMesh->GetComposedRefPoseMatrix(boneIndex));
+		ndMatrix scaleMatrix;
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				scaleMatrix[i][j] = refBoneMatrix.M[i][j];
+			}
+		}
+
+		ndVector scale;
+		ndMatrix stretchAxis;
+		ndMatrix transformMatrix;
+		scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+
+		check(boneIndex > -1);
+		// for some reason moronic unreal the bone exclude the root bone.
+		boneIndex = boneIndex - 1;
+
+		check(weights.Num() == vertexBuffer.PositionVertexBuffer.GetNumVertices());
+		for (ndInt32 i = weights.Num() - 1; i >= 0; --i)
+		{
+			ndInt32 bone = -1;
+			ndInt32 maxWieght = -1;
+			const FSkinWeightInfo& info = weights[i];
+			for (ndInt32 j = 0; j < MAX_TOTAL_INFLUENCES; ++j)
+			{
+				if (info.InfluenceWeights[j] > maxWieght)
+				{
+					bone = info.InfluenceBones[j];
+					maxWieght = info.InfluenceWeights[j];
+				}
+			}
+			if (bone == boneIndex)
+			{
+				const FVector3f skinPoint(vertexBuffer.PositionVertexBuffer.VertexPosition(i));
+				const ndVector p(float(skinPoint.X), float(skinPoint.Y), float(skinPoint.Z), float(1.0f));
+				points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
+			}
+		}
+	}
+	
+	ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
 	return instance;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionConvexhull::CreateBlueprintProxy() const
 {
-	//TObjectPtr<UNewtonCollisionConvexhull> component(NewObject<UNewtonCollisionConvexhull>(UNewtonCollisionConvexhull::StaticClass(), Name, RF_Transient));
-	TObjectPtr<UNewtonCollisionSphere> component(NewObject<UNewtonCollisionSphere>(UNewtonCollisionSphere::StaticClass(), Name, RF_Transient));
+	TObjectPtr<UNewtonCollisionConvexHull> component(NewObject<UNewtonCollisionConvexHull>(UNewtonCollisionConvexHull::StaticClass(), Name, RF_Transient));
+
 	return component;
 }
 
-void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneComponent> component) const
+void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	//UNewtonCollisionConvexhull* const shape = Cast<UNewtonCollisionConvexhull>(component.Get());
-	UNewtonCollisionSphere* const shape = Cast<UNewtonCollisionSphere>(component.Get());
-	shape->Radio = Radio;
+	UNewtonLinkRigidBody* const parentBody = Cast<UNewtonLinkRigidBody>(Parent);
+	UNewtonCollisionConvexHull* const shape = Cast<UNewtonCollisionConvexHull>(component.Get());
+	check(parentBody);
+	if (parentBody && parentBody->BoneIndex > 0)
+	{
+		USkeletalMesh* const staticMesh = mesh.Get();
+		const FSkeletalMeshRenderData* const resourceData = staticMesh->GetResourceForRendering();
+		const FSkeletalMeshLODRenderData& renderResource = resourceData->LODRenderData[0];
+
+		TArray<FSkinWeightInfo> weights;
+		const FStaticMeshVertexBuffers& vertexBuffer = renderResource.StaticVertexBuffers;
+		const FSkinWeightVertexBuffer& weightBuffer = renderResource.SkinWeightVertexBuffer;
+		weightBuffer.GetSkinWeights(weights);
+
+		const FMatrix refBoneMatrix(staticMesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
+		ndMatrix scaleMatrix;
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				scaleMatrix[i][j] = refBoneMatrix.M[i][j];
+			}
+		}
+
+		ndVector scale;
+		ndMatrix stretchAxis;
+		ndMatrix transformMatrix;
+		scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+
+		// for some reason moronic unreal the bone exclude the root bone.
+		int boneIndex = parentBody->BoneIndex - 1;
+		ndArray<ndBigVector> points;
+		check(weights.Num() == vertexBuffer.PositionVertexBuffer.GetNumVertices());
+		for (ndInt32 i = weights.Num() - 1; i >= 0; --i)
+		{
+			ndInt32 bone = -1;
+			ndInt32 maxWieght = -1;
+			const FSkinWeightInfo& info = weights[i];
+			for (ndInt32 j = 0; j < MAX_TOTAL_INFLUENCES; ++j)
+			{
+				if (info.InfluenceWeights[j] > maxWieght)
+				{
+					bone = info.InfluenceBones[j];
+					maxWieght = info.InfluenceWeights[j];
+				}
+			}
+			if (bone == boneIndex)
+			{
+				const FVector3f skinPoint(vertexBuffer.PositionVertexBuffer.VertexPosition(i));
+				const ndBigVector p(float(skinPoint.X), float(skinPoint.Y), float(skinPoint.Z), float(1.0f));
+				points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
+			}
+		}
+
+		ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), shape->Tolerance, shape->MaxVertexCount);
+		const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
+
+		for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
+		{
+			//FVector3f p(float(convexVertex[i].m_x * UNREAL_UNIT_SYSTEM), float(convexVertex[i].m_y * UNREAL_UNIT_SYSTEM), float(convexVertex[i].m_z * UNREAL_UNIT_SYSTEM));
+			FVector3f p(float(convexVertex[i].m_x), float(convexVertex[i].m_y), float(convexVertex[i].m_z));
+			shape->m_convexHullPoints.Push(p);
+		}
+	}
 }

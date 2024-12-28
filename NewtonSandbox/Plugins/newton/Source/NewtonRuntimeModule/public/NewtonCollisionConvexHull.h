@@ -42,7 +42,6 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 	
-	protected:
 	virtual void Serialize(FArchive& ar) override;
 
 	virtual void ApplyPropertyChanges() override;
