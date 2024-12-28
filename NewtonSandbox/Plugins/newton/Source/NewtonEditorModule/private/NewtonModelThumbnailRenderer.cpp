@@ -55,14 +55,14 @@ bool UNewtonModelThumbnailRenderer::CanVisualizeAsset(UObject* object)
 
 void UNewtonModelThumbnailRenderer::BeginDestroy()
 {
-	thumbnailSceneCache.Clear();
+	m_thumbnailSceneCache.Clear();
 	Super::BeginDestroy();
 }
 
 void UNewtonModelThumbnailRenderer::Draw(UObject* object, int32 x, int32 y, uint32 width, uint32 height, FRenderTarget* renderTarget, FCanvas* canvas, bool additionalViewFamily)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-	TSharedRef<FSkeletalMeshThumbnailScene> thumbnailScene = thumbnailSceneCache.EnsureThumbnailScene(object);
+	TSharedRef<FSkeletalMeshThumbnailScene> thumbnailScene = m_thumbnailSceneCache.EnsureThumbnailScene(object);
 	
 	UNewtonAsset* const newtonAsset = Cast<UNewtonAsset>(object);
 	check(newtonAsset);

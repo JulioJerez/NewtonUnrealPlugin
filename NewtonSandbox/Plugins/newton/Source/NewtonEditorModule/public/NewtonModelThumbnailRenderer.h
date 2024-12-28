@@ -39,5 +39,5 @@ class UNewtonModelThumbnailRenderer : public UThumbnailRenderer
 	virtual void Draw(UObject* object, int32 x, int32 y, uint32 width, uint32 height, FRenderTarget* renderTarget, FCanvas* canvas, bool additionalViewFamily) override;
 
 	protected:
-	TObjectInstanceThumbnailScene<FSkeletalMeshThumbnailScene, 128> thumbnailSceneCache;
+	TObjectInstanceThumbnailScene<FSkeletalMeshThumbnailScene, 128> m_thumbnailSceneCache;
 };
