@@ -90,6 +90,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	void OnAddShapeBoxRow();
 	void OnAddJointHingeRow();
+	void OnAddJointSliderRow();
 	void OnAddShapeWheelRow();
 	void OnAddShapeSphereRow();
 	void OnAddShapeCapsuleRow();

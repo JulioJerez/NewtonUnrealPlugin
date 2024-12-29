@@ -22,30 +22,17 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "NewtonLinkJoint.h"
-#include "NewtonLinkJointHinge.generated.h"
+#include "NewtonModelPhysicsTreeItemJoint.h"
 
-/**
- * 
- */
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkJointHinge : public UNewtonLinkJoint
+class FNewtonModelPhysicsTreeItemJointSlider : public FNewtonModelPhysicsTreeItemJoint
 {
-	GENERATED_BODY()
-
 	public:
-	UNewtonLinkJointHinge();
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointSlider, FNewtonModelPhysicsTreeItemJoint)
 
-	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+	FNewtonModelPhysicsTreeItemJointSlider(const FNewtonModelPhysicsTreeItemJointSlider& src);
+	FNewtonModelPhysicsTreeItemJointSlider(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
 
-	UPROPERTY(EditAnywhere)
-	bool EnableLimits;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.0f, ClampMax = 10000.0f))
-	float MinAngle;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = -10000.0f, ClampMax = -1.0f))
-	float MaxAngle;
+	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 };

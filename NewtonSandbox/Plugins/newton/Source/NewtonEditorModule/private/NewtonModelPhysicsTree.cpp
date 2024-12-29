@@ -43,6 +43,7 @@
 #include "NewtonModelPhysicsTreeItemShapeBox.h"
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
+#include "NewtonModelPhysicsTreeItemJointSlider.h"
 #include "NewtonModelPhysicsTreeItemShapeSphere.h"
 #include "NewtonModelPhysicsTreeItemShapeCapsule.h"
 #include "NewtonModelPhysicsTreeItemShapeCylinder.h"
@@ -317,6 +318,13 @@ void FNewtonModelPhysicsTree::OnAddJointHingeRow()
 	AddJointRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddJointSliderRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointSlider(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointSlider>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddJointRow(item);
+}
+
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
@@ -410,6 +418,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointHingeRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddJointSlider
+		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointSliderRow)
+		, FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	// delete any node action
 	commandList.MapAction(menuActions.DeleteSelectedRow 
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnDeleteSelectedRow)
@@ -448,6 +460,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJOints", LOCTEXT("AddJointsActions", "Add joints"));
 		menuBuilder.AddMenuEntry(actions.AddJointHinge);
+		menuBuilder.AddMenuEntry(actions.AddJointSlider);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "Add collision shape"));
@@ -679,8 +692,10 @@ void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 	FVector scalePool[TREE_STACK_DEPTH];
 	TSharedPtr<FNewtonModelPhysicsTreeItem> stackPool[TREE_STACK_DEPTH];
 
+	const FVector unitScale(1.0f, 1.0f, 1.0f);
+
 	stackPool[0] = m_root[0];
-	scalePool[0] = FVector (1.0f, 1.0f, 1.0f);
+	scalePool[0] = unitScale;
 	
 	while (stack)
 	{
@@ -691,17 +706,17 @@ void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 		if (Cast<UNewtonLinkRigidBody>(node->GetNode()))
 		{
 			scale = scale * node->GetNode()->Transform.GetScale3D();
-			node->GetNode()->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+			node->GetNode()->Transform.SetScale3D(unitScale);
 		}
-		else if (Cast<UNewtonLinkJointHinge>(node->GetNode()))
+		else if (Cast<UNewtonLinkJoint>(node->GetNode()))
 		{
 			scale = scale * node->GetNode()->Transform.GetScale3D();
-			node->GetNode()->Transform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+			node->GetNode()->Transform.SetScale3D(unitScale);
 		}
 		else if (Cast<UNewtonLinkCollision>(node->GetNode()))
 		{
 			node->GetNode()->Transform.SetScale3D(node->GetNode()->Transform.GetScale3D() * scale);
-			scale = FVector(1.0f, 1.0f, 1.0f);
+			scale = unitScale;
 		}
 		else
 		{
@@ -957,6 +972,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkJointHinge>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointHinge(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkJointSlider>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointSlider(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

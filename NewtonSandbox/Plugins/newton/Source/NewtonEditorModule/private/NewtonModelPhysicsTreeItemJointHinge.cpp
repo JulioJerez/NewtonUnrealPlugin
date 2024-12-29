@@ -49,18 +49,19 @@ void FNewtonModelPhysicsTreeItemJointHinge::DebugDraw(const FSceneView* const vi
 	}
 
 	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
+	const FColor pinColor(NEWTON_EDITOR_DEBUG_COLOR);
+
 	FMatrix matrix(GetWidgetMatrix());
 	float scale = jointNode->DebugScale;
-	const FColor pinColor(255.0f, 255.0f, 0.0f);
 	
 	const FVector pinDir(matrix.GetUnitAxis(EAxis::X));
-	const FVector pingStart(matrix.GetOrigin());
-	const FVector pingEnd(pingStart + pinDir * (scale * 0.5f * 100.0f));
+	const FVector pinStart(matrix.GetOrigin());
+	const FVector pinEnd(pinStart + pinDir * (scale * 0.5f * 100.0f));
 	
 	FMatrix coneMatrix(matrix);
-	coneMatrix.SetOrigin(pingEnd);
+	coneMatrix.SetOrigin(pinEnd);
 	DrawCone(pdi, coneMatrix, pinColor);
-	pdi->DrawLine(pingStart, pingEnd, pinColor, SDPG_Foreground, thickness);
+	pdi->DrawLine(pinStart, pinEnd, pinColor, SDPG_Foreground, thickness);
 	
 	if (jointNode->EnableLimits)
 	{

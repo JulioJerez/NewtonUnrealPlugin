@@ -68,7 +68,7 @@ void NewtonModelAction::OpenAssetEditor(const TArray<UObject*>& inObjects, TShar
 	for (int i = 0; i < inObjects.Num(); ++i)
 	{
 		UNewtonAsset* const newtonAsset = Cast<UNewtonAsset>(inObjects[i]);
-		if (newtonAsset)
+		if (newtonAsset && newtonAsset->SkeletalMeshAsset)
 		{
 			FSkeletalMeshRenderData* const renderData = newtonAsset->SkeletalMeshAsset->GetResourceForRendering();
 			if (renderData && (renderData->LODRenderData.Num() == 0))

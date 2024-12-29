@@ -45,19 +45,19 @@ void UNewtonJointSlider::DrawGizmo(float timestep) const
 	const ndMatrix matrix(ToNewtonMatrix(transform));
 	const FColor pinColor(255.0f, 255.0f, 0.0f);
 	const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
-	const FVector pingStart(transform.GetLocation());
-	const FVector pingEnd(float(pingStart.X + pinDir.m_x), float(pingStart.Y + pinDir.m_y), float(pingStart.Z + pinDir.m_z));
+	const FVector pinStart(transform.GetLocation());
+	const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
 
 	const UWorld* const world = GetWorld();
-	DrawDebugLine(world, pingStart, pingEnd, pinColor, false, timestep);
+	DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
 
 	UNewtonRigidBody* const child = FindChild();
 	if (EnableLimits && child)
 	{
 		const ndVector maxLimit(matrix.m_front.Scale(MaxDistance));
-		const FVector maxConeStart(pingStart.X + maxLimit.m_x, pingStart.Y + maxLimit.m_y, pingStart.Z + maxLimit.m_z);
+		const FVector maxConeStart(pinStart.X + maxLimit.m_x, pinStart.Y + maxLimit.m_y, pinStart.Z + maxLimit.m_z);
 		const ndVector minLimit(matrix.m_front.Scale(MinDistance));
-		const FVector minConeStart(pingStart.X + minLimit.m_x, pingStart.Y + minLimit.m_y, pingStart.Z + minLimit.m_z);
+		const FVector minConeStart(pinStart.X + minLimit.m_x, pinStart.Y + minLimit.m_y, pinStart.Z + minLimit.m_z);
 
 		const FVector coneDir(matrix.m_front.m_x, matrix.m_front.m_y, matrix.m_front.m_z);
 		DrawDebugLine(world, minConeStart, maxConeStart, pinColor, false, timestep);

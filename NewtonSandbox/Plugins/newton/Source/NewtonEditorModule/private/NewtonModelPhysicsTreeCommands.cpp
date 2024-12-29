@@ -47,6 +47,7 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(CollisionsVisibility, "hide collisions", "filter shapes visible state", EUserInterfaceActionType::ToggleButton, FInputChord());
 
 	UI_COMMAND(AddJointHinge, "Add Hinge Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointSlider, "Add Slider Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(AddShapeBox, "Add Box Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeSphere, "Add Sphere Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());

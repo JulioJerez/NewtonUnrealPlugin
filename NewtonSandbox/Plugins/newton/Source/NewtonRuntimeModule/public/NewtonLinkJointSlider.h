@@ -19,46 +19,34 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonJoint.h"
-#include "NewtonJointSlider.generated.h"
+#include "NewtonLinkJoint.h"
+#include "NewtonLinkJointSlider.generated.h"
 
-
-class ndWorld;
-class ANewtonWorldActor;
 /**
  * 
  */
-
-UCLASS(ClassGroup=(NewtonJoints), meta=(BlueprintSpawnableComponent))
-class UNewtonJointSlider : public UNewtonJoint
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointSlider : public UNewtonLinkJoint
 {
 	GENERATED_BODY()
-	
+
 	public:
-	// Sets default values for this component's properties
-	UNewtonJointSlider();
+	UNewtonLinkJointSlider();
 
-	virtual void DrawGizmo(float timestep) const override;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-	UPROPERTY(EditAnywhere, Category = Newton)
+	UPROPERTY(EditAnywhere)
 	bool EnableLimits;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -10000.0f, ClampMax = -0.1f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = -10000.0f, ClampMax = -0.1f))
 	float MinDistance;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.1f, ClampMax = 10000.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.1f, ClampMax = 10000.0f))
 	float MaxDistance;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
-	float SpringConst;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 1000.0f))
-	float DampingConst;
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0001f, ClampMax = 1.0f))
-	float SpringDamperRegularizer;
 };
