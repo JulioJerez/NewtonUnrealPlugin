@@ -95,7 +95,6 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
 
 	protected:
-	//UPROPERTY()
 	UNewtonAsset* m_newtonModel;
 	
 	TSharedPtr<IDetailsView> m_selectedNodeDetailView;
@@ -108,16 +107,16 @@ class NEWTONEDITORMODULE_API FNewtonModelEditor : public FPersonaAssetEditorTool
 	// Skeleton physics tree
 	TSharedPtr<FNewtonModelPhysicsTree> m_skeletonPhysicsTree;
 
-	// Persona tollkid stuff 
-	TSharedPtr<IPersonaViewport> Viewport;
-	TSharedPtr<IPersonaToolkit> PersonaToolkit;
-	TSharedPtr<IPersonaPreviewScene> PreviewScene;
+	// Persona toolkit stuff 
+	TSharedPtr<IPersonaViewport> m_viewport;
+	TSharedPtr<IPersonaToolkit> m_personaToolkit;
+	TSharedPtr<IPersonaPreviewScene> m_previewScene;
 
 	// Binding to send/receive skeletal mesh modifications
-	TSharedPtr<FNewtonModelEditorBinding> Binding;
+	TSharedPtr<FNewtonModelEditorBinding> m_binding;
 
 	// Pinned commands panel
-	TSharedPtr<IPinnedCommandList> PinnedCommands;
+	//TSharedPtr<IPinnedCommandList> m_pinnedCommands;
 
 	// save model when closing editor
 	FDelegateHandle m_onCloseHandle;

@@ -126,7 +126,7 @@ TSharedRef<ITableRow> FNewtonModelPhysicsTree::OnGenerateRow(TSharedPtr<FNewtonM
 
 TSharedRef< SWidget > FNewtonModelPhysicsTree::OnCreateNewMenuWidget()
 {
-	FToolMenuContext menuContext(UICommandList);
+	FToolMenuContext menuContext(m_uiCommandList);
 	return UToolMenus::Get()->GenerateWidget(m_menuName, menuContext);
 }
 
@@ -357,11 +357,11 @@ void FNewtonModelPhysicsTree::OnDeleteSelectedRow()
 void FNewtonModelPhysicsTree::BindCommands()
 {
 	// This should not be called twice on the same instance
-	check(!UICommandList.IsValid());
+	check(!m_uiCommandList.IsValid());
 
-	UICommandList = MakeShareable(new FUICommandList_Pinnable);
+	m_uiCommandList = MakeShareable(new FUICommandList_Pinnable);
 
-	FUICommandList_Pinnable& commandList = *UICommandList;
+	FUICommandList_Pinnable& commandList = *m_uiCommandList;
 
 	// Grab the list of menu commands to bind...
 	const FNewtonModelPhysicsTreeCommands& menuActions = FNewtonModelPhysicsTreeCommands::Get();
@@ -415,7 +415,7 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnDeleteSelectedRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::CanDeleteSelectedRow));
 
-	PinnedCommands->BindCommandList(UICommandList.ToSharedRef());
+	m_pinnedCommands->BindCommandList(m_uiCommandList.ToSharedRef());
 }
 
 void FNewtonModelPhysicsTree::RegisterNewMenu()
@@ -443,27 +443,27 @@ void FNewtonModelPhysicsTree::RegisterNewMenu()
 
 TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 {
-	FMenuBuilder MenuBuilder(true, UICommandList);
+	FMenuBuilder menuBuilder(true, m_uiCommandList);
 	const FNewtonModelPhysicsTreeCommands& actions = FNewtonModelPhysicsTreeCommands::Get();
 
-	MenuBuilder.BeginSection("NewtonModelPhysicsTreeAddJOints", LOCTEXT("AddJointsActions", "Add joints"));
-		MenuBuilder.AddMenuEntry(actions.AddJointHinge);
-	MenuBuilder.EndSection();
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJOints", LOCTEXT("AddJointsActions", "Add joints"));
+		menuBuilder.AddMenuEntry(actions.AddJointHinge);
+	menuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "Add collision shape"));
-		MenuBuilder.AddMenuEntry(actions.AddShapeBox);
-		MenuBuilder.AddMenuEntry(actions.AddShapeSphere);
-		MenuBuilder.AddMenuEntry(actions.AddShapeCapsule);
-		MenuBuilder.AddMenuEntry(actions.AddShapeCylinder);
-		MenuBuilder.AddMenuEntry(actions.AddShapeWheel);
-		MenuBuilder.AddMenuEntry(actions.AddShapeConvexhull);
-	MenuBuilder.EndSection();
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "Add collision shape"));
+		menuBuilder.AddMenuEntry(actions.AddShapeBox);
+		menuBuilder.AddMenuEntry(actions.AddShapeSphere);
+		menuBuilder.AddMenuEntry(actions.AddShapeCapsule);
+		menuBuilder.AddMenuEntry(actions.AddShapeCylinder);
+		menuBuilder.AddMenuEntry(actions.AddShapeWheel);
+		menuBuilder.AddMenuEntry(actions.AddShapeConvexhull);
+	menuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("NewtonModelPhysicsTreeDeleteItems", LOCTEXT("DeleteItemAction", "Delete items"));
-		MenuBuilder.AddMenuEntry(actions.DeleteSelectedRow);
-	MenuBuilder.EndSection();
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeDeleteItems", LOCTEXT("DeleteItemAction", "Delete items"));
+		menuBuilder.AddMenuEntry(actions.DeleteSelectedRow);
+	menuBuilder.EndSection();
 	
-	return MenuBuilder.MakeWidget();
+	return menuBuilder.MakeWidget();
 }
 
 void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEditor* const editor)
@@ -472,8 +472,8 @@ void FNewtonModelPhysicsTree::Construct(const FArguments& args, FNewtonModelEdit
 
 	// Register and bind all our menu commands
 	// Create our pinned commands before we bind commands
-	IPinnedCommandListModule& PinnedCommandListModule = FModuleManager::LoadModuleChecked<IPinnedCommandListModule>(TEXT("PinnedCommandList"));
-	PinnedCommands = PinnedCommandListModule.CreatePinnedCommandList(m_contextName);
+	IPinnedCommandListModule& commandListModule = FModuleManager::LoadModuleChecked<IPinnedCommandListModule>(TEXT("PinnedCommandList"));
+	m_pinnedCommands = commandListModule.CreatePinnedCommandList(m_contextName);
 
 	FNewtonModelPhysicsTreeCommands::Register();
 	BindCommands();
@@ -673,7 +673,7 @@ void FNewtonModelPhysicsTree::RebuildAcyclicTree()
 	RefreshView();
 }
 
-void FNewtonModelPhysicsTree::FreezeBoneScale()
+void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 {
 	int stack = 1;
 	FVector scalePool[TREE_STACK_DEPTH];
@@ -688,7 +688,6 @@ void FNewtonModelPhysicsTree::FreezeBoneScale()
 		FVector scale(scalePool[stack]);
 		TSharedPtr<FNewtonModelPhysicsTreeItem> node(stackPool[stack]);
 
-		node->GetNode()->Transform.SetLocation(node->GetNode()->Transform.GetLocation() * scale);
 		if (Cast<UNewtonLinkRigidBody>(node->GetNode()))
 		{
 			scale = scale * node->GetNode()->Transform.GetScale3D();
@@ -864,7 +863,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 			bodyNodeInfo->Transform = boneTM;
 		}
 
-		FreezeBoneScale();
+		NormalizeTransformsScale();
 		m_treeView->RebuildList();
 		RefreshView();
 	}

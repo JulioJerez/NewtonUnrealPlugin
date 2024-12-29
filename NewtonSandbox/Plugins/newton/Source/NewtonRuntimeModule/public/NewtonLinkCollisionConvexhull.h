@@ -39,4 +39,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexhull : public UNewtonLin
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
 	ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+
+	void GetBoneVertices(TArray<FVector>& points, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
 };

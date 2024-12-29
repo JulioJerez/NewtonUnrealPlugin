@@ -21,6 +21,7 @@
 
 
 #include "NewtonModelPhysicsTreeItemJoint.h"
+#include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src)
 	:FNewtonModelPhysicsTreeItem(src)
@@ -49,18 +50,6 @@ bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
 	return jointNode->ShowDebug;
 }
 
-//FMatrix FNewtonModelPhysicsTreeItemJoint::GetWidgetMatrix() const
-//{
-//	check(0);
-//	return FMatrix::Identity;
-//	//const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(Node);
-//	//check(jointNode);
-//	//
-//	//check(jointNode);
-//	//return jointNode->Transform.ToMatrixNoScale();
-//	return CalculateGlobalTransform().ToMatrixNoScale();
-//}
-
 bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
 {
 	const UNewtonLinkJoint* const shapeNode = Cast<UNewtonLinkJoint>(m_node);
@@ -73,17 +62,27 @@ void FNewtonModelPhysicsTreeItemJoint::ApplyDeltaTransform(const FVector& inDrag
 	UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(m_node);
 	check(jointNode);
 
-	check(0);
-	//// only allow rotation around the bone pivot. 
-	////jointNode->Transform.SetLocation(jointNode->Transform.GetLocation() + inDrag);
-	//
-	//if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
-	//{
-	//	const FQuat deltaRot(inRot.Quaternion());
-	//	FQuat rotation(deltaRot * jointNode->Transform.GetRotation());
-	//	rotation.Normalize();
-	//	jointNode->Transform.SetRotation(rotation);
-	//}
+	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
+	{
+		const FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicGraph = m_acyclicGraph;
+		check(acyclicGraph->m_children.Num() == 1);
+		FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicChild = acyclicGraph->m_children[0];
+		check(acyclicChild->m_item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+		UNewtonLinkRigidBody* const childBodyNode = Cast<UNewtonLinkRigidBody>(acyclicChild->m_item->m_node);
+		check(childBodyNode);
+
+		const FTransform parentTransform(m_parent->CalculateGlobalTransform());
+		const FTransform childBodyTransform(childBodyNode->Transform * jointNode->Transform * parentTransform);
+
+		const FTransform deltaTransform(inRot);
+		FTransform jointTransform(jointNode->Transform * parentTransform * deltaTransform * parentTransform.Inverse());
+		jointTransform.NormalizeRotation();
+		jointNode->Transform.SetRotation (jointTransform.GetRotation());
+
+		const FTransform bodyParentTransform(jointNode->Transform * parentTransform);
+		childBodyNode->Transform = childBodyTransform * bodyParentTransform.Inverse();
+		childBodyNode->Transform.NormalizeRotation();
+	}
 }
 
 void FNewtonModelPhysicsTreeItemJoint::DrawCone(FPrimitiveDrawInterface* const pdi, const FMatrix& matrix, const FColor& color) const

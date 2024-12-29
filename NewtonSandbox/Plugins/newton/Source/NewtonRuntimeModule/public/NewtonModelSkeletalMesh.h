@@ -15,6 +15,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelSkeletalMesh : public USkeletalMeshCom
 	UNewtonModelSkeletalMesh();
 	
 	virtual void FinalizeBoneTransform() override;
+	virtual bool ShouldUpdateTransform(bool lodHasChanged) const override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	TArray<FTransform> m_matrixPallete;

@@ -32,9 +32,9 @@ UNewtonLinkJointHinge::UNewtonLinkJointHinge()
 {
 	SetName(TEXT("NewHinge"));
 
-	EnableLimits = false;
-	MinAngle = -45.0f;
 	MaxAngle = 45.0f;
+	MinAngle = -45.0f;
+	EnableLimits = false;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointHinge::CreateBlueprintProxy() const
@@ -49,7 +49,7 @@ void UNewtonLinkJointHinge::InitBlueprintProxy(TObjectPtr<USceneComponent> compo
 
 	SetCommonProperties(joint);
 
-	joint->EnableLimits = EnableLimits;
 	joint->MinAngle = MinAngle;
 	joint->MaxAngle = MaxAngle;
+	joint->EnableLimits = EnableLimits;
 }

@@ -57,9 +57,9 @@ FNewtonModelEditor::FNewtonModelEditor()
 {
 	m_modelSaved = false;
 	m_newtonModel = nullptr;
-	PersonaToolkit = nullptr;
 	m_skeletonTree = nullptr;
 	m_selectedBone = nullptr;
+	m_personaToolkit = nullptr;
 	m_selectedNodeDetailView = nullptr;
 	m_skeletalMeshAssetCached = nullptr;
 }
@@ -70,12 +70,12 @@ FNewtonModelEditor::~FNewtonModelEditor()
 
 TSharedPtr<FNewtonModelEditorBinding> FNewtonModelEditor::GetBinding()
 {
-	if (!Binding)
+	if (!m_binding)
 	{
-		Binding = MakeShared<FNewtonModelEditorBinding>(SharedThis(this));
+		m_binding = MakeShared<FNewtonModelEditorBinding>(SharedThis(this));
 	}
 
-	return Binding;
+	return m_binding;
 }
 
 TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
@@ -85,8 +85,8 @@ TSharedRef<ISkeletonTree> FNewtonModelEditor::GetSkeletonTree() const
 
 UDebugSkelMeshComponent* FNewtonModelEditor::GetSkelMeshComponent() const
 {
-	check(PreviewScene.IsValid());
-	return PreviewScene->GetPreviewMeshComponent();
+	check(m_previewScene.IsValid());
+	return m_previewScene->GetPreviewMeshComponent();
 }
 
 TSharedRef<FNewtonModelPhysicsTree> FNewtonModelEditor::GetNewtonModelPhysicsTree() const
@@ -96,11 +96,11 @@ TSharedRef<FNewtonModelPhysicsTree> FNewtonModelEditor::GetNewtonModelPhysicsTre
 
 void FNewtonModelEditor::OnViewportCreated(const TSharedRef<IPersonaViewport>& viewport)
 {
-	Viewport = viewport;
+	m_viewport = viewport;
 
 	// we need the viewport client to start out focused, or else it won't get ticked until we click inside it.
-	FEditorViewportClient& ViewportClient = viewport->GetViewportClient();
-	ViewportClient.ReceivedFocus(ViewportClient.Viewport);
+	FEditorViewportClient& viewportClient = viewport->GetViewportClient();
+	viewportClient.ReceivedFocus(viewportClient.Viewport);
 }
 
 void FNewtonModelEditor::OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit)
@@ -113,12 +113,12 @@ void FNewtonModelEditor::OnToolkitHostingFinished(const TSharedRef<IToolkit>& To
 
 TSharedRef<IPersonaToolkit> FNewtonModelEditor::GetPersonaToolkit() const
 { 
-	return PersonaToolkit.ToSharedRef(); 
+	return m_personaToolkit.ToSharedRef();
 }
 
 TSharedRef<IPersonaPreviewScene> FNewtonModelEditor::GetPreviewScene() const
 {
-	return PreviewScene.ToSharedRef();
+	return m_previewScene.ToSharedRef();
 }
 
 FName FNewtonModelEditor::GetToolkitFName() const
@@ -300,25 +300,25 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	personaToolkitArgs.bPreviewMeshCanUseDifferentSkeleton = false;
 	//personaToolkitArgs.OnPreviewSceneCreated = FOnPreviewSceneCreated::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneCreated);
 	personaToolkitArgs.OnPreviewSceneSettingsCustomized = FOnPreviewSceneSettingsCustomized::FDelegate::CreateSP(this, &FNewtonModelEditor::OnPreviewSceneSettingsCustomized);
-	PersonaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
-	PreviewScene = PersonaToolkit->GetPreviewScene();
-	PreviewScene->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
+	m_personaToolkit = personaModule.CreatePersonaToolkit(m_skeletalMeshAssetCached, personaToolkitArgs);
+	m_previewScene = m_personaToolkit->GetPreviewScene();
+	m_previewScene->SetDefaultAnimationMode(EPreviewSceneDefaultAnimationMode::ReferencePose);
 
-	UDebugSkelMeshComponent* const skeletalMeshComponent = PreviewScene->GetPreviewMeshComponent();
+	UDebugSkelMeshComponent* const skeletalMeshComponent = m_previewScene->GetPreviewMeshComponent();
 	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);
 	check(m_skeletalMeshAssetCached == skeletalMeshComponent->GetSkeletalMeshAsset());
 
 
 	// create a skeleton tree widgets for visualization.
 	FSkeletonTreeArgs skeletonTreeArgs;
-	skeletonTreeArgs.PreviewScene = PreviewScene;
+	skeletonTreeArgs.PreviewScene = m_previewScene;
 	skeletonTreeArgs.ContextName = GetToolkitFName();
 	skeletonTreeArgs.bAllowMeshOperations = false;
 	skeletonTreeArgs.bAllowMeshOperations = false;
 	skeletonTreeArgs.bAllowSkeletonOperations = false;
 	skeletonTreeArgs.bShowDebugVisualizationOptions = true;
 	skeletonTreeArgs.OnSelectionChanged = FOnSkeletonTreeSelectionChanged::CreateSP(this, &FNewtonModelEditor::OnSkeletalMeshSelectionChanged);
-	m_skeletonTree = skeletonEditorModule.CreateSkeletonTree(PersonaToolkit->GetSkeleton(), skeletonTreeArgs);
+	m_skeletonTree = skeletonEditorModule.CreateSkeletonTree(m_personaToolkit->GetSkeleton(), skeletonTreeArgs);
 	
 	// create a acyclic physics tree widgets for physic model.
 	m_skeletonPhysicsTree = SNew(FNewtonModelPhysicsTree, this);
@@ -337,9 +337,9 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 	// register callback for rebuild model when click save button
 	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSave);
 
-	PreviewScene->RegisterOnMeshClick(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
-	//PreviewScene->RegisterOnDeselectAll(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
-	PreviewScene->SetAllowMeshHitProxies(true);
+	m_previewScene->RegisterOnMeshClick(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
+	//m_previewScene->RegisterOnDeselectAll(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
+	m_previewScene->SetAllowMeshHitProxies(true);
 
 	// this shit enable the transform tool bar. 
 	// why unreal does this crap is beyond reprehensible. 
