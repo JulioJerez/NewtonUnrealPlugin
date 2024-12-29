@@ -12,13 +12,23 @@ UNewtonModelSkeletalMesh::UNewtonModelSkeletalMesh()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
+	m_boneCount = 0;
+	m_boneIndex.Empty();
 	m_matrixPallete.Empty();
 };
+
+bool UNewtonModelSkeletalMesh::ShouldUpdateTransform(bool lodHasChanged) const
+{
+	Super::ShouldUpdateTransform(lodHasChanged);
+	return true;
+}
+
 
 void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* tickFunction)
 {
 	Super::TickComponent(deltaTime, tickType, tickFunction);
 
+	//UE_LOG(LogTemp, Warning, TEXT("function: %s"), TEXT(__FUNCTION__));
 	const int bonesCount = GetNumBones();
 	if (!bonesCount)
 	{
@@ -26,16 +36,18 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 	}
 	if (bonesCount != m_matrixPallete.Num())
 	{
+		m_boneIndex.SetNum(bonesCount);
 		m_matrixPallete.SetNum(bonesCount);
 	}
-
+	
 	bool isSleeping = true;
 	AActor* const owner = GetOwner();
 	check(owner->GetRootComponent());
-
+	
 	ndFixSizeArray<USceneComponent*, 256> stack;
 	stack.PushBack(owner->GetRootComponent());
 
+	int index = 0;
 	FTransform rootInverseTransfrom;
 	while (stack.GetCount())
 	{
@@ -47,18 +59,19 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 			const USceneComponent* const parent = Cast<UNewtonJoint>(rigidBodyBone->GetAttachParent());
 			if (!parent)
 			{
-				//invTransfrom = rigidBodyBone->GetComponentToWorld().Inverse();
 				rootInverseTransfrom = rigidBodyBone->m_globalTransform.Inverse();
 			}
 			else
 			{
-				//boneTransform = rigidBodyBone->GetComponentToWorld() * invTransfrom;
 				boneTransform = rigidBodyBone->m_globalTransform * rootInverseTransfrom;
 			}
-
+	
 			const FTransform boneTM(GetBoneTransform(rigidBodyBone->BoneIndex));
 			boneTransform.SetScale3D(boneTM.GetScale3D());
-			m_matrixPallete[rigidBodyBone->BoneIndex] = boneTransform;
+
+			m_boneIndex[index] = rigidBodyBone->BoneIndex;
+			m_matrixPallete[index] = boneTransform;
+			index++;
 		}
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
 		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
@@ -66,23 +79,16 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 			stack.PushBack(childrenComp[i].Get());
 		}
 	}
-}
-
-bool UNewtonModelSkeletalMesh::ShouldUpdateTransform(bool lodHasChanged) const
-{
-	Super::ShouldUpdateTransform(lodHasChanged);
-	return true;
+	m_boneCount = index;
 }
 
 void UNewtonModelSkeletalMesh::FinalizeBoneTransform()
 {
-	if (GetNumBones() == m_matrixPallete.Num())
+	TArray<FTransform>& matrixPallete = GetEditableComponentSpaceTransforms();
+	for (int i = m_boneCount - 1; i >= 0; --i)
 	{
-		TArray<FTransform>& matrixPallete = GetEditableComponentSpaceTransforms();
-		for (int i = GetNumBones() - 1; i >= 0; --i)
-		{
-			matrixPallete[i] = m_matrixPallete[i];
-		}
+		int index = m_boneIndex[i];
+		matrixPallete[index] = m_matrixPallete[i];
 	}
 
 	Super::FinalizeBoneTransform();
