@@ -673,7 +673,7 @@ void FNewtonModelPhysicsTree::RebuildAcyclicTree()
 	RefreshView();
 }
 
-void FNewtonModelPhysicsTree::FreezeBoneScale()
+void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 {
 	int stack = 1;
 	FVector scalePool[TREE_STACK_DEPTH];
@@ -688,7 +688,6 @@ void FNewtonModelPhysicsTree::FreezeBoneScale()
 		FVector scale(scalePool[stack]);
 		TSharedPtr<FNewtonModelPhysicsTreeItem> node(stackPool[stack]);
 
-		node->GetNode()->Transform.SetLocation(node->GetNode()->Transform.GetLocation() * scale);
 		if (Cast<UNewtonLinkRigidBody>(node->GetNode()))
 		{
 			scale = scale * node->GetNode()->Transform.GetScale3D();
@@ -864,7 +863,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 			bodyNodeInfo->Transform = boneTM;
 		}
 
-		FreezeBoneScale();
+		NormalizeTransformsScale();
 		m_treeView->RebuildList();
 		RefreshView();
 	}

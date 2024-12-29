@@ -67,6 +67,12 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 	}
 }
 
+bool UNewtonModelSkeletalMesh::ShouldUpdateTransform(bool lodHasChanged) const
+{
+	Super::ShouldUpdateTransform(lodHasChanged);
+	return true;
+}
+
 void UNewtonModelSkeletalMesh::FinalizeBoneTransform()
 {
 	if (GetNumBones() == m_matrixPallete.Num())
