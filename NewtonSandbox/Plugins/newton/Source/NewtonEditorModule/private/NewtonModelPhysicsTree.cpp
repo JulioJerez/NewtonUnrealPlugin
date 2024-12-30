@@ -246,11 +246,20 @@ void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTr
 	m_items.Add(shapeItem);
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(shapeItem, m_selectedItem->GetAcyclicGraph());
 
+	check(shapeItem->GetParent() == m_selectedItem);
 	check(shapeItem->GetParent()->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().X == 1.0f);
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().Y == 1.0f);
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().Z == 1.0f);
-	shapeItem->GetNode()->Transform = FTransform();
+
+	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(shapeItem->GetNode());
+	UNewtonLinkRigidBody* const bodyNodeInfo = Cast<UNewtonLinkRigidBody>(m_selectedItem->GetNode());
+
+	check(bodyNodeInfo);
+	check(shapeNodeInfo);
+	shapeNodeInfo->Transform = FTransform();
+	const FString name(bodyNodeInfo->BoneName.GetPlainNameString() + "_" + shapeNodeInfo->Name.GetPlainNameString());
+	shapeNodeInfo->Name = m_uniqueNames.GetUniqueName(FName(*name));
 
 	RefreshView();
 }
@@ -866,17 +875,38 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 		bodyNodeInfo->BoneIndex = boneIndex;
 		bodyNodeInfo->BoneName = item->GetAttachName();
 		bodyNodeInfo->Name = m_uniqueNames.GetUniqueName(bodyNodeInfo->BoneName);
+
 		const FTransform boneTM(meshComponent->GetBoneTransform(boneIndex));
 		if (m_selectedItem->GetParent())
 		{
 			const FTransform parentTransform(m_selectedItem->GetParent()->GetParent()->CalculateGlobalTransform());
 			m_selectedItem->GetParent()->GetNode()->Transform = boneTM * parentTransform.Inverse();
 			bodyNodeInfo->Transform = FTransform();
+
+			UNewtonLinkJoint* const jointNodeInfo = Cast<UNewtonLinkJoint>(m_selectedItem->GetParent()->GetNode());
+			check(jointNodeInfo);
+			FString jointName(bodyNodeInfo->BoneName.GetPlainNameString());
+			jointName = jointName + "_" + jointNodeInfo->Name.GetPlainNameString();
+			jointNodeInfo->Name = m_uniqueNames.GetUniqueName(FName(*jointName));
 		}
 		else
 		{
 			bodyNodeInfo->Transform = boneTM;
 		}
+
+		for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
+		{
+			TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
+			if ((itemInSet->GetParent() == m_selectedItem) && (itemInSet->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape"))))
+			{
+				UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_selectedItem->GetParent()->GetNode());
+				check(shapeNodeInfo);
+				FString shapeName(bodyNodeInfo->BoneName.GetPlainNameString());
+				shapeName = shapeName + "_" + shapeNodeInfo->Name.GetPlainNameString();
+				shapeNodeInfo->Name = m_uniqueNames.GetUniqueName(FName(*shapeName));
+			}
+		}
+
 
 		NormalizeTransformsScale();
 		m_treeView->RebuildList();

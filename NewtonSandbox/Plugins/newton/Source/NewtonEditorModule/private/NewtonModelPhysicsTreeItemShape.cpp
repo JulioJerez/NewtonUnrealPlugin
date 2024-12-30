@@ -146,9 +146,9 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 		return;
 	}
 
-	//const FColor color(FColor::Purple);
 	//const FColor color(FColor::Blue);
-	const FLinearColor color(FLinearColor::Gray);
+	//const FColor color(FColor::Purple);
+	const FLinearColor color(FColor::Purple);
 	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
 	
 	const FTransform transform(CalculateGlobalTransform());

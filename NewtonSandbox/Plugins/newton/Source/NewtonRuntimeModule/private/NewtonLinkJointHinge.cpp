@@ -30,7 +30,7 @@
 UNewtonLinkJointHinge::UNewtonLinkJointHinge()
 	:Super()
 {
-	SetName(TEXT("NewHinge"));
+	SetName(TEXT("hingeJoint"));
 
 	MaxAngle = 45.0f;
 	MinAngle = -45.0f;
