@@ -29,7 +29,7 @@
 UNewtonLinkCollisionWheel::UNewtonLinkCollisionWheel()
 	:Super()
 {
-	SetName(TEXT("NewWheel"));
+	SetName(TEXT("wheel"));
 
 	Radio = 50.0f;
 	Width = 25.0f;

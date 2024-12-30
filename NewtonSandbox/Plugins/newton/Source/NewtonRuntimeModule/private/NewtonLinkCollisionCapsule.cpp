@@ -29,7 +29,7 @@
 UNewtonLinkCollisionCapsule::UNewtonLinkCollisionCapsule()
 	:Super()
 {
-	SetName(TEXT("NewCapsule"));
+	SetName(TEXT("capsule"));
 
 	Radio0 = 50.0f;
 	Radio1 = 50.0f;

@@ -866,12 +866,19 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 		bodyNodeInfo->BoneIndex = boneIndex;
 		bodyNodeInfo->BoneName = item->GetAttachName();
 		bodyNodeInfo->Name = m_uniqueNames.GetUniqueName(bodyNodeInfo->BoneName);
+
 		const FTransform boneTM(meshComponent->GetBoneTransform(boneIndex));
 		if (m_selectedItem->GetParent())
 		{
 			const FTransform parentTransform(m_selectedItem->GetParent()->GetParent()->CalculateGlobalTransform());
 			m_selectedItem->GetParent()->GetNode()->Transform = boneTM * parentTransform.Inverse();
 			bodyNodeInfo->Transform = FTransform();
+
+			UNewtonLinkJoint* const jointNodeInfo = Cast<UNewtonLinkJoint>(m_selectedItem->GetParent()->GetNode());
+			check(jointNodeInfo);
+			FString jointName(bodyNodeInfo->BoneName.GetPlainNameString());
+			jointName = jointName + "_" + jointNodeInfo->Name.GetPlainNameString();
+			jointNodeInfo->Name = m_uniqueNames.GetUniqueName(FName(*jointName));
 		}
 		else
 		{

@@ -29,7 +29,7 @@
 UNewtonLinkCollisionCylinder::UNewtonLinkCollisionCylinder()
 	:Super()
 {
-	SetName(TEXT("NewCylinder"));
+	SetName(TEXT("cylinder"));
 
 	Radio0 = 50.0f;
 	Radio1 = 50.0f;

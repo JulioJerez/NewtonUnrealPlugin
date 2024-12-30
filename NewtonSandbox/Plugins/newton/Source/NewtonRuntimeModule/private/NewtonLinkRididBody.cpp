@@ -29,7 +29,7 @@
 UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 	:Super()
 {
-	SetName(TEXT("NewBody"));
+	SetName(TEXT("rigidBody"));
 	BoneIndex = -1;
 
 	Mass = 1.0f;

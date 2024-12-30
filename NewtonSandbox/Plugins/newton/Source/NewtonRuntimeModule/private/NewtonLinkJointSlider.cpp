@@ -30,7 +30,7 @@
 UNewtonLinkJointSlider::UNewtonLinkJointSlider()
 	:Super()
 {
-	SetName(TEXT("NewSlider"));
+	SetName(TEXT("sliderJoint"));
 
 	MaxDistance = 100.0f;
 	MinDistance = -100.0f;

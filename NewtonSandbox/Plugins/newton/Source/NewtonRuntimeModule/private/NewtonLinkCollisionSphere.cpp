@@ -31,7 +31,7 @@
 UNewtonLinkCollisionSphere::UNewtonLinkCollisionSphere()
 	:Super()
 {
-	SetName(TEXT("NewSphere"));
+	SetName(TEXT("sphere"));
 
 	Radio = 50.0f;
 }
