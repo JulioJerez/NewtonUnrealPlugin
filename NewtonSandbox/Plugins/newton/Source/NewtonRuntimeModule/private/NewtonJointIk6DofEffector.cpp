@@ -32,15 +32,15 @@ UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 	ReferencedBodyName = TEXT("None");
 
 	TargetFrame = FTransform();
-	AngularSpring = 1000.0f;
-	AngularDamper = 50.0f;
-	AngularMaxTorque = D_LCP_MAX_VALUE;
-	AngularRegularizer = 1.0e-4f;
+	AngularDamper = 500.0f;
+	AngularSpring = 10000.0f;
+	AngularMaxTorque = 10000.0f;
+	AngularRegularizer = 1.0e-5f;
 
-	LinearSpring = 1000.0f;
-	LinearDamper = 50.0f;
-	LinearMaxForce = D_LCP_MAX_VALUE;
-	LinearRegularizer = 1.0e-4f;
+	LinearDamper = 500.0f;
+	LinearSpring = 10000.0f;
+	LinearMaxForce = 10000.0f;
+	LinearRegularizer = 1.0e-5f;
 	//rotationType(ndIk6DofEffector::m_shortestPath)
 	//controlDofOptions(0xff)
 }
@@ -108,6 +108,12 @@ void UNewtonJointIk6DofEffector::CreateJoint(ANewtonWorldActor* const newtonWorl
 		const ndMatrix childMarix(ToNewtonMatrix(TargetFrame) * parentMarix);
 		ndIk6DofEffector* const joint = new ndIk6DofEffector(childMarix, parentMarix, childBody, parentBody);
 			
+		joint->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+		joint->SetAngularSpringDamper(LinearRegularizer, LinearSpring, LinearDamper);
+		joint->SetLinearSpringDamper(AngularRegularizer, AngularSpring, AngularDamper);
+		joint->SetMaxForce(LinearMaxForce);
+		joint->SetMaxTorque(AngularMaxTorque);
+
 		m_joint = joint;
 		world->AddJoint(m_joint);
 	}
