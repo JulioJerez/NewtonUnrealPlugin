@@ -30,14 +30,14 @@ class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJoint, FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src);
-	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
+	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
+	virtual int GetFreeDof() const;
 	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
 	virtual bool HaveSelection() const override;
 	virtual bool ShouldDrawWidget() const override;
-	//virtual FMatrix GetWidgetMatrix() const override;
 	void DrawCone(FPrimitiveDrawInterface* const pdi, const FMatrix& matrix, const FColor& color) const;
 	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale) override;
 };

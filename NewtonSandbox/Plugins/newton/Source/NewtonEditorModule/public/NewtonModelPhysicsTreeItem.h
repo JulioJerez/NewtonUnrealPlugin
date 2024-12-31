@@ -36,7 +36,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	NEWTON_INIT_RTTI(FNewtonModelPhysicsTreeItem)
 
 	FNewtonModelPhysicsTreeItem(const FNewtonModelPhysicsTreeItem& src);
-	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
+	FNewtonModelPhysicsTreeItem(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 	virtual ~FNewtonModelPhysicsTreeItem();
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const;
@@ -58,19 +58,13 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	virtual void ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale);
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const;
 
-	protected:
 	virtual FName BrushName() const;
 	virtual FString GetReferencerName() const override;
 	virtual void AddReferencedObjects(FReferenceCollector& collector) override;
 
+	FNewtonModelEditor* m_editor;
 	TObjectPtr<UNewtonLink> m_node;
-	const FNewtonModelEditor* m_editor;
 	TSharedPtr<FNewtonModelPhysicsTreeItem> m_parent;
 	FNewtonModelPhysicsTreeItemAcyclicGraph* m_acyclicGraph;
-
-	friend class FNewtonModelPhysicsTreeItemBody;
-	friend class FNewtonModelPhysicsTreeItemJoint;
-	friend class FNewtonModelPhysicsTreeItemShape;
-	friend class FNewtonModelPhysicsTreeItemAcyclicGraph;
 };
 

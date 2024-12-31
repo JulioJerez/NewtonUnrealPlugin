@@ -31,7 +31,7 @@ class FNewtonModelPhysicsTreeItemShapeConvexhull : public FNewtonModelPhysicsTre
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemShapeConvexhull, FNewtonModelPhysicsTreeItemShape)
 
 	FNewtonModelPhysicsTreeItemShapeConvexhull(const FNewtonModelPhysicsTreeItemShapeConvexhull& src);
-	FNewtonModelPhysicsTreeItemShapeConvexhull(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
+	FNewtonModelPhysicsTreeItemShapeConvexhull(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 

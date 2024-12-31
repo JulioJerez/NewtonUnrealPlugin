@@ -30,8 +30,9 @@ class FNewtonModelPhysicsTreeItemJointSlider : public FNewtonModelPhysicsTreeIte
 	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointSlider, FNewtonModelPhysicsTreeItemJoint)
 
 	FNewtonModelPhysicsTreeItemJointSlider(const FNewtonModelPhysicsTreeItemJointSlider& src);
-	FNewtonModelPhysicsTreeItemJointSlider(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor);
+	FNewtonModelPhysicsTreeItemJointSlider(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
+	virtual int GetFreeDof() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;

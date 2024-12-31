@@ -246,7 +246,7 @@ void FNewtonModelEditor::OnFinishedChangingProperties(const FPropertyChangedEven
 					// persona plugin does not support recreation the viewport, nor it supports changing the skeletal mesh,
 					// or skeleton, In fact almost nothing can be modified after Parsona tollkid is initialized. 
 					// The only solution is to change the skeletal mesh, is to just close and re-open the editor.
-					FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("CloseAndReopenEditor", "you need to close and reopen the physics editor for this change to take place. All the Physics Tree data will be loss"));
+					FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("CloseAndReopenEditor", "You need to close and re-open the physics editor for this change to take place.          All the previous authoring work pn this model will be lost"));
 				}
 				break;
 			}

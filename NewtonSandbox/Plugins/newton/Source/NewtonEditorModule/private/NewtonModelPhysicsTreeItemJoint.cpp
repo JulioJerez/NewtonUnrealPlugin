@@ -28,7 +28,7 @@ FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(const FNewton
 {
 }
 
-FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemJoint::FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItem(parentNode, modelNode, editor)
 {
 }
@@ -43,46 +43,9 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJoint::Clone() const
 	return new FNewtonModelPhysicsTreeItemJoint(*this);
 }
 
-bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
+int FNewtonModelPhysicsTreeItemJoint::GetFreeDof() const
 {
-	const UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(m_node);
-	check(jointNode);
-	return jointNode->ShowDebug;
-}
-
-bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
-{
-	const UNewtonLinkJoint* const shapeNode = Cast<UNewtonLinkJoint>(m_node);
-	check(shapeNode);
-	return shapeNode->ShowDebug;
-}
-
-void FNewtonModelPhysicsTreeItemJoint::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
-{
-	UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(m_node);
-	check(jointNode);
-
-	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
-	{
-		const FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicGraph = m_acyclicGraph;
-		check(acyclicGraph->m_children.Num() == 1);
-		FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicChild = acyclicGraph->m_children[0];
-		check(acyclicChild->m_item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
-		UNewtonLinkRigidBody* const childBodyNode = Cast<UNewtonLinkRigidBody>(acyclicChild->m_item->m_node);
-		check(childBodyNode);
-
-		const FTransform parentTransform(m_parent->CalculateGlobalTransform());
-		const FTransform childBodyTransform(childBodyNode->Transform * jointNode->Transform * parentTransform);
-
-		const FTransform deltaTransform(inRot);
-		FTransform jointTransform(jointNode->Transform * parentTransform * deltaTransform * parentTransform.Inverse());
-		jointTransform.NormalizeRotation();
-		jointNode->Transform.SetRotation (jointTransform.GetRotation());
-
-		const FTransform bodyParentTransform(jointNode->Transform * parentTransform);
-		childBodyNode->Transform = childBodyTransform * bodyParentTransform.Inverse();
-		childBodyNode->Transform.NormalizeRotation();
-	}
+	return 0;
 }
 
 void FNewtonModelPhysicsTreeItemJoint::DrawCone(FPrimitiveDrawInterface* const pdi, const FMatrix& matrix, const FColor& color) const
@@ -119,3 +82,46 @@ void FNewtonModelPhysicsTreeItemJoint::DrawCone(FPrimitiveDrawInterface* const p
 		p0 = base[i];
 	}
 }
+
+bool FNewtonModelPhysicsTreeItemJoint::ShouldDrawWidget() const
+{
+	const UNewtonLink* const node = Cast<UNewtonLink>(m_node);
+	check(node);
+	return node->ShowDebug;
+}
+
+bool FNewtonModelPhysicsTreeItemJoint::HaveSelection() const
+{
+	const UNewtonLink* const node = Cast<UNewtonLink>(m_node);
+	check(node);
+	return node->ShowDebug;
+}
+
+void FNewtonModelPhysicsTreeItemJoint::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
+{
+	UNewtonLinkJoint* const jointNode = Cast<UNewtonLinkJoint>(m_node);
+	check(jointNode);
+
+	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))
+	{
+		const FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicGraph = m_acyclicGraph;
+		check(acyclicGraph->m_children.Num() == 1);
+		FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicChild = acyclicGraph->m_children[0];
+		check(acyclicChild->m_item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+		UNewtonLinkRigidBody* const childBodyNode = Cast<UNewtonLinkRigidBody>(acyclicChild->m_item->m_node);
+		check(childBodyNode);
+
+		const FTransform parentTransform(m_parent->CalculateGlobalTransform());
+		const FTransform childBodyTransform(childBodyNode->Transform * jointNode->Transform * parentTransform);
+
+		const FTransform deltaTransform(inRot);
+		FTransform jointTransform(jointNode->Transform * parentTransform * deltaTransform * parentTransform.Inverse());
+		jointTransform.NormalizeRotation();
+		jointNode->Transform.SetRotation (jointTransform.GetRotation());
+
+		const FTransform bodyParentTransform(jointNode->Transform * parentTransform);
+		childBodyNode->Transform = childBodyTransform * bodyParentTransform.Inverse();
+		childBodyNode->Transform.NormalizeRotation();
+	}
+}
+

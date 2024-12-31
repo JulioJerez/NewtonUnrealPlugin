@@ -108,10 +108,10 @@ void FNewtonEditorModule::CreateIcons()
 	};
 
 	LoadIcon(TEXT("bodyIcon.png"));
+	LoadIcon(TEXT("loopIcon.png"));
 	LoadIcon(TEXT("jointIcon.png"));
 	LoadIcon(TEXT("shapeIcon.png"));
 	LoadIcon(TEXT("boneMapping.png"));
-
 
 	//const FVector2D iconSize(16.0f, 16.0f);
 	//const FString iconPath(m_styleSet->RootToContentDir(TEXT("ndModelIcon.png")));

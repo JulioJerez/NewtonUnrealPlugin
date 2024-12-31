@@ -63,6 +63,8 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void SaveModel();
 	void ResetSkeletalMesh();
 	void NormalizeTransformsScale();
+	FName GetUniqueName(const FName name);
+	TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>> GetItems() const;
 	void DetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
 	void DetailViewBoneSelectedUpdated(const TSharedPtr<ISkeletonTreeItem>& item);
 
@@ -81,6 +83,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void BindCommands();
 	void RegisterNewMenu();
 	void RebuildAcyclicTree();
+	void AddLoopRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& item);
 	void AddShapeRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& item);
 	void AddJointRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& iItem);
 
@@ -96,6 +99,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnAddShapeCapsuleRow();
 	void OnAddShapeCylinderRow();
 	void OnAddShapeConvexhullRow();
+	void OnAddJointLoopEffector6dofRow();
 
 	void OnDeleteSelectedRow();
 	void OnResetSelectedBone();

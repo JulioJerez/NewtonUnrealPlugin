@@ -41,12 +41,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionBox : public UNewtonLinkCollis
 	ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 2.0f))
 	float SizeX;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 2.0f))
 	float SizeY;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 2.0f))
 	float SizeZ;
 };

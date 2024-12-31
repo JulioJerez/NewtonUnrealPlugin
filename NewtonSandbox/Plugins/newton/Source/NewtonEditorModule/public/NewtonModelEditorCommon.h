@@ -26,6 +26,7 @@
 
 #include "NewtonLink.h"
 #include "NewtonAsset.h"
+#include "NewtonLinkLoop.h"
 #include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
 #include "NewtonLinkJointHinge.h"
@@ -35,11 +36,14 @@
 #include "NewtonLinkCollisionWheel.h"
 #include "NewtonLinkCollisionSphere.h"
 #include "NewtonLinkCollisionCapsule.h"
+#include "NewtonLinkLoopEffector6dof.h"
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkCollisionConvexhull.h"
 
+
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.4f
-#define NEWTON_EDITOR_DEBUG_COLOR		FColor::Red
+#define NEWTON_EDITOR_DEBUG_JOINT_COLOR	FColor::Red
+#define NEWTON_EDITOR_DEBUG_LOOP_COLOR	FColor::Yellow
 
 #define NEWTON_INIT_RTTI(RTTI)									\
 	static const FName& GetRtti()								\

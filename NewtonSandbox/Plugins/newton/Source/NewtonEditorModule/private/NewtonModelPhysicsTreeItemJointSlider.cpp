@@ -27,7 +27,7 @@ FNewtonModelPhysicsTreeItemJointSlider::FNewtonModelPhysicsTreeItemJointSlider(c
 {
 }
 
-FNewtonModelPhysicsTreeItemJointSlider::FNewtonModelPhysicsTreeItemJointSlider(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemJointSlider::FNewtonModelPhysicsTreeItemJointSlider(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode, editor)
 {
 }
@@ -37,6 +37,10 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointSlider::Clone() con
 	return new FNewtonModelPhysicsTreeItemJointSlider(*this);
 }
 
+int FNewtonModelPhysicsTreeItemJointSlider::GetFreeDof() const
+{
+	return 1;
+}
 
 void FNewtonModelPhysicsTreeItemJointSlider::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
@@ -49,7 +53,7 @@ void FNewtonModelPhysicsTreeItemJointSlider::DebugDraw(const FSceneView* const v
 	}
 
 	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
-	const FColor pinColor(NEWTON_EDITOR_DEBUG_COLOR);
+	const FColor pinColor(NEWTON_EDITOR_DEBUG_JOINT_COLOR);
 
 	FMatrix matrix(GetWidgetMatrix());
 	float scale = jointNode->DebugScale;

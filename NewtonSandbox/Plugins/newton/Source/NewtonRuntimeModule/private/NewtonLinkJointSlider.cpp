@@ -23,14 +23,13 @@
 
 #include "NewtonCommons.h"
 #include "NewtonJointSlider.h"
-#include "NewtonLinkRigidBody.h"
 
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkJointSlider::UNewtonLinkJointSlider()
 	:Super()
 {
-	SetName(TEXT("sliderJoint"));
+	Name = TEXT("slider");
 
 	MaxDistance = 100.0f;
 	MinDistance = -100.0f;

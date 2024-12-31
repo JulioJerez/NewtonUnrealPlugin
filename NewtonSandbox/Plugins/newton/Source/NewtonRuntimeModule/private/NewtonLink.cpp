@@ -40,11 +40,10 @@ void UNewtonLink::AttachNode(UNewtonLink* const node)
 	Children.Push(node);
 }
 
-void UNewtonLink::SetName(const TCHAR* const name)
-{
-	Name = FName(name);
-}
-
+//void UNewtonLink::SetName(const TCHAR* const name)
+//{
+//	Name = FName(name);
+//}
 
 TObjectPtr<USceneComponent> UNewtonLink::CreateBlueprintProxy() const
 {

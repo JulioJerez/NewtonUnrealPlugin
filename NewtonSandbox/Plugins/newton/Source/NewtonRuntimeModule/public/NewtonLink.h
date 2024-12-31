@@ -35,7 +35,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 	public:
 	UNewtonLink();
 
-	void SetName(const TCHAR* const name);
+	//void SetName(const TCHAR* const name);
 	virtual void AttachNode(UNewtonLink* const node);
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const;
@@ -43,14 +43,14 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 
 	FTransform CalculateGlobalTransform() const;
 
-	UPROPERTY(EditAnywhere, Category = Newton)
+	UPROPERTY(EditAnywhere)
 	FName Name;
 
 	// local space transform
-	UPROPERTY(EditAnywhere, Category = Newton)
+	UPROPERTY(EditAnywhere)
 	FTransform Transform;
 
-	UPROPERTY(EditAnywhere, Category = Newton)
+	UPROPERTY(EditAnywhere)
 	bool ShowDebug;
 
 	UPROPERTY()

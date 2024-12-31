@@ -29,7 +29,7 @@
 UNewtonLinkCollisionBox::UNewtonLinkCollisionBox()
 	:Super()
 {
-	SetName(TEXT("box"));
+	Name = TEXT("box");
 
 	SizeX = 100.0f;
 	SizeY = 100.0f;

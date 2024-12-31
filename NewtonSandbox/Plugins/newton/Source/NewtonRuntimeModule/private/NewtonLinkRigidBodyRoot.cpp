@@ -29,7 +29,7 @@
 UNewtonLinkRigidBodyRoot::UNewtonLinkRigidBodyRoot()
 	:Super()
 {
-	SetName(TEXT("rootRigidBody"));
+	Name = TEXT("rootRigidBody");
 }
 
 

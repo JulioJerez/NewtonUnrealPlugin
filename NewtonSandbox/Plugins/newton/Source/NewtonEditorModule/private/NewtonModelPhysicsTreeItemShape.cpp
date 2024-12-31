@@ -29,7 +29,7 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewton
 {
 }
 
-FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, const FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItem(parentNode, modelNode, editor)
 {
 	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_node);

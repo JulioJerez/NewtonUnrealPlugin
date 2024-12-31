@@ -39,6 +39,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionSphere : public UNewtonLinkCol
 	ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 2.0f))
 	float Radio;
 };

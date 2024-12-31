@@ -32,7 +32,7 @@
 UNewtonLinkCollisionConvexhull::UNewtonLinkCollisionConvexhull()
 	:Super()
 {
-	SetName(TEXT("convexhull"));
+	Name = TEXT("convexhull");
 }
 
 void UNewtonLinkCollisionConvexhull::GetBoneVertices(TArray<FVector>& points, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const

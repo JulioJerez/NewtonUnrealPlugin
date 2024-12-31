@@ -23,14 +23,13 @@
 
 #include "NewtonCommons.h"
 #include "NewtonJointHinge.h"
-#include "NewtonLinkRigidBody.h"
 
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkJointHinge::UNewtonLinkJointHinge()
 	:Super()
 {
-	SetName(TEXT("hingeJoint"));
+	Name = TEXT("hinge");
 
 	MaxAngle = 45.0f;
 	MinAngle = -45.0f;
