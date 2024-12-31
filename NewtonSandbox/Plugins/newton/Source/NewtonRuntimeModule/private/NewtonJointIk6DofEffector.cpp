@@ -107,7 +107,7 @@ void UNewtonJointIk6DofEffector::CreateJoint(ANewtonWorldActor* const newtonWorl
 		const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
 		const ndMatrix childMarix(ToNewtonMatrix(TargetFrame) * parentMarix);
 		ndIk6DofEffector* const joint = new ndIk6DofEffector(childMarix, parentMarix, childBody, parentBody);
-			
+
 		joint->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 		joint->SetAngularSpringDamper(LinearRegularizer, LinearSpring, LinearDamper);
 		joint->SetLinearSpringDamper(AngularRegularizer, AngularSpring, AngularDamper);
