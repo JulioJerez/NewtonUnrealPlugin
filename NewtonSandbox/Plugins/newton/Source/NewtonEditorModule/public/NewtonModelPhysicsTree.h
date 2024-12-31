@@ -101,6 +101,8 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnAddShapeConvexhullRow();
 	void OnAddJointLoopEffector6dofRow();
 
+	void OnShowDebug();
+	void OnClearDebug();
 	void OnDeleteSelectedRow();
 	void OnResetSelectedBone();
 	void OnToggleShapeVisibility();

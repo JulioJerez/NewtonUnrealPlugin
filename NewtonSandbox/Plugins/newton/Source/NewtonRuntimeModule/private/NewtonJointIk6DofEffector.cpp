@@ -29,6 +29,8 @@
 UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 	:Super()
 {
+	ReferencedBodyName = TEXT("None");
+
 	TargetFrame = FTransform();
 	AngularSpring = 1000.0f;
 	AngularDamper = 50.0f;
@@ -45,77 +47,68 @@ UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 
 void UNewtonJointIk6DofEffector::DrawGizmo(float timestep) const
 {
-	//ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
-	//const FTransform transform(GetComponentTransform());
-	//const ndMatrix matrix(ToNewtonMatrix(transform));
-	//const FColor pinColor(255.0f, 255.0f, 0.0f);
-	//const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
-	//const FVector coneDir(matrix.m_front.m_x, matrix.m_front.m_y, matrix.m_front.m_z);
-	//const FVector pinStart(transform.GetLocation());
-	//const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
-	//
-	//const UWorld* const world = GetWorld();
-	//DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
-	//DrawDebugCone(world, pinEnd, coneDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
-	//
-	//UNewtonRigidBody* const child = FindChild();
-	//if (EnableLimits && child)
-	//{
-	//	TArray<int32> indices;
-	//	TArray<FVector> verts;
-	//	float deltaTwist = MaxAngle - MinAngle;
-	//	if ((deltaTwist > 1.0e-3f) && (deltaTwist < 360.0f))
-	//	{
-	//		const ndVector point(ndFloat32(0.0f), scale, ndFloat32(0.0f), ndFloat32(0.0f));
-	//		const ndInt32 subdiv = 12;
-	//		ndFloat32 angle0 = MinAngle;
-	//		ndFloat32 angleStep = ndMin(deltaTwist, 360.0f) / subdiv;
-	//	
-	//		const FVector parentOrigin(transform.GetLocation());
-	//		const ndMatrix parentMatrix(ToNewtonMatrix(transform));
-	//		verts.Push(parentOrigin);
-	//		for (ndInt32 i = 0; i <= subdiv; ++i)
-	//		{
-	//			const ndVector p(parentMatrix.RotateVector(ndPitchMatrix(angle0 * ndDegreeToRad).RotateVector(point)));
-	//			const FVector p1(float(p.m_x + parentOrigin.X), float(p.m_y + parentOrigin.Y), float(p.m_z + parentOrigin.Z));
-	//			angle0 += angleStep;
-	//			verts.Push(p1);
-	//		}
-	//		for (ndInt32 i = 0; i < subdiv; ++i)
-	//		{
-	//			indices.Push(0);
-	//			indices.Push(i + 1);
-	//			indices.Push(i + 2);
-	//		}
-	//		const FColor meshColor(255.0f, 0.0f, 0.0f, 32.0f);
-	//		DrawDebugMesh(world, verts, indices, meshColor, false, timestep);
-	//	}
-	//}
+	float thickness = 0.5f;
+	const UWorld* const world = GetWorld();
+	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
+	
+	const FTransform parentTransform(GetComponentTransform());
+	const FVector positionParent(parentTransform.GetLocation());
+	const FVector xAxisParent(parentTransform.GetUnitAxis(EAxis::X));
+	const FVector yAxisParent(parentTransform.GetUnitAxis(EAxis::Y));
+	const FVector zAxisParent(parentTransform.GetUnitAxis(EAxis::Z));
+	DrawDebugLine(world, positionParent, positionParent + scale * xAxisParent, FColor::Red, false, timestep, thickness);
+	DrawDebugLine(world, positionParent, positionParent + scale * yAxisParent, FColor::Green, false, timestep, thickness);
+	DrawDebugLine(world, positionParent, positionParent + scale * zAxisParent, FColor::Blue, false, timestep, thickness);
+
+	const FTransform childTransform(TargetFrame * parentTransform);
+	const FVector positionChild(childTransform.GetLocation());
+	const FVector xAxisChild(childTransform.GetUnitAxis(EAxis::X));
+	const FVector yAxisChild(childTransform.GetUnitAxis(EAxis::Y));
+	const FVector zAxisChild(childTransform.GetUnitAxis(EAxis::Z));
+	DrawDebugLine(world, positionChild, positionChild + scale * xAxisChild, FColor::Red, false, timestep, thickness);
+	DrawDebugLine(world, positionChild, positionChild + scale * yAxisChild, FColor::Green, false, timestep, thickness);
+	DrawDebugLine(world, positionChild, positionChild + scale * zAxisChild, FColor::Blue, false, timestep, thickness);
 }
 
 // Called when the game starts
 void UNewtonJointIk6DofEffector::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
 {
-	check(0);
-	//Super::CreateJoint(newtonWorldActor);
-	//
-	//check(!m_joint);
-	//ndBodyKinematic* body0;
-	//ndBodyKinematic* body1;
-	//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
-	//GetBodyPairs(world, &body0, &body1);
-	//
-	//if (body0 && body1)
-	//{
-	//	const FTransform transform(GetRelativeTransform());
-	//	const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
-	//	ndJointIk6DofEffector* const joint = new ndJointIk6DofEffector(matrix, body0, body1);
-	//
-	//	joint->SetLimitState(EnableLimits);
-	//	joint->SetLimits(ndFloat32 (MinAngle * ndDegreeToRad), ndFloat32(MaxAngle * ndDegreeToRad));
-	//	joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
-	//	
-	//	m_joint = joint;
-	//	world->AddJoint(m_joint);
-	//}
+	Super::CreateJoint(newtonWorldActor);
+	
+	check(!m_joint);
+
+	UNewtonRigidBody* childComponent = nullptr;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
+	stack.PushBack(GetOwner()->GetRootComponent());
+	while (stack.GetCount())
+	{
+		USceneComponent* const component = stack.Pop();
+		check(component);
+		if (component->GetName() == ReferencedBodyName)
+		{
+			childComponent = Cast<UNewtonRigidBody>(component);
+			break;
+		}
+	
+		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+		{
+			stack.PushBack(childrenComp[i].Get());
+		}
+	}
+
+	UNewtonRigidBody* const parentComponet = FindParent();
+	if (parentComponet && childComponent)
+	{
+		ndWorld* const world = newtonWorldActor->GetNewtonWorld();
+		ndBodyKinematic* const childBody = childComponent->m_body;
+		ndBodyKinematic* const parentBody = parentComponet->m_body;
+		const FTransform transform(GetRelativeTransform());
+		const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
+		const ndMatrix childMarix(ToNewtonMatrix(TargetFrame) * parentMarix);
+		ndIk6DofEffector* const joint = new ndIk6DofEffector(childMarix, parentMarix, childBody, parentBody);
+			
+		m_joint = joint;
+		world->AddJoint(m_joint);
+	}
 }

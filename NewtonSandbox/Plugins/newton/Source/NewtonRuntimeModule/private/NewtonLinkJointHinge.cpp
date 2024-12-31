@@ -23,7 +23,6 @@
 
 #include "NewtonCommons.h"
 #include "NewtonJointHinge.h"
-
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkJointHinge::UNewtonLinkJointHinge()

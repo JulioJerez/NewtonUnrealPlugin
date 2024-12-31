@@ -30,6 +30,7 @@
 #include "PhysicsEngine/BodySetup.h"
 
 #include "NewtonJoint.h"
+#include "NewtonCommons.h"
 #include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
 #include "NewtonRuntimeModule.h"
@@ -257,7 +258,7 @@ void UNewtonRigidBody::ClearDebug()
 	m_propertyChanged = true;
 	Inertia.ShowPrincipalAxis = false;
 
-	ndFixSizeArray<USceneComponent*, 1024> stack;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 	stack.PushBack(this);
 	while (stack.GetCount())
 	{
@@ -283,7 +284,7 @@ void UNewtonRigidBody::ActivateDebug()
 	m_propertyChanged = true;
 	//Inertia.ShowPrincipalAxis = true;
 
-	ndFixSizeArray<USceneComponent*, 1024> stack;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 	stack.PushBack(this);
 	while (stack.GetCount())
 	{
@@ -376,7 +377,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		bool sleepState = m_body->GetSleepState();
 		if (m_sleeping && !sleepState)
 		{
-			ndFixSizeArray<USceneComponent*, 1024> stack;
+			ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 			stack.PushBack(this);
 			while (stack.GetCount())
 			{
@@ -396,7 +397,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		}
 		else if (!m_sleeping && sleepState)
 		{
-			ndFixSizeArray<USceneComponent*, 1024> stack;
+			ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 			stack.PushBack(this);
 			while (stack.GetCount())
 			{
@@ -507,7 +508,7 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 
 	AActor* const actor = GetOwner();
 	m_sleeping = false;
-	ndFixSizeArray<USceneComponent*, 1024> stack;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 	stack.PushBack(this);
 	while (stack.GetCount())
 	{
@@ -529,7 +530,7 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) const
 {
 	ndArray<UNewtonCollision*> collisionShapes;
-	ndFixSizeArray<USceneComponent*, 1024> stack;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 	stack.PushBack((USceneComponent*)this);
 	while (stack.GetCount())
 	{

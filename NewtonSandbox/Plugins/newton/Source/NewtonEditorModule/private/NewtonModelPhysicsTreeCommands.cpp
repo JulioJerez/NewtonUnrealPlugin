@@ -42,9 +42,11 @@ FNewtonModelPhysicsTreeCommands::FNewtonModelPhysicsTreeCommands()
 
 void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 {
-	UI_COMMAND(ResetSelectedBone, "Reset mapped bone", "clear the selected bone", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(JointsVisibility, "hide joints", "filter joints visible state", EUserInterfaceActionType::ToggleButton, FInputChord());
 	UI_COMMAND(CollisionsVisibility, "hide collisions", "filter shapes visible state", EUserInterfaceActionType::ToggleButton, FInputChord());
+	UI_COMMAND(ShowDebug, "Show all debug info", "Show all debug info", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(ClearDebug, "Hide all debug info", "Hide all debug info", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(ResetSelectedBone, "Reset mapped bone", "clear the selected bone", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(AddJointHinge, "Add Hinge Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointSlider, "Add Slider Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());

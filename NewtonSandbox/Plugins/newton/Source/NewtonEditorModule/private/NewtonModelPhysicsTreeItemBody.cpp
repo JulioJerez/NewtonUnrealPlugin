@@ -69,7 +69,7 @@ void FNewtonModelPhysicsTreeItemBody::DebugDraw(const FSceneView* const view, FV
 	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_node);
 	check(bodyNode);
 
-	if (bodyNode->BoneIndex >= 0)
+	if (bodyNode->ShowDebug && (bodyNode->BoneIndex >= 0))
 	{
 		const FTransform comTransform(CalculateGlobalTransform());
 

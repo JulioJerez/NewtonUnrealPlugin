@@ -22,36 +22,27 @@
 #include "NewtonLinkLoopEffector6dof.h"
 
 #include "NewtonCommons.h"
-//#include "NewtonLoopEffector6dof.h"
+#include "NewtonJointIk6DofEffector.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkLoopEffector6dof::UNewtonLinkLoopEffector6dof()
 	:Super()
 {
 	Name = TEXT("effector6dof");
-
-	//MaxAngle = 45.0f;
-	//MinAngle = -45.0f;
-	//EnableLimits = false;
 }
 
-
-#include "NewtonJointHinge.h"
 TObjectPtr<USceneComponent> UNewtonLinkLoopEffector6dof::CreateBlueprintProxy() const
 {
-	//TObjectPtr<UNewtonLoopEffector6dof> component(NewObject<UNewtonLoopEffector6dof>(UNewtonLoopEffector6dof::StaticClass(), Name, RF_Transient));
-	TObjectPtr<UNewtonJointHinge> component(NewObject<UNewtonJointHinge>(UNewtonJointHinge::StaticClass(), Name, RF_Transient));
+	TObjectPtr<UNewtonJointIk6DofEffector> component(NewObject<UNewtonJointIk6DofEffector>(UNewtonJointIk6DofEffector::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
 void UNewtonLinkLoopEffector6dof::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	//UNewtonLoopEffector6dof* const joint = Cast<UNewtonLoopEffector6dof>(component.Get());
-	UNewtonJointHinge* const joint = Cast<UNewtonJointHinge>(component.Get());
+	UNewtonJointIk6DofEffector* const joint = Cast<UNewtonJointIk6DofEffector>(component.Get());
 
 	SetCommonProperties(joint);
 
-	//joint->MinAngle = MinAngle;
-	//joint->MaxAngle = MaxAngle;
-	//joint->EnableLimits = EnableLimits;
+	joint->TargetFrame = TargetFrame;
+	joint->ReferencedBodyName = BoneName;
 }

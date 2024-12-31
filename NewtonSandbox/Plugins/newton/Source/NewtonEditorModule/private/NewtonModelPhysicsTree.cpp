@@ -216,6 +216,27 @@ void FNewtonModelPhysicsTree::OnResetSelectedBone()
 	}
 }
 
+void FNewtonModelPhysicsTree::OnShowDebug()
+{
+	for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
+		UNewtonLink* const nodeInfo = Cast<UNewtonLink>(itemInSet->GetNode());
+		nodeInfo->ShowDebug = true;
+	}
+}
+
+void FNewtonModelPhysicsTree::OnClearDebug()
+{
+	for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
+		UNewtonLink* const nodeInfo = Cast<UNewtonLink>(itemInSet->GetNode());
+		nodeInfo->ShowDebug = false;
+	}
+}
+
+
 void FNewtonModelPhysicsTree::OnToggleShapeVisibility()
 {
 	UNewtonAsset* const model = m_editor->GetNewtonModel();
@@ -437,6 +458,12 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FCanExecuteAction()
 		,FIsActionChecked::CreateLambda([this]() { return m_editor->GetNewtonModel()->m_hideJoints; }));
 
+	commandList.MapAction(menuActions.ShowDebug
+		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnShowDebug));
+
+	commandList.MapAction(menuActions.ClearDebug
+		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnClearDebug));
+
 	commandList.MapAction(menuActions.ResetSelectedBone
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnResetSelectedBone));
 
@@ -498,15 +525,12 @@ void FNewtonModelPhysicsTree::RegisterNewMenu()
 
 	UToolMenu* const menu = UToolMenus::Get()->RegisterMenu(m_menuName);
 
-	//MenuBuilder.BeginSection("NewtonModelPhysicsTreeOptions", LOCTEXT("Visibility", "Visibility options"));
-	//	MenuBuilder.AddMenuEntry(actions.HideJoints);
-	//	MenuBuilder.AddMenuEntry(actions.HideCollisions);
-	//MenuBuilder.EndSection();
-
 	FToolMenuSection& rootSection = menu->AddSection("options0", LOCTEXT("options1", "options2"));
-	rootSection.AddMenuEntry(menuActions.ResetSelectedBone);
 	rootSection.AddMenuEntry(menuActions.JointsVisibility);
 	rootSection.AddMenuEntry(menuActions.CollisionsVisibility);
+	rootSection.AddMenuEntry(menuActions.ShowDebug);
+	rootSection.AddMenuEntry(menuActions.ClearDebug);
+	rootSection.AddMenuEntry(menuActions.ResetSelectedBone);
 }
 
 TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()

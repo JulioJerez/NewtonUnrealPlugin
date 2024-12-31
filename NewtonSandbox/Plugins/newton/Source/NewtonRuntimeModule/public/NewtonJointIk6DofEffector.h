@@ -43,6 +43,9 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
+	FName ReferencedBodyName;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
 	FTransform TargetFrame;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 20000.0f))

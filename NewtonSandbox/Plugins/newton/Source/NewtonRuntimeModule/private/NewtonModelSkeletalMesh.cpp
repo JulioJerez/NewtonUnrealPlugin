@@ -4,6 +4,7 @@
 #include "NewtonModelSkeletalMesh.h"
 
 #include "NewtonJoint.h"
+#include "NewtonCommons.h"
 #include "NewtonRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
@@ -44,7 +45,7 @@ void UNewtonModelSkeletalMesh::TickComponent(float deltaTime, ELevelTick tickTyp
 	AActor* const owner = GetOwner();
 	check(owner->GetRootComponent());
 	
-	ndFixSizeArray<USceneComponent*, 256> stack;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 	stack.PushBack(owner->GetRootComponent());
 
 	int index = 0;

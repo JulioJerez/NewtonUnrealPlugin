@@ -40,12 +40,30 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkLoopEffector6dof : public UNewtonLinkLo
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
 	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-	UPROPERTY(EditAnywhere)
-	bool EnableLimits;
+	UPROPERTY(EditAnywhere, Category = Newton)
+	FTransform TargetFrame;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.0f, ClampMax = 10000.0f))
-	float MinAngle;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = -10000.0f, ClampMax = -1.0f))
-	float MaxAngle;
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 20000.0f))
+	//float AngularSpring;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 500.0f))
+	//float AngularDamper;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -10.0f))
+	//float AngularMaxTorque;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.00001f, ClampMax = 0.99f))
+	//float AngularRegularizer;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 20000.0f))
+	//float LinearSpring;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 20000.0f))
+	//float LinearDamper;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f))
+	//float LinearMaxForce;
+	//
+	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.00001f, ClampMax = 0.99f))
+	//float LinearRegularizer;
 };

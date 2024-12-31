@@ -22,6 +22,7 @@
 
 #include "NewtonModelPhysicsTreeItemLoopEffector6dof.h"
 
+#include "NewtonModelEditor.h"
 #include "NewtonModelPhysicsTree.h"
 #include "NewtonModelPhysicsTreeItemBody.h"
 #include "NewtonModelPhysicsTreeItemJoint.h"
@@ -52,61 +53,26 @@ void FNewtonModelPhysicsTreeItemLoopEffector6dof::DebugDraw(const FSceneView* co
 		return;
 	}
 
-	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
-	const FColor pinColor(NEWTON_EDITOR_DEBUG_JOINT_COLOR);
+	float scale = jointNode->DebugScale * 5.0f;
+	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS * 5.0f;
 
-	FMatrix matrix(GetWidgetMatrix());
-	float scale = jointNode->DebugScale;
-	
-	const FVector pinDir(matrix.GetUnitAxis(EAxis::X));
-	const FVector pinStart(matrix.GetOrigin());
-	const FVector pinEnd(pinStart + pinDir * (scale * 0.5f * 100.0f));
-	
-	FMatrix coneMatrix(matrix);
-	coneMatrix.SetOrigin(pinEnd);
-	DrawCone(pdi, coneMatrix, pinColor);
-	pdi->DrawLine(pinStart, pinEnd, pinColor, SDPG_Foreground, thickness);
-	
-	if (jointNode->EnableLimits)
-	{
-		const int numSides = 16;
-		const float size = scale * 25.0f;
-		const float degToRad = PI / 180.0f;
-		const float angle = jointNode->MinAngle * degToRad;
-		const float deltaAngle = degToRad * (jointNode->MaxAngle - jointNode->MinAngle) / numSides;
-		const float sinAngle = FMath::Sin(angle);
-		const float cosAngle = FMath::Cos(angle);
-	
-		FMatrix localRotation(FMatrix::Identity);
-		localRotation.M[1][1] = cosAngle;
-		localRotation.M[1][2] = sinAngle;
-		localRotation.M[2][2] = cosAngle;
-		localRotation.M[2][1] = -sinAngle;
-		FVector point(localRotation.TransformFVector4(FVector(0.0f, size, 0.0f)));
-	
-		const float deltaSinAngle = FMath::Sin(deltaAngle);
-		const float deltaCosAngle = FMath::Cos(deltaAngle);
-		localRotation.M[1][1] = deltaCosAngle;
-		localRotation.M[1][2] = deltaSinAngle;
-		localRotation.M[2][2] = deltaCosAngle;
-		localRotation.M[2][1] = -deltaSinAngle;
-	
-		FVector base[numSides + 1];
-	
-		const FVector origin(matrix.GetOrigin());
-		for (int32 i = 0; i <= numSides; ++i)
-		{
-			FVector p(matrix.TransformFVector4(point));
-			base[i] = p;
-			pdi->DrawLine(origin, p, pinColor, SDPG_Foreground, thickness);
-			point = localRotation.TransformFVector4(point);
-		}
-	
-		for (int32 i = 0; i < numSides; ++i)
-		{
-			pdi->DrawLine(base[i], base[i + 1], pinColor, SDPG_Foreground, thickness);
-		}
-	}
+	const FTransform parentTransform(CalculateGlobalTransform());
+	const FVector positionParent(parentTransform.GetLocation());
+	const FVector xAxisParent(parentTransform.GetUnitAxis(EAxis::X));
+	const FVector yAxisParent(parentTransform.GetUnitAxis(EAxis::Y));
+	const FVector zAxisParent(parentTransform.GetUnitAxis(EAxis::Z));
+	pdi->DrawLine(positionParent, positionParent + scale * xAxisParent, FColor::Red, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionParent, positionParent + scale * yAxisParent, FColor::Green, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionParent, positionParent + scale * zAxisParent, FColor::Blue, SDPG_Foreground, thickness);
+
+	const FTransform childTransform(jointNode->TargetFrame * parentTransform);
+	const FVector positionChild(childTransform.GetLocation());
+	const FVector xAxisChild(childTransform.GetUnitAxis(EAxis::X));
+	const FVector yAxisChild(childTransform.GetUnitAxis(EAxis::Y));
+	const FVector zAxisChild(childTransform.GetUnitAxis(EAxis::Z));
+	pdi->DrawLine(positionChild, positionChild + scale * xAxisChild, FColor::Red, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionChild, positionChild + scale * yAxisChild, FColor::Green, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionChild, positionChild + scale * zAxisChild, FColor::Blue, SDPG_Foreground, thickness);
 }
 
 void FNewtonModelPhysicsTreeItemLoopEffector6dof::OnPropertyChange(const FPropertyChangedEvent& event)
@@ -209,7 +175,11 @@ void FNewtonModelPhysicsTreeItemLoopEffector6dof::OnPropertyChange(const FProper
 	}
 
 	const UNewtonLinkRigidBody* const body1 = Cast<UNewtonLinkRigidBody>(bodyItem1->GetNode());
-	check(body1->BoneIndex == loopNode->BoneIndex);
-	FString jointName(body1->BoneName.GetPlainNameString() + TEXT("_effector6dof"));
-	loopNode->BoneName = m_editor->GetNewtonModelPhysicsTree()->GetUniqueName(FName(*jointName));
+	UNewtonLinkLoopEffector6dof* const effectorNode = Cast<UNewtonLinkLoopEffector6dof>(loopNode);
+	check(body1);
+	check(effectorNode);
+	check(body1->BoneIndex == effectorNode->BoneIndex);
+	
+	effectorNode->BoneName = body1->BoneName;
+	effectorNode->TargetFrame = childItem->CalculateGlobalTransform() * parentItem->CalculateGlobalTransform().Inverse();
 } 

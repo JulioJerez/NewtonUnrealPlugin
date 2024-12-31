@@ -23,6 +23,7 @@
 #include "EngineUtils.h"
 
 #include "NewtonJoint.h"
+#include "NewtonCommons.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
@@ -179,7 +180,7 @@ void NewtonWorld::VisualTick()
 		AActor* const actor = *actorItr;
 		if (actor->GetRootComponent())
 		{
-			ndFixSizeArray<USceneComponent*, 256> stack;
+			ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 			stack.PushBack(actor->GetRootComponent());
 			while (stack.GetCount())
 			{
@@ -412,7 +413,7 @@ void NewtonWorld::Intepolate() const
 		AActor* const actor = *actorItr;
 		if (actor->GetRootComponent())
 		{
-			ndFixSizeArray<USceneComponent*, 256> stack;
+			ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
 			stack.PushBack(actor->GetRootComponent());
 			while (stack.GetCount())
 			{
