@@ -48,18 +48,20 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(ClearDebug, "Hide all debug info", "Hide all debug info", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(ResetSelectedBone, "Reset mapped bone", "clear the selected bone", EUserInterfaceActionType::Button, FInputChord());
 
-	UI_COMMAND(AddJointHinge, "Add Hinge Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddJointSlider, "Add Slider Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddJointRoller, "Add Roller Joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointHinge, "Add hinge joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointSlider, "Add slider joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointRoller, "Add roller joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointWheel, "Add wheel joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(AddLoopEffector6dof, "Add Effector 6 dof Joint", "loop must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 
-	UI_COMMAND(AddShapeBox, "Add Box Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddShapeSphere, "Add Sphere Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddShapeCapsule, "Add Capsule Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddShapeCylinder, "Add Cylinder Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddShapeWheel, "Add Wheel Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddShapeConvexhull, "Add Convexhull Shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeBox, "Add box shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeSphere, "Add sphere shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeCapsule, "Add capsule shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeCylinder, "Add cylinder shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeWheel, "Add wheel shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeConvexhull, "Add convexhull shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddShapeConvexAggragate, "Add aggragate of convex shapes", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(DeleteSelectedRow, "Delete", "delete this item and all it children", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
 }

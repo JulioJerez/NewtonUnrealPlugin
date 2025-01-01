@@ -42,11 +42,8 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FN
 
 	UNewtonLinkRigidBody* const parentNodeInfo = Cast<UNewtonLinkRigidBody>(m_parent->GetNode());
 	check(parentNodeInfo);
-	//if (parentNodeInfo->BoneIndex)
-	{
-		UNewtonAsset* const asset = m_editor->GetNewtonModel();
-		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
-	}
+	UNewtonAsset* const asset = m_editor->GetNewtonModel();
+	shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
 }
 
 FName FNewtonModelPhysicsTreeItemShape::BrushName() const

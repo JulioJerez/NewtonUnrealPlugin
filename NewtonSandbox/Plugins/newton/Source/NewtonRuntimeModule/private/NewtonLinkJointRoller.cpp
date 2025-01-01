@@ -28,7 +28,7 @@
 UNewtonLinkJointRoller::UNewtonLinkJointRoller()
 	:Super()
 {
-	Name = TEXT("Roller");
+	Name = TEXT("roller");
 
 	SpringK = 10000.0f;
 	DamperC = 100.0f;

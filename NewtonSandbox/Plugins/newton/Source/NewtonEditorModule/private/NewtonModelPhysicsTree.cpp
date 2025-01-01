@@ -44,6 +44,7 @@
 #include "NewtonModelPhysicsTreeItemShapeBox.h"
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
+#include "NewtonModelPhysicsTreeItemJointWheel.h"
 #include "NewtonModelPhysicsTreeItemJointRoller.h"
 #include "NewtonModelPhysicsTreeItemJointSlider.h"
 #include "NewtonModelPhysicsTreeItemShapeSphere.h"
@@ -52,6 +53,7 @@
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexhull.h"
 #include "NewtonModelPhysicsTreeItemLoopEffector6dof.h"
+#include "NewtonModelPhysicsTreeItemShapeConvexApproximate.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
 
@@ -377,6 +379,13 @@ void FNewtonModelPhysicsTree::OnAddShapeConvexhullRow()
 	AddShapeRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddShapeConvexAggragateRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeConvexApproximate(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkCollisionConvexApproximate>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddShapeRow(item);
+}
+
 void FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemLoopEffector6dof(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkLoopEffector6dof>()), m_editor)));
@@ -401,6 +410,13 @@ void FNewtonModelPhysicsTree::OnAddJointSliderRow()
 void FNewtonModelPhysicsTree::OnAddJointRollerRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointRoller(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointRoller>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddJointRow(item);
+}
+
+void FNewtonModelPhysicsTree::OnAddJointWheelRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointWheel>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
@@ -467,10 +483,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FIsActionChecked::CreateLambda([this]() { return m_editor->GetNewtonModel()->m_hideJoints; }));
 
 	commandList.MapAction(menuActions.ShowDebug
-		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnShowDebug));
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnShowDebug));
 
 	commandList.MapAction(menuActions.ClearDebug
-		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnClearDebug));
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnClearDebug));
 
 	commandList.MapAction(menuActions.ResetSelectedBone
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnResetSelectedBone));
@@ -500,6 +516,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeConvexhullRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddShapeConvexAggragate
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeConvexAggragateRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddJointHinge
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointHingeRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
@@ -510,6 +530,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 
 	commandList.MapAction(menuActions.AddJointRoller
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointRollerRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
+	commandList.MapAction(menuActions.AddJointWheel
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointWheelRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 	commandList.MapAction(menuActions.AddLoopEffector6dof
@@ -554,6 +578,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddJointHinge);
 		menuBuilder.AddMenuEntry(actions.AddJointSlider);
 		menuBuilder.AddMenuEntry(actions.AddJointRoller);
+		menuBuilder.AddMenuEntry(actions.AddJointWheel);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddLoopsAction", "Add Loops"));
@@ -567,6 +592,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddShapeCylinder);
 		menuBuilder.AddMenuEntry(actions.AddShapeWheel);
 		menuBuilder.AddMenuEntry(actions.AddShapeConvexhull);
+		menuBuilder.AddMenuEntry(actions.AddShapeConvexAggragate);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeDeleteItems", LOCTEXT("DeleteItemAction", "Delete items"));
@@ -1103,6 +1129,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(item);
 			parent = item;
 		}
+		else if (Cast<UNewtonLinkJointWheel>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
 		else if (Cast<UNewtonLinkLoopEffector6dof>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemLoopEffector6dof(parent, proxyNode, m_editor)));
@@ -1143,6 +1175,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkCollisionConvexhull>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeConvexhull(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkCollisionConvexApproximate>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeConvexApproximate(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

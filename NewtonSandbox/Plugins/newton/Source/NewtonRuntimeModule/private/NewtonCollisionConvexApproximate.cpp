@@ -261,7 +261,6 @@ ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationSha
 	ndConvexHullSet* const hullSet = new ndConvexHullSet;
 	ndArray<ndHullOutput*>& hullArray = vhacdHullSet->m_ouputHulls;
 	for (ndInt32 i = hullArray.GetCount() - 1; i >= 0; --i)
-	//for (ndInt32 i = 4; i < 6; ++i)
 	{
 		ndHullPoints* const pointsSet = new ndHullPoints;
 		const ndHullOutput* const convexHull = hullArray[i];
@@ -300,9 +299,6 @@ ndShape* UNewtonCollisionConvexApproximate::CreateShape() const
 {
 	if (m_convexHullSet && m_convexHullSet->Num())
 	{
-		//const FVector uScale(GetComponentTransform().GetScale3D());
-		//const ndVector scale(ndFloat32(1.0f / uScale.X), ndFloat32(1.0f / uScale.Y), ndFloat32(1.0f / uScale.Z), ndFloat32(0.0f));
-
 		ndShapeCompound* const compound = new ndShapeCompound();
 		compound->BeginAddRemove();
 		for (ndInt32 i = m_convexHullSet->Num() - 1; i >= 0; --i)
@@ -311,8 +307,6 @@ ndShape* UNewtonCollisionConvexApproximate::CreateShape() const
 			const FVector3f* const vexterBuffer = &hullPoints[0];
 			ndShape* const shape = new ndShapeConvexHull(hullPoints.Num(), sizeof(FVector3f), Tolerance, &vexterBuffer[0].X);
 			ndShapeInstance* const subShape = new ndShapeInstance(shape);
-			//new ndShapeConvexHull(hullPoints, sizeof(ndVector), Tolerance, &points[0].m_x, MaxVertexCount);
-			//subShape->SetScale(scale);
 			compound->AddCollision(subShape);
 			delete subShape;
 		}

@@ -30,7 +30,7 @@
 #include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
 #include "NewtonLinkJointHinge.h"
-//#include "NewtonLinkJointWheel.h"
+#include "NewtonLinkJointWheel.h"
 #include "NewtonLinkJointSlider.h"
 #include "NewtonLinkJointRoller.h"
 #include "NewtonLinkCollisionBox.h"
@@ -41,6 +41,7 @@
 #include "NewtonLinkLoopEffector6dof.h"
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkCollisionConvexhull.h"
+#include "NewtonLinkCollisionConvexApproximate.h"
 
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.4f
 #define NEWTON_EDITOR_DEBUG_JOINT_COLOR	FColor::Red

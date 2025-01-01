@@ -28,7 +28,7 @@
 UNewtonLinkJointWheel::UNewtonLinkJointWheel()
 	:Super()
 {
-	Name = TEXT("Wheel");
+	Name = TEXT("wheel");
 
 	Radio = 50.0f;
 	SpringK = 100000.0f;

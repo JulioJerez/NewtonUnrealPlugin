@@ -19,23 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkCollisionConvexhull.h"
+#include "NewtonLinkCollisionConvexApproximate.h"
 #include "Rendering/SkeletalMeshModel.h"
 #include "Rendering/SkeletalMeshLODModel.h"
 #include "Rendering/SkeletalMeshRenderData.h"
 
 #include "NewtonCommons.h"
 #include "NewtonLinkRigidBody.h"
-#include "NewtonCollisionConvexHull.h"
+#include "NewtonCollisionConvexApproximate.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonLinkCollisionConvexhull::UNewtonLinkCollisionConvexhull()
+UNewtonLinkCollisionConvexApproximate::UNewtonLinkCollisionConvexApproximate()
 	:Super()
 {
-	Name = TEXT("convexhull");
+	Name = TEXT("ConvexApproximate");
 }
 
-void UNewtonLinkCollisionConvexhull::GetBoneVertices(TArray<FVector>& points, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
+void UNewtonLinkCollisionConvexApproximate::GetBoneVertices(TArray<FVector>& points, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
 	USkeletalMesh* const skinMesh = mesh.Get();
 
@@ -105,7 +105,9 @@ void UNewtonLinkCollisionConvexhull::GetBoneVertices(TArray<FVector>& points, TO
 	#endif
 }
 
-ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
+
+#include "NewtonCollisionConvexHull.h"
+ndShapeInstance UNewtonLinkCollisionConvexApproximate::CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
 	ndArray<ndVector> points;
 	if (boneIndex > 0)
@@ -135,56 +137,59 @@ ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkele
 		}
 	}
 	
+	//ndShapeInstance instance(new UNewtonCollisionConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
 	ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
 	return instance;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkCollisionConvexhull::CreateBlueprintProxy() const
+TObjectPtr<USceneComponent> UNewtonLinkCollisionConvexApproximate::CreateBlueprintProxy() const
 {
+	check(0);
+	//TObjectPtr<UNewtonCollisionConvexHull> component(NewObject<UNewtonCollisionConvexApproximate>(UNewtonCollisionConvexHull::StaticClass(), Name, RF_Transient));
 	TObjectPtr<UNewtonCollisionConvexHull> component(NewObject<UNewtonCollisionConvexHull>(UNewtonCollisionConvexHull::StaticClass(), Name, RF_Transient));
-
 	return component;
 }
 
-void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
+void UNewtonLinkCollisionConvexApproximate::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	UNewtonLinkRigidBody* const parentBody = Cast<UNewtonLinkRigidBody>(Parent);
-	UNewtonCollisionConvexHull* const shape = Cast<UNewtonCollisionConvexHull>(component.Get());
-	check(parentBody);
-	if (parentBody && parentBody->BoneIndex > 0)
-	{
-		TArray<FVector> bonePoints;
-		GetBoneVertices(bonePoints, mesh, parentBody->BoneIndex);
-
-		ndMatrix scaleMatrix;
-		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
-		for (ndInt32 i = 0; i < 4; ++i)
-		{
-			for (ndInt32 j = 0; j < 4; ++j)
-			{
-				scaleMatrix[i][j] = refBoneMatrix.M[i][j];
-			}
-		}
-
-		ndVector scale;
-		ndMatrix stretchAxis;
-		ndMatrix transformMatrix;
-		scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-
-		ndArray<ndBigVector> points;
-		for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
-		{
-			const ndVector p(float(bonePoints[i].X), float(bonePoints[i].Y), float(bonePoints[i].Z), float(1.0f));
-			points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
-		}
-
-		ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), shape->Tolerance, shape->MaxVertexCount);
-		const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
-
-		for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
-		{
-			FVector3f p(float(convexVertex[i].m_x), float(convexVertex[i].m_y), float(convexVertex[i].m_z));
-			shape->m_convexHullPoints.Push(p);
-		}
-	}
+	check(0);
+	//UNewtonLinkRigidBody* const parentBody = Cast<UNewtonLinkRigidBody>(Parent);
+	//UNewtonCollisionConvexApproximate* const shape = Cast<UNewtonCollisionConvexApproximate>(component.Get());
+	//check(parentBody);
+	//if (parentBody && parentBody->BoneIndex > 0)
+	//{
+	//	TArray<FVector> bonePoints;
+	//	GetBoneVertices(bonePoints, mesh, parentBody->BoneIndex);
+	//
+	//	ndMatrix scaleMatrix;
+	//	const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
+	//	for (ndInt32 i = 0; i < 4; ++i)
+	//	{
+	//		for (ndInt32 j = 0; j < 4; ++j)
+	//		{
+	//			scaleMatrix[i][j] = refBoneMatrix.M[i][j];
+	//		}
+	//	}
+	//
+	//	ndVector scale;
+	//	ndMatrix stretchAxis;
+	//	ndMatrix transformMatrix;
+	//	scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+	//
+	//	ndArray<ndBigVector> points;
+	//	for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
+	//	{
+	//		const ndVector p(float(bonePoints[i].X), float(bonePoints[i].Y), float(bonePoints[i].Z), float(1.0f));
+	//		points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
+	//	}
+	//
+	//	ndConvexApproximate3d ConvexApproximate(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), shape->Tolerance, shape->MaxVertexCount);
+	//	const ndArray<ndBigVector>& convexVertex = ConvexApproximate.GetVertexPool();
+	//
+	//	for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
+	//	{
+	//		FVector3f p(float(convexVertex[i].m_x), float(convexVertex[i].m_y), float(convexVertex[i].m_z));
+	//		shape->m_ConvexApproximatePoints.Push(p);
+	//	}
+	//}
 }
