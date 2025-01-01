@@ -22,39 +22,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "NewtonLinkJoint.h"
-#include "NewtonLinkJointRoller.generated.h"
+#include "NewtonModelPhysicsTreeItemJoint.h"
 
-/**
- * 
- */
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkJointRoller : public UNewtonLinkJoint
+class FNewtonModelPhysicsTreeItemJointRoller : public FNewtonModelPhysicsTreeItemJoint
 {
-	GENERATED_BODY()
-
 	public:
-	UNewtonLinkJointRoller();
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointRoller, FNewtonModelPhysicsTreeItemJoint)
 
-	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+	FNewtonModelPhysicsTreeItemJointRoller(const FNewtonModelPhysicsTreeItemJointRoller& src);
+	FNewtonModelPhysicsTreeItemJointRoller(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
-	UPROPERTY(EditAnywhere)
-	bool EnableLimits;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 100.0f, ClampMax = 100000.0f))
-	float SpringK;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 10.0f, ClampMax = 1000.0f))
-	float DamperC;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = -1000.0f, ClampMax = 0.0f))
-	float MinLimit;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 1000.0f))
-	float MaxLimit;
-
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.00001f, ClampMax = 1.0f))
-	float Regularizer;
+	virtual int GetFreeDof() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
+	
+	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 };

@@ -34,10 +34,15 @@ UNewtonJointRoller::UNewtonJointRoller()
 	MinLimit = -1.0e10f;
 	MaxLimit = 1.0e10f;
 	Regularizer = 1.e-3f;
+	EnableLimits = false;
 }
 
 void UNewtonJointRoller::DrawGizmo(float timestep) const
 {
+	const UWorld* const world = GetWorld();
+
+	UNewtonRigidBody* const child = FindChild();
+
 	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
 	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix(ToNewtonMatrix(transform));
@@ -47,44 +52,24 @@ void UNewtonJointRoller::DrawGizmo(float timestep) const
 	const FVector pinStart(transform.GetLocation());
 	const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
 
-	const UWorld* const world = GetWorld();
 	DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
 	DrawDebugCone(world, pinEnd, coneDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
 
-	check(0);
-	//UNewtonRigidBody* const child = FindChild();
-	//if (EnableLimits && child)
-	//{
-	//	TArray<int32> indices;
-	//	TArray<FVector> verts;
-	//	float deltaTwist = MaxAngle - MinAngle;
-	//	if ((deltaTwist > 1.0e-3f) && (deltaTwist < 360.0f))
-	//	{
-	//		const ndVector point= 0.0f), scale, ndFloat32(0.0f), ndFloat32(0.0f));
-	//		const ndInt32 subdiv = 12;
-	//		ndFloat32 angle0 = MinAngle;
-	//		ndFloat32 angleStep = ndMin(deltaTwist, 360.0f) / subdiv;
-	//	
-	//		const FVector parentOrigin(transform.GetLocation());
-	//		const ndMatrix parentMatrix(ToNewtonMatrix(transform));
-	//		verts.Push(parentOrigin);
-	//		for (ndInt32 i = 0; i <= subdiv; ++i)
-	//		{
-	//			const ndVector p(parentMatrix.RotateVector(ndPitchMatrix(angle0 * ndDegreeToRad).RotateVector(point)));
-	//			const FVector p1(float(p.m_x + parentOrigin.X), float(p.m_y + parentOrigin.Y), float(p.m_z + parentOrigin.Z));
-	//			angle0 += angleStep;
-	//			verts.Push(p1);
-	//		}
-	//		for (ndInt32 i = 0; i < subdiv; ++i)
-	//		{
-	//			indices.Push(0);
-	//			indices.Push(i + 1);
-	//			indices.Push(i + 2);
-	//		}
-	//		const FColor meshColor(255.0f, 0.0f, 0.0f, 32.0f);
-	//		DrawDebugMesh(world, verts, indices, meshColor, false, timestep);
-	//	}
-	//}
+	if (child && EnableLimits)
+	{
+		//const ndVector maxLimit(matrix.m_front.Scale(MaxLimit));
+		const ndVector springDir(matrix.m_right);
+		const ndVector maxLimit(springDir.Scale(MaxLimit));
+		const FVector maxConeStart(pinStart.X + maxLimit.m_x, pinStart.Y + maxLimit.m_y, pinStart.Z + maxLimit.m_z);
+		//const ndVector minLimit(matrix.m_front.Scale(MinLimit));
+		const ndVector minLimit(springDir.Scale(MinLimit));
+		const FVector minConeStart(pinStart.X + minLimit.m_x, pinStart.Y + minLimit.m_y, pinStart.Z + minLimit.m_z);
+
+		const FVector springConeDir(springDir.m_x, springDir.m_y, springDir.m_z);
+		DrawDebugLine(world, minConeStart, maxConeStart, pinColor, false, timestep);
+		DrawDebugCone(world, maxConeStart, springConeDir, scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
+		DrawDebugCone(world, minConeStart, springConeDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
+	}
 }
 
 // Called when the game starts
@@ -100,15 +85,16 @@ void UNewtonJointRoller::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
 	
 	if (body0 && body1)
 	{
-		check(0);
 		const FTransform transform(GetRelativeTransform());
 		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
-		//ndJointRoller* const joint = new ndJointRoller(matrix, body0, body1);
-		//joint->SetLimitState(EnableLimits);
-		//joint->SetLimits(ndFloat32 (MinAngle * ndDegreeToRad), ndFloat32(MaxAngle * ndDegreeToRad));
-		//joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
-		//
-		//m_joint = joint;
-		//world->AddJoint(m_joint);
+
+		ndJointRoller* const joint = new ndJointRoller(matrix, body0, body1);
+		joint->SetLimitStateAngle(false);
+		joint->SetLimitStatePosit(EnableLimits);
+		joint->SetAsSpringDamperPosit(Regularizer, SpringK, DamperC);
+		joint->SetLimitsPosit(ndFloat32(MinLimit * UNREAL_INV_UNIT_SYSTEM), ndFloat32(MaxLimit * UNREAL_INV_UNIT_SYSTEM));
+		
+		m_joint = joint;
+		world->AddJoint(m_joint);
 	}
 }

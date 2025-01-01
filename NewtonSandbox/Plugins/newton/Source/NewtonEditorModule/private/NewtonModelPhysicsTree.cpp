@@ -44,6 +44,7 @@
 #include "NewtonModelPhysicsTreeItemShapeBox.h"
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
+#include "NewtonModelPhysicsTreeItemJointRoller.h"
 #include "NewtonModelPhysicsTreeItemJointSlider.h"
 #include "NewtonModelPhysicsTreeItemShapeSphere.h"
 #include "NewtonModelPhysicsTreeItemShapeCapsule.h"
@@ -397,6 +398,13 @@ void FNewtonModelPhysicsTree::OnAddJointSliderRow()
 	AddJointRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddJointRollerRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointRoller(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointRoller>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddJointRow(item);
+}
+
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
@@ -500,6 +508,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointSliderRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddJointRoller
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointRollerRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddLoopEffector6dof
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
@@ -541,6 +553,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJoints", LOCTEXT("AddJointsAction", "Add joints"));
 		menuBuilder.AddMenuEntry(actions.AddJointHinge);
 		menuBuilder.AddMenuEntry(actions.AddJointSlider);
+		menuBuilder.AddMenuEntry(actions.AddJointRoller);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddLoopsAction", "Add Loops"));
@@ -1081,6 +1094,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkJointSlider>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointSlider(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkJointRoller>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointRoller(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

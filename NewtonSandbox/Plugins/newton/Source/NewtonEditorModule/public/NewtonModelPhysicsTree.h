@@ -90,16 +90,18 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	// delegates
 	bool OnCanAddChildRow() const;
 	bool CanDeleteSelectedRow() const;
-
-	void OnAddShapeBoxRow();
+	
 	void OnAddJointHingeRow();
 	void OnAddJointSliderRow();
+	void OnAddJointRollerRow();
+	void OnAddJointLoopEffector6dofRow();
+
+	void OnAddShapeBoxRow();
 	void OnAddShapeWheelRow();
 	void OnAddShapeSphereRow();
 	void OnAddShapeCapsuleRow();
 	void OnAddShapeCylinderRow();
 	void OnAddShapeConvexhullRow();
-	void OnAddJointLoopEffector6dofRow();
 
 	void OnShowDebug();
 	void OnClearDebug();

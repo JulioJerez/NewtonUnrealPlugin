@@ -30,11 +30,12 @@ UNewtonLinkJointRoller::UNewtonLinkJointRoller()
 {
 	Name = TEXT("Roller");
 
-	SpringK = 0.0f;
-	DamperC = 0.0f;
+	SpringK = 10000.0f;
+	DamperC = 100.0f;
 	MinLimit = -1.0e10f;
 	MaxLimit = 1.0e10f;
 	Regularizer = 1.e-3f;
+	EnableLimits = false;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointRoller::CreateBlueprintProxy() const
@@ -49,14 +50,10 @@ void UNewtonLinkJointRoller::InitBlueprintProxy(TObjectPtr<USceneComponent> comp
 
 	SetCommonProperties(joint);
 
-	check(0);
-	//joint->Radio = Radio;
-	//joint->SpringK = SpringK;
-	//joint->DamperC = DamperC;
-	//joint->UpperStop = UpperStop;
-	//joint->LowerStop = LowerStop;
-	//joint->Regularizer = Regularizer;
-	//joint->BrakeTorque = BrakeTorque;
-	//joint->SteeringAngle = SteeringAngle;
-	//joint->HandBrakeTorque = HandBrakeTorque;
+	joint->SpringK = SpringK;
+	joint->DamperC = DamperC;
+	joint->MaxLimit= MaxLimit;
+	joint->MinLimit = MinLimit;
+	joint->Regularizer = Regularizer;
+	joint->EnableLimits = EnableLimits;
 }

@@ -42,24 +42,8 @@ class UNewtonJointRoller : public UNewtonJoint
 	virtual void DrawGizmo(float timestep) const override;
 	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
 
-	//UPROPERTY(EditAnywhere)
-	//bool EnableLimits;
-
-	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 100.0f, ClampMax = 100000.0f))
-	//float SpringKAngle;
-	//
-	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f, ClampMax = 1000.0f))
-	//float DamperCAngle;
-	//
-	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -1000.0f, ClampMax = 0.0f))
-	//float MinLimitAngle;
-	//
-	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 1000.0f))
-	//float MaxLimitAngle;
-	//float OffsetAngle;
-
-	//UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.00001f, ClampMax = 1.0f))
-	//float SpringDamperRegularizerAngle;
+	UPROPERTY(EditAnywhere)
+	bool EnableLimits;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 100.0f, ClampMax = 100000.0f))
 	float SpringK;

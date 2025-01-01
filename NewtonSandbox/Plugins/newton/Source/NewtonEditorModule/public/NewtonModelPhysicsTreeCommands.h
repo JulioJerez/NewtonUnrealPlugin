@@ -58,6 +58,7 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 
 	TSharedPtr<FUICommandInfo> AddJointHinge;
 	TSharedPtr<FUICommandInfo> AddJointSlider;
+	TSharedPtr<FUICommandInfo> AddJointRoller;
 
 	TSharedPtr<FUICommandInfo> AddLoopEffector6dof;
 
