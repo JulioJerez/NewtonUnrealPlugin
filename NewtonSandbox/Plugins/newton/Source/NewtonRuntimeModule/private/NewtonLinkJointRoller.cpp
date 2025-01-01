@@ -32,9 +32,9 @@ UNewtonLinkJointRoller::UNewtonLinkJointRoller()
 
 	SpringK = 10000.0f;
 	DamperC = 100.0f;
-	MinLimit = -1.0e10f;
-	MaxLimit = 1.0e10f;
-	Regularizer = 1.e-3f;
+	MinLimit = -1.0f;
+	MaxLimit = 1.0f;
+	Regularizer = 1.0e-2f;
 	EnableLimits = false;
 }
 
