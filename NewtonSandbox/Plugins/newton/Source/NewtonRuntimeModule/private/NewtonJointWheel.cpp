@@ -103,15 +103,27 @@ void UNewtonJointWheel::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
 	
 	if (body0 && body1)
 	{
-		check(0);
 		const FTransform transform(GetRelativeTransform());
 		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
-		//ndJointWheel* const joint = new ndJointWheel(matrix, body0, body1);
+
+		ndWheelDescriptor desc;
+
+		desc.m_radios = Radio;
+		desc.m_springK = SpringK;
+		desc.m_damperC = DamperC;
+		desc.m_upperStop = UpperStop;
+		desc.m_lowerStop = LowerStop;
+		desc.m_regularizer = Regularizer;
+		desc.m_brakeTorque = BrakeTorque;
+		desc.m_steeringAngle = SteeringAngle;
+		desc.m_handBrakeTorque = HandBrakeTorque;
+		ndJointWheel* const joint = new ndJointWheel(matrix, body0, body1, desc);
+		
 		//joint->SetLimitState(EnableLimits);
 		//joint->SetLimits(ndFloat32 (MinAngle * ndDegreeToRad), ndFloat32(MaxAngle * ndDegreeToRad));
 		//joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
-		//
-		//m_joint = joint;
-		//world->AddJoint(m_joint);
+		
+		m_joint = joint;
+		world->AddJoint(m_joint);
 	}
 }

@@ -27,9 +27,7 @@
 #include "NewtonLinkCollisionConvexhull.generated.h"
 
 
-/**
- *
- */
+
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexhull : public UNewtonLinkCollision
 {

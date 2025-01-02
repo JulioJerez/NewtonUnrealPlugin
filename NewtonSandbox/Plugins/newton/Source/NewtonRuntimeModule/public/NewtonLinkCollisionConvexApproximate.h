@@ -23,13 +23,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NewtonCommons.h"
 #include "NewtonLinkCollision.h"
 #include "NewtonLinkCollisionConvexApproximate.generated.h"
 
 
-/**
- *
- */
+class ndHullInputMesh;
+struct FndCachedHullPoints;
+
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexApproximate : public UNewtonLinkCollision
 {
@@ -40,5 +41,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexApproximate : public UNe
 	ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-	void GetBoneVertices(TArray<FVector>& points, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
+	void GetBoneMesh(ndHullInputMesh& boneMesh, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
+
+	UPROPERTY()
+	mutable uint64 ShapeHullsHash;
+
+	UPROPERTY()
+	mutable TArray<FndCachedHullPoints> ShapeHulls;
 };

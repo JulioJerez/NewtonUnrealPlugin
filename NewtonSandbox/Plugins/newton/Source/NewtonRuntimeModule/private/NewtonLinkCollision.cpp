@@ -37,6 +37,51 @@ void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, T
 	class DebugWireframeMeshBuilder : public ndShapeDebugNotify
 	{
 		public:
+		struct EdgeKey
+		{
+			EdgeKey(const FVector& p0, const FVector& p1)
+			{
+				m_data[0] = ndInt32 (p0.X * 100.0f);
+				m_data[1] = ndInt32 (p0.Y * 100.0f);
+				m_data[2] = ndInt32 (p0.Z * 100.0f);
+				m_data[3] = ndInt32 (p1.X * 100.0f);
+				m_data[4] = ndInt32 (p1.Y * 100.0f);
+				m_data[5] = ndInt32 (p1.Z * 100.0f);
+			}
+
+			bool operator>(const EdgeKey& src) const
+			{
+				for (int i = 0; i < 6; ++i)
+				{
+					if (m_data[i] >= src.m_data[i])
+					{
+						if (m_data[i] > src.m_data[i])
+						{
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+
+			bool operator<(const EdgeKey& src) const
+			{
+				for (int i = 0; i < 6; ++i)
+				{
+					if (m_data[i] <= src.m_data[i])
+					{
+						if (m_data[i] < src.m_data[i])
+						{
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+
+			int m_data[6];
+		};
+
 		DebugWireframeMeshBuilder(TArray<FVector>& wireFrameMesh)
 			:ndShapeDebugNotify()
 			,m_wireFrameMesh(wireFrameMesh)
@@ -54,12 +99,17 @@ void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, T
 				const ndVector q(faceArray[i].Scale(UNREAL_UNIT_SYSTEM));
 				const FVector p(float(q.m_x), float(q.m_y), float(q.m_z));
 
-				m_wireFrameMesh.Push(p);
-				m_wireFrameMesh.Push(p0);
+				if (!m_filter.Find(EdgeKey(p0, p)))
+				{
+					m_wireFrameMesh.Push(p);
+					m_wireFrameMesh.Push(p0);
+					m_filter.Insert(0, EdgeKey(p, p0));
+				}
 				p0 = p;
 			}
 		}
 
+		ndTree<ndInt32, EdgeKey> m_filter;
 		TArray<FVector>& m_wireFrameMesh;
 	};
 
