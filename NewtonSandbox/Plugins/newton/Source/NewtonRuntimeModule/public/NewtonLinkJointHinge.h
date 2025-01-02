@@ -43,9 +43,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointHinge : public UNewtonLinkJoint
 	UPROPERTY(EditAnywhere)
 	bool EnableLimits;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.0f, ClampMax = 10000.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = -10000.0f, ClampMax = -1.0f))
 	float MinAngle;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = -10000.0f, ClampMax = -1.0f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.0f, ClampMax = 10000.0f))
 	float MaxAngle;
 };
