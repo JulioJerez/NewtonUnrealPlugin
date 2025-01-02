@@ -27,9 +27,9 @@
 #include "NewtonCollision.h"
 #include "NewtonCollisionConvexApproximate.generated.h"
 
-/**
- * 
- */
+
+struct FndCachedHullPoints;
+
 UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
 class UNewtonCollisionConvexApproximate : public UNewtonCollision
 {
@@ -49,12 +49,9 @@ class UNewtonCollisionConvexApproximate : public UNewtonCollision
 	virtual ndVector GetVolumePosition(const ndMatrix& bodyMatrix) const override;
 	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;
 	
-	long long CalculateStaticMeshHash() const;
+	//long long CalculateStaticMeshHash() const;
 	const FStaticMeshLODResources* GetRenderLOD() const;
 	ndConvexHullSet* CreateConvexApproximationShapes() const;
-
-	virtual void Serialize(FArchive& ar) override;
-	void SerializeLoadRevision_firstVersion(FArchive& ar);
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool Generate;
@@ -74,7 +71,10 @@ class UNewtonCollisionConvexApproximate : public UNewtonCollision
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0, ClampMax = 1.0))
 	float Tolerance;
 	
-	long long m_meshHash;
-	TSharedPtr<ndConvexHullSet> m_convexHullSet;
+	UPROPERTY(EditAnywhere, Category = Newton)
+	TArray<FndCachedHullPoints> ShapeHulls;
+
 	bool m_generateFlipFlop;
+
+	friend class UNewtonLinkCollisionConvexApproximate;
 };

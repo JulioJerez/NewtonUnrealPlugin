@@ -53,7 +53,7 @@ void UNewtonLinkCollisionConvexhull::GetBoneVertices(TArray<FVector>& points, TO
 			const FSkelMeshSection& section = model->Sections[index];
 			for (int32 i = section.SoftVertices.Num() - 1; i >= 0 ; --i)
 			{
-				const FSoftSkinVertex* softVert = &section.SoftVertices[i];
+				const FSoftSkinVertex* const softVert = &section.SoftVertices[i];
 
 				ndInt32 bone = -1;
 				ndInt32 maxWeight = 0;
@@ -133,9 +133,11 @@ ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkele
 			const ndVector p(float(bonePoints[i].X), float(bonePoints[i].Y), float(bonePoints[i].Z), float(1.0f));
 			points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
 		}
-	}
-	
 	ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
+	return instance;
+}
+	check(0);
+	ndShapeInstance instance(new ndShapeNull());
 	return instance;
 }
 
@@ -149,13 +151,12 @@ TObjectPtr<USceneComponent> UNewtonLinkCollisionConvexhull::CreateBlueprintProxy
 void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
 	UNewtonLinkRigidBody* const parentBody = Cast<UNewtonLinkRigidBody>(Parent);
-	UNewtonCollisionConvexHull* const shape = Cast<UNewtonCollisionConvexHull>(component.Get());
 	check(parentBody);
 	if (parentBody && parentBody->BoneIndex > 0)
 	{
 		TArray<FVector> bonePoints;
 		GetBoneVertices(bonePoints, mesh, parentBody->BoneIndex);
-
+	
 		ndMatrix scaleMatrix;
 		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
 		for (ndInt32 i = 0; i < 4; ++i)
@@ -165,12 +166,12 @@ void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneCompone
 				scaleMatrix[i][j] = refBoneMatrix.M[i][j];
 			}
 		}
-
+	
 		ndVector scale;
 		ndMatrix stretchAxis;
 		ndMatrix transformMatrix;
 		scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-
+	
 		ndArray<ndBigVector> points;
 		for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
 		{
@@ -178,13 +179,14 @@ void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneCompone
 			points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
 		}
 
+		UNewtonCollisionConvexHull* const shape = Cast<UNewtonCollisionConvexHull>(component.Get());
 		ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), shape->Tolerance, shape->MaxVertexCount);
 		const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
 
 		for (ndInt32 i = convexVertex.GetCount() - 1; i >= 0; --i)
 		{
-			FVector3f p(float(convexVertex[i].m_x), float(convexVertex[i].m_y), float(convexVertex[i].m_z));
-			shape->m_convexHullPoints.Push(p);
+			FVector p(float(convexVertex[i].m_x), float(convexVertex[i].m_y), float(convexVertex[i].m_z));
+			shape->ShapeHull.Points.Push(p);
 		}
 	}
 }

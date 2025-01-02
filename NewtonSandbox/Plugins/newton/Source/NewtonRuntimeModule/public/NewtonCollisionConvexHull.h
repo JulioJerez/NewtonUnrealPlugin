@@ -29,9 +29,16 @@ class ndHullOutput;
 class ndShapeInstance;
 class UNewtonRigidBody;
 
-/**
- * 
- */
+USTRUCT()
+struct FndCachedHullPoints
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	TArray<FVector> Points;
+};
+
+
 UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
 class UNewtonCollisionConvexHull : public UNewtonCollision
 {
@@ -42,8 +49,6 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 	
-	virtual void Serialize(FArchive& ar) override;
-
 	virtual void ApplyPropertyChanges() override;
 	virtual ndShape* CreateShape() const override;
 	virtual long long CalculateHash() const override;
@@ -59,7 +64,8 @@ class UNewtonCollisionConvexHull : public UNewtonCollision
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 16))
 	int MaxVertexCount;
 
-	TArray<FVector3f> m_convexHullPoints;
+	UPROPERTY(EditAnywhere, Category = Newton)
+	FndCachedHullPoints ShapeHull;
 };
 	
 
