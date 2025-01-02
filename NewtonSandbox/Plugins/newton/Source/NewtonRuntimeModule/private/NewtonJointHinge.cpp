@@ -28,13 +28,14 @@
 
 UNewtonJointHinge::UNewtonJointHinge()
 	:Super()
-	,EnableLimits(false)
-	,MinAngle(-45.0f)
-	,MaxAngle(45.0f)
-	,SpringConst(0.0f)
-	,DampingConst(0.0f)
-	,SpringDamperRegularizer(1.0e-3f)
 {
+	MaxAngle = 45.0f;
+	MinAngle = -45.0f;
+	SpringConst = 0.0f;
+	DampingConst = 0.0f;
+	EnableLimits = false;
+	ProptionalDerivativeAngle = 0.0f;
+	SpringDamperRegularizer = 1.0e-3f;
 }
 
 void UNewtonJointHinge::DrawGizmo(float timestep) const

@@ -32,7 +32,11 @@ UNewtonLinkJointHinge::UNewtonLinkJointHinge()
 
 	MaxAngle = 45.0f;
 	MinAngle = -45.0f;
+	SpringConst = 0.0f;
+	DampingConst = 0.0f;
 	EnableLimits = false;
+	ProptionalDerivativeAngle = 0.0f;
+	SpringDamperRegularizer = 1.0e-3f;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointHinge::CreateBlueprintProxy() const
@@ -49,5 +53,9 @@ void UNewtonLinkJointHinge::InitBlueprintProxy(TObjectPtr<USceneComponent> compo
 
 	joint->MinAngle = MinAngle;
 	joint->MaxAngle = MaxAngle;
+	joint->SpringConst = SpringConst;
+	joint->DampingConst = DampingConst;
 	joint->EnableLimits = EnableLimits;
+	joint->SpringDamperRegularizer = SpringDamperRegularizer;
+	joint->ProptionalDerivativeAngle = ProptionalDerivativeAngle;
 }

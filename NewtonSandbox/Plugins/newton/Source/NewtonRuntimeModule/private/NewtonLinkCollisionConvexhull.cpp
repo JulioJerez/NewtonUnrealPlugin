@@ -133,9 +133,9 @@ ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkele
 			const ndVector p(float(bonePoints[i].X), float(bonePoints[i].Y), float(bonePoints[i].Z), float(1.0f));
 			points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
 		}
-	ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
-	return instance;
-}
+		ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
+		return instance;
+	}
 	check(0);
 	ndShapeInstance instance(new ndShapeNull());
 	return instance;

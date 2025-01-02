@@ -51,6 +51,9 @@ class UNewtonJointHinge : public UNewtonJoint
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1.0f, ClampMax = 10000.0f))
 	float MaxAngle;
 
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -10000.0f, ClampMax = 10000.0f))
+	float ProptionalDerivativeAngle;
+
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
 	float SpringConst;
 
