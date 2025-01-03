@@ -29,18 +29,15 @@
 UNewtonLinkCollisionWheel::UNewtonLinkCollisionWheel()
 	:Super()
 {
-	Name = TEXT("wheel");
-
 	Radio = 50.0f;
-	Width = 25.0f;
+	Width = 50.0f;
+	Name = TEXT("wheel");
 }
 
 ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
 {
-	ndShapeInstance instance(new ndShapeChamferCylinder(0.5f, 1.0f));
+	ndShapeInstance instance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)));
 
-	//const ndMatrix alignment (ndYawMatrix(ndPi * 0.5f));
-	//instance.SetLocalMatrix(alignment);
 	const ndVector scale(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 	instance.SetScale(scale);
 	return instance;

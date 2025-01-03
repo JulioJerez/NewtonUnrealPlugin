@@ -26,14 +26,14 @@
 
 UNewtonCollisionWheel::UNewtonCollisionWheel()
 	:Super()
-	,Radio(50.0f)
-	,Width(50.0f)
 {
+	Radio = 50.0f;
+	Width = 50.0f;
 }
 
 ndShape* UNewtonCollisionWheel::CreateShape() const
 {
-	return new ndShapeChamferCylinder(0.5f, 1.0f);
+	return new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f));
 }
 
 long long UNewtonCollisionWheel::CalculateHash() const
