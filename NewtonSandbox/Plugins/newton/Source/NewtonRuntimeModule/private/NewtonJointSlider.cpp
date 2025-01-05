@@ -67,15 +67,18 @@ void UNewtonJointSlider::DrawGizmo(float timestep) const
 }
 
 // Called when the game starts
-void UNewtonJointSlider::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
+ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 {
-	Super::CreateJoint(newtonWorldActor);
+	Super::CreateJoint();
 
+	check(!m_joint);
 	check(!m_joint);
 	ndBodyKinematic* body0;
 	ndBodyKinematic* body1;
-	ndWorld* const world = newtonWorldActor->GetNewtonWorld();
-	GetBodyPairs(world, &body0, &body1);
+	//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
+	//GetBodyPairs(world, &body0, &body1);
+	GetBodyPairs(&body0, &body1);
+
 	if (body0 && body1)
 	{
 		const FTransform transform(GetRelativeTransform());
@@ -87,7 +90,9 @@ void UNewtonJointSlider::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
 		joint->SetLimits(ndFloat32(MinDistance * UNREAL_INV_UNIT_SYSTEM), ndFloat32(MaxDistance * UNREAL_INV_UNIT_SYSTEM));
 		joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
 
-		m_joint = joint;
-		world->AddJoint(m_joint);
+		//m_joint = joint;
+		//world->AddJoint(m_joint);
+		return joint;
 	}
+	return nullptr;
 }

@@ -265,6 +265,7 @@
     <ClInclude Include="Public\dCore\ndVectorArmNeon.h" />
     <ClInclude Include="Public\dCore\ndVectorScalar.h" />
     <ClInclude Include="Public\dCore\ndVectorSimd.h" />
+    <ClInclude Include="Public\dCore\ndWeakPtr.h" />
     <ClInclude Include="Public\dCore\tinyxml\ndTinyXmlGlue.h" />
     <ClInclude Include="Public\dCore\tinyxml\tinystr.h" />
     <ClInclude Include="Public\dCore\tinyxml\tinyxml.h" />

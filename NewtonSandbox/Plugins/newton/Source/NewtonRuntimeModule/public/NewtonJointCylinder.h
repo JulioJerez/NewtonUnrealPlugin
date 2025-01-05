@@ -43,7 +43,7 @@ class UNewtonJointCylinder : public UNewtonJoint
 	void DrawLinearGizmo(float timestep) const;
 	void DrawAngularGizmo(float timestep) const;
 	virtual void DrawGizmo(float timestep) const override;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool EnableAngularLimits;

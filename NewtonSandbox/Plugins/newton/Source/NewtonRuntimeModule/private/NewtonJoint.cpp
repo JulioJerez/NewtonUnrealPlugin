@@ -50,10 +50,11 @@ void UNewtonJoint::ActivateDebug()
 	m_propertyChanged = true;
 }
 
-void UNewtonJoint::CreateJoint(ANewtonWorldActor* const)
+ndJointBilateralConstraint* UNewtonJoint::CreateJoint()
 {
 	m_transfrom = GetComponentTransform();
 	ApplyPropertyChanges();
+	return nullptr;
 }
 
 void UNewtonJoint::DestroyJoint()
@@ -87,7 +88,7 @@ UNewtonRigidBody* UNewtonJoint::FindParent() const
 	return Cast<UNewtonRigidBody>(GetAttachParent());
 }
 
-void UNewtonJoint::GetBodyPairs(ndWorld* const world, ndBodyKinematic** body0, ndBodyKinematic** body1) const
+void UNewtonJoint::GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1) const
 {
 	*body0 = nullptr;
 	*body1 = nullptr;
@@ -95,20 +96,20 @@ void UNewtonJoint::GetBodyPairs(ndWorld* const world, ndBodyKinematic** body0, n
 	UNewtonRigidBody* const child = FindChild();
 	if (child)
 	{
-		check(child->m_body);
-		*body0 = child->m_body->GetAsBodyKinematic();
+		check(child->GetBody());
+		*body0 = child->GetBody();
 	}
 
 	UNewtonRigidBody* const parent = FindParent();
 	if (parent)
 	{
-		check(parent->m_body);
-		*body1 = parent->m_body->GetAsBodyKinematic();
+		check(parent->GetBody());
+		*body1 = parent->GetBody();
 	}
-	else
-	{
-		*body1 = world->GetSentinelBody();
-	}
+	//else
+	//{
+	//	*body1 = world->GetSentinelBody();
+	//}
 
 	if (!body0)
 	{
@@ -117,6 +118,7 @@ void UNewtonJoint::GetBodyPairs(ndWorld* const world, ndBodyKinematic** body0, n
 
 	if (!body1)
 	{
+		check(0);
 		UE_LOG(LogTemp, Warning, TEXT("The parent of a: %s must be a UNewtonRigidBody. Failed to create joint"), *GetName());
 	}
 }

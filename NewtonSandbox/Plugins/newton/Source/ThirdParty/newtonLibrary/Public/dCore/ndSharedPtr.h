@@ -15,6 +15,16 @@
 template <typename T>
 class ndSharedPtr
 {
+	class ndRefCounter : public ndContainersFreeListAlloc<ndRefCounter>
+	{
+		public:
+		ndRefCounter();
+		void AddRef();
+		ndInt32 Release();
+		ndAtomic<ndInt32> m_weakRef;
+		ndAtomic<ndInt32> m_sharedRef;
+	};
+
 	public:
 	ndSharedPtr();
 	ndSharedPtr(T* const ptr);
@@ -33,36 +43,29 @@ class ndSharedPtr
 	operator bool() const;
 	ndInt32 GetRefCount() const;
 
-	private:
-	class ndRefCounter : public ndAtomic<ndInt32>, public ndContainersFreeListAlloc<ndRefCounter>
-	{
-		public:
-		ndRefCounter();
-		void AddRef();
-		ndInt32 Release();
-	};
-
+	protected:
 	T* m_ptr;
 	ndRefCounter* m_references;
 };
 
 template <typename T>
 ndSharedPtr<T>::ndRefCounter::ndRefCounter()
-	:ndAtomic<ndInt32>(0)
-	,ndContainersFreeListAlloc<ndRefCounter>()
+	:ndContainersFreeListAlloc<ndRefCounter>()
+	,m_weakRef(0)
+	,m_sharedRef(0)
 {
 }
 
 template <typename T>
 void ndSharedPtr<T>::ndRefCounter::AddRef()
 {
-	fetch_add(1);
+	m_sharedRef.fetch_add(1);
 }
 
 template <typename T>
 ndInt32 ndSharedPtr<T>::ndRefCounter::Release()
 {
-	ndInt32 ref = fetch_add(-1);
+	ndInt32 ref = m_sharedRef.fetch_add(-1);
 	return ref - 1;
 }
 

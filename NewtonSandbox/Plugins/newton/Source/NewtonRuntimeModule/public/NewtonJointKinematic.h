@@ -41,5 +41,5 @@ class UNewtonJointKinematic : public UNewtonJoint
 
 	protected:
 	virtual void DrawGizmo(float timestep) const override;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
 };

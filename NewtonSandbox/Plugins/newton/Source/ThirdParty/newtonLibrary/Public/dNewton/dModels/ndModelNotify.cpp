@@ -46,12 +46,17 @@ ndModelNotify::~ndModelNotify()
 }
 
 ndModel* ndModelNotify::GetModel() const
-{ 
+{
 	return m_model;
 }
 
+void ndModelNotify::SetModel(ndModel* const model)
+{
+	m_model = model;
+}
+
 void ndModelNotify::Debug(ndConstraintDebugCallback&) const
-{ 
+{
 }
 
 

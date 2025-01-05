@@ -40,7 +40,7 @@ class UNewtonJointRoller : public UNewtonJoint
 	UNewtonJointRoller();
 
 	virtual void DrawGizmo(float timestep) const override;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UPROPERTY(EditAnywhere)
 	bool EnableLimits;

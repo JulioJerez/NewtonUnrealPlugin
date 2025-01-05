@@ -40,7 +40,7 @@ class UNewtonJointWheel : public UNewtonJoint
 	UNewtonJointWheel();
 
 	virtual void DrawGizmo(float timestep) const override;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -1.0f, ClampMax = 1000.0f))
 	float Radio;

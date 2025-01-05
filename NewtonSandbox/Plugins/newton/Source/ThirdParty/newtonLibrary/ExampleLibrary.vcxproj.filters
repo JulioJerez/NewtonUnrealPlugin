@@ -875,6 +875,9 @@
     <ClInclude Include="Public\dCore\ndTriangulatePolygon.h">
       <Filter>dCore</Filter>
     </ClInclude>
+    <ClInclude Include="Public\dCore\ndWeakPtr.h">
+      <Filter>dCore</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Public\dCore\ndTypes.natvis">

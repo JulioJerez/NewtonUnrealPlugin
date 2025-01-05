@@ -160,9 +160,7 @@ void ndModelArticulation::ClearMemory()
 		//	ndContact* const contact = it.GetNode()->GetInfo();
 		//	contact->ClearMemory();
 		//}
-
 	}
-
 }
 
 ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<ndBody>& rootBody)
@@ -208,7 +206,6 @@ void ndModelArticulation::OnAddToWorld()
 
 	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 	{
-		//ndNode* const node = *node->GetInfo();
 		m_world->AddJoint(node->GetInfo().m_joint);
 	}
 }
@@ -322,6 +319,19 @@ void ndModelArticulation::AddToWorld(ndWorld* const world)
 		}
 	}
 	world->AddModel(this);
+}
+
+ndModelArticulation::ndNode* ndModelArticulation::FindByBody(const ndBody* const body) const
+{
+	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		if (*node->m_body == body)
+		{
+			return node;
+		}
+	}
+
+	return nullptr;
 }
 
 ndModelArticulation::ndNode* ndModelArticulation::FindByName(const char* const name) const

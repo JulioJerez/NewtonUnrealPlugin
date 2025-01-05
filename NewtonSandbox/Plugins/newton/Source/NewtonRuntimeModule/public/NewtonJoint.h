@@ -46,12 +46,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	void ActivateDebug();
 
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* tickFunction) override;
 
 	void DestroyJoint();
 	void UpdateTransform();
 	virtual void DrawGizmo(float timestep) const;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor);
+	virtual ndJointBilateralConstraint* CreateJoint() ;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool ShowDebug;
@@ -62,16 +62,18 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	protected:
 	UNewtonRigidBody* FindChild() const;
 	UNewtonRigidBody* FindParent() const;
-	void GetBodyPairs(ndWorld* const world, ndBodyKinematic** body0, ndBodyKinematic** body1) const;
+	void GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1) const;
 
 	void ApplyPropertyChanges();
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 
 	FTransform m_transfrom;
 	ndJointBilateralConstraint* m_joint;
 	FTransform m_localChildTransfrom;
 	FTransform m_localParentTransfrom;
 	bool m_propertyChanged;
-
+	
+	friend class NewtonWorld;
+	friend class UNewtonModel;
 	friend class FNewtonRuntimeModule;
 };

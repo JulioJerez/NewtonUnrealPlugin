@@ -27,13 +27,23 @@
 #include "NewtonModel.generated.h"
 
 class UNewtonAsset;
+class ANewtonWorldActor;
+class ndModelArticulation;
 
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 {
 	GENERATED_BODY()
 	public:
+	class ModelNotify;
+
 	UNewtonModel();
+
+	virtual ndModelArticulation* CreateSubClassModel() const;
+	ndModelArticulation* CreateModel(ANewtonWorldActor* const worldActor);
+
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool RegenerateBluePrint;
@@ -43,4 +53,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	UNewtonAsset* NewtonAsset;
+
+	ndModelArticulation* m_model;
 };

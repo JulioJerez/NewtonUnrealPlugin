@@ -83,11 +83,12 @@ void UNewtonJointKinematic::DrawGizmo(float timestep) const
 }
 
 // Called when the game starts
-void UNewtonJointKinematic::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
+ndJointBilateralConstraint* UNewtonJointKinematic::CreateJoint()
 {
-	Super::CreateJoint(newtonWorldActor);
+	Super::CreateJoint();
 
 	check(0);
+	return nullptr;
 	//check(!m_joint);
 	//ndBodyKinematic* body0;
 	//ndBodyKinematic* body1;

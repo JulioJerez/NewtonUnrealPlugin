@@ -71,9 +71,9 @@ void UNewtonJointIk6DofEffector::DrawGizmo(float timestep) const
 }
 
 // Called when the game starts
-void UNewtonJointIk6DofEffector::CreateJoint(ANewtonWorldActor* const newtonWorldActor)
+ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 {
-	Super::CreateJoint(newtonWorldActor);
+	Super::CreateJoint();
 	
 	check(!m_joint);
 
@@ -100,9 +100,9 @@ void UNewtonJointIk6DofEffector::CreateJoint(ANewtonWorldActor* const newtonWorl
 	UNewtonRigidBody* const parentComponet = FindParent();
 	if (parentComponet && childComponent)
 	{
-		ndWorld* const world = newtonWorldActor->GetNewtonWorld();
-		ndBodyKinematic* const childBody = childComponent->m_body;
-		ndBodyKinematic* const parentBody = parentComponet->m_body;
+		//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
+		ndBodyKinematic* const childBody = childComponent->GetBody();
+		ndBodyKinematic* const parentBody = parentComponet->GetBody();
 		const FTransform transform(GetRelativeTransform());
 		const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
 		const ndMatrix childMarix(ToNewtonMatrix(TargetFrame) * parentMarix);
@@ -114,7 +114,9 @@ void UNewtonJointIk6DofEffector::CreateJoint(ANewtonWorldActor* const newtonWorl
 		joint->SetMaxForce(LinearMaxForce);
 		joint->SetMaxTorque(AngularMaxTorque);
 
-		m_joint = joint;
-		world->AddJoint(m_joint);
+		//m_joint = joint;
+		//world->AddJoint(m_joint);
+		return joint;
 	}
+	return nullptr;
 }

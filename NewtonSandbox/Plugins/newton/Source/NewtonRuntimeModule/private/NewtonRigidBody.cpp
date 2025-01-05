@@ -142,14 +142,14 @@ class UNewtonRigidBody::NotifyCallback : public ndBodyNotify
 		}
 	}
 
-	void CallBlueprintFunction()
-	{
-		FOutputDeviceNull ar;
-		AActor* const actorOwner = m_owner->GetOwner();
-		FString command(ND_RIGID_BODIES_EVENT_NAME);
-		bool test = actorOwner->CallFunctionByNameWithArguments(*command, ar, nullptr, true);
-		check(test);
-	}
+	//void CallBlueprintFunction()
+	//{
+	//	FOutputDeviceNull ar;
+	//	AActor* const actorOwner = m_owner->GetOwner();
+	//	FString command(ND_RIGID_BODIES_EVENT_NAME);
+	//	bool test = actorOwner->CallFunctionByNameWithArguments(*command, ar, nullptr, true);
+	//	check(test);
+	//}
 
 	void CallBlueprintEvent()
 	{
@@ -452,15 +452,21 @@ void UNewtonRigidBody::CalculateLocalTransform()
 	m_localTransform.SetScale3D(m_localScale);
 }
 
-void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep)
+ndBodyDynamic* UNewtonRigidBody::GetBody() const
 {
-	m_newtonWorld = worldActor;
+	return m_body;
+}
+
+ndBodyDynamic* UNewtonRigidBody::CreateRigidBody(bool overrideAutoSleep)
+{
+	//m_newtonWorld = worldActor;
 	const ndMatrix matrix(ToNewtonMatrix(m_globalTransform));
-	m_body = new ndBodyDynamic();
-	m_body->SetMatrix(matrix);
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetMatrix(matrix);
 
 	ndSharedPtr<ndShapeInstance> shape(CreateCollision(matrix));
-	m_body->SetCollisionShape(**shape);
+	body->SetCollisionShape(**shape);
 
 	FTransform transform;
 	transform.SetRotation(FQuat(Inertia.PrincipalInertiaAxis));
@@ -476,35 +482,35 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 	// when in reality the com is a the geometric center 
 	// and the inertia is relative to that point.
 	// SetIntrinsicMassMatrix does that.   
-	m_body->SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
+	body->SetIntrinsicMassMatrix(Mass, **shape, fullInertia);
 
-	const ndVector massMatrix(m_body->GetMassMatrix());
-	const ndMatrix hygenAxis(fullInertia ? m_body->GetPrincipalAxis() : ndGetIdentityMatrix());
+	const ndVector massMatrix(body->GetMassMatrix());
+	const ndMatrix hygenAxis(fullInertia ? body->GetPrincipalAxis() : ndGetIdentityMatrix());
 	ndMatrix diagonal(ndGetIdentityMatrix());
 	diagonal[0][0] = massMatrix[0] * Inertia.PrincipalInertiaScaler.X;
 	diagonal[1][1] = massMatrix[1] * Inertia.PrincipalInertiaScaler.Y;
 	diagonal[2][2] = massMatrix[2] * Inertia.PrincipalInertiaScaler.Z;
 	const ndMatrix fullScaledIntertia(hygenAxis.OrthoInverse() * diagonal * hygenAxis);
-	m_body->SetMassMatrix(Mass, fullScaledIntertia);
+	body->SetMassMatrix(Mass, fullScaledIntertia);
 
-	ndVector centerOfGravity(m_body->GetCentreOfMass());
+	ndVector centerOfGravity(body->GetCentreOfMass());
 	centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-	m_body->SetCentreOfMass(centerOfGravity);
+	body->SetCentreOfMass(centerOfGravity);
 
-	m_body->SetSeletonSelfCollision(SelfSkeletonCollidable);
-	m_body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
-	m_body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
+	body->SetSeletonSelfCollision(SelfSkeletonCollidable);
+	body->SetAutoSleep(AutoSleepMode && overrideAutoSleep);
+	body->SetNotifyCallback(new NotifyCallback(this, ndVector(ndFloat32(Gravity.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Gravity.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
 
-	m_body->SetLinearDamping(LinearDamp);
-	m_body->SetAngularDamping(ndVector(AngularDamp));
+	body->SetLinearDamping(LinearDamp);
+	body->SetAngularDamping(ndVector(AngularDamp));
 
 	const ndVector omega(ndVector(ndFloat32(InitialOmega.X), ndFloat32(InitialOmega.Y), ndFloat32(InitialOmega.Z), ndFloat32(0.0f)));
 	const ndVector veloc(ndFloat32(InitialVeloc.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-	m_body->SetOmega(matrix.RotateVector(omega));
-	m_body->SetVelocity(matrix.RotateVector(veloc));
+	body->SetOmega(matrix.RotateVector(omega));
+	body->SetVelocity(matrix.RotateVector(veloc));
 
-	ndWorld* const world = m_newtonWorld->GetNewtonWorld();
-	world->AddBody(m_body);
+	//ndWorld* const world = m_newtonWorld->GetNewtonWorld();
+	//world->AddBody(m_body);
 
 	AActor* const actor = GetOwner();
 	m_sleeping = false;
@@ -525,6 +531,7 @@ void UNewtonRigidBody::CreateRigidBody(ANewtonWorldActor* const worldActor, bool
 			stack.PushBack(childrenComp[i].Get());
 		}
 	}
+	return body;
 }
 
 ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) const

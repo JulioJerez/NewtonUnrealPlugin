@@ -23,6 +23,7 @@
 #include "EngineUtils.h"
 
 #include "NewtonJoint.h"
+#include "NewtonModel.h"
 #include "NewtonCommons.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
@@ -136,25 +137,42 @@ void NewtonWorld::StartGame()
 	m_world->Sync();
 	
 	UWorld* const world = m_owner->GetWorld();
+	ndWorld* const newtonWorld = GetNewtonWorld();
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
-		const TSet<UActorComponent*>& components = actor->GetComponents();
-		for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+		UNewtonModel* const modelComponent = Cast<UNewtonModel>(actor->FindComponentByClass(UNewtonModel::StaticClass()));
+		if (modelComponent)
 		{
-			UNewtonRigidBody* const component = Cast<UNewtonRigidBody>(*it);
-			if (component)
-			{
-				component->CreateRigidBody(m_owner, m_owner->AutoSleepMode);
-			}
+			ndModelArticulation* const model = modelComponent->CreateModel(m_owner);
+			modelComponent->m_model = model;
+			newtonWorld->AddModel(model);
 		}
-
-		for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+		else
 		{
-			UNewtonJoint* const component = Cast<UNewtonJoint>(*it);
-			if (component)
+			const TSet<UActorComponent*>& components = actor->GetComponents();
+			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
 			{
-				component->CreateJoint(m_owner);
+				UNewtonRigidBody* const component = Cast<UNewtonRigidBody>(*it);
+				if (component)
+				{
+					ndBodyDynamic* const body = component->CreateRigidBody(m_owner->AutoSleepMode);
+					component->m_body = body;
+					component->m_newtonWorld = m_owner;
+					newtonWorld->AddBody(body);
+				}
+			}
+
+			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
+			{
+				UNewtonJoint* const component = Cast<UNewtonJoint>(*it);
+				if (component)
+				{
+					ndJointBilateralConstraint* const joint = component->CreateJoint();
+					check(joint);
+					component->m_joint = joint;
+					newtonWorld->AddJoint(joint);
+				}
 			}
 		}
 	}

@@ -46,6 +46,7 @@ void UNewtonLinkCollisionConvexApproximate::GetBoneMesh(ndHullInputMesh& boneMes
 
 	const FSkeletalMeshModel* const importedResource = mesh->GetImportedModel();
 	const FSkeletalMeshLODModel* const model = &importedResource->LODModels[0];
+	const TArray<uint32>& indexBuffer = model->IndexBuffer;
 
 	ndTree<ndInt32, ndInt32> vertexFilter;
 	for (int32 index = model->Sections.Num() - 1; index >= 0; --index)
@@ -73,17 +74,19 @@ void UNewtonLinkCollisionConvexApproximate::GetBoneMesh(ndHullInputMesh& boneMes
 				skinVertex.m_x = softVert->Position.X;
 				skinVertex.m_y = softVert->Position.Y;
 				skinVertex.m_z = softVert->Position.Z;
-				vertexFilter.Insert(boneMesh.m_points.GetCount(), i + section.BaseIndex);
+				vertexFilter.Insert(boneMesh.m_points.GetCount(), i + section.BaseVertexIndex);
 				boneMesh.m_points.PushBack(skinVertex);
 			}
 		}
 
-		const TArray<uint32>& indexBuffer = model->IndexBuffer;
-		for (int32 i = indexBuffer.Num() - 3; i >= 0; i -= 3)
+		for (int32 i = section.NumTriangles-1; i>= 0; --i)
 		{
-			const ndTree<ndInt32, ndInt32>::ndNode* const node0 = vertexFilter.Find(indexBuffer[i + 0]);
-			const ndTree<ndInt32, ndInt32>::ndNode* const node1 = vertexFilter.Find(indexBuffer[i + 1]);
-			const ndTree<ndInt32, ndInt32>::ndNode* const node2 = vertexFilter.Find(indexBuffer[i + 2]);
+			int32 j0 = indexBuffer[section.BaseIndex + i * 3 + 0];
+			int32 j1 = indexBuffer[section.BaseIndex + i * 3 + 1];
+			int32 j2 = indexBuffer[section.BaseIndex + i * 3 + 2];
+			const ndTree<ndInt32, ndInt32>::ndNode* const node0 = vertexFilter.Find(j0);
+			const ndTree<ndInt32, ndInt32>::ndNode* const node1 = vertexFilter.Find(j1);
+			const ndTree<ndInt32, ndInt32>::ndNode* const node2 = vertexFilter.Find(j2);
 			if (node0 && node1 && node2)
 			{
 				ndHullInputMesh::ndFace face;

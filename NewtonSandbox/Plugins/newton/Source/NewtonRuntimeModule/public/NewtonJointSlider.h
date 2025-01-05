@@ -42,7 +42,7 @@ class UNewtonJointSlider : public UNewtonJoint
 	UNewtonJointSlider();
 
 	virtual void DrawGizmo(float timestep) const override;
-	virtual void CreateJoint(ANewtonWorldActor* const worldActor) override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool EnableLimits;

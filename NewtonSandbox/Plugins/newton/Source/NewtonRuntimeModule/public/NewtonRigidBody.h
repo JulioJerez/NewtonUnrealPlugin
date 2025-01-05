@@ -66,7 +66,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	void UpdateTransform();
 	void CalculateLocalTransform();
 	void InterpolateTransform(float param);
-	void CreateRigidBody(ANewtonWorldActor* const worldActor, bool overrideAutoSleep);
+
+	ndBodyDynamic* GetBody() const;
+	ndBodyDynamic* CreateRigidBody(bool overrideAutoSleep);
 
 	// **********************************
 	// BluePrint interface
@@ -116,7 +118,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	UFUNCTION(BlueprintCallable)
 	bool GetSleepState() const;
 
-	// Called every frame
 	virtual void PostLoad() override;
 	virtual void OnRegister() override;
 	virtual void OnUnregister() override;
@@ -124,7 +125,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	virtual void OnChildAttached(USceneComponent* ChildComponent);
 	virtual void OnChildDetached(USceneComponent* ChildComponent);
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	// Called every frame
+	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* tickFunction) override;
 	
 	void DestroyRigidBody();
 	
