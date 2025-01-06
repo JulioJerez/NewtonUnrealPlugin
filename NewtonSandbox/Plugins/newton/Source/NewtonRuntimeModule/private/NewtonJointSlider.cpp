@@ -72,7 +72,6 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 	Super::CreateJoint();
 
 	check(!m_joint);
-	check(!m_joint);
 	ndBodyKinematic* body0;
 	ndBodyKinematic* body1;
 	//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
@@ -90,9 +89,27 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 		joint->SetLimits(ndFloat32(MinDistance * UNREAL_INV_UNIT_SYSTEM), ndFloat32(MaxDistance * UNREAL_INV_UNIT_SYSTEM));
 		joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
 
+		joint->SetOffsetPosit(0.1f);
+
 		//m_joint = joint;
 		//world->AddJoint(m_joint);
 		return joint;
 	}
 	return nullptr;
+}
+
+
+
+float UNewtonJointSlider::GetOffsetPosit() const
+{
+	check(m_joint);
+	ndJointSlider* const slider = (ndJointSlider*)m_joint;
+	return slider->GetOffsetPosit() * UNREAL_UNIT_SYSTEM;
+}
+
+void UNewtonJointSlider::SetOffsetPosit(float offset)
+{
+	check(m_joint);
+	ndJointSlider* const slider = (ndJointSlider*)m_joint;
+	slider->SetOffsetPosit(offset * UNREAL_INV_UNIT_SYSTEM);
 }

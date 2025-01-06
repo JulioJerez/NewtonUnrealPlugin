@@ -34,6 +34,10 @@ UNewtonLinkJointSlider::UNewtonLinkJointSlider()
 	MaxDistance = 100.0f;
 	MinDistance = -100.0f;
 	EnableLimits = false;
+
+	SpringConst = 0.0f;
+	DampingConst = 0.0f;
+	SpringDamperRegularizer = 1.0e-3f;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointSlider::CreateBlueprintProxy() const
@@ -51,4 +55,9 @@ void UNewtonLinkJointSlider::InitBlueprintProxy(TObjectPtr<USceneComponent> comp
 	joint->MinDistance = MinDistance;
 	joint->MaxDistance = MaxDistance;
 	joint->EnableLimits = EnableLimits;
+
+	joint->SpringConst = SpringConst;
+	joint->DampingConst = DampingConst;
+	joint->EnableLimits = EnableLimits;
+	joint->SpringDamperRegularizer = SpringDamperRegularizer;
 }

@@ -41,6 +41,12 @@ class UNewtonJointSlider : public UNewtonJoint
 	// Sets default values for this component's properties
 	UNewtonJointSlider();
 
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	float GetOffsetPosit() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void SetOffsetPosit(float offset);
+
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 

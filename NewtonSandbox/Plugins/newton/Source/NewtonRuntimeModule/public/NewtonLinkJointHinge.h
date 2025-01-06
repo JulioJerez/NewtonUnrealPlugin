@@ -49,9 +49,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointHinge : public UNewtonLinkJoint
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.0f, ClampMax = 10000.0f))
 	float MaxAngle;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = -10000.0f, ClampMax = 10000.0f))
-	float ProptionalDerivativeAngle;
-
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
 	float SpringConst;
 

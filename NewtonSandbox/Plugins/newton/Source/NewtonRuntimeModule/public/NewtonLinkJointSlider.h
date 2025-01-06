@@ -49,4 +49,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointSlider : public UNewtonLinkJoint
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.1f, ClampMax = 10000.0f))
 	float MaxDistance;
 
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
+	float SpringConst;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 1000.0f))
+	float DampingConst;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0001f, ClampMax = 1.0f))
+	float SpringDamperRegularizer;
 };

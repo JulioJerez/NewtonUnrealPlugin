@@ -27,8 +27,10 @@
 
 #define ND_STACK_DEPTH				256
 
-#define ND_RIGID_BODIES_EVENT_NAME "OnNewtonForceAndTorque"
+
 #define ND_MODEL_UPDATE_EVENT_NAME "OnNewtonModelUpdate"
+#define ND_RIGID_BODIES_EVENT_NAME "OnNewtonForceAndTorque"
+
 
 #include "Engine/Texture.h"
 #include "Engine/Texture2DArray.h"
