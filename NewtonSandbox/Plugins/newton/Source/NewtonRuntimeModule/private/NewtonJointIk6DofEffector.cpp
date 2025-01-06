@@ -20,7 +20,10 @@
 */
 
 #include "NewtonJointIk6DofEffector.h"
+#include "Animation\Skeleton.h"
 
+#include "NewtonModel.h"
+#include "NewtonAsset.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
 #include "NewtonRuntimeModule.h"
@@ -77,17 +80,40 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 	
 	check(!m_joint);
 
+	AActor* const owner = GetOwner();
+	check(owner);
+	UNewtonModel* const model = owner->FindComponentByClass<UNewtonModel>();
+	check(model);
+	USkeleton* const skeleton = model->NewtonAsset->SkeletalMeshAsset->GetSkeleton();;
+	const FReferenceSkeleton& refSkeleton = skeleton->GetReferenceSkeleton();
+	const TArray<FMeshBoneInfo>& boneInfo = refSkeleton.GetRefBoneInfo();
+	
+	ndInt32 boneIndex = -1;
+	for (ndInt32 i = boneInfo.Num() - 1; i >= 0; --i)
+	{
+		if (boneInfo[i].Name == ReferencedBodyName)
+		{
+			boneIndex = i;
+			break;
+		}
+	}
+	check(boneIndex != -1);
+
 	UNewtonRigidBody* childComponent = nullptr;
 	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
-	stack.PushBack(GetOwner()->GetRootComponent());
+	stack.PushBack(owner->GetRootComponent());
 	while (stack.GetCount())
 	{
 		USceneComponent* const component = stack.Pop();
 		check(component);
-		if (component->GetName() == ReferencedBodyName)
+		UNewtonRigidBody* const bodyComponent = Cast<UNewtonRigidBody>(component);
+		if (Cast<UNewtonRigidBody>(component))
 		{
-			childComponent = Cast<UNewtonRigidBody>(component);
-			break;
+			if (bodyComponent->BoneIndex == boneIndex)
+			{
+				childComponent = bodyComponent;
+				break;
+			}
 		}
 	
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();

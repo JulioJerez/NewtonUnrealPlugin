@@ -48,7 +48,7 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FTransform TargetFrame;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 20000.0f))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
 	float AngularSpring;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 500.0f))
