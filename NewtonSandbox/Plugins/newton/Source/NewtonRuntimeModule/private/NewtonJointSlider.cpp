@@ -89,16 +89,12 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 		joint->SetLimits(ndFloat32(MinDistance * UNREAL_INV_UNIT_SYSTEM), ndFloat32(MaxDistance * UNREAL_INV_UNIT_SYSTEM));
 		joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
 
-		joint->SetOffsetPosit(0.1f);
-
 		//m_joint = joint;
 		//world->AddJoint(m_joint);
 		return joint;
 	}
 	return nullptr;
 }
-
-
 
 float UNewtonJointSlider::GetOffsetPosit() const
 {
