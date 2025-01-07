@@ -182,3 +182,9 @@ void UNewtonJoint::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		DrawGizmo(DeltaTime);
 	}
 }
+
+bool UNewtonJoint::HitLimits() const
+{
+	check(m_joint);
+	return m_joint->GetJointHitLimits();
+}

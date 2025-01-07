@@ -141,7 +141,8 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 		joint->SetMaxForce(LinearMaxForce);
 		joint->SetMaxTorque(AngularMaxTorque);
 
-		m_referenceFrame = ToUnrealMatrix(joint->GetEffectorMatrix());
+		const ndMatrix refFrame(joint->GetEffectorMatrix());
+		m_referenceFrame = ToUnrealMatrix(refFrame);
 
 		//m_joint = joint;
 		//world->AddJoint(m_joint);
@@ -181,6 +182,23 @@ void UNewtonJointIk6DofEffector::SetTargetTransform(const FTransform& transform)
 	}
 }
 
+FVector UNewtonJointIk6DofEffector::ClipRobotTarget()
+{
+	check(m_joint);
+	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+
+	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+	const ndMatrix currentEffectorMatrix(joint->GetEffectorMatrix());
+
+	ndFloat32 angle0 = ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x);
+	ndFloat32 angle = ndAtan2(currentEffectorMatrix.m_posit.m_y, currentEffectorMatrix.m_posit.m_x) - angle0;
+	const ndVector localPosit(ndRollMatrix(angle).UnrotateVector(currentEffectorMatrix.m_posit) - refMatrix.m_posit);
+	ndFloat32 x = (localPosit.m_x - 0.01f * ndSign(localPosit.m_x)) * UNREAL_UNIT_SYSTEM;
+	ndFloat32 z = (localPosit.m_z - 0.01f * ndSign(localPosit.m_z)) * UNREAL_UNIT_SYSTEM;
+	ndFloat32 azimuth = angle * ndRadToDegree;
+	return FVector(x, azimuth, z);
+}
+
 void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll)
 {
 	azimuth *= ndDegreeToRad;
@@ -194,10 +212,11 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 	const ndMatrix currentMatrix(joint->GetEffectorMatrix());
 	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
 
-	const ndMatrix azimuthRotation(ndRollMatrix(azimuth));
 	const ndVector referencePoint(refMatrix.m_posit);
 	const ndVector step(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
 	const ndVector source(currentMatrix.m_posit);
+
+	const ndMatrix azimuthRotation(ndRollMatrix(azimuth));
 	const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
 
 	ndMatrix matrix(joint->GetEffectorMatrix());
@@ -236,7 +255,7 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 			ndFloat32 angle = ndAcos(cosAngle);
 		
 			ndVector target(dst);
-			if (ndAbs(angle) > ndFloat32(0.1f))
+			if (ndAbs(angle) > ndFloat32(1.0e-3f))
 			{
 				const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
 				const ndQuaternion rotation(pin, angle);
