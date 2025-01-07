@@ -45,7 +45,7 @@ ndConvexHullSet::~ndConvexHullSet()
 	}
 }
 
-FTransform ToUnRealTransform(const ndMatrix& matrix)
+FTransform ToUnrealTransform(const ndMatrix& matrix)
 {
 	const ndQuaternion rotation(matrix);
 	const ndVector posit(matrix.m_posit.Scale(UNREAL_UNIT_SYSTEM));
@@ -67,4 +67,30 @@ ndMatrix ToNewtonMatrix(const FTransform& transform)
 	const ndVector posit(UNREAL_INV_UNIT_SYSTEM * ndFloat32(location.X), UNREAL_INV_UNIT_SYSTEM * ndFloat32(location.Y), UNREAL_INV_UNIT_SYSTEM * ndFloat32(location.Z), ndFloat32(1.0f));
 	const ndMatrix matrix(ndCalculateMatrix(quat, posit));
 	return matrix;
+}
+
+ndMatrix ToNewtonMatrix(const FMatrix& uMatrix)
+{
+	ndMatrix matrix;
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		for (ndInt32 j = 0; j < 4; ++j)
+		{
+			matrix[i][j] = uMatrix.M[i][j];
+		}
+	}
+	return matrix;
+}
+
+FMatrix ToUnrealMatrix(const ndMatrix& matrix)
+{
+	FMatrix uMatrix;
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		for (ndInt32 j = 0; j < 4; ++j)
+		{
+			uMatrix.M[i][j] = matrix[i][j];
+		}
+	}
+	return uMatrix;
 }

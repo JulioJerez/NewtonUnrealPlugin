@@ -42,6 +42,15 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	FTransform GetTargetTransform() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void SetTargetTransform(const FTransform& transform);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll);
+
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FName ReferencedBodyName;
 
@@ -71,4 +80,6 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.00001f, ClampMax = 0.99f))
 	float LinearRegularizer;
+
+	FMatrix m_referenceFrame;
 };

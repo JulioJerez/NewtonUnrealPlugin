@@ -113,15 +113,16 @@ ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkele
 		TArray<FVector> bonePoints;
 		GetBoneVertices(bonePoints, mesh, boneIndex);
 
-		ndMatrix scaleMatrix;
 		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(boneIndex));
-		for (ndInt32 i = 0; i < 4; ++i)
-		{
-			for (ndInt32 j = 0; j < 4; ++j)
-			{
-				scaleMatrix[i][j] = refBoneMatrix.M[i][j];
-			}
-		}
+		//ndMatrix scaleMatrix;
+		//for (ndInt32 i = 0; i < 4; ++i)
+		//{
+		//	for (ndInt32 j = 0; j < 4; ++j)
+		//	{
+		//		scaleMatrix[i][j] = refBoneMatrix.M[i][j];
+		//	}
+		//}
+		ndMatrix scaleMatrix(ToNewtonMatrix(refBoneMatrix));
 
 		ndVector scale;
 		ndMatrix stretchAxis;
@@ -157,15 +158,16 @@ void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneCompone
 		TArray<FVector> bonePoints;
 		GetBoneVertices(bonePoints, mesh, parentBody->BoneIndex);
 	
-		ndMatrix scaleMatrix;
 		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
-		for (ndInt32 i = 0; i < 4; ++i)
-		{
-			for (ndInt32 j = 0; j < 4; ++j)
-			{
-				scaleMatrix[i][j] = refBoneMatrix.M[i][j];
-			}
-		}
+		//ndMatrix scaleMatrix;
+		//for (ndInt32 i = 0; i < 4; ++i)
+		//{
+		//	for (ndInt32 j = 0; j < 4; ++j)
+		//	{
+		//		scaleMatrix[i][j] = refBoneMatrix.M[i][j];
+		//	}
+		//}
+		ndMatrix scaleMatrix (ToNewtonMatrix(refBoneMatrix));
 	
 		ndVector scale;
 		ndMatrix stretchAxis;

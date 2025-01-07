@@ -61,5 +61,8 @@ class ndConvexHullSet : public TArray<ndHullPoints*>
 	~ndConvexHullSet();
 };
 
+FMatrix ToUnrealMatrix(const ndMatrix& matrix);
+ndMatrix ToNewtonMatrix(const FMatrix& transform);
+
 ndMatrix ToNewtonMatrix(const FTransform& transform);
-FTransform ToUnRealTransform(const ndMatrix& matrix);
+FTransform ToUnrealTransform(const ndMatrix& matrix);

@@ -339,7 +339,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		ndMatrix inertiaMatrix(body.CalculateInertiaMatrix());
 		inertiaMatrix.EigenVectors();
 		const ndMatrix axisMatrix(inertiaMatrix * matrix);
-		const FTransform axisTranform(ToUnRealTransform(axisMatrix));
+		const FTransform axisTranform(ToUnrealTransform(axisMatrix));
 		const FRotator axisRot(axisTranform.GetRotation());
 		const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
 		DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);
@@ -366,7 +366,7 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 		centerOfGravity += ndVector(ndFloat32(CenterOfMass.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(CenterOfMass.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 		centerOfGravity = matrix.TransformVector(centerOfGravity);
 
-		const FTransform transform(ToUnRealTransform(matrix));
+		const FTransform transform(ToUnrealTransform(matrix));
 		const FRotator axisRot(transform.GetRotation());
 		const FVector axisLoc(centerOfGravity.m_x * UNREAL_UNIT_SYSTEM, centerOfGravity.m_y * UNREAL_UNIT_SYSTEM, centerOfGravity.m_z * UNREAL_UNIT_SYSTEM);
 		DrawDebugCoordinateSystem(GetWorld(), axisLoc, axisRot, DebugScale * UNREAL_UNIT_SYSTEM, false, timestep);

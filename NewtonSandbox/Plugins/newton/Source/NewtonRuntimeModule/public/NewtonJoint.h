@@ -60,6 +60,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	float DebugScale;
 
 	protected:
+	void AwakeBodies() const;
 	UNewtonRigidBody* FindChild() const;
 	UNewtonRigidBody* FindParent() const;
 	void GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1) const;

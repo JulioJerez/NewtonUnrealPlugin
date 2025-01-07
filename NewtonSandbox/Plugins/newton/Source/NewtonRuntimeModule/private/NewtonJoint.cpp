@@ -72,6 +72,15 @@ void UNewtonJoint::DestroyJoint()
 	}
 }
 
+void UNewtonJoint::AwakeBodies() const
+{
+	check(m_joint);
+	ndBodyKinematic* const body0 = m_joint->GetBody0();
+	ndBodyKinematic* const body1 = m_joint->GetBody1();
+	body0->SetSleepState(false);
+	body1->SetSleepState(false);
+}
+
 UNewtonRigidBody* UNewtonJoint::FindChild() const
 {
 	const TArray<TObjectPtr<USceneComponent>>& childArray = GetAttachChildren();

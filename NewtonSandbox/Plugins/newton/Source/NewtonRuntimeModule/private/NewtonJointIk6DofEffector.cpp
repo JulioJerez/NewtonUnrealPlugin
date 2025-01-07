@@ -44,6 +44,7 @@ UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 	LinearSpring = 10000.0f;
 	LinearMaxForce = 10000.0f;
 	LinearRegularizer = 1.0e-5f;
+	m_referenceFrame = FMatrix::Identity;
 	//rotationType(ndIk6DofEffector::m_shortestPath)
 	//controlDofOptions(0xff)
 }
@@ -140,9 +141,131 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 		joint->SetMaxForce(LinearMaxForce);
 		joint->SetMaxTorque(AngularMaxTorque);
 
+		m_referenceFrame = ToUnrealMatrix(joint->GetEffectorMatrix());
+
 		//m_joint = joint;
 		//world->AddJoint(m_joint);
 		return joint;
 	}
 	return nullptr;
+}
+
+
+FTransform UNewtonJointIk6DofEffector::GetTargetTransform() const
+{
+	check(m_joint);
+	const ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+	const ndMatrix matrix (joint->GetEffectorMatrix());
+	return ToUnrealTransform(matrix);
+}
+
+void UNewtonJointIk6DofEffector::SetTargetTransform(const FTransform& transform)
+{
+	check(m_joint);
+	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+
+	const ndMatrix targetMatrix(ToNewtonMatrix(transform));
+	const ndMatrix currentMatrix(joint->GetEffectorMatrix());
+	const ndMatrix relative(targetMatrix * currentMatrix.OrthoInverse());
+
+	bool isZero = true;
+	for (ndInt32 i = 0; isZero && (i < 3); ++i)
+	{
+		isZero = isZero && (ndAbs(relative[i][i]) > ndFloat32(0.9999f)) && (ndAbs(relative.m_posit.m_x) < ndFloat32(2.5e-3f));
+	}
+
+	if (!isZero)
+	{
+		AwakeBodies();
+		joint->SetOffsetMatrix(targetMatrix);
+	}
+}
+
+void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll)
+{
+	azimuth *= ndDegreeToRad;
+	x = x * UNREAL_INV_UNIT_SYSTEM;
+	z = z * UNREAL_INV_UNIT_SYSTEM;
+
+	check(m_joint);
+	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+
+	const ndVector upPin(0.0f, 0.0f, 1.0f, 0.0f);
+	const ndMatrix currentMatrix(joint->GetEffectorMatrix());
+	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+
+	const ndMatrix azimuthRotation(ndRollMatrix(azimuth));
+	const ndVector referencePoint(refMatrix.m_posit);
+	const ndVector step(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
+	const ndVector source(currentMatrix.m_posit);
+	const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
+
+	ndMatrix matrix(joint->GetEffectorMatrix());
+
+	// calculate the target position
+	ndFloat32 longitudinalStep = 0.05f;
+	ndFloat32 angularStep = 2.0f * ndDegreeToRad;
+
+	auto CalculateTargetPosition = [&source, &target, &upPin, longitudinalStep, angularStep]()
+	{
+		const ndVector mask(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), 0.0f);
+		const ndVector src(source * mask);
+		const ndVector dst(target * mask);
+		const ndVector src1(src - upPin * (src.DotProduct(upPin)));
+		const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
+		const ndVector srcDir(src1.Normalize());
+		const ndVector dstDir(dst1.Normalize());
+		ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+		ndFloat32 angle = ndAcos(cosAngle);
+		
+		ndVector result(src);
+		if (ndAbs(angle) > angularStep)
+		{
+			const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
+			const ndQuaternion rotation(pin, angularStep);
+			result = rotation.RotateVector(result);
+		}
+		
+		auto PlaneRotation = [&result, &dst, &upPin, longitudinalStep]()
+		{
+			const ndVector src1(result - upPin * (result.DotProduct(upPin)));
+			const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
+			const ndVector srcDir(src1.Normalize());
+			const ndVector dstDir(dst1.Normalize());
+			ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+			ndFloat32 angle = ndAcos(cosAngle);
+		
+			ndVector target(dst);
+			if (ndAbs(angle) > ndFloat32(0.1f))
+			{
+				const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
+				const ndQuaternion rotation(pin, angle);
+				target = rotation.UnrotateVector(target);
+			}
+		
+			for (ndInt32 i = 0; i < 3; ++i)
+			{
+				ndFloat32 step = target[i] - result[i];
+				if (ndAbs(step) > longitudinalStep)
+				{
+					result[i] += longitudinalStep * ndSign(step);
+				}
+				else
+				{
+					result[i] = target[i];
+				}
+			}
+			return result;
+		};
+		result = PlaneRotation();
+
+		result.m_w = ndFloat32(1.0f);
+		return result;
+	};
+
+
+	matrix.m_posit = CalculateTargetPosition();
+
+
+	SetTargetTransform(ToUnrealTransform(matrix));
 }
