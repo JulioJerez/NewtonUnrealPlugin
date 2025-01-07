@@ -171,7 +171,7 @@ void UNewtonJointIk6DofEffector::SetTargetTransform(const FTransform& transform)
 	bool isZero = true;
 	for (ndInt32 i = 0; isZero && (i < 3); ++i)
 	{
-		isZero = isZero && (ndAbs(relative[i][i]) > ndFloat32(0.9999f)) && (ndAbs(relative.m_posit.m_x) < ndFloat32(2.5e-3f));
+		isZero = isZero && (ndAbs(relative[i][i]) > ndFloat32(0.9999f)) && (ndAbs(relative.m_posit[i]) < ndFloat32(2.5e-3f));
 	}
 
 	if (!isZero)
