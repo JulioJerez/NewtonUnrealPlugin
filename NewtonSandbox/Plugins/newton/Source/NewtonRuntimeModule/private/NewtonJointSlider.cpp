@@ -107,5 +107,15 @@ void UNewtonJointSlider::SetOffsetPosit(float offset)
 {
 	check(m_joint);
 	ndJointSlider* const slider = (ndJointSlider*)m_joint;
-	slider->SetOffsetPosit(offset * UNREAL_INV_UNIT_SYSTEM);
+
+	ndFloat32 value = offset * UNREAL_INV_UNIT_SYSTEM;
+	ndFloat32 currentValue = slider->GetOffsetPosit();
+	if (ndAbs(value - currentValue) > ndFloat32(2.5e-3f))
+	{
+		slider->SetOffsetPosit(value);
+		ndBodyKinematic* const body0 = slider->GetBody0();
+		ndBodyKinematic* const body1 = slider->GetBody1();
+		body0->SetSleepState(false);
+		body1->SetSleepState(false);
+	}
 }
