@@ -209,10 +209,9 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
 
 	// claculate the orientation
-	pitch *= ndDegreeToRad; 
 	yaw *= ndDegreeToRad; 
 	roll *= ndDegreeToRad;
-
+	pitch *= ndDegreeToRad;
 	const ndMatrix targetMatrix(ndRollMatrix(roll) * ndYawMatrix(yaw) * ndPitchMatrix(pitch));
 
 	ndQuaternion targetRotation(targetMatrix);
