@@ -40,6 +40,13 @@ UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 	AngularMaxTorque = 10000.0f;
 	AngularRegularizer = 1.0e-5f;
 
+	m_targetX = 0.0f;
+	m_targetZ = 0.0f;
+	m_targetYaw = 0.0f;
+	m_targetRoll = 0.0f;
+	m_targetPitch = 0.0f;
+	m_targetAzimuth = 0.0f;
+
 	LinearDamper = 500.0f;
 	LinearSpring = 10000.0f;
 	LinearMaxForce = 10000.0f;
@@ -51,27 +58,47 @@ UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 
 void UNewtonJointIk6DofEffector::DrawGizmo(float timestep) const
 {
-	float thickness = 0.5f;
 	const UWorld* const world = GetWorld();
 	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
-	
 	const FTransform parentTransform(GetComponentTransform());
-	const FVector positionParent(parentTransform.GetLocation());
-	const FVector xAxisParent(parentTransform.GetUnitAxis(EAxis::X));
-	const FVector yAxisParent(parentTransform.GetUnitAxis(EAxis::Y));
-	const FVector zAxisParent(parentTransform.GetUnitAxis(EAxis::Z));
-	DrawDebugLine(world, positionParent, positionParent + scale * xAxisParent, FColor::Red, false, timestep, thickness);
-	DrawDebugLine(world, positionParent, positionParent + scale * yAxisParent, FColor::Green, false, timestep, thickness);
-	DrawDebugLine(world, positionParent, positionParent + scale * zAxisParent, FColor::Blue, false, timestep, thickness);
 
-	const FTransform childTransform(TargetFrame * parentTransform);
-	const FVector positionChild(childTransform.GetLocation());
-	const FVector xAxisChild(childTransform.GetUnitAxis(EAxis::X));
-	const FVector yAxisChild(childTransform.GetUnitAxis(EAxis::Y));
-	const FVector zAxisChild(childTransform.GetUnitAxis(EAxis::Z));
-	DrawDebugLine(world, positionChild, positionChild + scale * xAxisChild, FColor::Red, false, timestep, thickness);
-	DrawDebugLine(world, positionChild, positionChild + scale * yAxisChild, FColor::Green, false, timestep, thickness);
-	DrawDebugLine(world, positionChild, positionChild + scale * zAxisChild, FColor::Blue, false, timestep, thickness);
+	auto DrawFrame = [world, scale, timestep](const FTransform& frame)
+	{
+		float thickness = 0.5f;
+		const FVector positionParent(frame.GetLocation());
+		const FVector xAxisParent(frame.GetUnitAxis(EAxis::X));
+		const FVector yAxisParent(frame.GetUnitAxis(EAxis::Y));
+		const FVector zAxisParent(frame.GetUnitAxis(EAxis::Z));
+		DrawDebugLine(world, positionParent, positionParent + scale * xAxisParent, FColor::Red, false, timestep, thickness);
+		DrawDebugLine(world, positionParent, positionParent + scale * zAxisParent, FColor::Blue, false, timestep, thickness);
+		DrawDebugLine(world, positionParent, positionParent + scale * yAxisParent, FColor::Green, false, timestep, thickness);
+	};
+
+	// draw references frames
+	DrawFrame(parentTransform);
+	DrawFrame(TargetFrame * parentTransform);
+
+	if (m_joint)
+	{
+		// draw current effector frame
+		ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+		const FTransform effectorTransform(ToUnrealTransform(joint->GetEffectorMatrix()));
+		DrawFrame(effectorTransform * parentTransform);
+
+		// calculate the target frame for debug draw
+		const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+		const ndVector referencePoint(refMatrix.m_posit);
+		const ndVector step(m_targetX * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f), m_targetZ * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f));
+		const ndMatrix azimuthRotation(ndRollMatrix(m_targetAzimuth * ndDegreeToRad));
+		const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
+
+		ndMatrix targetMatrix(ndRollMatrix(m_targetRoll * ndDegreeToRad) * ndYawMatrix(m_targetYaw * ndDegreeToRad) * ndPitchMatrix(m_targetPitch * ndDegreeToRad));
+		targetMatrix.m_posit = target;
+		targetMatrix.m_posit.m_w = 1.0f;
+
+		const FTransform targetTransform(ToUnrealTransform(targetMatrix));
+		DrawFrame(targetTransform * parentTransform);
+	}
 }
 
 // Called when the game starts
@@ -203,6 +230,14 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 {
 	check(m_joint);
 	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+
+	// save target for debugging porpuses 
+	m_targetX = x;
+	m_targetZ = z;
+	m_targetYaw = yaw;
+	m_targetRoll = roll;
+	m_targetPitch = pitch;
+	m_targetAzimuth = azimuth;
 
 	const ndVector upPin(0.0f, 0.0f, 1.0f, 0.0f);
 	const ndMatrix currentMatrix(joint->GetEffectorMatrix());

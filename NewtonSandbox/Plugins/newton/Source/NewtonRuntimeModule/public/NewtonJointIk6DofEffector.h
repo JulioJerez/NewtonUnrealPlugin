@@ -87,4 +87,10 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 	float LinearRegularizer;
 
 	FMatrix m_referenceFrame;
+	float m_targetX;
+	float m_targetZ;
+	float m_targetYaw;
+	float m_targetRoll;
+	float m_targetPitch;
+	float m_targetAzimuth;
 };
