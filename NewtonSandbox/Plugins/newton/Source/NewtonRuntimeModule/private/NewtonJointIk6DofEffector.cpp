@@ -201,16 +201,43 @@ FVector UNewtonJointIk6DofEffector::ClipRobotTarget()
 
 void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll)
 {
-	azimuth *= ndDegreeToRad;
-	x = x * UNREAL_INV_UNIT_SYSTEM;
-	z = z * UNREAL_INV_UNIT_SYSTEM;
-
 	check(m_joint);
 	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
 
 	const ndVector upPin(0.0f, 0.0f, 1.0f, 0.0f);
 	const ndMatrix currentMatrix(joint->GetEffectorMatrix());
 	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+
+	// claculate the orientation
+	pitch *= ndDegreeToRad; 
+	yaw *= ndDegreeToRad; 
+	roll *= ndDegreeToRad;
+
+	const ndMatrix targetMatrix(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+
+	ndQuaternion targetRotation(targetMatrix);
+	const ndQuaternion currentRotation(currentMatrix);
+	if (currentRotation.DotProduct(targetRotation).GetScalar() < 0.0f)
+	{
+		targetRotation = targetRotation.Scale(-1.0f);
+	}
+	
+	ndVector omega(currentRotation.CalcAverageOmega(targetRotation, 1.0f));
+	ndFloat32 omegaMag = ndSqrt(omega.DotProduct(omega).GetScalar());
+	ndFloat32 omegaSpeed = 5.0f * ndDegreeToRad;
+	
+	ndQuaternion rotation(targetRotation);
+	if (omegaMag > omegaSpeed)
+	{
+		omega = omega.Normalize().Scale(omegaSpeed);
+		rotation = currentRotation.IntegrateOmega(omega, 1.0f);
+	}
+	ndMatrix matrix(ndCalculateMatrix(rotation, currentMatrix.m_posit));
+
+	// calculate the target position
+	azimuth *= ndDegreeToRad;
+	x = x * UNREAL_INV_UNIT_SYSTEM;
+	z = z * UNREAL_INV_UNIT_SYSTEM;
 
 	const ndVector referencePoint(refMatrix.m_posit);
 	const ndVector step(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
@@ -219,9 +246,6 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 	const ndMatrix azimuthRotation(ndRollMatrix(azimuth));
 	const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
 
-	ndMatrix matrix(joint->GetEffectorMatrix());
-
-	// calculate the target position
 	ndFloat32 longitudinalStep = 0.05f;
 	ndFloat32 angularStep = 2.0f * ndDegreeToRad;
 
@@ -281,10 +305,7 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 		result.m_w = ndFloat32(1.0f);
 		return result;
 	};
-
-
 	matrix.m_posit = CalculateTargetPosition();
-
 
 	SetTargetTransform(ToUnrealTransform(matrix));
 }
