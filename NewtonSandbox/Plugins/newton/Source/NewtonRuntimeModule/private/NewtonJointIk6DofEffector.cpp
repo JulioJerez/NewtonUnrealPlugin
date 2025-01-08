@@ -213,7 +213,7 @@ void UNewtonJointIk6DofEffector::SetRobotTarget(float x, float z, float azimuth,
 	yaw *= ndDegreeToRad; 
 	roll *= ndDegreeToRad;
 
-	const ndMatrix targetMatrix(ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll));
+	const ndMatrix targetMatrix(ndRollMatrix(roll) * ndYawMatrix(yaw) * ndPitchMatrix(pitch));
 
 	ndQuaternion targetRotation(targetMatrix);
 	const ndQuaternion currentRotation(currentMatrix);
