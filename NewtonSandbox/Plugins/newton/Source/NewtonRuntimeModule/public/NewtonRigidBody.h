@@ -178,6 +178,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
 
+	UPROPERTY(EditInstanceOnly, Category = Newton)
+	TObjectPtr<AActor> RefSceneActor;
+
 	UPROPERTY()
 	int BoneIndex;
 
@@ -185,10 +188,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	FVector m_globalScale;
 	FTransform m_localTransform;
 	FTransform m_globalTransform;
+	FTransform m_refActorBindTransform;
 	ndBodyDynamic* m_body;
 	ANewtonWorldActor* m_newtonWorld;
 	bool m_sleeping;
 	bool m_propertyChanged;
+	bool m_sceneActorChanged;
 
 	static FLinearColor m_awakeColor;
 	static FLinearColor m_sleepingColor;

@@ -189,9 +189,13 @@ UNewtonRigidBody::UNewtonRigidBody()
 	,m_globalTransform()
 	,m_body(nullptr)
 	,m_newtonWorld(nullptr)
-	,m_sleeping(true)
-	,m_propertyChanged(true)
+	
 {
+	m_sleeping = true;
+	RefSceneActor = nullptr;
+	m_propertyChanged = true;
+	m_sceneActorChanged = false;
+
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
@@ -249,6 +253,10 @@ void UNewtonRigidBody::PostEditChangeProperty(FPropertyChangedEvent& PropertyCha
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	m_propertyChanged = true;
+	if (PropertyChangedEvent.GetPropertyName() == FName(TEXT("RefSceneActor")))
+	{
+		m_sceneActorChanged = true;
+	}
 }
 
 void UNewtonRigidBody::ClearDebug()
@@ -459,8 +467,15 @@ ndBodyDynamic* UNewtonRigidBody::GetBody() const
 
 ndBodyDynamic* UNewtonRigidBody::CreateRigidBody(bool overrideAutoSleep)
 {
-	//m_newtonWorld = worldActor;
 	const ndMatrix matrix(ToNewtonMatrix(m_globalTransform));
+
+	if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
+	{
+		USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
+		check(sceneComponent);
+		const FTransform actorTransform(sceneComponent->GetComponentToWorld());
+		m_refActorBindTransform = actorTransform * m_globalTransform.Inverse();
+	}
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetMatrix(matrix);
@@ -508,9 +523,6 @@ ndBodyDynamic* UNewtonRigidBody::CreateRigidBody(bool overrideAutoSleep)
 	const ndVector veloc(ndFloat32(InitialVeloc.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(InitialVeloc.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 	body->SetOmega(matrix.RotateVector(omega));
 	body->SetVelocity(matrix.RotateVector(veloc));
-
-	//ndWorld* const world = m_newtonWorld->GetNewtonWorld();
-	//world->AddBody(m_body);
 
 	AActor* const actor = GetOwner();
 	m_sleeping = false;
@@ -586,6 +598,27 @@ ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) c
 void UNewtonRigidBody::ApplyPropertyChanges()
 {
 	m_propertyChanged = false;
+	if (m_sceneActorChanged && RefSceneActor)
+	{
+		UNewtonJoint* const parentJoint = Cast<UNewtonJoint>(GetAttachParent());
+		check(parentJoint);
+
+		const FTransform parentTransform(parentJoint->GetAttachParent()->GetComponentToWorld());
+		const FTransform actorTransform(RefSceneActor->GetRootComponent()->GetComponentToWorld());
+		const FTransform relativeTransform(actorTransform * parentTransform.Inverse());
+
+		parentJoint->SetRelativeRotation_Direct(relativeTransform.Rotator());
+		parentJoint->SetRelativeScale3D_Direct(relativeTransform.GetScale3D());
+		parentJoint->SetRelativeLocation_Direct(relativeTransform.GetLocation());
+		parentJoint->SetComponentToWorld(actorTransform);
+
+		const FTransform identity;
+		SetRelativeRotation_Direct(identity.Rotator());
+		SetRelativeScale3D_Direct(identity.GetScale3D());
+		SetRelativeLocation_Direct(identity.GetLocation());
+		SetComponentToWorld(actorTransform);
+		m_sceneActorChanged = false;
+	}
 
 	m_localTransform = GetRelativeTransform();
 	m_globalTransform = GetComponentTransform();
@@ -636,6 +669,18 @@ void UNewtonRigidBody::TickComponent(float deltaTime, ELevelTick tickType, FActo
 		DrawGizmo(deltaTime);
 		SetRelativeTransform(m_localTransform);
 		SetComponentToWorld(m_globalTransform);
+
+		if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
+		{
+			USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
+			check(sceneComponent);
+			const FTransform actorTransform(m_refActorBindTransform * m_globalTransform);
+
+			sceneComponent->SetRelativeRotation_Direct(actorTransform.Rotator());
+			sceneComponent->SetRelativeScale3D_Direct(actorTransform.GetScale3D());
+			sceneComponent->SetRelativeLocation_Direct(actorTransform.GetLocation());
+			sceneComponent->SetComponentToWorld(actorTransform);
+		}
 	}
 }
 

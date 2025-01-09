@@ -42,7 +42,11 @@ void UNewtonSceneRigidBody::RemoveAllCollisions()
 	const TArray<TObjectPtr<USceneComponent>>& chidren = GetAttachChildren();
 	for (ndInt32 i = chidren.Num() - 1; i >= 0; --i)
 	{
-		chidren[i]->DestroyComponent();
+		UNewtonCollision* const collision = Cast<UNewtonCollision>(chidren[i]);
+		if (collision)
+		{
+			chidren[i]->DestroyComponent();
+		}
 	}
 }
 

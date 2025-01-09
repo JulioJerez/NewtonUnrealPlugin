@@ -87,8 +87,7 @@ void UNewtonJointCylinder::DrawAngularGizmo(float timestep) const
 				indices.Push(i + 1);
 				indices.Push(i + 2);
 			}
-			const FColor meshColor(255.0f, 0.0f, 0.0f, 32.0f);
-			DrawDebugMesh(world, verts, indices, meshColor, false, timestep);
+			DrawDebugMesh(world, verts, indices, ND_DEBUG_MESH_COLOR, false, timestep);
 		}
 	}
 }

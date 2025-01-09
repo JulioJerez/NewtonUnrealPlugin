@@ -324,7 +324,7 @@ void UNewtonCollision::ApplyPropertyChanges()
 		bool showDebug = GetDebugMode();
 		if (showDebug)
 		{
-			if (!m_showDebug && m_debugVisualIsDirty)
+			if (!m_showDebug || m_debugVisualIsDirty)
 			{
 				FNewtonRuntimeModule* const plugin = FNewtonRuntimeModule::GetPlugin();
 				check(plugin);

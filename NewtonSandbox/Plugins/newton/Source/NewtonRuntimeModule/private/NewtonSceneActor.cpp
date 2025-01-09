@@ -254,6 +254,26 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(msg));
 		return;
 	}
+
+	ndTree<AActor*, AActor*> filter;
+	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
+	stack.PushBack(GetRootComponent());
+	while (stack.GetCount())
+	{
+		USceneComponent* const component = stack.Pop();
+		UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component);
+		if (body && body->RefSceneActor)
+		{
+			filter.Insert(body->RefSceneActor, body->RefSceneActor);
+		}
+
+		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+		{
+			stack.PushBack(childrenComp[i].Get());
+		}
+	}
+
 	
 	ndArray<AActor*> actorList;
 	const UWorld* const world = GetWorld();
@@ -261,7 +281,7 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
-		if (actor != this)
+		if ((actor != this) && !filter.Find(actor))
 		{
 			const FString key1(actor->GetFolder().ToString());
 			int index = key1.Find(key);

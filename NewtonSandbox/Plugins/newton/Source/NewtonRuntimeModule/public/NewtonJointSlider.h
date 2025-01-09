@@ -44,12 +44,11 @@ class UNewtonJointSlider : public UNewtonJoint
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	float GetTargetPosit() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Newton")
-	float GetOffsetPosit() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Newton")
-	void SetOffsetPosit(float offset);
+	void SetTargetPosit(float offset);
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool EnableLimits;

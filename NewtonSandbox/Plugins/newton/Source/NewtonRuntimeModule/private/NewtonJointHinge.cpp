@@ -82,8 +82,7 @@ void UNewtonJointHinge::DrawGizmo(float timestep) const
 				indices.Push(i + 1);
 				indices.Push(i + 2);
 			}
-			const FColor meshColor(255.0f, 0.0f, 0.0f, 32.0f);
-			DrawDebugMesh(world, verts, indices, meshColor, false, timestep);
+			DrawDebugMesh(world, verts, indices, ND_DEBUG_MESH_COLOR, false, timestep);
 		}
 	}
 }
@@ -115,4 +114,25 @@ ndJointBilateralConstraint* UNewtonJointHinge::CreateJoint()
 		return joint;
 	}
 	return nullptr;
+}
+
+float UNewtonJointHinge::GetTargetPosit() const
+{
+	check(m_joint);
+	ndJointHinge* const joint = (ndJointHinge*)m_joint;
+	return joint->GetTargetAngle() * UNREAL_UNIT_SYSTEM;
+}
+
+void UNewtonJointHinge::SetTargetPosit(float offset)
+{
+	check(m_joint);
+	ndJointHinge* const joint = (ndJointHinge*)m_joint;
+
+	ndFloat32 value = offset * UNREAL_INV_UNIT_SYSTEM;
+	ndFloat32 currentValue = joint->GetTargetAngle();
+	if (ndAbs(value - currentValue) > ndFloat32(2.5e-3f))
+	{
+		AwakeBodies();
+		joint->SetTargetAngle(value);
+	}
 }

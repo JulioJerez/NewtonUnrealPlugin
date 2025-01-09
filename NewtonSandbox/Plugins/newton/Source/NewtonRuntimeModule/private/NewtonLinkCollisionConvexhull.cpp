@@ -159,14 +159,6 @@ void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneCompone
 		GetBoneVertices(bonePoints, mesh, parentBody->BoneIndex);
 	
 		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
-		//ndMatrix scaleMatrix;
-		//for (ndInt32 i = 0; i < 4; ++i)
-		//{
-		//	for (ndInt32 j = 0; j < 4; ++j)
-		//	{
-		//		scaleMatrix[i][j] = refBoneMatrix.M[i][j];
-		//	}
-		//}
 		ndMatrix scaleMatrix (ToNewtonMatrix(refBoneMatrix));
 	
 		ndVector scale;

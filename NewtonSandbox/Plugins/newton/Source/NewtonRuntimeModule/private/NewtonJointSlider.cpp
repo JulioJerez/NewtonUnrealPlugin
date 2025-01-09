@@ -96,23 +96,23 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 	return nullptr;
 }
 
-float UNewtonJointSlider::GetOffsetPosit() const
+float UNewtonJointSlider::GetTargetPosit() const
 {
 	check(m_joint);
 	ndJointSlider* const joint = (ndJointSlider*)m_joint;
-	return joint->GetOffsetPosit() * UNREAL_UNIT_SYSTEM;
+	return joint->GetTargetPosit() * UNREAL_UNIT_SYSTEM;
 }
 
-void UNewtonJointSlider::SetOffsetPosit(float offset)
+void UNewtonJointSlider::SetTargetPosit(float offset)
 {
 	check(m_joint);
 	ndJointSlider* const joint = (ndJointSlider*)m_joint;
 
 	ndFloat32 value = offset * UNREAL_INV_UNIT_SYSTEM;
-	ndFloat32 currentValue = joint->GetOffsetPosit();
+	ndFloat32 currentValue = joint->GetTargetPosit();
 	if (ndAbs(value - currentValue) > ndFloat32(2.5e-3f))
 	{
 		AwakeBodies();
-		joint->SetOffsetPosit(value);
+		joint->SetTargetPosit(value);
 	}
 }
