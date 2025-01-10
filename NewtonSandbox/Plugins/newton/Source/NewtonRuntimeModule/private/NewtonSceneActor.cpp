@@ -71,8 +71,15 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 		{
 			bool hasSimple = false;
 			const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
+			check(staticMesh);
 			const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
-	
+			check(bodySetup);
+			
+			//if (staticMesh->GetFName() == "Door_01_L")
+			//{
+			//	staticMesh->GetFName();
+			//}
+
 			const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
 			auto AddComponent = [this, staticComponent](UNewtonCollision* const childComp)
 			{
@@ -194,33 +201,33 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 	}
 }
 
-void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
-{
-	TArray<TObjectPtr<USceneComponent>> stack;
-	TArray<TObjectPtr<UStaticMeshComponent>> staticMesh;
-
-	stack.Push(TObjectPtr<USceneComponent>(actor->GetRootComponent()));
-	while (stack.Num())
-	{
-		TObjectPtr<USceneComponent> component(stack.Pop());
-		TObjectPtr<UStaticMeshComponent> mesh(Cast<UStaticMeshComponent>(component));
-		if (mesh)
-		{
-			staticMesh.Push(mesh);
-		}
-		const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
-		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-		{
-			stack.Push(children[i].Get());
-		}
-	}
-
-	for (ndInt32 i = staticMesh.Num() - 1; i >= 0; --i)
-	{
-		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
-		CreateCollisionFromUnrealPrimitive(meshComponent);
-	}
-}
+//void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
+//{
+//	TArray<TObjectPtr<USceneComponent>> stack;
+//	TArray<TObjectPtr<UStaticMeshComponent>> staticMesh;
+//
+//	stack.Push(TObjectPtr<USceneComponent>(actor->GetRootComponent()));
+//	while (stack.Num())
+//	{
+//		TObjectPtr<USceneComponent> component(stack.Pop());
+//		TObjectPtr<UStaticMeshComponent> mesh(Cast<UStaticMeshComponent>(component));
+//		if (mesh)
+//		{
+//			staticMesh.Push(mesh);
+//		}
+//		const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
+//		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
+//		{
+//			stack.Push(children[i].Get());
+//		}
+//	}
+//
+//	for (ndInt32 i = staticMesh.Num() - 1; i >= 0; --i)
+//	{
+//		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
+//		CreateCollisionFromUnrealPrimitive(meshComponent);
+//	}
+//}
 
 void ANewtonSceneActor::ApplyPropertyChanges()
 {
@@ -256,7 +263,7 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	}
 
 	ndTree<AActor*, AActor*> filter;
-	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
+	ndFixSizeArray<TObjectPtr<USceneComponent>, ND_STACK_DEPTH> stack;
 	stack.PushBack(GetRootComponent());
 	while (stack.GetCount())
 	{
@@ -274,20 +281,49 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		}
 	}
 
-	
-	ndArray<AActor*> actorList;
 	const UWorld* const world = GetWorld();
 	const FString key(folder.GetPath().ToString());
+
+	ndArray<AActor*> landScapesList;
+	ndTree<TObjectPtr<USceneComponent>, UStaticMeshComponent*> staticList;
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
 		AActor* const actor = *actorItr;
+		if (filter.Find(actor))
+		{
+			filter.Find(actor);
+		}
+
+		//if (!((actor->GetFName() == TEXT("Floor_1_1")) || (actor->GetFName() == TEXT("Door_01_L"))))
+		//if (!(actor->GetFName() == TEXT("Building_Parrent")))
+		//{
+		//	continue;
+		//}
+
 		if ((actor != this) && !filter.Find(actor))
 		{
 			const FString key1(actor->GetFolder().ToString());
 			int index = key1.Find(key);
 			if (index == 0)
 			{
-				actorList.PushBack(actor);
+				check(!stack.GetCount());
+				stack.PushBack(actor->GetRootComponent());
+				while (stack.GetCount())
+				{
+					TObjectPtr<USceneComponent> component(stack.Pop());
+					UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(component.Get());
+					const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
+					if (staticMesh)
+					{
+						staticList.Insert(component, staticComponent);
+					}
+
+					const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+					for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+					{
+						stack.PushBack(childrenComp[i].Get());
+					}
+				}
 			}
 			else if (Cast<ALandscapeStreamingProxy>(actor))
 			{
@@ -297,24 +333,27 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 				index = streamingKey.Find(key);
 				if (index == 0)
 				{
-					actorList.PushBack(actor);
+					//actorList.PushBack(actor);
+					landScapesList.PushBack(actor);
 				}
 			}
 		}
 	}
 	
 	staticSceneBody->RemoveAllCollisions();
-	for (ndInt32 i = ndInt32(actorList.GetCount()) - 1; i >= 0; --i)
+	
+	ndTree<TObjectPtr<USceneComponent>, UStaticMeshComponent*>::Iterator it(staticList);
+	for (it.Begin(); it; it++)
 	{
-		AActor* const sceneActor = actorList[i];
+		TObjectPtr<USceneComponent> component(it.GetNode()->GetInfo());
+		check(Cast<UStaticMeshComponent>(component));
+		CreateCollisionFromUnrealPrimitive(Cast<UStaticMeshComponent>(component));
+	}
+	
+	for (ndInt32 i = ndInt32(landScapesList.GetCount()) - 1; i >= 0; --i)
+	{
+		AActor* const sceneActor = landScapesList[i];
 		const ALandscapeProxy* const landscapeProxy = Cast<ALandscapeProxy>(sceneActor);
-		if (landscapeProxy)
-		{
-			GenerateLandScapeCollision(landscapeProxy);
-		}
-		else
-		{
-			GenerateStaticMeshCollision(sceneActor);
-		}
+		GenerateLandScapeCollision(landscapeProxy);
 	}
 }

@@ -56,6 +56,14 @@ void UNewtonJointHinge::DrawGizmo(float timestep) const
 	UNewtonRigidBody* const child = FindChild();
 	if (EnableLimits && child)
 	{
+		if (m_joint)
+		{
+			ndMatrix childMatrix(m_joint->GetLocalMatrix0() * ToNewtonMatrix(child->m_globalTransform));
+			const ndVector hingeAnglePin(childMatrix.m_up.Scale(scale * 0.9f));
+			const FVector hingeAngleEnd(float(pinStart.X + hingeAnglePin.m_x), float(pinStart.Y + hingeAnglePin.m_y), float(pinStart.Z + hingeAnglePin.m_z));
+			DrawDebugLine(world, pinStart, hingeAngleEnd, pinColor, false, timestep);
+		}
+
 		TArray<int32> indices;
 		TArray<FVector> verts;
 		float deltaTwist = MaxAngle - MinAngle;

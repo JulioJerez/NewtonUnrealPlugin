@@ -676,10 +676,9 @@ void UNewtonRigidBody::TickComponent(float deltaTime, ELevelTick tickType, FActo
 			check(sceneComponent);
 			const FTransform actorTransform(m_refActorBindTransform * m_globalTransform);
 
-			sceneComponent->SetRelativeRotation_Direct(actorTransform.Rotator());
-			sceneComponent->SetRelativeScale3D_Direct(actorTransform.GetScale3D());
-			sceneComponent->SetRelativeLocation_Direct(actorTransform.GetLocation());
+			sceneComponent->SetRelativeTransform(actorTransform);
 			sceneComponent->SetComponentToWorld(actorTransform);
+			sceneComponent->MarkRenderInstancesDirty();
 		}
 	}
 }

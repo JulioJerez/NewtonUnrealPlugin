@@ -50,7 +50,7 @@ class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
 	TObjectPtr<UNewtonSceneRigidBody> RootBody;
 
 	private:
-	void GenerateStaticMeshCollision(const AActor* const actor);
+	//void GenerateStaticMeshCollision(const AActor* const actor);
 	void GenerateLandScapeCollision(const ALandscapeProxy* const landscape);
 	void CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMeshComponent> staticComponent);
 
