@@ -143,6 +143,23 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 				GenerateMesh(parent);
 			}
 		}
+		else
+		{
+			UNewtonRigidBody* const parentBody = Cast<UNewtonRigidBody>(GetAttachParent());
+			if (parentBody && parentBody->RefSceneActor)
+			{
+				const USceneComponent* const sceneComponent = Cast<UStaticMeshComponent>(parentBody->RefSceneActor->GetRootComponent());
+				check(sceneComponent);
+				const FTransform actorTransform(sceneComponent->GetComponentToWorld());
+				const FTransform localTransform(actorTransform * parentBody->GetComponentToWorld().Inverse());
+
+				SetComponentToWorld(actorTransform);
+				SetRelativeRotation_Direct(localTransform.Rotator());
+				SetRelativeScale3D_Direct(localTransform.GetScale3D());
+				SetRelativeLocation_Direct(localTransform.GetLocation());
+				GenerateMesh(sceneComponent);
+			}
+		}
 	}
 	m_debugVisualIsDirty = true;
 	
