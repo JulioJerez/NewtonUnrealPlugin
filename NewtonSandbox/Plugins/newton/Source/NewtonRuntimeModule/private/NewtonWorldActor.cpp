@@ -210,3 +210,49 @@ void ANewtonWorldActor::Update(float timestep)
 		m_world->Update(timestep);
 	}
 }
+
+bool ANewtonWorldActor::RayCast(struct FNewtonRaycastResult& result, const FVector& origin, const FVector& target, bool filterStatic) const
+{
+	class ndRayPickingCallback : public ndRayCastClosestHitCallback
+	{
+		public:
+		ndRayPickingCallback()
+			:ndRayCastClosestHitCallback()
+		{
+		}
+
+		ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
+		{
+			if (contact.m_body0->GetInvMass() == ndFloat32(0.0f))
+			{
+				return 1.2f;
+			}
+			return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
+		}
+	};
+
+	const ndVector start(ndFloat32 (origin.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(origin.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(origin.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(1.0f));
+	const ndVector end(ndFloat32(target.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(target.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(target.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(1.0f));
+
+	ndRayPickingCallback rayCaster;
+
+	const ndWorld* const newtonWorld = m_world->GetNewtonWorld();
+	if (newtonWorld->RayCast(rayCaster, start, end))
+	{
+		const ndBodyDynamic* const body = ((ndBody*)rayCaster.m_contact.m_body0)->GetAsBodyDynamic();
+		check(body);
+		const ndBodyNotify* const notify = body->GetNotifyCallback();
+		check(notify);
+
+		const ndVector normal(rayCaster.m_contact.m_normal);
+		const ndVector contact(rayCaster.m_contact.m_point.Scale(UNREAL_UNIT_SYSTEM));
+
+		result.HitParam = rayCaster.m_param;
+		result.HitBody = (UNewtonRigidBody*)notify->GetUserData();
+		result.HitNormal = FVector(normal.m_x, normal.m_y, normal.m_z);
+		result.HitPosit = FVector(contact.m_x, contact.m_y, contact.m_z);
+		return true;
+	}
+	return false;
+}
+

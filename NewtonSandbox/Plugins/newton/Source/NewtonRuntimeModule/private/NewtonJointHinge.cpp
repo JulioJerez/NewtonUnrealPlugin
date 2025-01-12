@@ -103,8 +103,6 @@ ndJointBilateralConstraint* UNewtonJointHinge::CreateJoint()
 	check(!m_joint);
 	ndBodyKinematic* body0;
 	ndBodyKinematic* body1;
-	//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
-	//GetBodyPairs(world, &body0, &body1);
 	GetBodyPairs(&body0, &body1);
 
 	if (body0 && body1)
@@ -117,8 +115,6 @@ ndJointBilateralConstraint* UNewtonJointHinge::CreateJoint()
 		joint->SetLimits(ndFloat32 (MinAngle * ndDegreeToRad), ndFloat32(MaxAngle * ndDegreeToRad));
 		joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
 		
-		//m_joint = joint;
-		//world->AddJoint(m_joint);
 		return joint;
 	}
 	return nullptr;

@@ -189,7 +189,6 @@ UNewtonRigidBody::UNewtonRigidBody()
 	,m_globalTransform()
 	,m_body(nullptr)
 	,m_newtonWorld(nullptr)
-	
 {
 	m_sleeping = true;
 	RefSceneActor = nullptr;

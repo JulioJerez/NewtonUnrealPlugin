@@ -26,6 +26,7 @@
 #include "NewtonJointKinematic.generated.h"
 
 class ndWorld;
+class UNewtonRigidBody;
 class ANewtonWorldActor;
 /**
  * 
@@ -38,6 +39,24 @@ class UNewtonJointKinematic : public UNewtonJoint
 	public:
 	// Sets default values for this component's properties
 	UNewtonJointKinematic();
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void SetTargetPosit(const FVector& glocalSpacePosit);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void SetTargetRotation(const FRotator& glocalSpaceRotation);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void SetTargetMatrix(const FTransform& glocalSpaceTransform);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	FTransform GetTargetMatrix() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void DestroyAttachament();
 
 	protected:
 	virtual void DrawGizmo(float timestep) const override;

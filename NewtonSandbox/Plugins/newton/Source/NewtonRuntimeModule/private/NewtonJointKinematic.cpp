@@ -110,3 +110,73 @@ ndJointBilateralConstraint* UNewtonJointKinematic::CreateJoint()
 }
 
 
+void UNewtonJointKinematic::DestroyAttachament()
+{
+	check(m_joint);
+	const ndBodyDynamic* const body = m_joint->GetBody0()->GetAsBodyDynamic();
+	check(body);
+	ndWorld* const world = body->GetScene()->GetWorld();
+
+	world->RemoveJoint(m_joint);
+	m_joint = nullptr;
+}
+
+void UNewtonJointKinematic::CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction)
+{
+	FTransform transform(location);
+	ndMatrix matrix(ToNewtonMatrix(transform));
+	ndWorld* const world = childBody->GetBody()->GetScene()->GetWorld();
+	ndJointKinematicController* const pickJoint = new ndJointKinematicController(childBody->GetBody(), world->GetSentinelBody(), matrix);
+
+	m_joint = pickJoint;
+
+	const ndVector massMatrix(childBody->GetBody()->GetMassMatrix());
+	const FVector gravity(childBody->Gravity * UNREAL_INV_UNIT_SYSTEM);
+
+	ndFloat32 inertia = ndMax(ndMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+	ndFloat32 weight = massMatrix.m_w * ndMax(ndMax(ndAbs(gravity.X), ndAbs(gravity.Y)), ndAbs(gravity.Z));
+
+	pickJoint->SetMaxLinearFriction(linearFriction * weight);
+	pickJoint->SetMaxAngularFriction(angularFriction * inertia);
+	pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+
+	world->AddJoint(pickJoint);
+}
+
+FTransform UNewtonJointKinematic::GetTargetMatrix() const
+{
+	check(m_joint);
+	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+
+	const ndMatrix matrix(joint->GetTargetMatrix());
+	return ToUnrealTransform(matrix);
+}
+
+void UNewtonJointKinematic::SetTargetPosit(const FVector& glocalSpacePosit)
+{
+	check(m_joint);
+	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+
+	const FVector p(glocalSpacePosit * UNREAL_INV_UNIT_SYSTEM);
+	const ndVector posit(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(1.0f));
+	joint->SetTargetPosit(posit);
+}
+
+void UNewtonJointKinematic::SetTargetRotation(const FRotator& glocalSpaceRotation)
+{
+	check(m_joint);
+	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+
+	const ndMatrix rotation(ToNewtonMatrix(FTransform(glocalSpaceRotation)));
+	joint->SetTargetRotation(rotation);
+}
+
+void UNewtonJointKinematic::SetTargetMatrix(const FTransform& glocalSpaceTransform)
+{
+	check(m_joint);
+	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+
+	const ndMatrix matrix(ToNewtonMatrix(glocalSpaceTransform));
+	joint->SetTargetMatrix(matrix);
+}
+

@@ -28,12 +28,37 @@
 class ndWorld;
 class NewtonWorld;
 class UDynamicMesh;
+class UNewtonRigidBody;
 
 UENUM()
 enum class SolverModeTypes : uint8
 {
 	scalar,
 	soaSimd,
+};
+
+
+USTRUCT(BlueprintType)
+struct FNewtonRaycastResult
+{
+	GENERATED_BODY()
+
+	FNewtonRaycastResult()
+	{
+	}
+
+	/** PrimitiveComponent hit by the trace. */
+	UPROPERTY(BlueprintReadOnly, Category = "Newton")
+	TWeakObjectPtr<UNewtonRigidBody> HitBody;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Newton")
+	FVector HitPosit;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Newton")
+	FVector HitNormal;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Newton")
+	float HitParam;
 };
 
 UCLASS( ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent) )
@@ -55,6 +80,9 @@ class NEWTONRUNTIMEMODULE_API ANewtonWorldActor : public AActor
 	void ApplySettings();
 	float GetSimTime() const;
 	void Update(float timestep);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	bool RayCast(struct FNewtonRaycastResult& result, const FVector& origin, const FVector& target, bool filterStatic) const;
 
 	UPROPERTY(EditAnywhere, Category=Newton)
 	float UpdateRate;
