@@ -112,17 +112,20 @@ ndJointBilateralConstraint* UNewtonJointKinematic::CreateJoint()
 
 void UNewtonJointKinematic::DestroyAttachament()
 {
-	check(m_joint);
-	const ndBodyDynamic* const body = m_joint->GetBody0()->GetAsBodyDynamic();
-	check(body);
-	ndWorld* const world = body->GetScene()->GetWorld();
+	if (m_joint)
+	{
+		const ndBodyDynamic* const body = m_joint->GetBody0()->GetAsBodyDynamic();
+		check(body);
+		ndWorld* const world = body->GetScene()->GetWorld();
 
-	world->RemoveJoint(m_joint);
-	m_joint = nullptr;
+		world->RemoveJoint(m_joint);
+		m_joint = nullptr;
+	}
 }
 
 void UNewtonJointKinematic::CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction)
 {
+	check(!m_joint);
 	FTransform transform(location);
 	ndMatrix matrix(ToNewtonMatrix(transform));
 	ndWorld* const world = childBody->GetBody()->GetScene()->GetWorld();
@@ -145,38 +148,47 @@ void UNewtonJointKinematic::CreateAttachament(UNewtonRigidBody* const childBody,
 
 FTransform UNewtonJointKinematic::GetTargetMatrix() const
 {
-	check(m_joint);
-	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+	if (m_joint)
+	{
+		ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
 
-	const ndMatrix matrix(joint->GetTargetMatrix());
-	return ToUnrealTransform(matrix);
+		const ndMatrix matrix(joint->GetTargetMatrix());
+		return ToUnrealTransform(matrix);
+	}
+	return FTransform();
 }
 
 void UNewtonJointKinematic::SetTargetPosit(const FVector& glocalSpacePosit)
 {
-	check(m_joint);
-	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+	if (m_joint)
+	{
+		ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
 
-	const FVector p(glocalSpacePosit * UNREAL_INV_UNIT_SYSTEM);
-	const ndVector posit(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(1.0f));
-	joint->SetTargetPosit(posit);
+		const FVector p(glocalSpacePosit * UNREAL_INV_UNIT_SYSTEM);
+		const ndVector posit(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(1.0f));
+		joint->SetTargetPosit(posit);
+	}
 }
 
 void UNewtonJointKinematic::SetTargetRotation(const FRotator& glocalSpaceRotation)
 {
-	check(m_joint);
-	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+	if (m_joint)
+	{
+		ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
 
-	const ndMatrix rotation(ToNewtonMatrix(FTransform(glocalSpaceRotation)));
-	joint->SetTargetRotation(rotation);
+		const ndMatrix rotation(ToNewtonMatrix(FTransform(glocalSpaceRotation)));
+		joint->SetTargetRotation(rotation);
+	}
 }
 
 void UNewtonJointKinematic::SetTargetMatrix(const FTransform& glocalSpaceTransform)
 {
-	check(m_joint);
-	ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
+	if (m_joint)
+	{
+		ndJointKinematicController* const joint = (ndJointKinematicController*)m_joint;
 
-	const ndMatrix matrix(ToNewtonMatrix(glocalSpaceTransform));
-	joint->SetTargetMatrix(matrix);
+		const ndMatrix matrix(ToNewtonMatrix(glocalSpaceTransform));
+		joint->SetTargetMatrix(matrix);
+	}
 }
 
