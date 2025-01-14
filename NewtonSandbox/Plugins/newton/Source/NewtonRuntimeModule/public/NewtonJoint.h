@@ -56,7 +56,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	UFUNCTION(BlueprintCallable, Category = "Newton")
 	bool HitLimits() const;
 
-
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool ShowDebug;
 

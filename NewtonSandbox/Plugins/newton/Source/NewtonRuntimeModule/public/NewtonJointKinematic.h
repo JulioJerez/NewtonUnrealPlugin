@@ -41,6 +41,12 @@ class UNewtonJointKinematic : public UNewtonJoint
 	UNewtonJointKinematic();
 
 	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction);
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
+	void DestroyAttachament();
+
+	UFUNCTION(BlueprintCallable, Category = "Newton")
 	void SetTargetPosit(const FVector& glocalSpacePosit);
 
 	UFUNCTION(BlueprintCallable, Category = "Newton")
@@ -51,12 +57,6 @@ class UNewtonJointKinematic : public UNewtonJoint
 
 	UFUNCTION(BlueprintCallable, Category = "Newton")
 	FTransform GetTargetMatrix() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Newton")
-	void CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction);
-
-	UFUNCTION(BlueprintCallable, Category = "Newton")
-	void DestroyAttachament();
 
 	protected:
 	virtual void DrawGizmo(float timestep) const override;
