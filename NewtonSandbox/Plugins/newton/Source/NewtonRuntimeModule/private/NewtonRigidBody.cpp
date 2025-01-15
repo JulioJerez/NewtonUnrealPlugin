@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "NewtonRigidBody.h"
 #include "Selection.h"
 #include "LevelEditor.h"
@@ -428,14 +427,21 @@ void UNewtonRigidBody::DrawGizmo(float timestep)
 
 void UNewtonRigidBody::UpdateTransform()
 {
-	check(m_body);
+	if (!m_body)
+	{
+		return;
+	}
+
 	NotifyCallback* const notify = (NotifyCallback*)m_body->GetNotifyCallback();
 	notify->UpdateTransform();
 }
 
 void UNewtonRigidBody::InterpolateTransform(float param)
 {
-	check(m_body);
+	if (!m_body)
+	{
+		return;
+	}
 	NotifyCallback* const notify = (NotifyCallback*)m_body->GetNotifyCallback();
 	m_globalTransform = notify->InteptolateTransform(ndFloat32 (param));
 	m_globalTransform.SetScale3D(m_globalScale);
@@ -443,7 +449,10 @@ void UNewtonRigidBody::InterpolateTransform(float param)
 
 void UNewtonRigidBody::CalculateLocalTransform()
 {
-	check(m_body);
+	if (!m_body)
+	{
+		return;
+	}
 	
 	const USceneComponent* const parent = GetAttachParent();
 	if (parent)

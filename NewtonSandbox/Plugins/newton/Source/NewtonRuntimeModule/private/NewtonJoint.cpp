@@ -150,20 +150,29 @@ void UNewtonJoint::ApplyPropertyChanges()
 {
 	m_propertyChanged = false;
 	const FTransform transform(GetComponentTransform());
-	const UNewtonRigidBody* const child = FindChild();
-	if (child)
-	{
-		const FTransform childTransform(child->GetComponentTransform());
-		m_localChildTransfrom = transform * childTransform.Inverse();
-	}
-	
+
 	const UNewtonRigidBody* const parent = FindParent();
 	if (parent)
 	{
 		const FTransform parentTransform(parent->GetComponentTransform());
 		m_localParentTransfrom = transform * parentTransform.Inverse();
 	}
+
+	UNewtonRigidBody* const child = FindChild();
+	if (child)
+	{
+		const FTransform childTransform(child->GetComponentTransform());
+		m_localChildTransfrom = transform * childTransform.Inverse();
+	}
 }
+
+#if WITH_EDITOR
+void UNewtonJoint::PostEditComponentMove(bool bFinished)
+{
+	Super::PostEditComponentMove(bFinished);
+	m_propertyChanged = true;
+}
+#endif
 
 void UNewtonJoint::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

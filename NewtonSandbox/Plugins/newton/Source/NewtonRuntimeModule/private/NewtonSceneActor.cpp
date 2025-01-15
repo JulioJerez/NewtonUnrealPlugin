@@ -33,6 +33,7 @@
 #include "NewtonCollisionCapsule.h"
 #include "NewtonCollisionLandscape.h"
 #include "NewtonCollisionConvexHull.h"
+#include "NewtonCollisionCollection.h"
 #include "NewtonCollisionPolygonalMesh.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
@@ -67,7 +68,10 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 	const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
 	if (staticMesh)
 	{
-		auto GenerateSimpleCollision = [this, staticComponent]()
+		UNewtonCollisionCollection* const collection = FindComponentByClass<UNewtonCollisionCollection>();
+		check(collection);
+
+		auto GenerateSimpleCollision = [this, staticComponent, collection]()
 		{
 			bool hasSimple = false;
 			const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
@@ -81,13 +85,14 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			//}
 
 			const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
-			auto AddComponent = [this, staticComponent](UNewtonCollision* const childComp)
+			auto AddComponent = [this, staticComponent, collection](UNewtonCollision* const childComp)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("From NewtonSceneRigidBody, component render but does not shows in blueprint browser"));
 				check(IsValid(childComp));
 				FinishAddComponent(childComp, false, FTransform());
 				AddInstanceComponent(childComp);
-				childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+				//childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+				childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 				childComp->InitStaticMeshCompoment(staticComponent);
 				childComp->MarkRenderDynamicDataDirty();
 				childComp->NotifyMeshUpdated();
@@ -139,12 +144,13 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			return hasSimple;
 		};
 	
-		auto GenerateComplexCollision = [this, staticComponent]()
+		auto GenerateComplexCollision = [this, staticComponent, collection]()
 		{
 			UNewtonCollisionPolygonalMesh* const childComp = Cast<UNewtonCollisionPolygonalMesh>(AddComponentByClass(UNewtonCollisionPolygonalMesh::StaticClass(), false, FTransform(), true));
 			FinishAddComponent(childComp, false, FTransform());
 			AddInstanceComponent(childComp);
-			childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+			//childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+			childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 			childComp->InitStaticMeshCompoment(staticComponent);
 			childComp->MarkRenderDynamicDataDirty();
 			childComp->NotifyMeshUpdated();
@@ -200,34 +206,6 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 		collisionTile->NotifyMeshUpdated();
 	}
 }
-
-//void ANewtonSceneActor::GenerateStaticMeshCollision(const AActor* const actor)
-//{
-//	TArray<TObjectPtr<USceneComponent>> stack;
-//	TArray<TObjectPtr<UStaticMeshComponent>> staticMesh;
-//
-//	stack.Push(TObjectPtr<USceneComponent>(actor->GetRootComponent()));
-//	while (stack.Num())
-//	{
-//		TObjectPtr<USceneComponent> component(stack.Pop());
-//		TObjectPtr<UStaticMeshComponent> mesh(Cast<UStaticMeshComponent>(component));
-//		if (mesh)
-//		{
-//			staticMesh.Push(mesh);
-//		}
-//		const TArray<TObjectPtr<USceneComponent>>& children = component->GetAttachChildren();
-//		for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-//		{
-//			stack.Push(children[i].Get());
-//		}
-//	}
-//
-//	for (ndInt32 i = staticMesh.Num() - 1; i >= 0; --i)
-//	{
-//		TObjectPtr<UStaticMeshComponent>meshComponent(staticMesh[i]);
-//		CreateCollisionFromUnrealPrimitive(meshComponent);
-//	}
-//}
 
 void ANewtonSceneActor::ApplyPropertyChanges()
 {
@@ -338,7 +316,14 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	}
 	
 	staticSceneBody->RemoveAllCollisions();
-	
+
+	UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(AddComponentByClass(UNewtonCollisionCollection::StaticClass(), false, FTransform(), true));
+	check(IsValid(collection));
+	FinishAddComponent(collection, false, FTransform());
+	AddInstanceComponent(collection);
+	collection->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+	collection->MarkRenderDynamicDataDirty();
+
 	for (ndInt32 i = ndInt32(landScapesList.GetCount()) - 1; i >= 0; --i)
 	{
 		AActor* const sceneActor = landScapesList[i];

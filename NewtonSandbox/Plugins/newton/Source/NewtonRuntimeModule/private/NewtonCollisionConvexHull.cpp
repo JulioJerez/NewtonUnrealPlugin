@@ -142,7 +142,7 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 				SetRelativeLocation_Direct(localTransform.GetLocation());
 				GenerateMesh(parent);
 			}
-		}
+		} 
 		else
 		{
 			UNewtonRigidBody* const parentBody = Cast<UNewtonRigidBody>(GetAttachParent());

@@ -129,6 +129,8 @@ void UNewtonJointKinematic::SetTargetPosit(const FVector& glocalSpacePosit)
 
 		const FVector p(glocalSpacePosit * UNREAL_INV_UNIT_SYSTEM);
 		const ndVector posit(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(1.0f));
+		UE_LOG(LogTemp, Display, TEXT("w(%f %f %f)"), posit.m_x, posit.m_y, posit.m_z);
+
 		joint->SetTargetPosit(posit);
 	}
 }
@@ -158,24 +160,27 @@ void UNewtonJointKinematic::SetTargetMatrix(const FTransform& glocalSpaceTransfo
 void UNewtonJointKinematic::CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction)
 {
 	check(!m_joint);
-	FTransform transform(location);
-	ndMatrix matrix(ToNewtonMatrix(transform));
-	ndWorld* const world = childBody->GetBody()->GetScene()->GetWorld();
-	ndJointKinematicController* const pickJoint = new ndJointKinematicController(childBody->GetBody(), world->GetSentinelBody(), matrix);
+	if (!m_joint)
+	{
+		FTransform transform(location);
+		ndMatrix matrix(ToNewtonMatrix(transform));
+		ndWorld* const world = childBody->GetBody()->GetScene()->GetWorld();
+		ndJointKinematicController* const pickJoint = new ndJointKinematicController(childBody->GetBody(), world->GetSentinelBody(), matrix);
 
-	m_joint = pickJoint;
+		m_joint = pickJoint;
 
-	const ndVector massMatrix(childBody->GetBody()->GetMassMatrix());
-	const FVector gravity(childBody->Gravity * UNREAL_INV_UNIT_SYSTEM);
+		const ndVector massMatrix(childBody->GetBody()->GetMassMatrix());
+		const FVector gravity(childBody->Gravity * UNREAL_INV_UNIT_SYSTEM);
 
-	ndFloat32 inertia = ndMax(ndMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
-	ndFloat32 weight = massMatrix.m_w * ndMax(ndMax(ndAbs(gravity.X), ndAbs(gravity.Y)), ndAbs(gravity.Z));
+		ndFloat32 inertia = ndMax(ndMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+		ndFloat32 weight = massMatrix.m_w * ndMax(ndMax(ndAbs(gravity.X), ndAbs(gravity.Y)), ndAbs(gravity.Z));
 
-	pickJoint->SetMaxLinearFriction(linearFriction * weight);
-	pickJoint->SetMaxAngularFriction(angularFriction * inertia);
-	pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+		pickJoint->SetMaxLinearFriction(linearFriction * weight);
+		pickJoint->SetMaxAngularFriction(angularFriction * inertia);
+		pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
 
-	world->AddJoint(pickJoint);
+		world->AddJoint(pickJoint);
+	}
 }
 
 void UNewtonJointKinematic::DestroyAttachament()

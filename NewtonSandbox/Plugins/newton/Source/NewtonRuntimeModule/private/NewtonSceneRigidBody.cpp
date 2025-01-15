@@ -22,9 +22,10 @@
 
 #include "NewtonSceneRigidBody.h"
 
+#include "NewtonCollision.h"
 #include "NewtonWorldActor.h"
 #include "NewtonRuntimeModule.h"
-#include "NewtonCollision.h"
+#include "NewtonCollisionCollection.h"
 #include "ThirdParty/newtonLibrary/Public/thirdParty/ndConvexApproximation.h"
 
 UNewtonSceneRigidBody::UNewtonSceneRigidBody()
@@ -39,13 +40,23 @@ UNewtonSceneRigidBody::UNewtonSceneRigidBody()
 
 void UNewtonSceneRigidBody::RemoveAllCollisions()
 {
-	const TArray<TObjectPtr<USceneComponent>>& chidren = GetAttachChildren();
-	for (ndInt32 i = chidren.Num() - 1; i >= 0; --i)
+	const TArray<TObjectPtr<USceneComponent>>& children = GetAttachChildren();
+	for (ndInt32 i = children.Num() - 1; i >= 0; --i)
 	{
-		UNewtonCollision* const collision = Cast<UNewtonCollision>(chidren[i]);
+		UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(children[i]);
+		if (collection)
+		{
+			const TArray<TObjectPtr<USceneComponent>>& collectionChildren = collection->GetAttachChildren();
+			for (ndInt32 j = collectionChildren.Num() - 1; j >= 0; --j)
+			{
+				collectionChildren[j]->DestroyComponent();
+			}
+			collectionChildren[i]->DestroyComponent();
+		}
+		UNewtonCollision* const collision = Cast<UNewtonCollision>(children[i]);
 		if (collision)
 		{
-			chidren[i]->DestroyComponent();
+			children[i]->DestroyComponent();
 		}
 	}
 }
@@ -57,10 +68,23 @@ ndShapeInstance* UNewtonSceneRigidBody::CreateCollision(const ndMatrix& bodyMatr
 
 	for (ndInt32 i = children.Num() - 1; i >= 0; --i)
 	{
-		const UNewtonCollision* const shape = Cast<UNewtonCollision>(children[i]);
-		if (shape)
+		UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(children[i]);
+		if (collection)
 		{
-			subShapes.PushBack(shape);
+			const TArray<TObjectPtr<USceneComponent>>& collectionChildren = collection->GetAttachChildren();
+			for (ndInt32 j = collectionChildren.Num() - 1; j >= 0; --j)
+			{
+				const UNewtonCollision* const shape = Cast<UNewtonCollision>(collectionChildren[j]);
+				subShapes.PushBack(shape);
+			}
+		}
+		else
+		{
+			const UNewtonCollision* const shape = Cast<UNewtonCollision>(children[i]);
+			if (shape)
+			{
+				subShapes.PushBack(shape);
+			}
 		}
 	}
 

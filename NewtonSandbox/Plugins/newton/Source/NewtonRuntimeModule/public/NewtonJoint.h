@@ -71,6 +71,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	void ApplyPropertyChanges();
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 
+#if WITH_EDITOR
+	virtual void PostEditComponentMove(bool bFinished) override;
+#endif
+
+
 	FTransform m_transfrom;
 	ndJointBilateralConstraint* m_joint;
 	FTransform m_localChildTransfrom;
