@@ -43,10 +43,10 @@ class UNewtonJointHinge : public UNewtonJoint
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Newton")
-	float GetTargetPosit() const;
+	float GetTargetAngle() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Newton")
-	void SetTargetPosit(float offset);
+	void SetTargetAngle(float angle);
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool EnableLimits;

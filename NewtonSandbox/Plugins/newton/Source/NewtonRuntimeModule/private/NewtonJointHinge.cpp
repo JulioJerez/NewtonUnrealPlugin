@@ -120,23 +120,23 @@ ndJointBilateralConstraint* UNewtonJointHinge::CreateJoint()
 	return nullptr;
 }
 
-float UNewtonJointHinge::GetTargetPosit() const
+float UNewtonJointHinge::GetTargetAngle() const
 {
 	check(m_joint);
 	ndJointHinge* const joint = (ndJointHinge*)m_joint;
-	return joint->GetTargetAngle() * UNREAL_UNIT_SYSTEM;
+	return joint->GetTargetAngle() * ndRadToDegree;
 }
 
-void UNewtonJointHinge::SetTargetPosit(float offset)
+void UNewtonJointHinge::SetTargetAngle(float degrees)
 {
 	check(m_joint);
 	ndJointHinge* const joint = (ndJointHinge*)m_joint;
 
-	ndFloat32 value = offset * UNREAL_INV_UNIT_SYSTEM;
+	ndFloat32 radians = degrees * ndDegreeToRad;
 	ndFloat32 currentValue = joint->GetTargetAngle();
-	if (ndAbs(value - currentValue) > ndFloat32(2.5e-3f))
+	if (ndAbs(radians - currentValue) > ndFloat32(2.5e-3f))
 	{
 		AwakeBodies();
-		joint->SetTargetAngle(value);
+		joint->SetTargetAngle(radians);
 	}
 }
