@@ -42,17 +42,17 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FTransform GetTargetTransform() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetTargetTransform(const FTransform& transform);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector ClipRobotTarget();
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll);
 
 

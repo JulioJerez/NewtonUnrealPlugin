@@ -44,14 +44,10 @@ void UNewtonJointSlider::DrawGizmo(float timestep) const
 	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix(ToNewtonMatrix(transform));
 	const FColor pinColor(255.0f, 255.0f, 0.0f);
-	const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
 	const FVector pinStart(transform.GetLocation());
-	const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
 
 	const UWorld* const world = GetWorld();
-	DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
-
-	UNewtonRigidBody* const child = FindChild();
+	const UNewtonRigidBody* const child = FindChild();
 	if (EnableLimits && child)
 	{
 		const ndVector maxLimit(matrix.m_front.Scale(MaxDistance));
@@ -64,6 +60,12 @@ void UNewtonJointSlider::DrawGizmo(float timestep) const
 		DrawDebugCone(world, maxConeStart, coneDir, scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
 		DrawDebugCone(world, minConeStart, coneDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
 	}
+	else
+	{
+		const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
+		const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
+		DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
+	}
 }
 
 // Called when the game starts
@@ -74,8 +76,6 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 	check(!m_joint);
 	ndBodyKinematic* body0;
 	ndBodyKinematic* body1;
-	//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
-	//GetBodyPairs(world, &body0, &body1);
 	GetBodyPairs(&body0, &body1);
 
 	if (body0 && body1)
@@ -89,8 +89,6 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 		joint->SetLimits(ndFloat32(MinDistance * UNREAL_INV_UNIT_SYSTEM), ndFloat32(MaxDistance * UNREAL_INV_UNIT_SYSTEM));
 		joint->SetAsSpringDamper(SpringDamperRegularizer, SpringConst, DampingConst);
 
-		//m_joint = joint;
-		//world->AddJoint(m_joint);
 		return joint;
 	}
 	return nullptr;
@@ -98,21 +96,55 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 
 float UNewtonJointSlider::GetTargetPosit() const
 {
-	check(m_joint);
-	ndJointSlider* const joint = (ndJointSlider*)m_joint;
-	return joint->GetTargetPosit() * UNREAL_UNIT_SYSTEM;
+	if (m_joint)
+	{
+		ndJointSlider* const joint = (ndJointSlider*)m_joint;
+		return joint->GetTargetPosit() * UNREAL_UNIT_SYSTEM;
+	}
+	return 0.0f;
 }
 
 void UNewtonJointSlider::SetTargetPosit(float offset)
 {
-	check(m_joint);
-	ndJointSlider* const joint = (ndJointSlider*)m_joint;
-
-	ndFloat32 value = offset * UNREAL_INV_UNIT_SYSTEM;
-	ndFloat32 currentValue = joint->GetTargetPosit();
-	if (ndAbs(value - currentValue) > ndFloat32(2.5e-3f))
+	if (m_joint)
 	{
-		AwakeBodies();
-		joint->SetTargetPosit(value);
+		ndJointSlider* const joint = (ndJointSlider*)m_joint;
+
+		ndFloat32 value = offset * UNREAL_INV_UNIT_SYSTEM;
+		ndFloat32 currentValue = joint->GetTargetPosit();
+		if (ndAbs(value - currentValue) > ndFloat32(2.5e-3f))
+		{
+			AwakeBodies();
+			joint->SetTargetPosit(value);
+		}
 	}
 }
+
+//float UNewtonJointSlider::GetMinPosit() const
+//{
+//	//if (m_joint)
+//	//{
+//	//	ndJointSlider* const joint = (ndJointSlider*)m_joint;
+//	//
+//	//	ndFloat32 minLimit;
+//	//	ndFloat32 maxLimit;
+//	//	joint->GetLimits(minLimit, maxLimit);
+//	//	return minLimit * UNREAL_UNIT_SYSTEM;
+//	//}
+//	return 0.0f;
+//}
+
+//float UNewtonJointSlider::GetMaxPosit() const
+//{
+//	if (m_joint)
+//	{
+//		ndJointSlider* const joint = (ndJointSlider*)m_joint;
+//
+//		ndFloat32 minLimit;
+//		ndFloat32 maxLimit;
+//		joint->GetLimits(minLimit, maxLimit);
+//		return maxLimit * UNREAL_UNIT_SYSTEM;
+//	}
+//	return 0.0f;
+//}
+

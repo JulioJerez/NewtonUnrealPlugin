@@ -53,7 +53,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	virtual void DrawGizmo(float timestep) const;
 	virtual ndJointBilateralConstraint* CreateJoint() ;
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	bool HitLimits() const;
 
 	UPROPERTY(EditAnywhere, Category = Newton)

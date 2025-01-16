@@ -42,10 +42,10 @@ class UNewtonJointHinge : public UNewtonJoint
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	float GetTargetAngle() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetTargetAngle(float angle);
 
 	UPROPERTY(EditAnywhere, Category = Newton)

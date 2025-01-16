@@ -40,22 +40,22 @@ class UNewtonJointKinematic : public UNewtonJoint
 	// Sets default values for this component's properties
 	UNewtonJointKinematic();
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void CreateAttachament(UNewtonRigidBody* const childBody, const FVector& location, float angularFriction, float linearFriction);
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void DestroyAttachament();
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetTargetPosit(const FVector& glocalSpacePosit);
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetTargetRotation(const FRotator& glocalSpaceRotation);
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetTargetMatrix(const FTransform& glocalSpaceTransform);
 
-	UFUNCTION(BlueprintCallable, Category = "Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FTransform GetTargetMatrix() const;
 
 	protected:

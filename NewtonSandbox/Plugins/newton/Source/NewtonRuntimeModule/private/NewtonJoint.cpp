@@ -84,10 +84,19 @@ void UNewtonJoint::AwakeBodies() const
 UNewtonRigidBody* UNewtonJoint::FindChild() const
 {
 	const TArray<TObjectPtr<USceneComponent>>& childArray = GetAttachChildren();
-	if (childArray.Num())
+
+	if (childArray.Num() > 1)
 	{
-		check(childArray.Num() == 1);
-		return Cast<UNewtonRigidBody>(childArray[0]);
+		UE_LOG(LogTemp, Warning, TEXT("Newton joints compoments can only have one rigid body Child"));
+	}
+
+	for (int i = childArray.Num() - 1; i >= 0; --i)
+	{
+		UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(childArray[i]);
+		if (body)
+		{
+			return body;
+		}
 	}
 	return nullptr;
 }
@@ -115,10 +124,28 @@ void UNewtonJoint::GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1
 		check(parent->GetBody());
 		*body1 = parent->GetBody();
 	}
-	//else
-	//{
-	//	*body1 = world->GetSentinelBody();
-	//}
+	else
+	{
+		// special case: check if this joint that is the root of a blueprint and is attache to NewtonSceneActor.
+		UNewtonRigidBody* parentBody = nullptr;
+		for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
+		{
+			UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component);
+			if (body)
+			{
+				parentBody = body;
+				break;
+			}
+		}
+		if (parentBody)
+		{
+			*body1 = parentBody->GetBody();
+		}
+		else
+		{
+			check(0);
+		}
+	}
 
 	if (!body0)
 	{
