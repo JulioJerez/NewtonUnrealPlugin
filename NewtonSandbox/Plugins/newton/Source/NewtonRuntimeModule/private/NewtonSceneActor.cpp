@@ -240,18 +240,15 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		return;
 	}
 
+	staticSceneBody->RemoveAllCollisions();
+
 	ndTree<ndInt32, const USceneComponent*> filter;
 	ndFixSizeArray<TObjectPtr<USceneComponent>, ND_STACK_DEPTH> stack;
 	stack.PushBack(GetRootComponent());
 	while (stack.GetCount())
 	{
 		USceneComponent* const component = stack.Pop();
-		UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component);
-		//if (body && body->RefSceneActor)
-		//{
-		//	filter.Insert(0, body->RefSceneActor->GetRootComponent());
-		//}
-
+		filter.Insert(0, component);
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
 		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
 		{
@@ -274,49 +271,50 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 			int index = key1.Find(key);
 			if (index == 0)
 			{
-				check(!stack.GetCount());
-				stack.PushBack(actor->GetRootComponent());
-				while (stack.GetCount())
+				if (Cast<ALandscapeStreamingProxy>(actor))
 				{
-					TObjectPtr<USceneComponent> component(stack.Pop());
-					if (!filter.Find(component.Get()))
+					const ALandscapeStreamingProxy* const streamingProxy = Cast<ALandscapeStreamingProxy>(actor);
+					const AActor* const parent = streamingProxy->GetSceneOutlinerParent();
+					const FString streamingKey(parent->GetFolder().ToString());
+					index = streamingKey.Find(key);
+					if (index == 0)
 					{
-						const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(component.Get());
-						const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
-						if (staticMesh)
-						{
-							//if (staticMesh->GetFName() == TEXT("Door_01_L"))
-							//{
-							//	index = 1;
-							//}
-							staticList.Insert(component, staticComponent);
-						}
-					}
-
-					const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-					for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
-					{
-						stack.PushBack(childrenComp[i].Get());
+						//actorList.PushBack(actor);
+						landScapesList.PushBack(actor);
 					}
 				}
-			}
-			else if (Cast<ALandscapeStreamingProxy>(actor))
-			{
-				const ALandscapeStreamingProxy* const streamingProxy = Cast<ALandscapeStreamingProxy>(actor);
-				const AActor* const parent = streamingProxy->GetSceneOutlinerParent();
-				const FString streamingKey(parent->GetFolder().ToString());
-				index = streamingKey.Find(key);
-				if (index == 0)
+				else
 				{
-					//actorList.PushBack(actor);
-					landScapesList.PushBack(actor);
+					check(!stack.GetCount());
+					stack.PushBack(actor->GetRootComponent());
+					while (stack.GetCount())
+					{
+						TObjectPtr<USceneComponent> component(stack.Pop());
+						if (!filter.Find(component.Get()))
+						{
+							const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(component.Get());
+							const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
+							if (staticMesh)
+							{
+								//if (staticMesh->GetFName() == TEXT("Door_01_L"))
+								//{
+								//	index = 1;
+								//}
+								staticList.Insert(component, staticComponent);
+							}
+						}
+
+						const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+						for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+						{
+							stack.PushBack(childrenComp[i].Get());
+						}
+					}
 				}
 			}
 		}
 	}
 	
-	staticSceneBody->RemoveAllCollisions();
-
 	UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(AddComponentByClass(UNewtonCollisionCollection::StaticClass(), false, FTransform(), true));
 	check(IsValid(collection));
 	FinishAddComponent(collection, false, FTransform());

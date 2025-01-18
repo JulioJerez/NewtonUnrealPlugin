@@ -166,7 +166,12 @@ void UNewtonJoint::UpdateTransform()
 		}
 		transform = transform * component->GetRelativeTransform();
 	}
-	m_transform = transform * parent->m_globalTransform;
+
+	if (parent)
+	{ 
+		transform = transform * parent->m_globalTransform;
+	}
+	m_transform = transform;
 }
 
 void UNewtonJoint::ApplyPropertyChanges()

@@ -51,7 +51,7 @@ void UNewtonSceneRigidBody::RemoveAllCollisions()
 			{
 				collectionChildren[j]->DestroyComponent();
 			}
-			collectionChildren[i]->DestroyComponent();
+			children[i]->DestroyComponent();
 		}
 		UNewtonCollision* const collision = Cast<UNewtonCollision>(children[i]);
 		if (collision)
