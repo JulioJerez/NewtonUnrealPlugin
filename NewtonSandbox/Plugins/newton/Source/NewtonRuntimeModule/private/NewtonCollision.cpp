@@ -145,7 +145,7 @@ void UNewtonCollision::SetTransform(const USceneComponent* const meshComponent)
 			break;
 		}
 	}
-	const FTransform globalTransform(meshComponent->GetComponentToWorld());
+	const FTransform globalTransform(meshComponent->GetComponentTransform());
 	const FTransform localTransform(globalTransform * bodyTransform.Inverse());
 
 	// for some reason, this does not work in the unreal editor
@@ -279,7 +279,7 @@ ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyM
 	const FVector uScale(GetComponentTransform().GetScale3D());
 	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(1.0f));
 
-	const FTransform transform(GetComponentToWorld());
+	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
 
 	instance->SetScale(scale);

@@ -151,7 +151,9 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 		}
 	}
 
-	UNewtonRigidBody* const parentComponet = FindParent();
+	//UNewtonRigidBody* const parentComponet = FindParent();
+	UNewtonRigidBody* const parentComponet = Cast<UNewtonRigidBody>(GetAttachParent());
+	check(parentComponet);
 	if (parentComponet && childComponent)
 	{
 		//ndWorld* const world = newtonWorldActor->GetNewtonWorld();

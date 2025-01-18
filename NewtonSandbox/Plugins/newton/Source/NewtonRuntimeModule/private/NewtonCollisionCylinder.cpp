@@ -50,11 +50,11 @@ void UNewtonCollisionCylinder::InitStaticMeshCompoment(const USceneComponent* co
 	//
 	//SetTransform(meshComponent);
 	//const FTransform localTransformOffset(element.GetTransform());
-	//const FTransform globalTransform(localTransformOffset * GetComponentToWorld());
+	//const FTransform globalTransform(localTransformOffset * GetComponentTransform());
 	//SetComponentToWorld(globalTransform);
 	//
 	//const AActor* const owner = GetOwner();
-	//const FTransform bodyTransform(owner->GetRootComponent()->GetComponentToWorld());
+	//const FTransform bodyTransform(owner->GetRootComponent()->GetComponentTransform());
 	//const FTransform localTransform(globalTransform * bodyTransform.Inverse());
 	//
 	//SetRelativeRotation_Direct(localTransform.Rotator());

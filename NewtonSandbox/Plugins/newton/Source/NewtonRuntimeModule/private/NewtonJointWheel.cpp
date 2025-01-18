@@ -98,17 +98,11 @@ ndJointBilateralConstraint* UNewtonJointWheel::CreateJoint()
 	check(!m_joint);
 	ndBodyKinematic* body0;
 	ndBodyKinematic* body1;
-	//ndWorld* const world = newtonWorldActor->GetNewtonWorld();
-	//GetBodyPairs(world, &body0, &body1);
 	GetBodyPairs(&body0, &body1);
 
 	if (body0 && body1)
 	{
-		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
-
 		ndWheelDescriptor desc;
-
 		desc.m_radios = Radio;
 		desc.m_springK = SpringK;
 		desc.m_damperC = DamperC;
@@ -118,6 +112,11 @@ ndJointBilateralConstraint* UNewtonJointWheel::CreateJoint()
 		desc.m_brakeTorque = BrakeTorque;
 		desc.m_steeringAngle = SteeringAngle;
 		desc.m_handBrakeTorque = HandBrakeTorque;
+
+		//const FTransform transform(GetRelativeTransform());
+		//const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
+
+		const ndMatrix matrix(GetPivotMatrix());
 		ndJointWheel* const joint = new ndJointWheel(matrix, body0, body1, desc);
 		
 		//joint->SetLimitState(EnableLimits);

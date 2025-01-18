@@ -49,8 +49,7 @@ ndJointBilateralConstraint* UNewtonJointFix::CreateJoint()
 
 	if (body0 && body1)
 	{
-		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
+		const ndMatrix matrix(GetPivotMatrix());
 		ndJointFix6dof* const joint = new ndJointFix6dof(matrix, body0, body1);
 		return joint;
 	}

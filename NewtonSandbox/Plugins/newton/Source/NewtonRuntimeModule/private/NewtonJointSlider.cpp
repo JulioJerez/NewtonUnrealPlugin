@@ -59,6 +59,9 @@ void UNewtonJointSlider::DrawGizmo(float timestep) const
 		DrawDebugLine(world, minConeStart, maxConeStart, pinColor, false, timestep);
 		DrawDebugCone(world, maxConeStart, coneDir, scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
 		DrawDebugCone(world, minConeStart, coneDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
+
+		FTransform childTransform(child->GetComponentTransform());
+		DrawDebugPoint(world, childTransform.GetLocation(), 4.0, FColor::Red, false, timestep);
 	}
 	else
 	{
@@ -80,9 +83,7 @@ ndJointBilateralConstraint* UNewtonJointSlider::CreateJoint()
 
 	if (body0 && body1)
 	{
-		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
-
+		const ndMatrix matrix(GetPivotMatrix());
 		ndJointSlider* const joint = new ndJointSlider(matrix, body0, body1);
 
 		joint->SetLimitState(EnableLimits);

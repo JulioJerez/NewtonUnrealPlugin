@@ -87,9 +87,7 @@ ndJointBilateralConstraint* UNewtonJointRoller::CreateJoint()
 
 	if (body0 && body1)
 	{
-		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
-
+		const ndMatrix matrix(GetPivotMatrix());
 		ndJointRoller* const joint = new ndJointRoller(matrix, body0, body1);
 		joint->SetLimitStateAngle(false);
 		joint->SetLimitStatePosit(EnableLimits);

@@ -257,7 +257,7 @@ ndShapeInstance* UNewtonCollisionConvexApproximate::CreateBodyInstanceShape(cons
 	ndShapeInstance* const instance = CreateInstanceShape();
 
 	const ndVector scale(ndFloat32(1.0f));
-	const FTransform transform(GetComponentToWorld());
+	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
 
 	instance->SetScale(scale);

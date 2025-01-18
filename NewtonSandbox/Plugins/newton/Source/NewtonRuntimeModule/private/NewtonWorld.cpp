@@ -162,7 +162,16 @@ void NewtonWorld::StartGame()
 					newtonWorld->AddBody(body);
 				}
 			}
+		}
+	}
 
+	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
+	{
+		AActor* const actor = *actorItr;
+		UNewtonModel* const modelComponent = Cast<UNewtonModel>(actor->FindComponentByClass(UNewtonModel::StaticClass()));
+		if (!modelComponent)
+		{
+			const TSet<UActorComponent*>& components = actor->GetComponents();
 			for (TSet<UActorComponent*>::TConstIterator it(components.CreateConstIterator()); it; ++it)
 			{
 				UNewtonJoint* const component = Cast<UNewtonJoint>(*it);

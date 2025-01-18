@@ -190,7 +190,7 @@ UNewtonRigidBody::UNewtonRigidBody()
 	,m_newtonWorld(nullptr)
 {
 	m_sleeping = true;
-	RefSceneActor = nullptr;
+	//RefSceneActor = nullptr;
 	m_propertyChanged = true;
 	m_sceneActorChanged = false;
 
@@ -477,13 +477,13 @@ ndBodyDynamic* UNewtonRigidBody::CreateRigidBody(bool overrideAutoSleep)
 {
 	const ndMatrix matrix(ToNewtonMatrix(m_globalTransform));
 
-	if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
-	{
-		USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
-		check(sceneComponent);
-		const FTransform actorTransform(sceneComponent->GetComponentToWorld());
-		m_refActorBindTransform = actorTransform * m_globalTransform.Inverse();
-	}
+	//if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
+	//{
+	//	USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
+	//	check(sceneComponent);
+	//	const FTransform actorTransform(sceneComponent->GetComponentTransform());
+	//	m_refActorBindTransform = actorTransform * m_globalTransform.Inverse();
+	//}
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetMatrix(matrix);
@@ -606,27 +606,27 @@ ndShapeInstance* UNewtonRigidBody::CreateCollision(const ndMatrix& bodyMatrix) c
 void UNewtonRigidBody::ApplyPropertyChanges()
 {
 	m_propertyChanged = false;
-	if (m_sceneActorChanged && RefSceneActor)
-	{
-		UNewtonJoint* const parentJoint = Cast<UNewtonJoint>(GetAttachParent());
-		check(parentJoint);
-
-		const FTransform parentTransform(parentJoint->GetAttachParent()->GetComponentToWorld());
-		const FTransform actorTransform(RefSceneActor->GetRootComponent()->GetComponentToWorld());
-		const FTransform relativeTransform(actorTransform * parentTransform.Inverse());
-
-		parentJoint->SetRelativeRotation_Direct(relativeTransform.Rotator());
-		parentJoint->SetRelativeScale3D_Direct(relativeTransform.GetScale3D());
-		parentJoint->SetRelativeLocation_Direct(relativeTransform.GetLocation());
-		parentJoint->SetComponentToWorld(actorTransform);
-
-		const FTransform identity;
-		SetRelativeRotation_Direct(identity.Rotator());
-		SetRelativeScale3D_Direct(identity.GetScale3D());
-		SetRelativeLocation_Direct(identity.GetLocation());
-		SetComponentToWorld(actorTransform);
-		m_sceneActorChanged = false;
-	}
+	//if (m_sceneActorChanged && RefSceneActor)
+	//{
+	//	UNewtonJoint* const parentJoint = Cast<UNewtonJoint>(GetAttachParent());
+	//	check(parentJoint);
+	//
+	//	const FTransform parentTransform(parentJoint->GetAttachParent()->GetComponentTransform());
+	//	const FTransform actorTransform(RefSceneActor->GetRootComponent()->GetComponentTransform());
+	//	const FTransform relativeTransform(actorTransform * parentTransform.Inverse());
+	//
+	//	parentJoint->SetRelativeRotation_Direct(relativeTransform.Rotator());
+	//	parentJoint->SetRelativeScale3D_Direct(relativeTransform.GetScale3D());
+	//	parentJoint->SetRelativeLocation_Direct(relativeTransform.GetLocation());
+	//	parentJoint->SetComponentToWorld(actorTransform);
+	//
+	//	const FTransform identity;
+	//	SetRelativeRotation_Direct(identity.Rotator());
+	//	SetRelativeScale3D_Direct(identity.GetScale3D());
+	//	SetRelativeLocation_Direct(identity.GetLocation());
+	//	SetComponentToWorld(actorTransform);
+	//	m_sceneActorChanged = false;
+	//}
 
 	m_localTransform = GetRelativeTransform();
 	m_globalTransform = GetComponentTransform();
@@ -678,16 +678,22 @@ void UNewtonRigidBody::TickComponent(float deltaTime, ELevelTick tickType, FActo
 		SetRelativeTransform(m_localTransform);
 		SetComponentToWorld(m_globalTransform);
 
-		if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
-		{
-			USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
-			check(sceneComponent);
-			const FTransform actorTransform(m_refActorBindTransform * m_globalTransform);
-
-			sceneComponent->SetRelativeTransform(actorTransform);
-			sceneComponent->SetComponentToWorld(actorTransform);
-			sceneComponent->MarkRenderInstancesDirty();
-		}
+		//UWorld* xxxxxxx = GetWorld();
+		//if (Mass > 0.0f && (xxxxxxx->WorldType == EWorldType::PIE))
+		//{
+		//	FVector xxxx(m_localTransform.GetLocation());
+		//	UE_LOG(LogTemp, Display, TEXT("%s p(%f %f %f)"), RefSceneActor ? TEXT("blueprint") : TEXT("scene"), xxxx.X, xxxx.Y, xxxx.Z);
+		//}
+		//if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
+		//{
+		//	USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
+		//	check(sceneComponent);
+		//	const FTransform actorTransform(m_refActorBindTransform * m_globalTransform);
+		//
+		//	sceneComponent->SetRelativeTransform(actorTransform);
+		//	sceneComponent->SetComponentToWorld(actorTransform);
+		//	sceneComponent->MarkRenderInstancesDirty();
+		//}
 	}
 }
 

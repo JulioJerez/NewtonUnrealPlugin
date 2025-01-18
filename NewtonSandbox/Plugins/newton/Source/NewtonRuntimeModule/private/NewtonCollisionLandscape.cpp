@@ -158,7 +158,7 @@ ndShape* UNewtonCollisionLandscape::CreateShape() const
 ndShapeInstance* UNewtonCollisionLandscape::CreateInstanceShape() const
 {
 	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
-	const FVector uScale(GetComponentToWorld().GetScale3D());
+	const FVector uScale(GetComponentTransform().GetScale3D());
 	ndMatrix origin(ndGetIdentityMatrix());
 	//origin.m_posit.m_x = ndFloat32(tile->SectionBaseX * tile->CollisionScale * uScale.X * UNREAL_INV_UNIT_SYSTEM);
 	origin.m_posit.m_y = ndFloat32(ndFloat32(m_tileSize_y - 1) * m_scale_y * uScale.Y * UNREAL_INV_UNIT_SYSTEM);
@@ -179,7 +179,7 @@ ndShapeInstance* UNewtonCollisionLandscape::CreateInstanceShape() const
 ndShapeInstance* UNewtonCollisionLandscape::CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const
 {
 	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
-	const FTransform transform(GetComponentToWorld());
+	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix (ToNewtonMatrix(transform));
 	const FVector uScale(transform.GetScale3D());
 	ndMatrix origin(ndGetIdentityMatrix());

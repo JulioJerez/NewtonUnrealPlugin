@@ -27,6 +27,7 @@
 #include "NewtonJoint.generated.h"
 
 class ndWorld;
+class ndMatrix;
 class ndBodyKinematic;
 class UNewtonRigidBody;
 class ANewtonWorldActor;
@@ -65,8 +66,9 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	protected:
 	void AwakeBodies() const;
 	UNewtonRigidBody* FindChild() const;
-	UNewtonRigidBody* FindParent() const;
 	void GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1) const;
+
+	ndMatrix GetPivotMatrix() const;
 
 	void ApplyPropertyChanges();
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
@@ -76,10 +78,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 #endif
 
 
-	FTransform m_transfrom;
+	FTransform m_transform;
 	ndJointBilateralConstraint* m_joint;
-	FTransform m_localChildTransfrom;
-	FTransform m_localParentTransfrom;
 	bool m_propertyChanged;
 	
 	friend class NewtonWorld;

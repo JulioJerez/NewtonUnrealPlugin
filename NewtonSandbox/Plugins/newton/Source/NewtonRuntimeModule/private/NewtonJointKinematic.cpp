@@ -96,8 +96,7 @@ ndJointBilateralConstraint* UNewtonJointKinematic::CreateJoint()
 	//
 	//if (body0 && body1)
 	//{
-	//	const FTransform transform(GetRelativeTransform());
-	//	const ndMatrix matrix(UNewtonRigidBody::ToNewtonMatrix(transform) * body1->GetMatrix());
+	//  const ndMatrix matrix(GetPivotMatrix());
 	//	ndJointHinge* const joint = new ndJointHinge(matrix, body0, body1);
 	//
 	//	joint->SetLimitState(EnableLimits);

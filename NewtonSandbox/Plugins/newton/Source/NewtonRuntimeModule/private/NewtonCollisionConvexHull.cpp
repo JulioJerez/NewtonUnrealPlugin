@@ -108,7 +108,7 @@ void UNewtonCollisionConvexHull::SetTransform(const USceneComponent* const meshC
 			break;
 		}
 	}
-	FTransform meshGlobalTransform(meshComponent->GetComponentToWorld());
+	FTransform meshGlobalTransform(meshComponent->GetComponentTransform());
 	meshGlobalTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 	const FTransform localTransform(meshGlobalTransform * bodyTransform.Inverse());
 
@@ -136,7 +136,7 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 			if (parent)
 			{
 				const FTransform localTransform;
-				SetComponentToWorld(parent->GetComponentToWorld());
+				SetComponentToWorld(parent->GetComponentTransform());
 				SetRelativeRotation_Direct(localTransform.Rotator());
 				SetRelativeScale3D_Direct(localTransform.GetScale3D());
 				SetRelativeLocation_Direct(localTransform.GetLocation());
@@ -145,20 +145,21 @@ void UNewtonCollisionConvexHull::ApplyPropertyChanges()
 		} 
 		else
 		{
-			UNewtonRigidBody* const parentBody = Cast<UNewtonRigidBody>(GetAttachParent());
-			if (parentBody && parentBody->RefSceneActor)
-			{
-				const USceneComponent* const sceneComponent = Cast<UStaticMeshComponent>(parentBody->RefSceneActor->GetRootComponent());
-				check(sceneComponent);
-				const FTransform actorTransform(sceneComponent->GetComponentToWorld());
-				const FTransform localTransform(actorTransform * parentBody->GetComponentToWorld().Inverse());
-
-				SetComponentToWorld(actorTransform);
-				SetRelativeRotation_Direct(localTransform.Rotator());
-				SetRelativeScale3D_Direct(localTransform.GetScale3D());
-				SetRelativeLocation_Direct(localTransform.GetLocation());
-				GenerateMesh(sceneComponent);
-			}
+			check(0);
+			//UNewtonRigidBody* const parentBody = Cast<UNewtonRigidBody>(GetAttachParent());
+			//if (parentBody && parentBody->RefSceneActor)
+			//{
+			//	const USceneComponent* const sceneComponent = Cast<UStaticMeshComponent>(parentBody->RefSceneActor->GetRootComponent());
+			//	check(sceneComponent);
+			//	const FTransform actorTransform(sceneComponent->GetComponentTransform());
+			//	const FTransform localTransform(actorTransform * parentBody->GetComponentTransform().Inverse());
+			//
+			//	SetComponentToWorld(actorTransform);
+			//	SetRelativeRotation_Direct(localTransform.Rotator());
+			//	SetRelativeScale3D_Direct(localTransform.GetScale3D());
+			//	SetRelativeLocation_Direct(localTransform.GetLocation());
+			//	GenerateMesh(sceneComponent);
+			//}
 		}
 	}
 	m_debugVisualIsDirty = true;
@@ -190,7 +191,7 @@ ndShapeInstance* UNewtonCollisionConvexHull::CreateBodyInstanceShape(const ndMat
 {
 	ndShapeInstance* const instance = new ndShapeInstance(m_shape);
 
-	const FTransform transform(GetComponentToWorld());
+	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix(ToNewtonMatrix(transform) * bodyMatrix.OrthoInverse());
 
 	instance->SetLocalMatrix(matrix);

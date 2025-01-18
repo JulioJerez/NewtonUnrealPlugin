@@ -178,8 +178,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FVector Gravity;
 
-	UPROPERTY(EditInstanceOnly, Category = Newton)
-	TObjectPtr<AActor> RefSceneActor;
+	//UPROPERTY(EditInstanceOnly, Category = Newton)
+	//TObjectPtr<AActor> RefSceneActor;
 
 	UPROPERTY()
 	int BoneIndex;

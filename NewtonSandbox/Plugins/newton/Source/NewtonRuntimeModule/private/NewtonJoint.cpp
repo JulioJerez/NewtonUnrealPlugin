@@ -22,6 +22,7 @@
 
 #include "NewtonJoint.h"
 
+#include "NewtonCommons.h"
 #include "NewtonRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
@@ -52,7 +53,7 @@ void UNewtonJoint::ActivateDebug()
 
 ndJointBilateralConstraint* UNewtonJoint::CreateJoint()
 {
-	m_transfrom = GetComponentTransform();
+	//m_transform = GetComponentTransform();
 	ApplyPropertyChanges();
 	return nullptr;
 }
@@ -101,11 +102,6 @@ UNewtonRigidBody* UNewtonJoint::FindChild() const
 	return nullptr;
 }
 
-UNewtonRigidBody* UNewtonJoint::FindParent() const
-{
-	return Cast<UNewtonRigidBody>(GetAttachParent());
-}
-
 void UNewtonJoint::GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1) const
 {
 	*body0 = nullptr;
@@ -118,33 +114,25 @@ void UNewtonJoint::GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1
 		*body0 = child->GetBody();
 	}
 
-	UNewtonRigidBody* const parent = FindParent();
-	if (parent)
+	// Find the a NewtonRigidBody in the parent chain of compoments.
+	UNewtonRigidBody* parentBody = nullptr;
+	for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
 	{
-		check(parent->GetBody());
-		*body1 = parent->GetBody();
+		UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component);
+		if (body)
+		{
+			parentBody = body;
+			break;
+		}
+	}
+
+	if (parentBody)
+	{
+		*body1 = parentBody->GetBody();
 	}
 	else
 	{
-		// special case: check if this joint that is the root of a blueprint and is attache to NewtonSceneActor.
-		UNewtonRigidBody* parentBody = nullptr;
-		for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
-		{
-			UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component);
-			if (body)
-			{
-				parentBody = body;
-				break;
-			}
-		}
-		if (parentBody)
-		{
-			*body1 = parentBody->GetBody();
-		}
-		else
-		{
-			check(0);
-		}
+		check(0);
 	}
 
 	if (!body0)
@@ -166,31 +154,24 @@ void UNewtonJoint::DrawGizmo(float timestep) const
 
 void UNewtonJoint::UpdateTransform()
 {
-	UNewtonRigidBody* const parent = FindParent();
-	if (parent)
+	UNewtonRigidBody* parent = nullptr;
+	FTransform transform(GetRelativeTransform());
+	for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
 	{
-		m_transfrom = GetRelativeTransform() * parent->m_globalTransform;
+		UNewtonRigidBody* const parentBody = Cast<UNewtonRigidBody>(component);
+		if (parentBody)
+		{
+			parent = parentBody;
+			break;
+		}
+		transform = transform * component->GetRelativeTransform();
 	}
+	m_transform = transform * parent->m_globalTransform;
 }
 
 void UNewtonJoint::ApplyPropertyChanges()
 {
 	m_propertyChanged = false;
-	const FTransform transform(GetComponentTransform());
-
-	const UNewtonRigidBody* const parent = FindParent();
-	if (parent)
-	{
-		const FTransform parentTransform(parent->GetComponentTransform());
-		m_localParentTransfrom = transform * parentTransform.Inverse();
-	}
-
-	UNewtonRigidBody* const child = FindChild();
-	if (child)
-	{
-		const FTransform childTransform(child->GetComponentTransform());
-		m_localChildTransfrom = transform * childTransform.Inverse();
-	}
 }
 
 #if WITH_EDITOR
@@ -207,12 +188,32 @@ void UNewtonJoint::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 	m_propertyChanged = true;
 }
 
+ndMatrix UNewtonJoint::GetPivotMatrix() const
+{
+	ndBody* body = nullptr;
+	FTransform transform(GetRelativeTransform());
+	for (USceneComponent* component = GetAttachParent(); component; component = component->GetAttachParent())
+	{
+		const UNewtonRigidBody* const parent = Cast<UNewtonRigidBody>(component);
+		if (parent)
+		{
+			body = parent->GetBody();
+			break;
+		}
+		transform = transform * component->GetRelativeTransform();
+	}
+	
+	check(body);
+	const ndMatrix matrix(ToNewtonMatrix(transform) * body->GetMatrix());
+	return matrix;
+}
+
 // Called every frame
 void UNewtonJoint::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	SetComponentToWorld(m_transfrom);
+	SetComponentToWorld(m_transform);
 	if (ShowDebug)
 	{
 		DrawGizmo(DeltaTime);

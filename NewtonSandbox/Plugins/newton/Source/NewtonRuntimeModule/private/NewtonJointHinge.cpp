@@ -44,14 +44,9 @@ void UNewtonJointHinge::DrawGizmo(float timestep) const
 	const FTransform transform(GetComponentTransform());
 	const ndMatrix matrix(ToNewtonMatrix(transform));
 	const FColor pinColor(255.0f, 255.0f, 0.0f);
-	const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
-	const FVector coneDir(matrix.m_front.m_x, matrix.m_front.m_y, matrix.m_front.m_z);
 	const FVector pinStart(transform.GetLocation());
-	const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
 
 	const UWorld* const world = GetWorld();
-	DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
-	DrawDebugCone(world, pinEnd, coneDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
 
 	UNewtonRigidBody* const child = FindChild();
 	if (EnableLimits && child)
@@ -93,6 +88,14 @@ void UNewtonJointHinge::DrawGizmo(float timestep) const
 			DrawDebugMesh(world, verts, indices, ND_DEBUG_MESH_COLOR, false, timestep);
 		}
 	}
+	else
+	{
+		const ndVector pinDir(matrix.m_front.Scale(scale * 0.9f));
+		const FVector coneDir(matrix.m_front.m_x, matrix.m_front.m_y, matrix.m_front.m_z);
+		const FVector pinEnd(float(pinStart.X + pinDir.m_x), float(pinStart.Y + pinDir.m_y), float(pinStart.Z + pinDir.m_z));
+		DrawDebugLine(world, pinStart, pinEnd, pinColor, false, timestep);
+		DrawDebugCone(world, pinEnd, coneDir, -scale * 0.125f, 15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad, 8, pinColor, false, timestep);
+	}
 }
 
 // Called when the game starts
@@ -107,8 +110,7 @@ ndJointBilateralConstraint* UNewtonJointHinge::CreateJoint()
 
 	if (body0 && body1)
 	{
-		const FTransform transform(GetRelativeTransform());
-		const ndMatrix matrix(ToNewtonMatrix(transform) * body1->GetMatrix());
+		const ndMatrix matrix(GetPivotMatrix());
 		ndJointHinge* const joint = new ndJointHinge(matrix, body0, body1);
 
 		joint->SetLimitState(EnableLimits);

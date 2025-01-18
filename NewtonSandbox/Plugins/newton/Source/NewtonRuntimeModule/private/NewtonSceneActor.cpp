@@ -247,10 +247,10 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	{
 		USceneComponent* const component = stack.Pop();
 		UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(component);
-		if (body && body->RefSceneActor)
-		{
-			filter.Insert(0, body->RefSceneActor->GetRootComponent());
-		}
+		//if (body && body->RefSceneActor)
+		//{
+		//	filter.Insert(0, body->RefSceneActor->GetRootComponent());
+		//}
 
 		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
 		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
