@@ -240,7 +240,17 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		return;
 	}
 
-	staticSceneBody->RemoveAllCollisions();
+	//staticSceneBody->RemoveAllCollisions();
+	if (GetOwner()->FindComponentByClass<UNewtonCollisionCollection>())
+	{
+		UNewtonCollisionCollection* const collection = GetOwner()->FindComponentByClass<UNewtonCollisionCollection>();
+		const TArray<TObjectPtr<USceneComponent>>& children = collection->GetAttachChildren();
+		for (ndInt32 j = children.Num() - 1; j >= 0; --j)
+		{
+			children[j]->DestroyComponent();
+		}
+		collection->DestroyComponent();
+	}
 
 	ndTree<ndInt32, const USceneComponent*> filter;
 	ndFixSizeArray<TObjectPtr<USceneComponent>, ND_STACK_DEPTH> stack;

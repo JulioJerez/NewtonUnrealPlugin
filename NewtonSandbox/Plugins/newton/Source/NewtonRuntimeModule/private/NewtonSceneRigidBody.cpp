@@ -38,29 +38,6 @@ UNewtonSceneRigidBody::UNewtonSceneRigidBody()
 	SetRelativeLocation_Direct(transform.GetLocation());
 }
 
-void UNewtonSceneRigidBody::RemoveAllCollisions()
-{
-	const TArray<TObjectPtr<USceneComponent>>& children = GetAttachChildren();
-	for (ndInt32 i = children.Num() - 1; i >= 0; --i)
-	{
-		UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(children[i]);
-		if (collection)
-		{
-			const TArray<TObjectPtr<USceneComponent>>& collectionChildren = collection->GetAttachChildren();
-			for (ndInt32 j = collectionChildren.Num() - 1; j >= 0; --j)
-			{
-				collectionChildren[j]->DestroyComponent();
-			}
-			children[i]->DestroyComponent();
-		}
-		UNewtonCollision* const collision = Cast<UNewtonCollision>(children[i]);
-		if (collision)
-		{
-			children[i]->DestroyComponent();
-		}
-	}
-}
-
 ndShapeInstance* UNewtonSceneRigidBody::CreateCollision(const ndMatrix& bodyMatrix) const
 {
 	ndArray<const UNewtonCollision*> subShapes;
