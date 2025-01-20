@@ -241,9 +241,9 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	}
 
 	//staticSceneBody->RemoveAllCollisions();
-	if (GetOwner()->FindComponentByClass<UNewtonCollisionCollection>())
+	if (FindComponentByClass<UNewtonCollisionCollection>())
 	{
-		UNewtonCollisionCollection* const collection = GetOwner()->FindComponentByClass<UNewtonCollisionCollection>();
+		UNewtonCollisionCollection* const collection = FindComponentByClass<UNewtonCollisionCollection>();
 		const TArray<TObjectPtr<USceneComponent>>& children = collection->GetAttachChildren();
 		for (ndInt32 j = children.Num() - 1; j >= 0; --j)
 		{
