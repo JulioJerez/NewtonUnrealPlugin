@@ -21,13 +21,14 @@
 
 #include "NewtonSceneActor.h"
 #include "EngineUtils.h"
+#include "LandscapeInfo.h"
 #include "LandscapeStreamingProxy.h"
 #include "LandscapeHeightfieldCollisionComponent.h"
 
-#include "NewtonWorldActor.h"
-#include "NewtonRuntimeModule.h"
 #include "NewtonCollision.h"
+#include "NewtonWorldActor.h"
 #include "NewtonCollisionBox.h"
+#include "NewtonRuntimeModule.h"
 #include "NewtonSceneRigidBody.h"
 #include "NewtonCollisionSphere.h"
 #include "NewtonCollisionCapsule.h"
@@ -192,10 +193,15 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 
 void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
 {
-	const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
-	for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
+	// fucking unreal derrailed this code again, they now use ULandscapeInfo intead of an array of tiles.
+	//const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
+	//for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
+	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
+	check(info);
+	for (TMap<FIntPoint, ULandscapeHeightfieldCollisionComponent*>::TIterator it (info->XYtoCollisionComponentMap.CreateIterator()); it; ++it)
 	{
-		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
+	//	const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
+		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = it->Value;
 		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
 		FinishAddComponent(collisionTile, false, FTransform());
 		AddInstanceComponent(collisionTile);
