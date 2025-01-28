@@ -35,5 +35,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonSceneRigidBody : public UNewtonRigidBody
 
 	public:
 	UNewtonSceneRigidBody();
+
+	virtual void PostLoad() override;
 	virtual ndShapeInstance* CreateCollision(const ndMatrix& bodyMatrix) const override;
 };

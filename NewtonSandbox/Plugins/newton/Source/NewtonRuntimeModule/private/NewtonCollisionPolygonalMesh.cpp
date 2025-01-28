@@ -189,7 +189,7 @@ void UNewtonCollisionPolygonalMesh::InitStaticMeshCompoment(const USceneComponen
 	delete polyTree;
 }
 
-void* UNewtonCollisionPolygonalMesh::BeghinSplineMesh(const USceneComponent* const meshComponent)
+void* UNewtonCollisionPolygonalMesh::BeginSplineMesh(const USceneComponent* const meshComponent)
 {
 	SetTransform(meshComponent);
 	ndPolygonSoupBuilder* const builder = new ndPolygonSoupBuilder;

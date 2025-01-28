@@ -63,6 +63,15 @@ void ANewtonSceneActor::PostLoad()
 void ANewtonSceneActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FTransform transform;
+
+	// for some reason, this does not work in the unreal editor
+	RootComponent->SetRelativeRotation_Direct(transform.Rotator());
+	RootComponent->SetRelativeScale3D_Direct(transform.GetScale3D());
+	RootComponent->SetRelativeLocation_Direct(transform.GetLocation());
+	RootComponent->SetComponentToWorld(transform);
+
 	m_propertyChanged = true;
 }
 
@@ -190,13 +199,16 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 {
 	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
 	check(info);
+	UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(FindComponentByClass<UNewtonCollisionCollection>());
+	check(collection);
 	for (TMap<FIntPoint, ULandscapeHeightfieldCollisionComponent*>::TIterator it (info->XYtoCollisionComponentMap.CreateIterator()); it; ++it)
 	{
 		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = it->Value;
 		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
 		FinishAddComponent(collisionTile, false, FTransform());
 		AddInstanceComponent(collisionTile);
-		collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+		//collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
+		collisionTile->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 	
 		collisionTile->InitStaticMeshCompoment(tile);
 		collisionTile->MarkRenderDynamicDataDirty();
@@ -214,7 +226,7 @@ void ANewtonSceneActor::GenerateSplineMeshCollision(const ALandscapeSplineActor*
 	AddInstanceComponent(childComp);
 	childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 
-	void* const handle = childComp->BeghinSplineMesh(splineActor->GetRootComponent());
+	void* const handle = childComp->BeginSplineMesh(splineActor->GetRootComponent());
 	for (TSet<UActorComponent*>::TConstIterator it(splineActor->GetComponents().CreateConstIterator()); it; ++it)
 	{
 		const USplineMeshComponent* const splineMesh = Cast<USplineMeshComponent>(*it);

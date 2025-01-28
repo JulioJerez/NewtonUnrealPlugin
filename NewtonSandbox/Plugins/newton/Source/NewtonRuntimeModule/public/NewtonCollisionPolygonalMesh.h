@@ -41,7 +41,7 @@ class UNewtonCollisionPolygonalMesh : public UNewtonCollision
 	// Sets default values for this component's properties
 	UNewtonCollisionPolygonalMesh();
 
-	void* BeghinSplineMesh(const USceneComponent* const rootComponent);
+	void* BeginSplineMesh(const USceneComponent* const rootComponent);
 	void AddSplineMesh(void* const handle, const USplineMeshComponent* const splineMesh);
 	void EndSplineMesh(void* const handle);
 

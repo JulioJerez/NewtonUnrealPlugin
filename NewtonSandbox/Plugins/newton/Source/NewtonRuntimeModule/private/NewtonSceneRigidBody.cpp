@@ -31,6 +31,12 @@
 UNewtonSceneRigidBody::UNewtonSceneRigidBody()
 	:Super()
 {
+}
+
+void UNewtonSceneRigidBody::PostLoad()
+{
+	Super::PostLoad();
+
 	const FTransform transform;
 	SetComponentToWorld(transform);
 	SetRelativeRotation_Direct(transform.Rotator());
