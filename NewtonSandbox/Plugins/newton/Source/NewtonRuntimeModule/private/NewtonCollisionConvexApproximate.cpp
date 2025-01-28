@@ -103,41 +103,6 @@ const FStaticMeshLODResources* UNewtonCollisionConvexApproximate::GetRenderLOD()
 	return nullptr;
 }
 
-//long long UNewtonCollisionConvexApproximate::CalculateStaticMeshHash() const
-//{
-//	long long hash = ndCRC64(ndShapeCompound::StaticClassName(), strlen(ndShapeConvexHull::StaticClassName()), 0);
-//	const FStaticMeshLODResources* const renderLOD = GetRenderLOD();
-//	if (renderLOD)
-//	{
-//		const FVector uScale(GetComponentTransform().GetScale3D());
-//		const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-//		const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-//
-//		const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD->VertexBuffers;;
-//		const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
-//		for (ndInt32 i = 0; i < ndInt32(positBuffer.GetNumVertices()); ++i)
-//		{
-//			const FVector3f p(positBuffer.VertexPosition(i));
-//			FVector3f q;
-//			q.X = ndReal(p.X * bakedScale.m_x);
-//			q.Y = ndReal(p.Y * bakedScale.m_y);
-//			q.Z = ndReal(p.Z * bakedScale.m_z);
-//			hash = ndCRC64(&q, sizeof(FVector3f), hash);
-//		}
-//		const FRawStaticIndexBuffer& indexBuffer = renderLOD->IndexBuffer;
-//		for (ndInt32 i = 0; i < ndInt32(indexBuffer.GetNumIndices()); i += 3)
-//		{
-//			ndInt32 j = indexBuffer.GetIndex(i);
-//			hash = ndCRC64(&j, sizeof(ndInt32), hash);
-//		}
-//		hash = ndCRC64(&HighResolution, sizeof(bool), hash);
-//		hash = ndCRC64(&MaxVertexPerConvex, sizeof(int), hash);
-//		hash = ndCRC64(&MaxConvexes, sizeof(int), hash);
-//		hash = ndCRC64(&Tolerance, sizeof(float), hash);
-//	}
-//	return hash;
-//}
-
 ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationShapes() const
 {
 	const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(GetAttachParent());

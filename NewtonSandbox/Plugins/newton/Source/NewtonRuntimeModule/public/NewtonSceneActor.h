@@ -26,6 +26,7 @@
 #include "NewtonSceneActor.generated.h"
 
 class ALandscapeProxy;
+class ALandscapeSplineActor;
 class UNewtonSceneRigidBody;
 
 UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
@@ -50,8 +51,8 @@ class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
 	TObjectPtr<UNewtonSceneRigidBody> RootBody;
 
 	private:
-	//void GenerateStaticMeshCollision(const AActor* const actor);
 	void GenerateLandScapeCollision(const ALandscapeProxy* const landscape);
+	void GenerateSplineMeshCollision(const ALandscapeSplineActor* const splineActor);
 	void CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMeshComponent> staticComponent);
 
 	bool m_propertyChanged;

@@ -22,7 +22,9 @@
 #include "NewtonSceneActor.h"
 #include "EngineUtils.h"
 #include "LandscapeInfo.h"
+#include "LandscapeSplineActor.h"
 #include "LandscapeStreamingProxy.h"
+#include "Components\SplineMeshComponent.h"
 #include "LandscapeHeightfieldCollisionComponent.h"
 
 #include "NewtonCollision.h"
@@ -80,11 +82,6 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			const UBodySetup* const bodySetup = staticMesh->GetBodySetup();
 			check(bodySetup);
 			
-			//if (staticMesh->GetFName() == "Door_01_L")
-			//{
-			//	staticMesh->GetFName();
-			//}
-
 			const FKAggregateGeom& aggGeom = bodySetup->AggGeom;
 			auto AddComponent = [this, staticComponent, collection](UNewtonCollision* const childComp)
 			{
@@ -92,7 +89,6 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 				check(IsValid(childComp));
 				FinishAddComponent(childComp, false, FTransform());
 				AddInstanceComponent(childComp);
-				//childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
 				childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 				childComp->InitStaticMeshCompoment(staticComponent);
 				childComp->MarkRenderDynamicDataDirty();
@@ -150,7 +146,6 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 			UNewtonCollisionPolygonalMesh* const childComp = Cast<UNewtonCollisionPolygonalMesh>(AddComponentByClass(UNewtonCollisionPolygonalMesh::StaticClass(), false, FTransform(), true));
 			FinishAddComponent(childComp, false, FTransform());
 			AddInstanceComponent(childComp);
-			//childComp->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
 			childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 			childComp->InitStaticMeshCompoment(staticComponent);
 			childComp->MarkRenderDynamicDataDirty();
@@ -193,14 +188,10 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 
 void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
 {
-	// fucking unreal derrailed this code again, they now use ULandscapeInfo intead of an array of tiles.
-	//const TArray<TObjectPtr<ULandscapeHeightfieldCollisionComponent>>& landScapeTiles = landscapeProxy->CollisionComponents;
-	//for (ndInt32 i = 0; i < landScapeTiles.Num(); ++i)
 	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
 	check(info);
 	for (TMap<FIntPoint, ULandscapeHeightfieldCollisionComponent*>::TIterator it (info->XYtoCollisionComponentMap.CreateIterator()); it; ++it)
 	{
-	//	const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = landScapeTiles[i];
 		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = it->Value;
 		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
 		FinishAddComponent(collisionTile, false, FTransform());
@@ -211,6 +202,31 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 		collisionTile->MarkRenderDynamicDataDirty();
 		collisionTile->NotifyMeshUpdated();
 	}
+}
+
+void ANewtonSceneActor::GenerateSplineMeshCollision(const ALandscapeSplineActor* const splineActor)
+{
+	UNewtonCollisionCollection* const collection = FindComponentByClass<UNewtonCollisionCollection>();
+	check(collection);
+
+	UNewtonCollisionPolygonalMesh* const childComp = Cast<UNewtonCollisionPolygonalMesh>(AddComponentByClass(UNewtonCollisionPolygonalMesh::StaticClass(), false, FTransform(), true));
+	FinishAddComponent(childComp, false, FTransform());
+	AddInstanceComponent(childComp);
+	childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
+
+	void* const handle = childComp->BeghinSplineMesh(splineActor->GetRootComponent());
+	for (TSet<UActorComponent*>::TConstIterator it(splineActor->GetComponents().CreateConstIterator()); it; ++it)
+	{
+		const USplineMeshComponent* const splineMesh = Cast<USplineMeshComponent>(*it);
+		if (splineMesh)
+		{
+			childComp->AddSplineMesh(handle, splineMesh);
+		}
+	}
+	childComp->EndSplineMesh(handle);
+
+	childComp->MarkRenderDynamicDataDirty();
+	childComp->NotifyMeshUpdated();
 }
 
 void ANewtonSceneActor::ApplyPropertyChanges()
@@ -246,7 +262,6 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 		return;
 	}
 
-	//staticSceneBody->RemoveAllCollisions();
 	if (FindComponentByClass<UNewtonCollisionCollection>())
 	{
 		UNewtonCollisionCollection* const collection = FindComponentByClass<UNewtonCollisionCollection>();
@@ -275,7 +290,8 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	const UWorld* const world = GetWorld();
 	const FString key(folder.GetPath().ToString());
 
-	ndArray<AActor*> landScapesList;
+	ndArray<const ALandscapeProxy*> landScapesActors;
+	ndArray<const ALandscapeSplineActor*> splineActors;
 	ndTree<TObjectPtr<USceneComponent>, const UStaticMeshComponent*> staticList;
 	for (TActorIterator<AActor> actorItr(world); actorItr; ++actorItr)
 	{
@@ -283,47 +299,45 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 
 		if (actor != this)
 		{
-			const FString key1(actor->GetFolder().ToString());
-			int index = key1.Find(key);
-			if (index == 0)
+			const ALandscapeSplineActor* const spline = Cast<ALandscapeSplineActor>(actor);
+			if (spline)
 			{
-				if (Cast<ALandscapeStreamingProxy>(actor))
+				splineActors.PushBack(spline);
+			}
+			else 
+			{
+				const FString key1(actor->GetFolder().ToString());
+				int index = key1.Find(key);
+				if (index == 0)
 				{
-					const ALandscapeStreamingProxy* const streamingProxy = Cast<ALandscapeStreamingProxy>(actor);
-					const AActor* const parent = streamingProxy->GetSceneOutlinerParent();
-					const FString streamingKey(parent->GetFolder().ToString());
-					index = streamingKey.Find(key);
-					if (index == 0)
+					if (Cast<ALandscapeProxy>(actor))
 					{
-						//actorList.PushBack(actor);
-						landScapesList.PushBack(actor);
-					}
-				}
-				else
-				{
-					check(!stack.GetCount());
-					stack.PushBack(actor->GetRootComponent());
-					while (stack.GetCount())
-					{
-						TObjectPtr<USceneComponent> component(stack.Pop());
-						if (!filter.Find(component.Get()))
-						{
-							const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(component.Get());
-							const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
-							if (staticMesh)
-							{
-								//if (staticMesh->GetFName() == TEXT("Door_01_L"))
-								//{
-								//	index = 1;
-								//}
-								staticList.Insert(component, staticComponent);
-							}
-						}
+						const ALandscapeProxy* const landscape = Cast<ALandscapeProxy>(actor);
+						landScapesActors.PushBack(landscape);
 
-						const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-						for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+					}
+					else
+					{
+						check(!stack.GetCount());
+						stack.PushBack(actor->GetRootComponent());
+						while (stack.GetCount())
 						{
-							stack.PushBack(childrenComp[i].Get());
+							TObjectPtr<USceneComponent> component(stack.Pop());
+							if (!filter.Find(component.Get()))
+							{
+								const UStaticMeshComponent* const staticComponent = Cast<UStaticMeshComponent>(component.Get());
+								const UStaticMesh* const staticMesh = staticComponent->GetStaticMesh().Get();
+								if (staticMesh)
+								{
+									staticList.Insert(component, staticComponent);
+								}
+							}
+
+							const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
+							for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+							{
+								stack.PushBack(childrenComp[i].Get());
+							}
 						}
 					}
 				}
@@ -338,11 +352,16 @@ void ANewtonSceneActor::ApplyPropertyChanges()
 	collection->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
 	collection->MarkRenderDynamicDataDirty();
 
-	for (ndInt32 i = ndInt32(landScapesList.GetCount()) - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(landScapesActors.GetCount()) - 1; i >= 0; --i)
 	{
-		AActor* const sceneActor = landScapesList[i];
-		const ALandscapeProxy* const landscapeProxy = Cast<ALandscapeProxy>(sceneActor);
-		GenerateLandScapeCollision(landscapeProxy);
+		const ALandscapeProxy* const landScape = landScapesActors[i];
+		GenerateLandScapeCollision(landScape);
+	}
+
+	for (ndInt32 i = ndInt32(splineActors.GetCount()) - 1; i >= 0; --i)
+	{
+		const ALandscapeSplineActor* const spline = splineActors[i];
+		GenerateSplineMeshCollision(spline);
 	}
 
 	ndTree<TObjectPtr<USceneComponent>, const UStaticMeshComponent*>::Iterator it(staticList);

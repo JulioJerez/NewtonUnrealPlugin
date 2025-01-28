@@ -25,6 +25,7 @@
 #include "NewtonCollision.h"
 #include "NewtonCollisionPolygonalMesh.generated.h"
 
+class USplineMeshComponent;
 
 /**
  * 
@@ -39,6 +40,11 @@ class UNewtonCollisionPolygonalMesh : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionPolygonalMesh();
+
+	void* BeghinSplineMesh(const USceneComponent* const rootComponent);
+	void AddSplineMesh(void* const handle, const USplineMeshComponent* const splineMesh);
+	void EndSplineMesh(void* const handle);
+
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
 	protected:

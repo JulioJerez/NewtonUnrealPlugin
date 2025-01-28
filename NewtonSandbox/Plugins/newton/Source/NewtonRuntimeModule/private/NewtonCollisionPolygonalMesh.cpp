@@ -20,8 +20,10 @@
 */
 
 #include "NewtonCollisionPolygonalMesh.h"
+#include "Components/SplineMeshComponent.h"
 
-#include "NewtonRuntimeModule.h"
+//#include "NewtonRuntimeModule.h"
+#include "NewtonCommons.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 class UNewtonCollisionPolygonalMesh::ndShapeStatic : public ndShapeStatic_bvh
@@ -165,9 +167,9 @@ void UNewtonCollisionPolygonalMesh::InitStaticMeshCompoment(const USceneComponen
 			ndInt32 i1 = collisionData.Indices[i].v1;
 			ndInt32 i2 = collisionData.Indices[i].v2;
 	
-			const FVector3f p0(collisionData.Vertices[i0]);
-			const FVector3f p1(collisionData.Vertices[i1]);
-			const FVector3f p2(collisionData.Vertices[i2]);
+			const FVector p0(collisionData.Vertices[i0]);
+			const FVector p1(collisionData.Vertices[i1]);
+			const FVector p2(collisionData.Vertices[i2]);
 			const ndVector q0(ndFloat32(p0.X), ndFloat32(p0.Y), ndFloat32(p0.Z), ndFloat32(0.0f));
 			const ndVector q1(ndFloat32(p1.X), ndFloat32(p1.Y), ndFloat32(p1.Z), ndFloat32(0.0f));
 			const ndVector q2(ndFloat32(p2.X), ndFloat32(p2.Y), ndFloat32(p2.Z), ndFloat32(0.0f));
@@ -185,6 +187,81 @@ void UNewtonCollisionPolygonalMesh::InitStaticMeshCompoment(const USceneComponen
 	ndShapeStatic* const polyTree= new ndShapeStatic(meshBuilder, this);
 	polyTree->ScanMesh();
 	delete polyTree;
+}
+
+void* UNewtonCollisionPolygonalMesh::BeghinSplineMesh(const USceneComponent* const meshComponent)
+{
+	SetTransform(meshComponent);
+	ndPolygonSoupBuilder* const builder = new ndPolygonSoupBuilder;
+	builder->Begin();
+	return builder;
+}
+
+void UNewtonCollisionPolygonalMesh::AddSplineMesh(void* const handle, const USplineMeshComponent* const splineMesh)
+{
+	FTriMeshCollisionData collisionData;
+	UStaticMesh* const staticMesh = splineMesh->GetStaticMesh().Get();
+	bool data = staticMesh->GetPhysicsTriMeshData(&collisionData, true);
+	if (data)
+	{
+		ndVector face[8];
+		ndArray<FVector> vertices;
+
+		ndPolygonSoupBuilder* const builder = (ndPolygonSoupBuilder*)handle;
+		const FVector uScale(splineMesh->GetComponentTransform().GetScale3D());
+		const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
+		const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
+		const FTransform localTranform(splineMesh->GetRelativeTransform());
+
+		const FSplineMeshParams& splineParams = splineMesh->SplineParams;
+		TEnumAsByte<ESplineMeshAxis::Type> forwardAxis (splineMesh->ForwardAxis);
+		
+		for (ndInt32 i = 0; i < collisionData.Vertices.Num(); ++i)
+		{
+			FVector point(collisionData.Vertices[i]);
+			double& axisRef = splineMesh->GetAxisValueRef(point, forwardAxis);
+			float dist = float(axisRef);
+			point[forwardAxis] = 0.0f;
+			const FTransform sliceTransform(splineMesh->CalcSliceTransform(dist));
+		
+			const FVector splinePoint(sliceTransform.TransformPosition(point));
+			const FVector worldPoint(localTranform.TransformPosition(splinePoint));
+			vertices.PushBack(worldPoint);
+		}
+		
+		for (ndInt32 i = collisionData.Indices.Num() - 1; i >= 0; --i)
+		{
+			ndInt32 i0 = collisionData.Indices[i].v0;
+			ndInt32 i1 = collisionData.Indices[i].v1;
+			ndInt32 i2 = collisionData.Indices[i].v2;
+		
+			const FVector p0(vertices[i0]);
+			const FVector p1(vertices[i1]);
+			const FVector p2(vertices[i2]);
+			const ndVector q0(ndFloat32(p0.X), ndFloat32(p0.Y), ndFloat32(p0.Z), ndFloat32(0.0f));
+			const ndVector q1(ndFloat32(p1.X), ndFloat32(p1.Y), ndFloat32(p1.Z), ndFloat32(0.0f));
+			const ndVector q2(ndFloat32(p2.X), ndFloat32(p2.Y), ndFloat32(p2.Z), ndFloat32(0.0f));
+		
+			face[0] = q0 * bakedScale;
+			face[1] = q1 * bakedScale;
+			face[2] = q2 * bakedScale;
+		
+			//for now MaterialIndex = 0
+			ndInt32 materialIndex = 0;
+			builder->AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
+		}
+	}
+}
+
+void UNewtonCollisionPolygonalMesh::EndSplineMesh(void* const handle)
+{
+	ndPolygonSoupBuilder* const builder = (ndPolygonSoupBuilder*)handle;
+	builder->End(true);
+
+	ndShapeStatic* const polyTree = new ndShapeStatic(*builder, this);
+	polyTree->ScanMesh();
+
+	delete builder;
 }
 
 void UNewtonCollisionPolygonalMesh::ApplyPropertyChanges()
