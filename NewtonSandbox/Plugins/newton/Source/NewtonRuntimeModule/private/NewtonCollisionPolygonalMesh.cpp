@@ -116,7 +116,7 @@ ndShape* UNewtonCollisionPolygonalMesh::CreateShape() const
 	}
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
-	ndVector face[8];
+	ndVector face[3];
 	for (ndInt32 i =  m_indexData.Num() - 3; i >= 0; i -= 3)
 	{
 		ndInt32 i0 = m_indexData[i + 0];
@@ -148,19 +148,18 @@ void UNewtonCollisionPolygonalMesh::InitStaticMeshCompoment(const USceneComponen
 	check(staticMeshComponent);
 	UStaticMesh* const staticMesh = staticMeshComponent->GetStaticMesh().Get();
 
-	ndVector face[8];
-	
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
-	
-	const FVector uScale(GetComponentTransform().GetScale3D());
-	const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
-	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
 	
 	FTriMeshCollisionData collisionData;
 	bool data = staticMesh->GetPhysicsTriMeshData(&collisionData, true);
 	if (data)
 	{
+		const FVector uScale(GetComponentTransform().GetScale3D());
+		const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
+		const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
+	
+		ndVector face[3];
 		for (ndInt32 i =  collisionData.Indices.Num() - 1; i >= 0; --i)
 		{
 			ndInt32 i0 = collisionData.Indices[i].v0;
@@ -204,7 +203,7 @@ void UNewtonCollisionPolygonalMesh::AddSplineMesh(void* const handle, const USpl
 	bool data = staticMesh->GetPhysicsTriMeshData(&collisionData, true);
 	if (data)
 	{
-		ndVector face[8];
+		ndVector face[3];
 		ndArray<FVector> vertices;
 
 		ndPolygonSoupBuilder* const builder = (ndPolygonSoupBuilder*)handle;
