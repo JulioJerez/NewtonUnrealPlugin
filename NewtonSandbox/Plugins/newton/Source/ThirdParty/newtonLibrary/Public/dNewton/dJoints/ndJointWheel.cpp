@@ -30,7 +30,6 @@ ndJointWheel::ndJointWheel()
 
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
-	//,ndJointBilateralConstraint::ndIkInterface()
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
 	,m_posit(ndFloat32 (0.0f))
@@ -57,12 +56,37 @@ void ndJointWheel::SetInfo(const ndWheelDescriptor& info)
 	m_info = info;
 }
 
-void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
+ndFloat32 ndJointWheel::GetPosit() const
+{
+	return m_posit;
+}
+
+ndFloat32 ndJointWheel::SetSpeed() const
+{
+	return m_speed;
+}
+
+ndFloat32 ndJointWheel::GetBreak() const
+{
+	return m_normalizedBrake;
+}
+
+ndFloat32 ndJointWheel::GetSteering() const
+{
+	return m_normalidedSteering;
+}
+
+ndFloat32 ndJointWheel::GetHandBreak() const
+{
+	return m_normalizedHandBrake;
+}
+
+void ndJointWheel::SetBreak(ndFloat32 normalizedBrake)
 {
 	m_normalizedBrake = ndClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
 }
 
-void ndJointWheel::SetHandBrake(ndFloat32 normalizedBrake)
+void ndJointWheel::SetHandBreak(ndFloat32 normalizedBrake)
 {
 	m_normalizedHandBrake = ndClamp(normalizedBrake, ndFloat32(0.0f), ndFloat32(1.0f));
 }
@@ -80,7 +104,7 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-	const ndFloat32 distance = ndClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
+	const ndFloat32 distance = ndClamp(localRelPosit.m_y, m_info.m_lowerStop, m_info.m_upperStop);
 
 	const ndFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
 	ndMatrix newTireMatrix(ndPitchMatrix(spinAngle) * chassisMatrix);
@@ -98,8 +122,31 @@ ndMatrix ndJointWheel::CalculateBaseFrame() const
 ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const
 {
 	ndMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
-	matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
+	//matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
+	matrix.m_posit += matrix.m_up.Scale(m_info.m_upperStop);
 	return matrix;
+}
+
+void ndJointWheel::DebugJoint(ndConstraintDebugCallback& context) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	//draw reference frame
+	context.DrawFrame(matrix1);
+
+	// draw upper bumper
+	ndMatrix upperBumberMatrix(CalculateUpperBumperMatrix());
+	ndMatrix tireBaseFrame(CalculateBaseFrame());
+	context.DrawFrame(tireBaseFrame);
+
+	// show tire center of mass;
+	ndBodyKinematic* const tireBody = GetBody0()->GetAsBodyKinematic();
+	ndMatrix tireFrame(tireBody->GetMatrix());
+	context.DrawFrame(tireFrame);
+	upperBumberMatrix.m_posit = tireFrame.m_posit;
+	context.DrawFrame(upperBumberMatrix);
 }
 
 void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
@@ -162,14 +209,16 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// add suspension limits alone the vertical axis 
 	const ndFloat32 x = m_posit + m_speed * desc.m_timestep;
-	if (x < m_info.m_upperStop)
+	//if (x < m_info.m_upperStop)
+	if (x >= m_info.m_upperStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
 		SetLowerFriction(desc, ndFloat32(0.0f));
 	}
-	else if (x > m_info.m_lowerStop)
+	//else if (x > m_info.m_lowerStop)
+	else if (x <= m_info.m_lowerStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);

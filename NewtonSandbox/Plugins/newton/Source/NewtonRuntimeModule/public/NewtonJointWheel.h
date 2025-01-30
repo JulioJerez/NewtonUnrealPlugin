@@ -42,13 +42,39 @@ class UNewtonJointWheel : public UNewtonJoint
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	float GetSteering() const;
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	float GetBreak() const;
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	float GetHandBreak() const;
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	void SetSteering(float parametricAngle);
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	void SetBreak(float parametricBreak);
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	void SetHandBreak(float parametricBreak);
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	float GetSuspensionPosit() const;
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
+	float GetSuspensionSpeed() const;
+
+
+
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -1.0f, ClampMax = 1000.0f))
 	float Radio;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 100.0f, ClampMax = 100000.0f))
 	float SpringK;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f, ClampMax = 1000.0f))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 1000.0f))
 	float DamperC;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -0.0f, ClampMax = 50.0f))
