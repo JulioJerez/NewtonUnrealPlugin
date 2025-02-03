@@ -158,7 +158,7 @@ void UNewtonCollisionPolygonalMesh::InitStaticMeshCompoment(const USceneComponen
 		const FVector uScale(GetComponentTransform().GetScale3D());
 		const ndVector scale(ndFloat32(uScale.X), ndFloat32(uScale.Y), ndFloat32(uScale.Z), ndFloat32(0.0f));
 		const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
-	
+
 		ndVector face[3];
 		for (ndInt32 i =  collisionData.Indices.Num() - 1; i >= 0; --i)
 		{

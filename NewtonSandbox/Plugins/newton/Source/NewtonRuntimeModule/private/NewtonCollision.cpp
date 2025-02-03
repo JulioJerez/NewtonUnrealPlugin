@@ -237,6 +237,10 @@ void UNewtonCollision::BuildNewtonShape()
 		if (!shape)
 		{
 			shape = CreateShape();
+			int xxxx1 = sizeof(ndShapeStaticMesh);
+			int xxxx2 = sizeof(ndShapeHeightfield);
+
+			check(ndMemory::CheckMemory(shape));
 			plugin->AddShape(shape, m_hash);
 		}
 		m_shape = (ndShape*)shape->AddRef();
@@ -287,7 +291,7 @@ ndShapeInstance* UNewtonCollision::CreateBodyInstanceShape(const ndMatrix& bodyM
 	return instance;
 }
 
-ndVector UNewtonCollision::GetVolumePosition(const ndMatrix& bodyMatrix) const
+FVector4 UNewtonCollision::GetVolumePosition(const ndMatrix& bodyMatrix) const
 {
 	ndVector posit(0.0f);
 	ndShapeInstance* const instance = CreateBodyInstanceShape(bodyMatrix);
@@ -299,7 +303,8 @@ ndVector UNewtonCollision::GetVolumePosition(const ndMatrix& bodyMatrix) const
 		posit.m_w = instance->GetVolume();
 		delete instance;
 	}
-	return posit;
+	//return posit;
+	return FVector4(posit.m_x, posit.m_y, posit.m_z, posit.m_w);
 }
 
 bool UNewtonCollision::GetDebugMode() const

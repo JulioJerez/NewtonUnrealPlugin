@@ -239,9 +239,10 @@ ndShapeInstance* UNewtonCollisionConvexApproximate::CreateInstanceShape() const
 	return instance;
 }
 
-ndVector UNewtonCollisionConvexApproximate::GetVolumePosition(const ndMatrix& bodyMatrix) const
+//ndVector UNewtonCollisionConvexApproximate::GetVolumePosition(const ndMatrix& bodyMatrix) const
+FVector4 UNewtonCollisionConvexApproximate::GetVolumePosition(const ndMatrix& bodyMatrix) const
 {
-	ndVector posit(0.0f);
+	ndVector posit (0.0f);
 	ndShapeInstance* const instance = CreateInstanceShape();
 	if (instance)
 	{
@@ -253,7 +254,8 @@ ndVector UNewtonCollisionConvexApproximate::GetVolumePosition(const ndMatrix& bo
 		posit.m_w = instance->GetVolume();
 		delete instance;
 	}
-	return posit;
+	//return posit;
+	return FVector4(posit.m_x, posit.m_y, posit.m_z, posit.m_w);
 }
 
 void UNewtonCollisionConvexApproximate::ApplyPropertyChanges()

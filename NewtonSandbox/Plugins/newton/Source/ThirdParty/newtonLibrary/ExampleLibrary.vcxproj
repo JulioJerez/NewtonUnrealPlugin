@@ -34,6 +34,7 @@
     <ClCompile Include="Public\dCollision\ndConstraint.cpp" />
     <ClCompile Include="Public\dCollision\ndContact.cpp" />
     <ClCompile Include="Public\dCollision\ndContactArray.cpp" />
+    <ClCompile Include="Public\dCollision\ndContactNotify.cpp" />
     <ClCompile Include="Public\dCollision\ndContactSolver.cpp" />
     <ClCompile Include="Public\dCollision\ndConvexCastNotify.cpp" />
     <ClCompile Include="Public\dCollision\ndJointBilateralConstraint.cpp" />
@@ -464,6 +465,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

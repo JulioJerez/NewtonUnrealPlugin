@@ -46,7 +46,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonCollision : public UDynamicMeshComponent
 	// Sets default values for this component's properties
 	UNewtonCollision();
 	virtual void SetWireFrameColor(const FLinearColor& color);
-	virtual ndVector GetVolumePosition(const ndMatrix& bodyMatrix) const;
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent);
 
 	protected:
@@ -69,8 +68,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonCollision : public UDynamicMeshComponent
 	virtual long long CalculateHash() const;
 	virtual ndShapeInstance* CreateInstanceShape() const;
 	virtual UNewtonRigidBody* GetRigidBodyParent() const;
+	//virtual ndVector GetVolumePosition(const ndMatrix& bodyMatrix) const;
+	virtual FVector4 GetVolumePosition(const ndMatrix& bodyMatrix) const;
 	virtual void SetTransform(const USceneComponent* const meshComponent);
 	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const;
+	//virtual void GetVolumePosition(const ndMatrix& bodyMatrix, ndVector& positVolume) const;
 
 	//public:	
 	long long m_hash;
