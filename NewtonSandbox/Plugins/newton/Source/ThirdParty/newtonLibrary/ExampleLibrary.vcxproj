@@ -420,6 +420,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

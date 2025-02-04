@@ -61,7 +61,7 @@ struct FNewtonRaycastResult
 	float HitParam;
 };
 
-UCLASS( ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent) )
 class NEWTONRUNTIMEMODULE_API ANewtonWorldActor : public AActor
 {
 	GENERATED_BODY()
@@ -84,16 +84,16 @@ class NEWTONRUNTIMEMODULE_API ANewtonWorldActor : public AActor
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	bool RayCast(struct FNewtonRaycastResult& result, const FVector& origin, const FVector& target, bool filterStatic) const;
 
-	UPROPERTY(EditAnywhere, Category=Newton)
+	UPROPERTY(EditAnywhere, Category = Newton)
 	float UpdateRate;
 
-	UPROPERTY(EditAnywhere, Category=Newton, meta = (ClampMin = 2, ClampMax = 8))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 2, ClampMax = 8))
 	int SolverPasses;
 
-	UPROPERTY(EditAnywhere, Category=Newton, meta = (ClampMin = 4, ClampMax = 32))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 4, ClampMax = 32))
 	int SolverIterations;
 
-	UPROPERTY(EditAnywhere, Category=Newton, meta = (ClampMin = 1, ClampMax = 32))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 32))
 	int ParallelThreads;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta=(ValidEnumValues="scalar, soaSimd"))
@@ -102,10 +102,10 @@ class NEWTONRUNTIMEMODULE_API ANewtonWorldActor : public AActor
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool AutoSleepMode;
 
-	UPROPERTY(EditAnywhere, Category=Newton)
+	UPROPERTY(EditAnywhere, Category = Newton)
 	bool ClearDebug;
 
-	UPROPERTY(EditAnywhere, Category=Newton)
+	UPROPERTY(EditAnywhere, Category = Newton)
 	bool ShowDebug;
 
 	private:
