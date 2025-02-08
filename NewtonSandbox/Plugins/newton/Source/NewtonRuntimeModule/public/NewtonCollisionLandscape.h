@@ -42,6 +42,7 @@ class UNewtonCollisionLandscape : public UNewtonCollision
 	public:
 	// Sets default values for this component's properties
 	UNewtonCollisionLandscape();
+	virtual void InitStaticMeshCompoment(const ALandscapeProxy* const landscapeProxy);
 	virtual void InitStaticMeshCompoment(const USceneComponent* const meshComponent) override;
 
 	protected:
@@ -53,10 +54,12 @@ class UNewtonCollisionLandscape : public UNewtonCollision
 	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;;
 
 	TArray<char> m_materials;
-	TArray<float> m_heightfield;
+	//TArray<float> m_heightfield;
+	TArray<unsigned short> m_heightfield;
 	float m_scale_x;
 	float m_scale_y;
 	float m_scale_z;
+	float m_minHeight;
 	int m_tileSize_x;
 	int m_tileSize_y;
 };

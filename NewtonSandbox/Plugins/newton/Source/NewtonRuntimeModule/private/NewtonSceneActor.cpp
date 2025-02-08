@@ -197,23 +197,36 @@ void ANewtonSceneActor::CreateCollisionFromUnrealPrimitive(TObjectPtr<UStaticMes
 
 void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const landscapeProxy)
 {
-	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
-	check(info);
 	UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(FindComponentByClass<UNewtonCollisionCollection>());
 	check(collection);
+
+#if 0
+	check(landscapeProxy->GetLandscapeInfo());
+	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
 	for (TMap<FIntPoint, ULandscapeHeightfieldCollisionComponent*>::TIterator it (info->XYtoCollisionComponentMap.CreateIterator()); it; ++it)
 	{
 		const TObjectPtr<ULandscapeHeightfieldCollisionComponent>& tile = it->Value;
 		UNewtonCollisionLandscape* const collisionTile = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
 		FinishAddComponent(collisionTile, false, FTransform());
 		AddInstanceComponent(collisionTile);
-		//collisionTile->AttachToComponent(RootBody, FAttachmentTransformRules::KeepRelativeTransform);
 		collisionTile->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
 	
 		collisionTile->InitStaticMeshCompoment(tile);
 		collisionTile->MarkRenderDynamicDataDirty();
 		collisionTile->NotifyMeshUpdated();
 	}
+#else
+
+	UNewtonCollisionLandscape* const childComp = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
+	FinishAddComponent(childComp, false, FTransform());
+	AddInstanceComponent(childComp);
+	childComp->AttachToComponent(collection, FAttachmentTransformRules::KeepRelativeTransform);
+
+	childComp->InitStaticMeshCompoment(landscapeProxy);
+
+	childComp->MarkRenderDynamicDataDirty();
+	childComp->NotifyMeshUpdated();
+#endif
 }
 
 void ANewtonSceneActor::GenerateSplineMeshCollision(const ALandscapeSplineActor* const splineActor)
