@@ -200,7 +200,7 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 	UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(FindComponentByClass<UNewtonCollisionCollection>());
 	check(collection);
 
-#if 0
+#if 1
 	check(landscapeProxy->GetLandscapeInfo());
 	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
 	for (TMap<FIntPoint, ULandscapeHeightfieldCollisionComponent*>::TIterator it (info->XYtoCollisionComponentMap.CreateIterator()); it; ++it)

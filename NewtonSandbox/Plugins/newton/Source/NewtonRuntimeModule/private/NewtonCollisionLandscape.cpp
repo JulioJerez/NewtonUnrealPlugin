@@ -55,64 +55,76 @@ void UNewtonCollisionLandscape::Serialize(FArchive& ar)
 
 void UNewtonCollisionLandscape::InitStaticMeshCompoment(const USceneComponent* const meshComponent)
 {
-	check(0);
-	//SetTransform(meshComponent);
-	//
-	//const ULandscapeHeightfieldCollisionComponent* const tile = Cast<ULandscapeHeightfieldCollisionComponent>(meshComponent);
-	//check(tile);
-	//
-	//const ULandscapeHeightfieldCollisionComponent::FHeightfieldGeometryRef* const heightfieldRef = tile->HeightfieldRef;
-	//const Chaos::FHeightField* const mapData = heightfieldRef->HeightfieldGeometry;
-	//check(mapData);
-	//const Chaos::FHeightField::FData<uint16>& elevationData = mapData->GeomData;
-	//
-	//const Chaos::FVec3 elevationScale(elevationData.Scale);
-	//// this is not a bug, y and z are swapped after the mapping
-	//ndFloat32 xScale = elevationScale[0] * UNREAL_INV_UNIT_SYSTEM;
-	//ndFloat32 zScale = elevationScale[1] * UNREAL_INV_UNIT_SYSTEM;
-	//
-	//ndShapeHeightfield* const heightfield = new ndShapeHeightfield(
-	//	ndInt32(mapData->GetNumCols()), ndInt32(mapData->GetNumRows()),
-	//	ndShapeHeightfield::m_normalDiagonals, xScale, zScale);
-	//
-	//ndReal minValue = elevationData.MinValue;
-	//ndReal highScale = elevationData.HeightPerUnit;
-	//
-	//const ndShape* const shape = heightfield;
-	//const ndShapeInfo info(shape->GetShapeInfo());
-	//ndReal* const dstHeight = info.m_heightfield.m_elevation;
-	//ndInt8* const attributes = info.m_heightfield.m_atributes;
-	//
-	//ndReal yScale = ndReal(elevationScale[2] * UNREAL_INV_UNIT_SYSTEM);
-	//
-	//ndInt32 dstRow = 0;
-	//ndInt32 srcRow = (ndInt32(elevationData.NumRows) - 1) * elevationData.NumCols;
-	//for (ndInt32 row = ndInt32(elevationData.NumRows) - 1; row >= 0; --row)
-	//{
-	//	for (ndInt32 colum = 0; colum < elevationData.NumCols; ++colum)
-	//	{
-	//		ndReal h = minValue + ndReal(elevationData.Heights[srcRow + colum]) * highScale;
-	//		attributes[dstRow + colum] = 0;
-	//		dstHeight[dstRow + colum] = h * yScale;
-	//	}
-	//	srcRow -= elevationData.NumCols;
-	//	dstRow += elevationData.NumCols;
-	//}
-	//
+	SetTransform(meshComponent);
+	
+	const ULandscapeHeightfieldCollisionComponent* const tile = Cast<ULandscapeHeightfieldCollisionComponent>(meshComponent);
+	check(tile);
+	
+	const ULandscapeHeightfieldCollisionComponent::FHeightfieldGeometryRef* const heightfieldRef = tile->HeightfieldRef;
+	const Chaos::FHeightField* const mapData = heightfieldRef->HeightfieldGeometry;
+	check(mapData);
+	const Chaos::FHeightField::FData<uint16>& elevationData = mapData->GeomData;
+	
+	const Chaos::FVec3 elevationScale(elevationData.Scale);
+	// this is not a bug, y and z are swapped after the mapping
+	ndFloat32 xScale = elevationScale[0] * UNREAL_INV_UNIT_SYSTEM;
+	ndFloat32 zScale = elevationScale[1] * UNREAL_INV_UNIT_SYSTEM;
+	
+	ndShapeHeightfield* const heightfield = new ndShapeHeightfield(
+		ndInt32(mapData->GetNumCols()), ndInt32(mapData->GetNumRows()),
+		ndShapeHeightfield::m_normalDiagonals, xScale, zScale);
+	
+	ndReal minValue = elevationData.MinValue;
+	ndReal highScale = elevationData.HeightPerUnit;
+	
+	const ndShape* const shape = heightfield;
+	const ndShapeInfo info(shape->GetShapeInfo());
+	ndReal* const dstHeight = info.m_heightfield.m_elevation;
+	ndInt8* const attributes = info.m_heightfield.m_atributes;
+	
+	ndReal yScale = ndReal(elevationScale[2] * UNREAL_INV_UNIT_SYSTEM);
+	
+	ndInt32 dstRow = 0;
+	ndInt32 srcRow = (ndInt32(elevationData.NumRows) - 1) * elevationData.NumCols;
+
+	ndReal minHeight = ndReal(1.0e10f);
+	ndReal maxHeight = ndReal(-1.0e10f);
+	for (ndInt32 row = ndInt32(elevationData.NumRows) - 1; row >= 0; --row)
+	{
+		for (ndInt32 colum = 0; colum < elevationData.NumCols; ++colum)
+		{
+			ndReal h = minValue + ndReal(elevationData.Heights[srcRow + colum]) * highScale;
+			attributes[dstRow + colum] = 0;
+			h *= yScale;
+			dstHeight[dstRow + colum] = h;
+			minHeight = ndMin(minHeight, h);
+			maxHeight = ndMax(maxHeight, h);
+
+		}
+		srcRow -= elevationData.NumCols;
+		dstRow += elevationData.NumCols;
+	}
+	
 	//m_scale_z = 1.0f;
-	//m_scale_x = info.m_heightfield.m_horizonalScale_x;
-	//m_scale_y = info.m_heightfield.m_horizonalScale_z;
-	//m_tileSize_x = info.m_heightfield.m_width;
-	//m_tileSize_y = info.m_heightfield.m_height;
-	//
-	//ndInt32 size = info.m_heightfield.m_width * info.m_heightfield.m_height;
-	//for (ndInt32 i = 0; i < size; ++i)
-	//{
+	m_minHeight = minHeight;
+	m_scale_z = (maxHeight - minHeight + 1.0f);
+	m_scale_x = info.m_heightfield.m_horizonalScale_x;
+	m_scale_y = info.m_heightfield.m_horizonalScale_z;
+	m_tileSize_x = info.m_heightfield.m_width;
+	m_tileSize_y = info.m_heightfield.m_height;
+
+	ndInt32 size = m_tileSize_x * m_tileSize_y;
+	ndReal invScale = ndReal(256.0f * 256.0f - 1.0f)/ m_scale_z;
+
+	for (ndInt32 i = 0; i < size; ++i)
+	{
 	//	m_heightfield.Push(dstHeight[i]);
-	//	m_materials.Push(attributes[i]);
-	//}
-	//
-	//delete heightfield;
+		m_materials.Push(attributes[i]);
+		ndFloat32 x = (dstHeight[i] - m_minHeight) * invScale;
+		m_heightfield.Push(unsigned short(x));
+	}
+	
+	delete heightfield;
 }
 
 void UNewtonCollisionLandscape::InitStaticMeshCompoment(const ALandscapeProxy* const landscapeProxy)
@@ -220,7 +232,7 @@ void UNewtonCollisionLandscape::InitStaticMeshCompoment(const ALandscapeProxy* c
 	}
 	m_minHeight = minHeight;
 	m_scale_z = (maxHeight - minHeight + 1.0f);
-	ndReal invScale = ndReal (256.0f * 256.0f / m_scale_z);
+	ndReal invScale = ndReal (256.0f * 256.0f - 1.0f) / m_scale_z;
 
 	for (ndInt32 i = ndInt32(elevations.GetCount()) - 1; i >= 0; --i)
 	{
@@ -258,14 +270,14 @@ ndShape* UNewtonCollisionLandscape::CreateShape() const
 	
 	ndShapeHeightfield* const shape = new ndShapeHeightfield(
 		m_tileSize_x, m_tileSize_y,
-		ndShapeHeightfield::m_normalDiagonals, m_scale_x, m_scale_z);
+		ndShapeHeightfield::m_normalDiagonals, m_scale_x, m_scale_y);
 	
 	const ndShapeInfo info(((ndShape*)shape)->GetShapeInfo());
 	ndInt8* const attributes = info.m_heightfield.m_atributes;
 	ndReal* const dstHeigh = info.m_heightfield.m_elevation;
 	
 	ndInt32 size = m_tileSize_x * m_tileSize_y;
-	ndReal scale = m_scale_z / ndReal(256.0f * 256.0f);
+	ndReal scale = m_scale_z / ndReal(256.0f * 256.0f - 1.0f);
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		ndReal x = ndReal(ndFloat32(m_heightfield[i]) * scale + m_minHeight);
