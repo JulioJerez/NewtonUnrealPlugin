@@ -200,7 +200,8 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 	UNewtonCollisionCollection* const collection = Cast<UNewtonCollisionCollection>(FindComponentByClass<UNewtonCollisionCollection>());
 	check(collection);
 
-#if 1
+#if 0
+	// one new collision shape 	per each tile, may have probel with edeg when rolling across tile. 
 	check(landscapeProxy->GetLandscapeInfo());
 	ULandscapeInfo* const info = landscapeProxy->GetLandscapeInfo();
 	for (TMap<FIntPoint, ULandscapeHeightfieldCollisionComponent*>::TIterator it (info->XYtoCollisionComponentMap.CreateIterator()); it; ++it)
@@ -216,7 +217,7 @@ void ANewtonSceneActor::GenerateLandScapeCollision(const ALandscapeProxy* const 
 		collisionTile->NotifyMeshUpdated();
 	}
 #else
-
+	// only collision shape for all tiles, edge have skirts
 	UNewtonCollisionLandscape* const childComp = Cast<UNewtonCollisionLandscape>(AddComponentByClass(UNewtonCollisionLandscape::StaticClass(), false, FTransform(), true));
 	FinishAddComponent(childComp, false, FTransform());
 	AddInstanceComponent(childComp);
