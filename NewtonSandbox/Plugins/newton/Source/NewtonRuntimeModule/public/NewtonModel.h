@@ -40,7 +40,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 	UNewtonModel();
 
 	virtual ndModelArticulation* CreateSubClassModel() const;
-	ndModelArticulation* CreateModel(ANewtonWorldActor* const worldActor);
+	virtual ndModelArticulation* CreateModel(ANewtonWorldActor* const worldActor);
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

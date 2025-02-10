@@ -111,11 +111,14 @@ void NewtonWorld::ApplySettings() const
 	ndWorld::ndSolverModes mode = ndWorld::ndStandardSolver;
 	switch(m_owner->SolverMode)
 	{
-		case SolverModeTypes::scalar:
+		case SolverModeTypes::Simd:
 			mode = ndWorld::ndStandardSolver;
 			break;
-		case SolverModeTypes::soaSimd:
+		case SolverModeTypes::SimdSoa:
 			mode = ndWorld::ndSimdSoaSolver;
+			break;
+		case SolverModeTypes::SimdSoaAvx:
+			mode = ndWorld::ndSimdAvx2Solver;
 			break;
 	};
 	

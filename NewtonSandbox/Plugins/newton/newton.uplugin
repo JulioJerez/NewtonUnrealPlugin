@@ -4,7 +4,7 @@
   "VersionName": "1.0",
   "Modules": [
     {
-      "Name": "NewtonEditorModule",
+      "Name": "NewtonModelModule",
       "Type": "Editor",
       "LoadingPhase": "Default"
     },

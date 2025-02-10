@@ -319,6 +319,9 @@
     <Natvis Include="Public\dCore\ndTypes.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="ndAvx2Solver.vcxproj">
+      <Project>{f3d1f323-6080-42ef-9a9a-cce5914574f5}</Project>
+    </ProjectReference>
     <ProjectReference Include="Public\thirdParty\hacd\hacd.vcxproj">
       <Project>{57eaf94c-1149-4125-8427-fba4050b9b71}</Project>
     </ProjectReference>
@@ -399,7 +402,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/dNewton/dExtensions/dAvx2;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -416,9 +419,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;_D_USE_AVX2_SOLVER;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/dNewton/dExtensions/dAvx2;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
@@ -441,7 +444,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/dNewton/dExtensions/dAvx2;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -462,12 +465,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_D_SINGLE_LIBRARY;_D_CORE_DLL;_D_NEWTON_DLL;_D_COLLISION_DLL;_D_CORE_EXPORT_DLL;_D_NEWTON_EXPORT_DLL;_D_COLLISION_EXPORT_DLL;_D_USE_AVX2_SOLVER;D_USE_FORCE_THREAD_EMULATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Public/dCore;Public/dCollision;Public/dNewton;Public/dNewton/dJoints;Public/dNewton/dIkSolver;Public/dNewton/dModels;Public/dNewton/dModels/dVehicle;Public/dNewton/dExtensions/dAvx2;Public/thirdParty/hacd/src/VHACD_Lib/inc;Public/thirdParty/hacd/src/VHACD_Lib/public</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>ndCoreStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

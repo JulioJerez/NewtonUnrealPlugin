@@ -158,27 +158,27 @@ ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
-	case m_unit:
-	{
-		return m_shape->SupportVertex(dir);
-	}
-	case m_uniform:
-	{
-		return m_scale * m_shape->SupportVertex(dir);
-	}
-	case m_nonUniform:
-	{
-		// support((p * S), n) = S * support (p, n * transp(S)) 
-		const ndVector dir1((m_scale * dir).Normalize());
-		return m_scale * m_shape->SupportVertex(dir1);
-	}
+		case m_unit:
+		{
+			return m_shape->SupportVertex(dir);
+		}
+		case m_uniform:
+		{
+			return m_scale * m_shape->SupportVertex(dir);
+		}
+		case m_nonUniform:
+		{
+			// support((p * S), n) = S * support (p, n * transp(S)) 
+			const ndVector dir1((m_scale * dir).Normalize());
+			return m_scale * m_shape->SupportVertex(dir1);
+		}
 
-	case m_global:
-	default:
-	{
-		const ndVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-		return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertex(dir1));
-	}
+		case m_global:
+		default:
+		{
+			const ndVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+			return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertex(dir1));
+		}
 	}
 }
 
@@ -212,34 +212,34 @@ ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector& point
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
-	case m_unit:
-	{
-		return m_shape->SupportVertexSpecialProjectPoint(point, dir);
-	}
-	case m_uniform:
-	{
-		return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
-	}
+		case m_unit:
+		{
+			return m_shape->SupportVertexSpecialProjectPoint(point, dir);
+		}
+		case m_uniform:
+		{
+			return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
+		}
 
-	case m_global:
-	case m_nonUniform:
-	default:
-		return point;
+		case m_global:
+		case m_nonUniform:
+		default:
+			return point;
 
 #if 0
-	case m_nonUniform:
-	{
-		// support((p * S), n) = S * support (p/S, n * transp(S)) 
-		dVector dir1((m_scale * dir).Normalize());
-		return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
-	}
+		case m_nonUniform:
+		{
+			// support((p * S), n) = S * support (p/S, n * transp(S)) 
+			dVector dir1((m_scale * dir).Normalize());
+			return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
+		}
 
-	case m_global:
-	default:
-	{
-		dVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-		return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_alignmentMatrix.UntransformVector(point * m_invScale), dir1));
-	}
+		case m_global:
+		default:
+		{
+			dVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+			return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_alignmentMatrix.UntransformVector(point * m_invScale), dir1));
+		}
 #endif
 	}
 }

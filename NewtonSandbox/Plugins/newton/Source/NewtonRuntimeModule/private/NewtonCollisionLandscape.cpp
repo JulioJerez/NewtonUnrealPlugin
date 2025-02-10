@@ -118,7 +118,7 @@ void UNewtonCollisionLandscape::InitStaticMeshCompoment(const USceneComponent* c
 
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-	//	m_heightfield.Push(dstHeight[i]);
+		//m_heightfield.Push(dstHeight[i]);
 		m_materials.Push(attributes[i]);
 		ndFloat32 x = (dstHeight[i] - m_minHeight) * invScale;
 		m_heightfield.Push(unsigned short(x));

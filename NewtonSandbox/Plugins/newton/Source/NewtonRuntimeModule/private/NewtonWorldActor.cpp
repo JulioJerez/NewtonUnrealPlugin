@@ -48,7 +48,9 @@ ANewtonWorldActor::ANewtonWorldActor()
 	ClearDebug = false;
 	
 	AutoSleepMode = true;
-	SolverMode = SolverModeTypes::scalar;
+	//SolverMode = SolverModeTypes::Simd;
+	SolverMode = SolverModeTypes::SimdSoa;
+	//SolverMode = SolverModeTypes::SimdSoaAvx;
 }
 
 ndWorld* ANewtonWorldActor::GetNewtonWorld() const

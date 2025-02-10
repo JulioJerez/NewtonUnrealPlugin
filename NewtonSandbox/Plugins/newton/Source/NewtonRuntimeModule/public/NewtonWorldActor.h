@@ -33,8 +33,9 @@ class UNewtonRigidBody;
 UENUM()
 enum class SolverModeTypes : uint8
 {
-	scalar,
-	soaSimd,
+	Simd,
+	SimdSoa,
+	SimdSoaAvx,
 };
 
 
@@ -96,7 +97,7 @@ class NEWTONRUNTIMEMODULE_API ANewtonWorldActor : public AActor
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 32))
 	int ParallelThreads;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta=(ValidEnumValues="scalar, soaSimd"))
+	UPROPERTY(EditAnywhere, Category = Newton, meta=(ValidEnumValues="Simd, SimdSoa, SimdSoaAvx"))
 	SolverModeTypes SolverMode;
 
 	UPROPERTY(EditAnywhere, Category = Newton)

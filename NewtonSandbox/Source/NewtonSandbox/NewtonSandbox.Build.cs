@@ -14,7 +14,7 @@ public class NewtonSandbox : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"EnhancedInput",
-			"NewtonEditorModule",
+			"NewtonModelModule",
 			"NewtonRuntimeModule"
         });
 

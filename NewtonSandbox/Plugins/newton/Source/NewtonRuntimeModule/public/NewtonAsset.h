@@ -49,6 +49,5 @@ class NEWTONRUNTIMEMODULE_API UNewtonAsset : public UObject
 
 	UPROPERTY()
 	bool m_hideJoints;
-
 };
 
