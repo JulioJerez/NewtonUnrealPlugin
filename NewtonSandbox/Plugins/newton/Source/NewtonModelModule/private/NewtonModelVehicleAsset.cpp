@@ -25,5 +25,6 @@
 UNewtonModelVehicleAsset::UNewtonModelVehicleAsset()
 	:Super()
 {
+	m_modelType = ModelsType::m_vehicleModel;
 }
 

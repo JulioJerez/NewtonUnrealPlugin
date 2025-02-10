@@ -39,6 +39,34 @@
 #define MAX_MODEL_NODES			2048
 #define MAX_MODEL_STACK_DEPTH	256
 
+bool UNewtonModelBlueprintBuilder::UpdateModel(UNewtonModel* const model)
+{
+	AActor* const actor = model->GetOwner();
+	UBlueprint* const blueprint = Cast<UBlueprint>(actor->GetClass()->ClassGeneratedBy);
+
+	model->RegenerateBluePrint = false;
+	TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
+	const TArray<USCS_Node*>& nodes = constructScript->GetAllNodes();
+	for (int i = nodes.Num() - 1; i >= 0; --i)
+	{
+		USCS_Node* const blueprintNode = nodes[i];
+		if (blueprintNode->ComponentClass->IsChildOf(UNewtonModel::StaticClass()))
+		{
+			USCS_Node* const assetNode = blueprintNode;
+			UEditorEngine::CopyPropertiesForUnrelatedObjects(model, assetNode->ComponentTemplate);
+			break;
+		}
+	}
+
+	if (!model->NewtonAsset || !model->NewtonAsset->SkeletalMeshAsset.Get())
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("a NewtonModel must contain a valid NewtonAsset")));
+		return false;
+	}
+
+	return true;
+}
+
 void UNewtonModelBlueprintBuilder::BuildModel(UNewtonModel* const model)
 {
 	AActor* const actor = model->GetOwner();
@@ -76,32 +104,9 @@ void UNewtonModelBlueprintBuilder::BuildModel(UNewtonModel* const model)
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
 }
 
-bool UNewtonModelBlueprintBuilder::UpdateModel(UNewtonModel* const model)
+void UNewtonModelBlueprintBuilder::UpdateVehicleModel(UNewtonModel* const model)
 {
-	AActor* const actor = model->GetOwner();
-	UBlueprint* const blueprint = Cast<UBlueprint>(actor->GetClass()->ClassGeneratedBy);
-
-	model->RegenerateBluePrint = false;
-	TObjectPtr<USimpleConstructionScript> constructScript(blueprint->SimpleConstructionScript);
-	const TArray<USCS_Node*>& nodes = constructScript->GetAllNodes();
-	for (int i = nodes.Num() - 1; i >= 0; --i)
-	{
-		USCS_Node* const blueprintNode = nodes[i];
-		if (blueprintNode->ComponentClass->IsChildOf(UNewtonModel::StaticClass()))
-		{
-			USCS_Node* const assetNode = blueprintNode;
-			UEditorEngine::CopyPropertiesForUnrelatedObjects(model, assetNode->ComponentTemplate);
-			break;
-		}
-	}
-
-	if (!model->NewtonAsset || !model->NewtonAsset->SkeletalMeshAsset.Get())
-	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("a NewtonModel must contain a valid NewtonAsset")));
-		return false;
-	}
-
-	return true;
+	BuildModel(model);
 }
 
 void UNewtonModelBlueprintBuilder::AddSkeletalMesh(UNewtonModel* const model, USCS_Node* const parentNode)
@@ -274,13 +279,25 @@ void UNewtonModelBlueprintBuilder::HideDebug(UNewtonModel* const model)
 	//	}
 	//}
 	//FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(blueprint);
-	}
+}
 
 void UNewtonModelBlueprintBuilder::ApplyBlueprintProperties(UNewtonModel* const model)
 {
 	if (model->RegenerateBluePrint)
 	{
-		BuildModel(model);
+		UNewtonAsset* const asset = model->NewtonAsset;
+		if (asset)
+		{
+			switch (asset->m_modelType)
+			{
+				case ModelsType::m_vehicleModel:
+					UpdateVehicleModel(model);
+					break;
+
+				default:
+					BuildModel(model);
+			}
+		}
 	}
 	//if (model->HideDebug)
 	//{

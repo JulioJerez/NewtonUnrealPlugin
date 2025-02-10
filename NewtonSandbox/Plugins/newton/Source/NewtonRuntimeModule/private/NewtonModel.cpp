@@ -88,6 +88,19 @@ void UNewtonModel::TickComponent(float deltaTime, ELevelTick tickType, FActorCom
 
 ndModelArticulation* UNewtonModel::CreateSubClassModel() const
 {
+	UNewtonAsset* const asset = NewtonAsset;
+	if (asset)
+	{
+		switch (asset->m_modelType)
+		{
+			case ModelsType::m_vehicleModel:
+				return new ndMultiBodyVehicle();
+
+			default:
+				return new ndModelArticulation();
+		}
+	}
+
 	return new ndModelArticulation();
 }
 
@@ -100,6 +113,11 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 	ndFixSizeArray<ndModelArticulation::ndNode*, ND_STACK_DEPTH> parentStack;
 
 	ndModelArticulation* const articulatedModel = CreateSubClassModel();
+	if (articulatedModel->GetAsMultiBodyVehicle())
+	{
+		BuildVehicleModel(articulatedModel->GetAsMultiBodyVehicle(), worldActor);
+	}
+
 	stack.PushBack(owner->GetRootComponent());
 	parentStack.PushBack(nullptr);
 	while (stack.GetCount())
@@ -163,3 +181,8 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 	return articulatedModel;
 }
 
+
+void UNewtonModel::BuildVehicleModel(ndMultiBodyVehicle* const vehicle, ANewtonWorldActor* const worldActor)
+{
+
+}

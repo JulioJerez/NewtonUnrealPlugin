@@ -39,7 +39,6 @@ FNewtonModelVehicleAction::~FNewtonModelVehicleAction()
 
 FText FNewtonModelVehicleAction::GetName() const
 {
-	//return FText::FromString(TEXT("ActionName"));
 	return FText::FromString(ND_NEWTON_MODEL_VEHICLE_DISPLAY_NAME);
 }
 

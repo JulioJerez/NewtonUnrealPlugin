@@ -43,6 +43,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModelBlueprintBuilder : public UBlueprintFu
 	static void BuildModel(UNewtonModel* const model);
 	static bool UpdateModel(UNewtonModel* const model);
 	static void BuildHierarchy(UNewtonModel* const model);
-	//static USCS_Node* CreateRootBodyComponent(UNewtonModel* const model);
+	static void UpdateVehicleModel(UNewtonModel* const model);
 	static void AddSkeletalMesh(UNewtonModel* const model, USCS_Node* const parent);
 };

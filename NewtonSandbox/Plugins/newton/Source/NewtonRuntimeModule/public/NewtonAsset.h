@@ -27,6 +27,14 @@
 #include "NewtonCommons.h"
 #include "NewtonAsset.generated.h"
 
+
+UENUM()
+enum class ModelsType : uint8
+{
+	m_baseModel, 
+	m_vehicleModel,
+};
+
 class UNewtonLinkRigidBodyRoot;
 
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
@@ -49,5 +57,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonAsset : public UObject
 
 	UPROPERTY()
 	bool m_hideJoints;
+
+	UPROPERTY(EditAnywhere, Category = NewtonLink, meta = (ValidEnumValues = "m_baseModel, m_vehicleModel"))
+	ModelsType m_modelType;
 };
 

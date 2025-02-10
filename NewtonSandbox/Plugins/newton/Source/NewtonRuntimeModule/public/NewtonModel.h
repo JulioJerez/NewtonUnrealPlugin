@@ -28,6 +28,7 @@
 
 class UNewtonAsset;
 class ANewtonWorldActor;
+class ndMultiBodyVehicle;
 class ndModelArticulation;
 
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
@@ -39,12 +40,16 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 
 	UNewtonModel();
 
-	virtual ndModelArticulation* CreateSubClassModel() const;
 	virtual ndModelArticulation* CreateModel(ANewtonWorldActor* const worldActor);
+
+	protected:
+	virtual ndModelArticulation* CreateSubClassModel() const;
+	virtual void BuildVehicleModel(ndMultiBodyVehicle* const vehicle, ANewtonWorldActor* const worldActor);
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	public:
 	UPROPERTY(EditAnywhere, Category = Newton)
 	bool RegenerateBluePrint;
 

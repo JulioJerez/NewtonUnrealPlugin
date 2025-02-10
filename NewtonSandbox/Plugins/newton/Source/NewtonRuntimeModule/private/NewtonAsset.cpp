@@ -41,6 +41,7 @@ UNewtonAsset::UNewtonAsset()
 
 	m_hideShapes = false;
 	m_hideJoints = false;
+	m_modelType = ModelsType::m_baseModel;
 }
 
 void UNewtonAsset::Serialize(FArchive& ar)
