@@ -421,6 +421,14 @@ void FNewtonModelPhysicsTree::OnAddJointWheelRow()
 	AddJointRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddJointTireRow()
+{
+	check(0);
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointWheel>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddJointRow(item);
+}
+
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
@@ -536,6 +544,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointWheelRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddJointTire
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointTireRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddLoopEffector6dof
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
@@ -579,6 +591,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddJointSlider);
 		menuBuilder.AddMenuEntry(actions.AddJointRoller);
 		menuBuilder.AddMenuEntry(actions.AddJointWheel);
+		menuBuilder.AddMenuEntry(actions.AddJointTire);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddLoopsAction", "Add Loops"));

@@ -224,6 +224,21 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 	}
 }
 
+void ndMultiBodyVehicle::AddTire(const ndSharedPtr<ndBody>& tireBody, const ndSharedPtr<ndJointBilateralConstraint>& tireJoint)
+{
+	m_tireList.Append((ndMultiBodyVehicleTireJoint*) *tireJoint);
+
+	ndNode* const tireNode = FindByBody(*tireBody);
+	ndAssert(!tireNode || ((tireNode->m_body->GetAsBody() == *tireBody) && ((*tireNode->m_joint == *tireJoint))));
+	if (!tireNode)
+	{
+		ndAssert(tireJoint->GetBody1() == GetRoot()->m_body->GetAsBody());
+		AddLimb(GetRoot(), tireBody, tireJoint);
+	}
+
+	tireBody->GetAsBodyDynamic()->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+}
+
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicleTireJointInfo& desc, const ndSharedPtr<ndBody>& tire)
 {
 	ndAssert(m_chassis);
@@ -246,10 +261,10 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicl
 	tireBody->SetMassMatrix(inertia);
 
 	ndSharedPtr<ndJointBilateralConstraint> tireJoint (new ndMultiBodyVehicleTireJoint(matrix, tireBody, m_chassis, desc, this));
-	m_tireList.Append((ndMultiBodyVehicleTireJoint*) *tireJoint);
-	AddLimb(GetRoot(), tire, tireJoint);
-	
-	tireBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+	AddTire(tire, tireJoint);
+	//m_tireList.Append((ndMultiBodyVehicleTireJoint*) *tireJoint);
+	//AddLimb(GetRoot(), tire, tireJoint);
+	//tireBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
 	return m_tireList.GetLast()->GetInfo();
 }
 
@@ -282,7 +297,6 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVe
 	tireBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
 	return m_tireList.GetLast()->GetInfo();
 }
-
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(ndFloat32 radius, ndFloat32 width) const
 {

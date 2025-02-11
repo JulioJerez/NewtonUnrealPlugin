@@ -52,6 +52,7 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(AddJointSlider, "Add slider joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointRoller, "Add roller joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointWheel, "Add wheel joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointTire, "Add vehicle tire joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(AddLoopEffector6dof, "Add Effector 6 dof Joint", "loop must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 

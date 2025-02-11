@@ -57,6 +57,7 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 	TSharedPtr<FUICommandInfo> AddShapeConvexhull;
 	TSharedPtr<FUICommandInfo> AddShapeConvexAggragate;
 
+	TSharedPtr<FUICommandInfo> AddJointTire;
 	TSharedPtr<FUICommandInfo> AddJointWheel;
 	TSharedPtr<FUICommandInfo> AddJointHinge;
 	TSharedPtr<FUICommandInfo> AddJointSlider;

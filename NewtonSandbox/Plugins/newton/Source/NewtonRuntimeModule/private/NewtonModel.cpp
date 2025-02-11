@@ -71,6 +71,66 @@ class UNewtonModel::ModelNotify : public ndModelNotify
 	UFunction* m_onModelUpdate;
 };
 
+class ndModelVehicleNotify : public UNewtonModel::ModelNotify
+{
+	public:
+	ndModelVehicleNotify(UNewtonModel* const owner, ndMultiBodyVehicle* const vehicle)
+		:UNewtonModel::ModelNotify(owner, vehicle)
+	{
+		m_sleepingState = false;
+
+		check(vehicle->GetRoot());
+		vehicle->AddChassis(vehicle->GetRoot()->m_body);
+
+		for (ndMultiBodyVehicle::ndNode* node = vehicle->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndMultiBodyVehicleTireJoint* const tire = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
+			if (tire && !strcmp (tire->ClassName(), "ndMultiBodyVehicleTireJoint"))
+			{
+				check(0);
+			}
+		}
+	}
+
+	void Debug(ndConstraintDebugCallback& context) const override
+	{
+		UNewtonModel::ModelNotify::Debug(context);
+	}
+
+	void Update(ndWorld* const world, ndFloat32 timestep) override
+	{
+		UNewtonModel::ModelNotify::Update(world, timestep);
+
+		ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
+		m_sleepingState = true;
+		if (vehicle && !vehicle->IsSleeping())
+		{
+			m_sleepingState = false;
+			//ApplyInputs(world, timestep);
+			vehicle->Update(world, timestep);
+		}
+		ndModelNotify::Update(world, timestep);
+	}
+
+	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override
+	{
+		UNewtonModel::ModelNotify::PostUpdate(world, timestep);
+		ndModelNotify::PostUpdate(world, timestep);
+		ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
+		if (vehicle && !m_sleepingState)
+		{
+			vehicle->PostUpdate(world, timestep);
+		}
+	}
+
+	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) override
+	{
+		UNewtonModel::ModelNotify::PostTransformUpdate(world, timestep);
+	}
+
+	bool m_sleepingState;
+};
+
 UNewtonModel::UNewtonModel()
 	:Super()
 {
@@ -178,20 +238,28 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 		articulatedModel->AddCloseLoop(joint);
 	}
 
-	ndSharedPtr<ndModelNotify> notify(new ModelNotify(this, articulatedModel));
-	articulatedModel->SetNotifyCallback(notify);
-
-	if (articulatedModel->GetAsMultiBodyVehicle())
+	UNewtonAsset* const asset = NewtonAsset;
+	if (asset)
 	{
-		BuildVehicleModel(articulatedModel->GetAsMultiBodyVehicle(), worldActor);
+		switch (asset->m_modelType)
+		{
+			case ModelsType::m_vehicleModel:
+			{
+				check(articulatedModel->GetAsMultiBodyVehicle());
+				ndSharedPtr<ndModelNotify> notify(new ndModelVehicleNotify(this, articulatedModel->GetAsMultiBodyVehicle()));
+				articulatedModel->SetNotifyCallback(notify);
+				break;
+			}
+
+			case ModelsType::m_baseModel:
+			default:
+			{
+				ndSharedPtr<ndModelNotify> notify(new ModelNotify(this, articulatedModel));
+				articulatedModel->SetNotifyCallback(notify);
+				break;
+			}
+		}
 	}
 
 	return articulatedModel;
-}
-
-
-void UNewtonModel::BuildVehicleModel(ndMultiBodyVehicle* const vehicle, ANewtonWorldActor* const worldActor)
-{
-	check(vehicle->GetRoot());
-	vehicle->AddChassis(vehicle->GetRoot()->m_body);
 }
