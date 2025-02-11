@@ -113,11 +113,6 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 	ndFixSizeArray<ndModelArticulation::ndNode*, ND_STACK_DEPTH> parentStack;
 
 	ndModelArticulation* const articulatedModel = CreateSubClassModel();
-	if (articulatedModel->GetAsMultiBodyVehicle())
-	{
-		BuildVehicleModel(articulatedModel->GetAsMultiBodyVehicle(), worldActor);
-	}
-
 	stack.PushBack(owner->GetRootComponent());
 	parentStack.PushBack(nullptr);
 	while (stack.GetCount())
@@ -177,6 +172,11 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 
 	ndSharedPtr<ndModelNotify> notify(new ModelNotify(this, articulatedModel));
 	articulatedModel->SetNotifyCallback(notify);
+
+	if (articulatedModel->GetAsMultiBodyVehicle())
+	{
+		BuildVehicleModel(articulatedModel->GetAsMultiBodyVehicle(), worldActor);
+	}
 
 	return articulatedModel;
 }
