@@ -36,4 +36,6 @@ class UNewtonJointVehicleTire : public UNewtonJointWheel
 	// Sets default values for this component's properties
 	UNewtonJointVehicleTire();
 
+	virtual ndJointBilateralConstraint* CreateJoint() override;
+
 };

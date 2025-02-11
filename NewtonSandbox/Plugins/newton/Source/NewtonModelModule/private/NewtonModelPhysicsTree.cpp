@@ -42,6 +42,7 @@
 #include "NewtonModelPhysicsTreeItemBody.h"
 #include "NewtonModelPhysicsTreeItemLoop.h"
 #include "NewtonModelPhysicsTreeItemShapeBox.h"
+#include "NewtonModelPhysicsTreeItemJointTire.h"
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
 #include "NewtonModelPhysicsTreeItemJointWheel.h"
@@ -423,8 +424,7 @@ void FNewtonModelPhysicsTree::OnAddJointWheelRow()
 
 void FNewtonModelPhysicsTree::OnAddJointTireRow()
 {
-	check(0);
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointWheel>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointTire(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointVehicleTire>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
@@ -1138,6 +1138,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkJointRoller>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointRoller(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkJointVehicleTire>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

@@ -31,3 +31,35 @@ UNewtonJointVehicleTire::UNewtonJointVehicleTire()
 {
 }
 
+
+ndJointBilateralConstraint* UNewtonJointVehicleTire::CreateJoint()
+{
+	Super::Super::CreateJoint();
+
+	check(!m_joint);
+	check(!m_joint);
+	ndBodyKinematic* body0;
+	ndBodyKinematic* body1;
+	GetBodyPairs(&body0, &body1);
+
+	if (body0 && body1)
+	{
+		ndMultiBodyVehicleTireJointInfo desc;
+		desc.m_radios = Radio;
+		desc.m_springK = SpringK;
+		desc.m_damperC = DamperC;
+		desc.m_upperStop = UpperStop;
+		desc.m_lowerStop = LowerStop;
+		desc.m_regularizer = Regularizer;
+		desc.m_brakeTorque = BrakeTorque;
+		desc.m_steeringAngle = SteeringAngle;
+		desc.m_handBrakeTorque = HandBrakeTorque;
+
+		const ndMatrix matrix(GetPivotMatrix());
+		ndMultiBodyVehicleTireJoint* const joint = new ndMultiBodyVehicleTireJoint(matrix, body0, body1, desc, nullptr);
+
+		return joint;
+	}
+	return nullptr;
+
+}

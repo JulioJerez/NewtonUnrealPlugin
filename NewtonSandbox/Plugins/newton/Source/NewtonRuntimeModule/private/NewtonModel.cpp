@@ -87,7 +87,9 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			ndMultiBodyVehicleTireJoint* const tire = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
 			if (tire && !strcmp (tire->ClassName(), "ndMultiBodyVehicleTireJoint"))
 			{
-				check(0);
+				//ndMultiBodyVehicleTireJointInfo info(tire->GetInfo());
+				tire->SetVehicle(vehicle);
+				vehicle->AddTire(node->m_body, node->m_joint);
 			}
 		}
 	}

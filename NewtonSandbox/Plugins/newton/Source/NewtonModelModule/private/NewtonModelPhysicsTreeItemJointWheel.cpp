@@ -39,7 +39,7 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointWheel::Clone() cons
 
 int FNewtonModelPhysicsTreeItemJointWheel::GetFreeDof() const
 {
-	return 1;
+	return 2;
 }
 
 void FNewtonModelPhysicsTreeItemJointWheel::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const

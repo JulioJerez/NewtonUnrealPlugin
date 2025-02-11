@@ -38,6 +38,7 @@
 #include "NewtonLinkCollisionWheel.h"
 #include "NewtonLinkCollisionSphere.h"
 #include "NewtonLinkCollisionCapsule.h"
+#include "NewtonLinkJointVehicleTire.h"
 #include "NewtonLinkLoopEffector6dof.h"
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkCollisionConvexhull.h"
