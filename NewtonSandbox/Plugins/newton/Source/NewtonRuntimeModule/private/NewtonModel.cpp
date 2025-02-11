@@ -94,8 +94,16 @@ ndModelArticulation* UNewtonModel::CreateSubClassModel() const
 		switch (asset->m_modelType)
 		{
 			case ModelsType::m_vehicleModel:
-				return new ndMultiBodyVehicle();
+			{
+				ndMatrix localFrame(ndGetIdentityMatrix());
+				localFrame.m_up = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
+				localFrame.m_right = localFrame.m_front.CrossProduct(localFrame.m_up);
+				ndMultiBodyVehicle* const vehicle = new ndMultiBodyVehicle();
+				vehicle->SetLocalFrame(localFrame);
 
+				return vehicle;
+			}
+			case ModelsType::m_baseModel:
 			default:
 				return new ndModelArticulation();
 		}
@@ -184,5 +192,6 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 
 void UNewtonModel::BuildVehicleModel(ndMultiBodyVehicle* const vehicle, ANewtonWorldActor* const worldActor)
 {
-
+	check(vehicle->GetRoot());
+	vehicle->AddChassis(vehicle->GetRoot()->m_body);
 }
