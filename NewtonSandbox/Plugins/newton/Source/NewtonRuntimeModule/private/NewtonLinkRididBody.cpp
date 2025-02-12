@@ -23,7 +23,9 @@
 
 #include "NewtonCommons.h"
 #include "NewtonRigidBody.h"
+#include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
+#include "NewtonLinkJointDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkRigidBody::UNewtonLinkRigidBody()
@@ -74,9 +76,22 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(TObjectPtr<USkeletalMes
 	return com;
 }
 
+void UNewtonLinkRigidBody::PostCreate(const UNewtonLink* const parentNde)
+{
+	Super::PostCreate(parentNde);
+	if (parentNde && Cast<UNewtonLinkJoint>(parentNde))
+	{
+		const UNewtonLinkJointDifferential* const differential = Cast<UNewtonLinkJointDifferential>(parentNde);
+		if (differential)
+		{
+			Mass = differential->BodyMass;
+		}
+	}
+}
+
 TObjectPtr<USceneComponent> UNewtonLinkRigidBody::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonRigidBody> component(NewObject<UNewtonRigidBody>(UNewtonRigidBody::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonRigidBody>(UNewtonRigidBody::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

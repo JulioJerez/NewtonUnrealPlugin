@@ -77,12 +77,12 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	virtual void PostEditComponentMove(bool bFinished) override;
 #endif
 
-
 	FTransform m_transform;
 	ndJointBilateralConstraint* m_joint;
 	bool m_propertyChanged;
 	
 	friend class NewtonWorld;
 	friend class UNewtonModel;
+	friend class ndModelVehicleNotify;
 	friend class FNewtonRuntimeModule;
 };

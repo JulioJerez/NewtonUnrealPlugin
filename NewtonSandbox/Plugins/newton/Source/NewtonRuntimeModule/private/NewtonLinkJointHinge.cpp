@@ -40,7 +40,7 @@ UNewtonLinkJointHinge::UNewtonLinkJointHinge()
 
 TObjectPtr<USceneComponent> UNewtonLinkJointHinge::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonJointHinge> component(NewObject<UNewtonJointHinge>(UNewtonJointHinge::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointHinge>(UNewtonJointHinge::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

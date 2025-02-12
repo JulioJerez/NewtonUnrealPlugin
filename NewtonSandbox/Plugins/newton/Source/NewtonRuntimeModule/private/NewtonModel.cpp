@@ -27,6 +27,7 @@
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
 #include "NewtonModelBlueprintBuilder.h"
+#include "NewtonJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 class UNewtonModel::ModelNotify : public ndModelNotify
@@ -82,14 +83,49 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 		check(vehicle->GetRoot());
 		vehicle->AddChassis(vehicle->GetRoot()->m_body);
 
+		// add all tires
 		for (ndMultiBodyVehicle::ndNode* node = vehicle->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			ndMultiBodyVehicleTireJoint* const tire = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
-			if (tire && !strcmp (tire->ClassName(), "ndMultiBodyVehicleTireJoint"))
+			ndMultiBodyVehicleTireJoint* const joint = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
+			if (joint && !strcmp (joint->ClassName(), "ndMultiBodyVehicleTireJoint"))
 			{
 				//ndMultiBodyVehicleTireJointInfo info(tire->GetInfo());
-				tire->SetVehicle(vehicle);
+				joint->SetVehicle(vehicle);
 				vehicle->AddTire(node->m_body, node->m_joint);
+			}
+		}
+
+		auto FindJointComponent = [owner](const ndJointBilateralConstraint* const joint)
+		{
+			AActor* const actorOwner = owner->GetOwner();
+			for (TSet<UActorComponent*>::TConstIterator it(actorOwner->GetComponents().CreateConstIterator()); it; ++it)
+			{
+				const UNewtonJoint* const jointComponent = Cast<UNewtonJoint>(*it);
+				if (jointComponent && (jointComponent->m_joint == joint))
+				{
+					return jointComponent;
+				}
+			}
+			return (const UNewtonJoint*)nullptr;
+		};
+
+		// add all differentials
+		for (ndMultiBodyVehicle::ndNode* node = vehicle->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*node->m_joint;
+			if (joint && !strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferential"))
+			{
+				const UNewtonJointVehicleDifferential* const componentOwner = Cast<UNewtonJointVehicleDifferential>(FindJointComponent(joint));
+				ndAssert(componentOwner);
+				if (componentOwner)
+				{
+					// set the procedural shape
+					ndBodyKinematic* const differentialBody = joint->GetBody0();
+					ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
+					differentialBody->SetCollisionShape(diffCollision);
+					differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
+					differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+				}
 			}
 		}
 	}

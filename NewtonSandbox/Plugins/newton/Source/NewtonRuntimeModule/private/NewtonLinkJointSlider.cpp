@@ -42,7 +42,7 @@ UNewtonLinkJointSlider::UNewtonLinkJointSlider()
 
 TObjectPtr<USceneComponent> UNewtonLinkJointSlider::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonJointSlider> component(NewObject<UNewtonJointSlider>(UNewtonJointSlider::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointSlider>(UNewtonJointSlider::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

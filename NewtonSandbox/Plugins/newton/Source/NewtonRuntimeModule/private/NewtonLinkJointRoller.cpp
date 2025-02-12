@@ -40,7 +40,7 @@ UNewtonLinkJointRoller::UNewtonLinkJointRoller()
 
 TObjectPtr<USceneComponent> UNewtonLinkJointRoller::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonJointRoller> component(NewObject<UNewtonJointRoller>(UNewtonJointRoller::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointRoller>(UNewtonJointRoller::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

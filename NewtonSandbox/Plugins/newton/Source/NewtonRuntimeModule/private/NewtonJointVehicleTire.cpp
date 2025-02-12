@@ -45,7 +45,6 @@ ndJointBilateralConstraint* UNewtonJointVehicleTire::CreateJoint()
 	if (body0 && body1)
 	{
 		ndMultiBodyVehicleTireJointInfo desc;
-		desc.m_radios = Radio;
 		desc.m_springK = SpringK;
 		desc.m_damperC = DamperC;
 		desc.m_upperStop = UpperStop;

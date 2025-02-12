@@ -51,6 +51,10 @@ TObjectPtr<USceneComponent> UNewtonLink::CreateBlueprintProxy() const
 	return nullptr;
 }
 
+void UNewtonLink::PostCreate(const UNewtonLink* const parentNde)
+{
+}
+
 void UNewtonLink::InitBlueprintProxy(TObjectPtr<USceneComponent>, TObjectPtr<USkeletalMesh>) const
 {
 	check(0);

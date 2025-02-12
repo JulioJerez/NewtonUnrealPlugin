@@ -41,6 +41,7 @@
 #include "NewtonLinkJointVehicleTire.h"
 #include "NewtonLinkLoopEffector6dof.h"
 #include "NewtonLinkCollisionCylinder.h"
+#include "NewtonLinkJointDifferential.h"
 #include "NewtonLinkCollisionConvexhull.h"
 #include "NewtonLinkCollisionConvexApproximate.h"
 

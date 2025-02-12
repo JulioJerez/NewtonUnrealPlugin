@@ -66,21 +66,16 @@ class UNewtonJointWheel : public UNewtonJoint
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	float GetSuspensionSpeed() const;
 
-
-
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -1.0f, ClampMax = 1000.0f))
-	float Radio;
-
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 100.0f, ClampMax = 100000.0f))
 	float SpringK;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 1000.0f))
 	float DamperC;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -0.0f, ClampMax = 50.0f))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -0.0f, ClampMax = 100.0f))
 	float UpperStop;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -50.0f, ClampMax = 0.0f))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = -100.0f, ClampMax = 0.0f))
 	float LowerStop;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.00001f, ClampMax = 1.0f))

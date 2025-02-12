@@ -150,9 +150,9 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 	{
 		USCS_Node* parent = parentPool.Pop();
 		UNewtonLink* const link = stackPool.Pop();
-		TObjectPtr<USceneComponent> parentComponentProxy = parentProxy.Pop();
-
+		TObjectPtr<USceneComponent> parentComponentProxy (parentProxy.Pop());
 		TObjectPtr<USceneComponent> componentProxy(link->CreateBlueprintProxy());
+
 		USCS_Node* const blueprintNode = constructScript->CreateNode(componentProxy->GetClass(), link->Name);
 
 		links.PushBack(link);
@@ -193,6 +193,21 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 			stackPool.PushBack(link->Children[i]);
 		}
 	}
+	
+	// post init nodes
+	//bluePrintNodes.PushBack(constructScript->GetDefaultSceneRootNode());
+	//while (bluePrintNodes.GetCount())
+	//{
+	//	USCS_Node* const node = parentPool.Pop();
+	//
+	//
+	//	const TArray<USCS_Node*>& children = node->GetChildNodes();
+	//	for (int i = 0; i < children.Num(); ++i)
+	//	{
+	//		bluePrintNodes.PushBack(children[i]);
+	//	}
+	//}
+
 
 	TObjectPtr<USkeletalMesh> mesh(asset->SkeletalMeshAsset);
 

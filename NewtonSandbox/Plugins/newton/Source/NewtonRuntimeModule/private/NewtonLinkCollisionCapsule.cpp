@@ -44,7 +44,7 @@ ndShapeInstance UNewtonLinkCollisionCapsule::CreateInstance(TObjectPtr<USkeletal
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionCapsule::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonCollisionCapsule> component(NewObject<UNewtonCollisionCapsule>(UNewtonCollisionCapsule::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonCollisionCapsule>(UNewtonCollisionCapsule::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

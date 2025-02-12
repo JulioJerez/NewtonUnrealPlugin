@@ -35,8 +35,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLink : public UObject
 	public:
 	UNewtonLink();
 
-	//void SetName(const TCHAR* const name);
 	virtual void AttachNode(UNewtonLink* const node);
+	virtual void PostCreate(const UNewtonLink* const parentNde);
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const;

@@ -54,6 +54,7 @@
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexhull.h"
 #include "NewtonModelPhysicsTreeItemLoopEffector6dof.h"
+#include "NewtonModelPhysicsTreeItemJointDifferential.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexApproximate.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
@@ -335,6 +336,7 @@ void FNewtonModelPhysicsTree::AddJointRow(const TSharedRef<FNewtonModelPhysicsTr
 	m_items.Add(bodyItem);
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(bodyItem, jointAcyclic);
 	
+	bodyItem->GetNode()->PostCreate(jointAcyclic->m_item->GetNode());
 	RefreshView();
 }
 
@@ -425,6 +427,13 @@ void FNewtonModelPhysicsTree::OnAddJointWheelRow()
 void FNewtonModelPhysicsTree::OnAddJointTireRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointTire(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointVehicleTire>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddJointRow(item);
+}
+
+void FNewtonModelPhysicsTree::OnAddJointDifferentialRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointDifferential>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
@@ -548,6 +557,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointTireRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddJointDifferential
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointDifferentialRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddLoopEffector6dof
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
@@ -592,6 +605,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddJointRoller);
 		menuBuilder.AddMenuEntry(actions.AddJointWheel);
 		menuBuilder.AddMenuEntry(actions.AddJointTire);
+		menuBuilder.AddMenuEntry(actions.AddJointDifferential);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddLoopsAction", "Add Loops"));
@@ -1150,6 +1164,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkJointWheel>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkJointDifferential>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

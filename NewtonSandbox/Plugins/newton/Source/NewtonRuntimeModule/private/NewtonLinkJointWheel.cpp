@@ -43,7 +43,7 @@ UNewtonLinkJointWheel::UNewtonLinkJointWheel()
 
 TObjectPtr<USceneComponent> UNewtonLinkJointWheel::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonJointWheel> component(NewObject<UNewtonJointWheel>(UNewtonJointWheel::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointWheel>(UNewtonJointWheel::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
@@ -53,7 +53,6 @@ void UNewtonLinkJointWheel::InitBlueprintProxy(TObjectPtr<USceneComponent> compo
 
 	SetCommonProperties(joint);
 
-	joint->Radio = Radio;
 	joint->SpringK = SpringK;
 	joint->DamperC = DamperC;
 	joint->UpperStop = UpperStop;

@@ -33,7 +33,7 @@ UNewtonLinkLoopEffector6dof::UNewtonLinkLoopEffector6dof()
 
 TObjectPtr<USceneComponent> UNewtonLinkLoopEffector6dof::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonJointIk6DofEffector> component(NewObject<UNewtonJointIk6DofEffector>(UNewtonJointIk6DofEffector::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointIk6DofEffector>(UNewtonJointIk6DofEffector::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

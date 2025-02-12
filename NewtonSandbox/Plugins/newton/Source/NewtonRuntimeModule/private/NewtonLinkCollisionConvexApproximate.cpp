@@ -177,7 +177,7 @@ ndShapeInstance UNewtonLinkCollisionConvexApproximate::CreateInstance(TObjectPtr
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionConvexApproximate::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonCollisionConvexApproximate> component(NewObject<UNewtonCollisionConvexApproximate>(UNewtonCollisionConvexApproximate::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonCollisionConvexApproximate>(UNewtonCollisionConvexApproximate::StaticClass(), Name, RF_Transient));
 	return component;
 }
 

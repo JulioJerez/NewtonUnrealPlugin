@@ -69,7 +69,7 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 
 	D_NEWTON_API void SetVehicle(ndMultiBodyVehicle* const vehicle);
 	D_NEWTON_API const ndTireFrictionModel& GetFrictionModel() const;
-
+	
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 

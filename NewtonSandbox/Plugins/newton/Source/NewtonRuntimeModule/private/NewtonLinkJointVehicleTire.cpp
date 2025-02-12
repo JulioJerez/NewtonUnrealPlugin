@@ -33,7 +33,7 @@ UNewtonLinkJointVehicleTire::UNewtonLinkJointVehicleTire()
 
 TObjectPtr<USceneComponent> UNewtonLinkJointVehicleTire::CreateBlueprintProxy() const
 {
-	TObjectPtr<UNewtonJointVehicleTire> component(NewObject<UNewtonJointVehicleTire>(UNewtonJointVehicleTire::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointVehicleTire>(UNewtonJointVehicleTire::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
