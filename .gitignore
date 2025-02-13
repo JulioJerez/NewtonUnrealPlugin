@@ -105,5 +105,3 @@ vc143.pdb
 
 NewtonSandbox/NewtonSandbox.sln
 NewtonSandbox/Plugins/newton/Binaries/Win64
-#NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/x64
-#NewtonSandbox/Plugins/newton/Source/ThirdParty/newtonLibrary/ExampleLibrary/x64
