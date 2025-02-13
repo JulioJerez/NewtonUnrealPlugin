@@ -121,10 +121,20 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 				{
 					// set the procedural shape
 					ndBodyKinematic* const differentialBody = joint->GetBody0();
+					const ndMatrix matrix(vehicle->GetLocalFrame() * differentialBody->GetMatrix());
+					differentialBody->SetMatrix(matrix);
+
+					ndMatrix localMatrix0;
+					ndMatrix localMatrix1;
+					node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
+					node->m_joint->SetLocalMatrix0(localMatrix0);
+					node->m_joint->SetLocalMatrix1(localMatrix1);
+
 					ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
 					differentialBody->SetCollisionShape(diffCollision);
 					differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
 					differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+					vehicle->AddDifferential(node->m_body, node->m_joint);
 				}
 			}
 		}

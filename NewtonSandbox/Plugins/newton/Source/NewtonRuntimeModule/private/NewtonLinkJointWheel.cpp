@@ -30,12 +30,11 @@ UNewtonLinkJointWheel::UNewtonLinkJointWheel()
 {
 	Name = TEXT("wheel");
 
-	Radio = 50.0f;
-	SpringK = 100000.0f;
-	DamperC = 100.0f;
+	SpringK = 10000.0f;
+	DamperC = 50.0f;
 	UpperStop = 25.0f;
 	LowerStop = -25.0f;
-	Regularizer = 1.0e-3f;
+	Regularizer = 0.1f;
 	BrakeTorque = 0.0f;
 	SteeringAngle = 0.0f;
 	HandBrakeTorque = 0.0f;
