@@ -30,7 +30,7 @@ class ANewtonWorldActor;
 /**
  * 
  */
-UCLASS(ClassGroup = NewtonJoints, meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
 class UNewtonJointCylinder : public UNewtonJoint
 {
 	GENERATED_BODY()

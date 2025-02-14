@@ -28,7 +28,7 @@
 //class ANewtonWorldActor;
 
 
-UCLASS(ClassGroup = NewtonJoints, meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
 class UNewtonJointIk6DofEffector : public UNewtonJointLoop
 {
 	GENERATED_BODY()
@@ -51,9 +51,6 @@ class UNewtonJointIk6DofEffector : public UNewtonJointLoop
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll);
-
-	UPROPERTY(EditAnywhere, Category = Newton)
-	FTransform TargetFrame;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
 	float AngularSpring;

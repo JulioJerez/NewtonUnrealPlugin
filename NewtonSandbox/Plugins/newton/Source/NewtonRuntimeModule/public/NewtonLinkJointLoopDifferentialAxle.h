@@ -23,34 +23,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonLink.h"
-#include "NewtonLinkLoop.generated.h"
+#include "NewtonLinkJointLoop.h"
+#include "NewtonLinkJointLoopDifferentialAxle.generated.h"
 
-class UNewtonJoint;
-
-
+/**
+ * 
+ */
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkLoop : public UNewtonLink
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoopDifferentialAxle : public UNewtonLinkJointLoop
 {
 	GENERATED_BODY()
 
 	public:
-	UNewtonLinkLoop();
+	UNewtonLinkJointLoopDifferentialAxle();
 
-	void SetCommonProperties(UNewtonJoint* const joint) const;
-
-	UPROPERTY(VisibleAnywhere)
-	FName BoneName;
-
-	UPROPERTY(EditAnywhere)
-	int BoneIndex;
-
-	UPROPERTY(EditAnywhere)
-	float DebugScale;
-
-	//UPROPERTY(VisibleAnywhere)
-	//FName ReferencedBodyName;
-	//
-	//UPROPERTY(EditAnywhere)
-	//int ReferencedBoneIndex;
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 };

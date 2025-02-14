@@ -85,7 +85,7 @@ void FNewtonModelPhysicsTreeItemLoopEffector6dof::OnPropertyChange(const FProper
 	}
 
 	check(GetParent());
-	UNewtonLinkLoop* const loopNode = Cast<UNewtonLinkLoop>(m_node);
+	UNewtonLinkJointLoop* const loopNode = Cast<UNewtonLinkJointLoop>(m_node);
 	TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem0(GetParent());
 	const UNewtonLinkRigidBody* const body0 = Cast<UNewtonLinkRigidBody>(bodyItem0->GetNode());
 	if (!body0 || (body0->BoneIndex < 0))

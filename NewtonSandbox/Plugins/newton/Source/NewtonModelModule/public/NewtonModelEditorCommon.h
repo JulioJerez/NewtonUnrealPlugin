@@ -26,7 +26,7 @@
 
 #include "NewtonLink.h"
 #include "NewtonAsset.h"
-#include "NewtonLinkLoop.h"
+#include "NewtonLinkJointLoop.h"
 #include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
 #include "NewtonLinkJointHinge.h"
@@ -43,7 +43,7 @@
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkJointDifferential.h"
 #include "NewtonLinkCollisionConvexhull.h"
-#include "NewtonLinkJointDifferentialAxle.h"
+#include "NewtonLinkJointLoopDifferentialAxle.h"
 #include "NewtonLinkCollisionConvexApproximate.h"
 
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.4f

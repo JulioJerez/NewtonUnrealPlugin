@@ -37,7 +37,7 @@ enum class ModelsType : uint8
 
 class UNewtonLinkRigidBodyRoot;
 
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonAsset : public UObject
 {
 	GENERATED_BODY()
@@ -49,7 +49,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonAsset : public UObject
 	UPROPERTY()
 	UNewtonLinkRigidBodyRoot* RootBody;
 
-	UPROPERTY(EditAnywhere, Category = NewtonLink, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
 
 	UPROPERTY()
@@ -58,7 +58,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonAsset : public UObject
 	UPROPERTY()
 	bool m_hideJoints;
 
-	UPROPERTY(EditAnywhere, Category = NewtonLink, meta = (ValidEnumValues = "m_baseModel, m_vehicleModel"))
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ValidEnumValues = "m_baseModel, m_vehicleModel"))
 	ModelsType m_modelType;
 };
 

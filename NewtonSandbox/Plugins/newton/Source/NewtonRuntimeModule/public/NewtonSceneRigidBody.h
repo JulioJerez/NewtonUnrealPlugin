@@ -28,7 +28,7 @@
 /**
  * 
  */
-UCLASS(ClassGroup = NewtonScene, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+UCLASS(ClassGroup = NewtonScene, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonSceneRigidBody : public UNewtonRigidBody
 {
 	GENERATED_BODY()

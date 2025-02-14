@@ -291,7 +291,7 @@ void FNewtonModelPhysicsTree::AddLoopRow(const TSharedRef<FNewtonModelPhysicsTre
 	check(loopItem->GetParent()->GetNode()->Transform.GetScale3D().Y == 1.0f);
 	check(loopItem->GetParent()->GetNode()->Transform.GetScale3D().Z == 1.0f);
 
-	UNewtonLinkLoop* const shapeNodeInfo = Cast<UNewtonLinkLoop>(loopItem->GetNode());
+	UNewtonLinkJointLoop* const shapeNodeInfo = Cast<UNewtonLinkJointLoop>(loopItem->GetNode());
 	UNewtonLinkRigidBody* const bodyNodeInfo = Cast<UNewtonLinkRigidBody>(m_selectedItem->GetNode());
 
 	check(bodyNodeInfo);
@@ -441,7 +441,7 @@ void FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow()
 
 void FNewtonModelPhysicsTree::OnAddJointDifferentialAxleRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferentialAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointDifferentialAxle>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferentialAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopDifferentialAxle>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddLoopRow(item);
 }
@@ -611,21 +611,21 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 	FMenuBuilder menuBuilder(true, m_uiCommandList);
 	const FNewtonModelPhysicsTreeCommands& actions = FNewtonModelPhysicsTreeCommands::Get();
 
-	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJoints", LOCTEXT("AddJointsAction", "Add joints"));
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJoints", LOCTEXT("AddJointsActions", "Add joints"));
 		menuBuilder.AddMenuEntry(actions.AddJointHinge);
 		menuBuilder.AddMenuEntry(actions.AddJointSlider);
 		menuBuilder.AddMenuEntry(actions.AddJointRoller);
 		menuBuilder.AddMenuEntry(actions.AddJointWheel);
 		menuBuilder.AddMenuEntry(actions.AddJointTire);
 		menuBuilder.AddMenuEntry(actions.AddJointDifferential);
+	menuBuilder.EndSection();
+
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddJointsLoopActions", "Add Joints Loop"));
+		menuBuilder.AddMenuEntry(actions.AddLoopEffector6dof);
 		menuBuilder.AddMenuEntry(actions.AddJointDifferentialAxle);
 	menuBuilder.EndSection();
 
-	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddLoopsAction", "Add Loops"));
-		menuBuilder.AddMenuEntry(actions.AddLoopEffector6dof);
-	menuBuilder.EndSection();
-
-	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeAction", "Add collision shape"));
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "Add collision shapes"));
 		menuBuilder.AddMenuEntry(actions.AddShapeBox);
 		menuBuilder.AddMenuEntry(actions.AddShapeSphere);
 		menuBuilder.AddMenuEntry(actions.AddShapeCapsule);
@@ -1186,7 +1186,7 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(item);
 			parent = item;
 		}
-		else if (Cast<UNewtonLinkJointDifferentialAxle>(node))
+		else if (Cast<UNewtonLinkJointLoopDifferentialAxle>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferentialAxle(parent, proxyNode, m_editor)));
 			m_items.Add(item);

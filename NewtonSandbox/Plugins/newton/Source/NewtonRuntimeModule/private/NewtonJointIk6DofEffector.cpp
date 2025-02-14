@@ -33,8 +33,6 @@ UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 	:Super()
 {
 	//ReferencedBodyName = TEXT("None");
-
-	TargetFrame = FTransform();
 	AngularDamper = 500.0f;
 	AngularSpring = 10000.0f;
 	AngularMaxTorque = 10000.0f;
@@ -119,12 +117,11 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 	ndInt32 boneIndex = -1;
 	for (ndInt32 i = boneInfo.Num() - 1; i >= 0; --i)
 	{
-		check(0);
-		//if (boneInfo[i].Name == ReferencedBodyName)
-		//{
-		//	boneIndex = i;
-		//	break;
-		//}
+		if (boneInfo[i].Name == ReferencedBodyName)
+		{
+			boneIndex = i;
+			break;
+		}
 	}
 	check(boneIndex != -1);
 

@@ -45,7 +45,7 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointDifferentialAxle::C
 
 void FNewtonModelPhysicsTreeItemJointDifferentialAxle::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonLinkJointDifferentialAxle* const jointNode = Cast<UNewtonLinkJointDifferentialAxle>(m_node);
+	const UNewtonLinkJointLoopDifferentialAxle* const jointNode = Cast<UNewtonLinkJointLoopDifferentialAxle>(m_node);
 	check(jointNode);
 
 	if (jointNode->m_hidden || !jointNode->ShowDebug)
@@ -85,7 +85,7 @@ void FNewtonModelPhysicsTreeItemJointDifferentialAxle::OnPropertyChange(const FP
 	}
 
 	check(GetParent());
-	UNewtonLinkLoop* const loopNode = Cast<UNewtonLinkLoop>(m_node);
+	UNewtonLinkJointLoop* const loopNode = Cast<UNewtonLinkJointLoop>(m_node);
 	TSharedPtr<FNewtonModelPhysicsTreeItem> parentBodyItem(GetParent());
 
 	TSharedPtr<FNewtonModelPhysicsTreeItem> childBodyItem(nullptr);
@@ -114,7 +114,7 @@ void FNewtonModelPhysicsTreeItemJointDifferentialAxle::OnPropertyChange(const FP
 	}
 
 	const UNewtonLinkRigidBody* const childBody = Cast<UNewtonLinkRigidBody>(childBodyItem->GetNode());
-	UNewtonLinkJointDifferentialAxle* const effectorNode = Cast<UNewtonLinkJointDifferentialAxle>(loopNode);
+	UNewtonLinkJointLoopDifferentialAxle* const effectorNode = Cast<UNewtonLinkJointLoopDifferentialAxle>(loopNode);
 	check(childBody);
 	check(effectorNode);
 	check(childBody->BoneIndex == effectorNode->BoneIndex);

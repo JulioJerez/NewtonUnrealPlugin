@@ -35,7 +35,7 @@ class UNewtonRigidBody;
 template <typename T>
 class ndSharedPtr;
 
-//UCLASS(ClassGroup = NewtonCollisionCollection, meta=(BlueprintSpawnableComponent), HideCategories = (RayTracing, Mobile, TextureStreaming, VirtualTexture, MaterialParameters, DynamicMeshComponent, Advanced, Activation, Collision, Lighting, BodySetup, Primitives, HLOD, ComponentTick, Rendering, Physics, Tags, Replication, ComponentReplication, Cooking, Events, LOD, Navigation, AssetUserData))
+//UCLASS(ClassGroup = NewtonCollisionCollection, meta = (BlueprintSpawnableComponent), HideCategories = (RayTracing, Mobile, TextureStreaming, VirtualTexture, MaterialParameters, DynamicMeshComponent, Advanced, Activation, Collision, Lighting, BodySetup, Primitives, HLOD, ComponentTick, Rendering, Physics, Tags, Replication, ComponentReplication, Cooking, Events, LOD, Navigation, AssetUserData))
 UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonCollisionCollection : public USceneComponent
 {

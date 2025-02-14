@@ -94,7 +94,7 @@ bool FNewtonModelPhysicsTreeItemLoop::HaveSelection() const
 
 void FNewtonModelPhysicsTreeItemLoop::ApplyDeltaTransform(const FVector& inDrag, const FRotator& inRot, const FVector& inScale)
 {
-	UNewtonLinkLoop* const loopNode = Cast<UNewtonLinkLoop>(m_node);
+	UNewtonLinkJointLoop* const loopNode = Cast<UNewtonLinkJointLoop>(m_node);
 	check(loopNode);
 
 	if ((inRot.Pitch != 0.0f) || (inRot.Yaw != 0.0) || (inRot.Roll != 0.0))

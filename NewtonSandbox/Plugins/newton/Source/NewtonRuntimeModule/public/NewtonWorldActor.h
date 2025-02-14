@@ -62,7 +62,7 @@ struct FNewtonRaycastResult
 	float HitParam;
 };
 
-UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = NewtonActors, meta = (BlueprintSpawnableComponent) )
 class NEWTONRUNTIMEMODULE_API ANewtonWorldActor : public AActor
 {
 	GENERATED_BODY()

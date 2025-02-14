@@ -27,7 +27,7 @@
 //class ndWorld;
 //class ANewtonWorldActor;
 
-UCLASS(ClassGroup = NewtonJoints, meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
 class UNewtonJointDifferentialAxle : public UNewtonJointLoop
 {
 	GENERATED_BODY()

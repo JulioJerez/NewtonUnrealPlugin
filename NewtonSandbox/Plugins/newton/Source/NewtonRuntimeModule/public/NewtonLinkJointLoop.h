@@ -19,27 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointDifferentialAxle.h"
 
-#include "NewtonCommons.h"
-#include "NewtonJointDifferentialAxle.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+#pragma once
 
-UNewtonLinkJointDifferentialAxle::UNewtonLinkJointDifferentialAxle()
-	:Super()
+#include "CoreMinimal.h"
+#include "NewtonLink.h"
+#include "NewtonLinkJointLoop.generated.h"
+
+class UNewtonJoint;
+
+
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoop : public UNewtonLink
 {
-	Name = TEXT("differentialAxle");
-}
+	GENERATED_BODY()
 
-TObjectPtr<USceneComponent> UNewtonLinkJointDifferentialAxle::CreateBlueprintProxy() const
-{
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointDifferentialAxle>(UNewtonJointDifferentialAxle::StaticClass(), Name, RF_Transient));
-	return component;
-}
+	public:
+	UNewtonLinkJointLoop();
 
-void UNewtonLinkJointDifferentialAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
-{
-	UNewtonJointDifferentialAxle* const joint = Cast<UNewtonJointDifferentialAxle>(component.Get());
-	SetCommonProperties(joint);
-	//joint->TargetFrame = TargetFrame;
-}
+	void SetCommonProperties(UNewtonJoint* const joint) const;
+
+	UPROPERTY(VisibleAnywhere, Category = Newton)
+	FName BoneName;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	int BoneIndex;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	float DebugScale;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	FTransform TargetFrame;
+};

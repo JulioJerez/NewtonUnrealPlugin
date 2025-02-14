@@ -33,5 +33,5 @@ UNewtonJointLoop::UNewtonJointLoop()
 	:Super()
 {
 	ReferencedBodyName = TEXT("None");
-	//TargetFrame = FTransform();
+	TargetFrame = FTransform();
 }

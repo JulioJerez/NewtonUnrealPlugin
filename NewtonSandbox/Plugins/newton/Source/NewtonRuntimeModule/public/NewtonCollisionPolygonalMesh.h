@@ -30,7 +30,7 @@ class USplineMeshComponent;
 /**
  * 
  */
-UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonCollision, meta = (BlueprintSpawnableComponent))
 class UNewtonCollisionPolygonalMesh : public UNewtonCollision
 {
 	GENERATED_BODY()

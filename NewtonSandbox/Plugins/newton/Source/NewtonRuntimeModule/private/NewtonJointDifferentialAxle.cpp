@@ -32,12 +32,11 @@
 UNewtonJointDifferentialAxle::UNewtonJointDifferentialAxle()
 	:Super()
 {
-	//ReferencedBodyName = TEXT("None");
-	//TargetFrame = FTransform();
 }
 
 void UNewtonJointDifferentialAxle::DrawGizmo(float timestep) const
 {
+	check(0);
 	//const UWorld* const world = GetWorld();
 	//ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
 	//const FTransform parentTransform(GetComponentTransform());

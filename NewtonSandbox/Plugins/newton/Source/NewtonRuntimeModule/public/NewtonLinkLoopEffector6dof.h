@@ -23,14 +23,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewtonLinkLoop.h"
+#include "NewtonLinkJointLoop.h"
 #include "NewtonLinkLoopEffector6dof.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkLoopEffector6dof : public UNewtonLinkLoop
+class NEWTONRUNTIMEMODULE_API UNewtonLinkLoopEffector6dof : public UNewtonLinkJointLoop
 {
 	GENERATED_BODY()
 
@@ -43,8 +43,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkLoopEffector6dof : public UNewtonLinkLo
 	//UPROPERTY(EditAnywhere, Category = Newton)
 	//FName ReferencedBodyName;
 
-	UPROPERTY(EditAnywhere, Category = Newton)
-	FTransform TargetFrame;
+	//UPROPERTY(EditAnywhere, Category = Newton)
+	//FTransform TargetFrame;
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
 	float AngularSpring;

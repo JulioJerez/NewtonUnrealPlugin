@@ -31,7 +31,7 @@ class UNewtonRigidBody;
 /**
  * 
  */
-UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonCollision, meta = (BlueprintSpawnableComponent))
 class UNewtonCollisionCylinder : public UNewtonCollision
 {
 	GENERATED_BODY()

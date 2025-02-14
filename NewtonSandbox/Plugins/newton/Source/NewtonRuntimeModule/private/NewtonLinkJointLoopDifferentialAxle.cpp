@@ -19,27 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkLoop.h"
+#include "NewtonLinkJointLoopDifferentialAxle.h"
 
-#include "NewtonJoint.h"
 #include "NewtonCommons.h"
-#include "NewtonLinkLoop.h"
+#include "NewtonJointDifferentialAxle.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonLinkLoop::UNewtonLinkLoop()
+UNewtonLinkJointLoopDifferentialAxle::UNewtonLinkJointLoopDifferentialAxle()
 	:Super()
 {
-	BoneIndex = -1;
-	DebugScale = 1.0f;
-	BoneName = TEXT("None");
+	Name = TEXT("differentialAxle");
 }
 
-void UNewtonLinkLoop::SetCommonProperties(UNewtonJoint* const joint) const
+TObjectPtr<USceneComponent> UNewtonLinkJointLoopDifferentialAxle::CreateBlueprintProxy() const
 {
-	joint->ShowDebug = true;
-	//UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
-	//check(loop);
-	//
-	//loop->ShowDebug = true;
-	//loop->ReferencedBodyName = BoneName;
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointDifferentialAxle>(UNewtonJointDifferentialAxle::StaticClass(), Name, RF_Transient));
+	return component;
+}
+
+void UNewtonLinkJointLoopDifferentialAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
+{
+	UNewtonJointDifferentialAxle* const joint = Cast<UNewtonJointDifferentialAxle>(component.Get());
+	SetCommonProperties(joint);
 }

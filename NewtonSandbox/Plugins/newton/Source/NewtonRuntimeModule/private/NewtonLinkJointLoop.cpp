@@ -19,27 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "NewtonLinkJointLoop.h"
 
-#pragma once
+#include "NewtonJoint.h"
+#include "NewtonCommons.h"
+#include "NewtonJointLoop.h"
+#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-#include "CoreMinimal.h"
-#include "NewtonLinkLoop.h"
-#include "NewtonLinkJointDifferentialAxle.generated.h"
-
-/**
- * 
- */
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkJointDifferentialAxle : public UNewtonLinkLoop
+UNewtonLinkJointLoop::UNewtonLinkJointLoop()
+	:Super()
 {
-	GENERATED_BODY()
+	BoneIndex = -1;
+	DebugScale = 1.0f;
+	BoneName = TEXT("None");
+	TargetFrame = FTransform();
+}
 
-	public:
-	UNewtonLinkJointDifferentialAxle();
+void UNewtonLinkJointLoop::SetCommonProperties(UNewtonJoint* const joint) const
+{
+	UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
+	check(loop);
 
-	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
-
-	UPROPERTY(EditAnywhere, Category = Newton)
-	FTransform TargetFrame;
-};
+	loop->ShowDebug = true;
+	loop->TargetFrame = TargetFrame;
+	loop->ReferencedBodyName = BoneName;
+}

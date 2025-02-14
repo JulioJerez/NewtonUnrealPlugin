@@ -36,4 +36,7 @@ class UNewtonJointLoop : public UNewtonJoint
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FName ReferencedBodyName;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	FTransform TargetFrame;
 };

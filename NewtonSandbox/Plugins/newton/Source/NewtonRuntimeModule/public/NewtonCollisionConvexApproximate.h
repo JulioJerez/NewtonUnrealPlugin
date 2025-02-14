@@ -30,7 +30,7 @@
 
 struct FndCachedHullPoints;
 
-UCLASS(ClassGroup=(NewtonCollision), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonCollision, meta = (BlueprintSpawnableComponent))
 class UNewtonCollisionConvexApproximate : public UNewtonCollision
 {
 	GENERATED_BODY()

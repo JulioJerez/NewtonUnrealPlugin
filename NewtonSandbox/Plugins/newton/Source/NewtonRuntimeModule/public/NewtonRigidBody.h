@@ -54,7 +54,7 @@ struct FNewtonRigidBodyInertia
 /**
  * 
  */
-UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+UCLASS(ClassGroup = Newton, BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 {
 	GENERATED_BODY()
@@ -73,40 +73,40 @@ class NEWTONRUNTIMEMODULE_API UNewtonRigidBody : public USceneComponent
 	// **********************************
 	// BluePrint interface
 	// **********************************
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	float GetTimeStep() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	float GetMass() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetInertia() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetFrontDir() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetRightDir() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetUpDir() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetVelocity() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetVelocity(const FVector& veloc) const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetOmega() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetOmega(const FVector& omega) const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector GetForce() const;
 
-	UFUNCTION(BlueprintCallable, Category="Newton")
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetForce(const FVector& force);
 	
 	UFUNCTION(BlueprintCallable)

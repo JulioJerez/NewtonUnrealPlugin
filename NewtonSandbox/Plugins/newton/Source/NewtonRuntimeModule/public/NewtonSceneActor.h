@@ -29,7 +29,7 @@ class ALandscapeProxy;
 class ALandscapeSplineActor;
 class UNewtonSceneRigidBody;
 
-UCLASS(ClassGroup = NewtonActors, meta=(BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
+UCLASS(ClassGroup = NewtonActors, meta = (BlueprintSpawnableComponent), HideCategories = (Physics, Collision))
 class NEWTONRUNTIMEMODULE_API ANewtonSceneActor : public AActor
 {
 	GENERATED_BODY()

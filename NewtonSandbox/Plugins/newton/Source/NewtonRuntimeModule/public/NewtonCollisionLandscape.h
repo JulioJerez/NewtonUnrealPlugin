@@ -33,8 +33,8 @@ class ULandscapeHeightfieldCollisionComponent;
  * 
  */
 
-//UCLASS(Abstract, meta=(BlueprintSpawnableComponent))
-UCLASS(ClassGroup= NewtonLandScape, meta=(BlueprintSpawnableComponent))
+//UCLASS(Abstract, meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonLandScape, meta = (BlueprintSpawnableComponent))
 class UNewtonCollisionLandscape : public UNewtonCollision
 {
 	GENERATED_BODY()

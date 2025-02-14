@@ -27,7 +27,7 @@
 /**
  * 
  */
-UCLASS(ClassGroup = NewtonJoints, meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
 class UNewtonJointVehicleTire : public UNewtonJointWheel
 {
 	GENERATED_BODY()
