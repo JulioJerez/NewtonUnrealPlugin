@@ -21,17 +21,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "NewtonJoint.h"
+#include "NewtonJointLoop.h"
 #include "NewtonJointIk6DofEffector.generated.h"
 
-class ndWorld;
-class ANewtonWorldActor;
-/**
- * 
- */
-UCLASS(ClassGroup=(NewtonJoints), meta=(BlueprintSpawnableComponent))
-class UNewtonJointIk6DofEffector : public UNewtonJoint
+//class ndWorld;
+//class ANewtonWorldActor;
+
+
+UCLASS(ClassGroup = NewtonJoints, meta=(BlueprintSpawnableComponent))
+class UNewtonJointIk6DofEffector : public UNewtonJointLoop
 {
 	GENERATED_BODY()
 	
@@ -48,16 +46,11 @@ class UNewtonJointIk6DofEffector : public UNewtonJoint
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetTargetTransform(const FTransform& transform);
 
-
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	FVector ClipRobotTarget();
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	void SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll);
-
-
-	UPROPERTY(EditAnywhere, Category = Newton)
-	FName ReferencedBodyName;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FTransform TargetFrame;

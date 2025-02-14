@@ -138,6 +138,22 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 				}
 			}
 		}
+
+		const ndList<ndModelArticulation::ndNode>& loops = vehicle->GetCloseLoops();
+		for (ndList<ndModelArticulation::ndNode>::ndNode* node = loops.GetFirst(); node; node = node->GetNext())
+		{
+			ndModelArticulation::ndNode& vehicleNode = node->GetInfo();
+			ndJointBilateralConstraint* const joint = *vehicleNode.m_joint;
+			if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferentialAxle"))
+			{
+				check(0);
+				vehicle->AddDifferentialAxle(vehicleNode.m_joint);
+			}
+			else
+			{
+				check(0);
+			}
+		}
 	}
 
 	void Debug(ndConstraintDebugCallback& context) const override

@@ -33,9 +33,9 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-#define D_MAX_CONTACT_SPEED_TRESHOLD  ndFloat32 (0.25f)
-#define D_MAX_CONTACT_PENETRATION	  ndFloat32 (1.0e-2f)
-#define D_MIN_CONTACT_CLOSE_DISTANCE2 ndFloat32 (5.0e-2f * 5.0e-2f)
+#define D_MAX_CONTACT_SPEED_TRESHOLD	ndFloat32 (0.25f)
+#define D_MAX_CONTACT_PENETRATION		ndFloat32 (1.0e-2f)
+#define D_MIN_CONTACT_CLOSE_DISTANCE2	ndFloat32 (5.0e-2f * 5.0e-2f)
 
 #define D_MAX_SIDESLIP_ANGLE			ndFloat32(15.0f)
 //#define D_MAX_SIDESLIP_ANGLE			ndFloat32(5.0f)
@@ -333,11 +333,21 @@ ndBodyKinematic* ndMultiBodyVehicle::CreateInternalBodyPart(ndFloat32 mass, ndFl
 	return body;
 }
 
+void ndMultiBodyVehicle::AddDifferentialAxle(const ndSharedPtr<ndJointBilateralConstraint>& differentialAxleJoint)
+{
+	ndNode* const node = FindLoopByJoint(*differentialAxleJoint);
+	if (!node)
+	{
+		AddCloseLoop(differentialAxleJoint);
+	}
+}
+
 ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock)
 {
 	ndAssert(m_chassis);
 	ndSharedPtr<ndBody> differentialBody (CreateInternalBodyPart(mass, radius));
 	ndSharedPtr<ndJointBilateralConstraint> differentialJoint(new ndMultiBodyVehicleDifferential(differentialBody->GetAsBodyDynamic(), m_chassis, slipOmegaLock));
+	//AddLimb(GetRoot(), differentialBody, differential);
 	AddDifferential(differentialBody, differentialJoint);
 	
 	const ndVector pin(differentialBody->GetMatrix().RotateVector(differentialJoint->GetLocalMatrix0().m_front));
@@ -346,8 +356,10 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	
 	ndSharedPtr<ndJointBilateralConstraint> leftAxle (new ndMultiBodyVehicleDifferentialAxle(pin, upPin, differentialBody->GetAsBodyKinematic(), drivePin, leftTire->GetBody0()));
 	ndSharedPtr<ndJointBilateralConstraint> rightAxle (new ndMultiBodyVehicleDifferentialAxle(pin, upPin.Scale(ndFloat32(-1.0f)), differentialBody->GetAsBodyKinematic(), drivePin, rightTire->GetBody0()));
-	AddCloseLoop(leftAxle);
-	AddCloseLoop(rightAxle);
+	//AddCloseLoop(leftAxle);
+	//AddCloseLoop(rightAxle);
+	AddDifferentialAxle(leftAxle);
+	AddDifferentialAxle(rightAxle);
 
 	ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*differentialJoint;
 	return joint;
@@ -358,7 +370,8 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	ndAssert(m_chassis);
 	ndSharedPtr<ndBody> differentialBody(CreateInternalBodyPart(mass, radius));
 	ndSharedPtr<ndJointBilateralConstraint> differentialJoint(new ndMultiBodyVehicleDifferential(differentialBody->GetAsBodyKinematic(), m_chassis, slipOmegaLock));
-	AddLimb(GetRoot(), differentialBody, differentialJoint);
+	//AddLimb(GetRoot(), differentialBody, differentialJoint);
+	AddDifferential(differentialBody, differentialJoint);
 
 	const ndVector pin(differentialBody->GetMatrix().RotateVector(differentialJoint->GetLocalMatrix0().m_front));
 	const ndVector upPin(differentialBody->GetMatrix().RotateVector(differentialJoint->GetLocalMatrix0().m_up));
@@ -366,9 +379,10 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	
 	ndSharedPtr<ndJointBilateralConstraint> leftAxle (new ndMultiBodyVehicleDifferentialAxle(pin, upPin, differentialBody->GetAsBodyKinematic(), drivePin, leftDifferential->GetBody0()));
 	ndSharedPtr<ndJointBilateralConstraint> rightAxle (new ndMultiBodyVehicleDifferentialAxle(pin, upPin.Scale(ndFloat32(-1.0f)), differentialBody->GetAsBodyKinematic(), drivePin, rightDifferential->GetBody0()));
-
-	AddCloseLoop(leftAxle);
-	AddCloseLoop(rightAxle);
+	//AddCloseLoop(leftAxle);
+	//AddCloseLoop(rightAxle);
+	AddDifferentialAxle(leftAxle);
+	AddDifferentialAxle(rightAxle);
 
 	ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*differentialJoint;
 	return joint;
@@ -984,30 +998,30 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 				ndContactMaterial& contactPoint = contactNode->GetInfo();
 				switch (tire->m_frictionModel.m_frictionModel)
 				{
-				case ndTireFrictionModel::m_brushModel:
-				{
-					BrushTireModel(tire, contactPoint, timestep);
-					break;
-				}
+					case ndTireFrictionModel::m_brushModel:
+					{
+						BrushTireModel(tire, contactPoint, timestep);
+						break;
+					}
 
-				case ndTireFrictionModel::m_pacejka:
-				{
-					PacejkaTireModel(tire, contactPoint, timestep);
-					break;
-				}
+					case ndTireFrictionModel::m_pacejka:
+					{
+						PacejkaTireModel(tire, contactPoint, timestep);
+						break;
+					}
 
-				case ndTireFrictionModel::m_coulombCicleOfFriction:
-				{
-					CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
-					break;
-				}
+					case ndTireFrictionModel::m_coulombCicleOfFriction:
+					{
+						CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
+						break;
+					}
 
-				case ndTireFrictionModel::m_coulomb:
-				default:
-				{
-					CoulombTireModel(tire, contactPoint, timestep);
-					break;
-				}
+					case ndTireFrictionModel::m_coulomb:
+					default:
+					{
+						CoulombTireModel(tire, contactPoint, timestep);
+						break;
+					}
 				}
 			}
 		}

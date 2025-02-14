@@ -23,6 +23,7 @@
 
 #include "NewtonJoint.h"
 #include "NewtonCommons.h"
+#include "NewtonLinkLoop.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkLoop::UNewtonLinkLoop()
@@ -30,9 +31,15 @@ UNewtonLinkLoop::UNewtonLinkLoop()
 {
 	BoneIndex = -1;
 	DebugScale = 1.0f;
+	BoneName = TEXT("None");
 }
 
 void UNewtonLinkLoop::SetCommonProperties(UNewtonJoint* const joint) const
 {
 	joint->ShowDebug = true;
+	//UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
+	//check(loop);
+	//
+	//loop->ShowDebug = true;
+	//loop->ReferencedBodyName = BoneName;
 }

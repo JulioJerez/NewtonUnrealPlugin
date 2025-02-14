@@ -47,4 +47,10 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkLoop : public UNewtonLink
 
 	UPROPERTY(EditAnywhere)
 	float DebugScale;
+
+	//UPROPERTY(VisibleAnywhere)
+	//FName ReferencedBodyName;
+	//
+	//UPROPERTY(EditAnywhere)
+	//int ReferencedBoneIndex;
 };

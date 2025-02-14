@@ -32,7 +32,7 @@
 UNewtonJointIk6DofEffector::UNewtonJointIk6DofEffector()
 	:Super()
 {
-	ReferencedBodyName = TEXT("None");
+	//ReferencedBodyName = TEXT("None");
 
 	TargetFrame = FTransform();
 	AngularDamper = 500.0f;
@@ -119,11 +119,12 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 	ndInt32 boneIndex = -1;
 	for (ndInt32 i = boneInfo.Num() - 1; i >= 0; --i)
 	{
-		if (boneInfo[i].Name == ReferencedBodyName)
-		{
-			boneIndex = i;
-			break;
-		}
+		check(0);
+		//if (boneInfo[i].Name == ReferencedBodyName)
+		//{
+		//	boneIndex = i;
+		//	break;
+		//}
 	}
 	check(boneIndex != -1);
 

@@ -43,6 +43,7 @@
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkJointDifferential.h"
 #include "NewtonLinkCollisionConvexhull.h"
+#include "NewtonLinkJointDifferentialAxle.h"
 #include "NewtonLinkCollisionConvexApproximate.h"
 
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.4f

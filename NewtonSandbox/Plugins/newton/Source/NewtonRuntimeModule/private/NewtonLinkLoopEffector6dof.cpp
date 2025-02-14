@@ -29,6 +29,16 @@ UNewtonLinkLoopEffector6dof::UNewtonLinkLoopEffector6dof()
 	:Super()
 {
 	Name = TEXT("effector6dof");
+	TargetFrame = FTransform();
+	AngularDamper = 500.0f;
+	AngularSpring = 10000.0f;
+	AngularMaxTorque = 10000.0f;
+	AngularRegularizer = 1.0e-5f;
+
+	LinearDamper = 500.0f;
+	LinearSpring = 10000.0f;
+	LinearMaxForce = 10000.0f;
+	LinearRegularizer = 1.0e-5f;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkLoopEffector6dof::CreateBlueprintProxy() const
@@ -44,5 +54,15 @@ void UNewtonLinkLoopEffector6dof::InitBlueprintProxy(TObjectPtr<USceneComponent>
 	SetCommonProperties(joint);
 
 	joint->TargetFrame = TargetFrame;
-	joint->ReferencedBodyName = BoneName;
+	check(0);
+	//joint->ReferencedBodyName = BoneName;
+
+	joint->LinearSpring = LinearSpring;
+	joint->LinearDamper = LinearDamper;
+	joint->LinearMaxForce = LinearMaxForce;
+	joint->LinearRegularizer = LinearRegularizer;
+	joint->AngularSpring = AngularSpring;
+	joint->AngularDamper = AngularDamper;
+	joint->AngularMaxTorque = AngularMaxTorque;
+	joint->AngularRegularizer = AngularRegularizer;
 }
