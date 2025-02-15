@@ -149,7 +149,6 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 		}
 	}
 
-	//UNewtonRigidBody* const parentComponet = FindParent();
 	UNewtonRigidBody* const parentComponet = Cast<UNewtonRigidBody>(GetAttachParent());
 	check(parentComponet);
 	if (parentComponet && childComponent)
@@ -171,8 +170,6 @@ ndJointBilateralConstraint* UNewtonJointIk6DofEffector::CreateJoint()
 		const ndMatrix refFrame(joint->GetEffectorMatrix());
 		m_referenceFrame = ToUnrealMatrix(refFrame);
 
-		//m_joint = joint;
-		//world->AddJoint(m_joint);
 		return joint;
 	}
 	return nullptr;

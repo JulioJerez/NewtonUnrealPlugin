@@ -24,6 +24,7 @@
 
 #include "NewtonAsset.h"
 #include "NewtonJoint.h"
+#include "NewtonJointLoop.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
 #include "NewtonModelBlueprintBuilder.h"
@@ -82,6 +83,7 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 
 		check(vehicle->GetRoot());
 		vehicle->AddChassis(vehicle->GetRoot()->m_body);
+vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0f, 0.0f, 0.0f));
 
 		// add all tires
 		for (ndMultiBodyVehicle::ndNode* node = vehicle->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -97,8 +99,7 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 
 		auto FindJointComponent = [owner](const ndJointBilateralConstraint* const joint)
 		{
-			AActor* const actorOwner = owner->GetOwner();
-			for (TSet<UActorComponent*>::TConstIterator it(actorOwner->GetComponents().CreateConstIterator()); it; ++it)
+			for (TSet<UActorComponent*>::TConstIterator it(owner->GetOwner()->GetComponents().CreateConstIterator()); it; ++it)
 			{
 				const UNewtonJoint* const jointComponent = Cast<UNewtonJoint>(*it);
 				if (jointComponent && (jointComponent->m_joint == joint))
@@ -124,17 +125,22 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 					const ndMatrix matrix(vehicle->GetLocalFrame() * differentialBody->GetMatrix());
 					differentialBody->SetMatrix(matrix);
 
+					ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
+					diffCollision.SetCollisionMode(false);
+					differentialBody->SetCollisionShape(diffCollision);
+					differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
+//differentialBody->SetMassMatrix(componentOwner->BodyMass * 10.0f, diffCollision);
+//ndVector xxxx(10.0f, 0.0f, 0.0f, 0.0f);
+//differentialBody->SetOmega(xxxx);
+
+					differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+
 					ndMatrix localMatrix0;
 					ndMatrix localMatrix1;
 					node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
 					node->m_joint->SetLocalMatrix0(localMatrix0);
 					node->m_joint->SetLocalMatrix1(localMatrix1);
-
-					ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
-					differentialBody->SetCollisionShape(diffCollision);
-					differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
-					differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
-					vehicle->AddDifferential(node->m_body, node->m_joint);
+					//vehicle->AddDifferential(node->m_body, node->m_joint);
 				}
 			}
 		}
@@ -146,8 +152,7 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			ndJointBilateralConstraint* const joint = *vehicleNode.m_joint;
 			if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferentialAxle"))
 			{
-				check(0);
-				vehicle->AddDifferentialAxle(vehicleNode.m_joint);
+				//vehicle->AddDifferentialAxle(vehicleNode.m_joint);
 			}
 			else
 			{
@@ -276,13 +281,11 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 		}
 		else
 		{
-			UNewtonJoint* const loopComponent = Cast<UNewtonJoint>(component);
+			UNewtonJointLoop* const loopComponent = Cast<UNewtonJointLoop>(component);
 			if (loopComponent)
 			{
-				if (loopComponent->GetAttachChildren().Num() == 0)
-				{
-					loops.PushBack(loopComponent);
-				}
+				check (loopComponent->GetAttachChildren().Num() == 0)
+				loops.PushBack(loopComponent);
 			}
 		}
 

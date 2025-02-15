@@ -27,6 +27,8 @@
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
 #include "NewtonRuntimeModule.h"
+#include "NewtonJointVehicleTire.h"
+#include "NewtonJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonJointDifferentialAxle::UNewtonJointDifferentialAxle()
@@ -36,48 +38,25 @@ UNewtonJointDifferentialAxle::UNewtonJointDifferentialAxle()
 
 void UNewtonJointDifferentialAxle::DrawGizmo(float timestep) const
 {
-	check(0);
-	//const UWorld* const world = GetWorld();
-	//ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
-	//const FTransform parentTransform(GetComponentTransform());
-	//
-	//auto DrawFrame = [world, scale, timestep](const FTransform& frame)
-	//{
-	//	float thickness = 0.5f;
-	//	const FVector positionParent(frame.GetLocation());
-	//	const FVector xAxisParent(frame.GetUnitAxis(EAxis::X));
-	//	const FVector yAxisParent(frame.GetUnitAxis(EAxis::Y));
-	//	const FVector zAxisParent(frame.GetUnitAxis(EAxis::Z));
-	//	DrawDebugLine(world, positionParent, positionParent + scale * xAxisParent, FColor::Red, false, timestep, thickness);
-	//	DrawDebugLine(world, positionParent, positionParent + scale * zAxisParent, FColor::Blue, false, timestep, thickness);
-	//	DrawDebugLine(world, positionParent, positionParent + scale * yAxisParent, FColor::Green, false, timestep, thickness);
-	//};
-	//
-	//// draw references frames
-	//DrawFrame(parentTransform);
-	//DrawFrame(TargetFrame * parentTransform);
-	//
-	//if (m_joint)
-	//{
-	//	// draw current effector frame
-	//	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
-	//	const FTransform effectorTransform(ToUnrealTransform(joint->GetEffectorMatrix()));
-	//	DrawFrame(effectorTransform * parentTransform);
-	//
-	//	// calculate the target frame for debug draw
-	//	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
-	//	const ndVector referencePoint(refMatrix.m_posit);
-	//	const ndVector step(m_targetX * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f), m_targetZ * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f));
-	//	const ndMatrix azimuthRotation(ndRollMatrix(m_targetAzimuth * ndDegreeToRad));
-	//	const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
-	//
-	//	ndMatrix targetMatrix(ndRollMatrix(m_targetRoll * ndDegreeToRad) * ndYawMatrix(m_targetYaw * ndDegreeToRad) * ndPitchMatrix(m_targetPitch * ndDegreeToRad));
-	//	targetMatrix.m_posit = target;
-	//	targetMatrix.m_posit.m_w = 1.0f;
-	//
-	//	const FTransform targetTransform(ToUnrealTransform(targetMatrix));
-	//	DrawFrame(targetTransform * parentTransform);
-	//}
+	const UWorld* const world = GetWorld();
+	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
+	
+	auto DrawFrame = [world, scale, timestep](const FTransform& frame)
+	{
+		float thickness = 0.5f;
+		const FVector positionParent(frame.GetLocation());
+		const FVector xAxisParent(frame.GetUnitAxis(EAxis::X));
+		const FVector yAxisParent(frame.GetUnitAxis(EAxis::Y));
+		const FVector zAxisParent(frame.GetUnitAxis(EAxis::Z));
+		DrawDebugLine(world, positionParent, positionParent + scale * xAxisParent, FColor::Red, false, timestep, thickness);
+		DrawDebugLine(world, positionParent, positionParent + scale * zAxisParent, FColor::Blue, false, timestep, thickness);
+		DrawDebugLine(world, positionParent, positionParent + scale * yAxisParent, FColor::Green, false, timestep, thickness);
+	};
+	
+	// draw references frames
+	const FTransform parentTransform(GetComponentTransform());
+	DrawFrame(parentTransform);
+	DrawFrame(TargetFrame * parentTransform);
 }
 
 // Called when the game starts
@@ -87,7 +66,6 @@ ndJointBilateralConstraint* UNewtonJointDifferentialAxle::CreateJoint()
 	
 	check(!m_joint);
 
-	check(0);
 	AActor* const owner = GetOwner();
 	check(owner);
 	UNewtonModel* const model = owner->FindComponentByClass<UNewtonModel>();
@@ -135,18 +113,42 @@ ndJointBilateralConstraint* UNewtonJointDifferentialAxle::CreateJoint()
 	check(parentComponet);
 	if (parentComponet && childComponent)
 	{
-		check(0);
-		//ndBodyKinematic* const childBody = childComponent->GetBody();
-		//ndBodyKinematic* const parentBody = parentComponet->GetBody();
+		ndBodyKinematic* const childBody = childComponent->GetBody();
+		ndBodyKinematic* const parentBody = parentComponet->GetBody();
 		//const FTransform transform(GetRelativeTransform());
 		//const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
 		//const ndMatrix childMarix(ToNewtonMatrix(TargetFrame) * parentMarix);
-		//ndMultiBodyVehicleDifferentialAxle* const joint = new ndMultiBodyVehicleDifferentialAxle(childMarix, parentMarix, childBody, parentBody);
-		//
-		////const ndMatrix refFrame(joint->GetEffectorMatrix());
-		////m_referenceFrame = ToUnrealMatrix(refFrame);
-		//
-		//return joint;
+
+		const UNewtonJointVehicleTire* tireJoint = nullptr;
+		const UNewtonJointVehicleDifferential* differentialJoint = nullptr;
+		for (TSet<UActorComponent*>::TConstIterator it(parentComponet->GetOwner()->GetComponents().CreateConstIterator()); it; ++it)
+		{
+			const UNewtonJointVehicleTire* const wheelJoint = Cast<UNewtonJointVehicleTire>(*it);
+			if (wheelJoint && (wheelJoint->GetJoint()->GetBody0() == childBody))
+			{
+				tireJoint = wheelJoint;
+			}
+
+			const UNewtonJointVehicleDifferential* const diffJoint = Cast<UNewtonJointVehicleDifferential>(*it);
+			if (diffJoint && (diffJoint->GetJoint()->GetBody0() == parentBody))
+			{
+				differentialJoint = diffJoint;
+			}
+		}
+		check(tireJoint);
+		check(differentialJoint);
+
+		const FTransform transform(GetRelativeTransform());
+		const ndMatrix childMarix(tireJoint->GetJoint()->CalculateGlobalMatrix0());
+		//const ndMatrix parentMarix(differentialJoint->GetJoint()->CalculateGlobalMatrix0());
+		const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
+		
+		const ndVector upPin(parentMarix.m_up);
+		const ndVector pin(parentMarix.m_front);
+		const ndVector drivePin(childMarix.m_front);
+		ndMultiBodyVehicleDifferentialAxle* const joint = new ndMultiBodyVehicleDifferentialAxle(pin, upPin, parentBody, drivePin, childBody);
+		
+		return joint;
 	}
 	return nullptr;
 }

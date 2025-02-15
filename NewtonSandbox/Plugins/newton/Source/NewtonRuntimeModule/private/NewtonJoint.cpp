@@ -147,6 +147,11 @@ void UNewtonJoint::GetBodyPairs(ndBodyKinematic** body0, ndBodyKinematic** body1
 	}
 }
 
+ndJointBilateralConstraint* UNewtonJoint::GetJoint() const
+{
+	return m_joint;
+}
+
 void UNewtonJoint::DrawGizmo(float timestep) const
 {
 	check(0);

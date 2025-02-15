@@ -52,6 +52,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonJoint : public USceneComponent
 	void DestroyJoint();
 	void UpdateTransform();
 	virtual void DrawGizmo(float timestep) const;
+
+	ndJointBilateralConstraint* GetJoint() const;
 	virtual ndJointBilateralConstraint* CreateJoint() ;
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
