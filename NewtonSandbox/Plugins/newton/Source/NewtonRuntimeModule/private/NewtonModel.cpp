@@ -140,7 +140,7 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 					node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
 					node->m_joint->SetLocalMatrix0(localMatrix0);
 					node->m_joint->SetLocalMatrix1(localMatrix1);
-					//vehicle->AddDifferential(node->m_body, node->m_joint);
+					vehicle->AddDifferential(node->m_body, node->m_joint);
 				}
 			}
 		}
@@ -152,7 +152,7 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 			ndJointBilateralConstraint* const joint = *vehicleNode.m_joint;
 			if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferentialAxle"))
 			{
-				//vehicle->AddDifferentialAxle(vehicleNode.m_joint);
+				vehicle->AddDifferentialAxle(vehicleNode.m_joint);
 			}
 			else
 			{
