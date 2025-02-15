@@ -35,8 +35,6 @@ UNewtonLinkJointMotor::UNewtonLinkJointMotor()
 
 TObjectPtr<USceneComponent> UNewtonLinkJointMotor::CreateBlueprintProxy() const
 {
-	check(0);
-	//TObjectPtr<USceneComponent> component(NewObject<UNewtonLinkJointMotor>(UNewtonLinkJointMotor::StaticClass(), Name, RF_Transient));
 	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointVehicleMotor>(UNewtonJointVehicleMotor::StaticClass(), Name, RF_Transient));
 	return component;
 }
@@ -47,7 +45,6 @@ void UNewtonLinkJointMotor::InitBlueprintProxy(TObjectPtr<USceneComponent> compo
 
 	SetCommonProperties(joint);
 
-	check(0);
 	joint->BodyMass = BodyMass;
 	joint->BodyRadio = BodyRadio;
 }

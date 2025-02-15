@@ -44,6 +44,7 @@
 #include "NewtonModelPhysicsTreeItemShapeBox.h"
 #include "NewtonModelPhysicsTreeItemJointTire.h"
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
+#include "NewtonModelPhysicsTreeItemJointMotor.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
 #include "NewtonModelPhysicsTreeItemJointWheel.h"
 #include "NewtonModelPhysicsTreeItemJointRoller.h"
@@ -425,6 +426,13 @@ void FNewtonModelPhysicsTree::OnAddJointTireRow()
 	AddJointRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddJointMotorRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointMotor(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointMotor>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddJointRow(item);
+}
+
 void FNewtonModelPhysicsTree::OnAddJointDifferentialRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointDifferential>()), m_editor)));
@@ -565,6 +573,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointTireRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddJointMotor
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointMotorRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddJointDifferential
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointDifferentialRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
@@ -617,6 +629,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddJointRoller);
 		menuBuilder.AddMenuEntry(actions.AddJointWheel);
 		menuBuilder.AddMenuEntry(actions.AddJointTire);
+		menuBuilder.AddMenuEntry(actions.AddJointMotor);
 		menuBuilder.AddMenuEntry(actions.AddJointDifferential);
 	menuBuilder.EndSection();
 
@@ -1177,6 +1190,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkJointWheel>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkJointMotor>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointMotor(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

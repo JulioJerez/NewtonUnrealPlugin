@@ -96,6 +96,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnAddJointWheelRow();
 	void OnAddJointSliderRow();
 	void OnAddJointRollerRow();
+	void OnAddJointMotorRow();
 	void OnAddJointDifferentialRow();
 	void OnAddJointDifferentialAxleRow();
 	void OnAddJointLoopEffector6dofRow();

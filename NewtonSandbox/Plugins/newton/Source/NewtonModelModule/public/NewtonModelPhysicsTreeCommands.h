@@ -62,10 +62,11 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 	TSharedPtr<FUICommandInfo> AddJointHinge;
 	TSharedPtr<FUICommandInfo> AddJointSlider;
 	TSharedPtr<FUICommandInfo> AddJointRoller;
+	TSharedPtr<FUICommandInfo> AddJointMotor;
 	TSharedPtr<FUICommandInfo> AddJointDifferential;
-	TSharedPtr<FUICommandInfo> AddJointDifferentialAxle;
 
 	TSharedPtr<FUICommandInfo> AddLoopEffector6dof;
+	TSharedPtr<FUICommandInfo> AddJointDifferentialAxle;
 
 	TSharedPtr<FUICommandInfo> DeleteSelectedRow;
 };

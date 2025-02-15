@@ -27,6 +27,7 @@
 #include "NewtonJointLoop.h"
 #include "NewtonRigidBody.h"
 #include "NewtonWorldActor.h"
+#include "NewtonJointVehicleMotor.h"
 #include "NewtonModelBlueprintBuilder.h"
 #include "NewtonJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
@@ -85,17 +86,6 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 		vehicle->AddChassis(vehicle->GetRoot()->m_body);
 vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0f, 0.0f, 0.0f));
 
-		// add all tires
-		for (ndMultiBodyVehicle::ndNode* node = vehicle->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		{
-			ndMultiBodyVehicleTireJoint* const joint = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
-			if (joint && !strcmp (joint->ClassName(), "ndMultiBodyVehicleTireJoint"))
-			{
-				//ndMultiBodyVehicleTireJointInfo info(tire->GetInfo());
-				joint->SetVehicle(vehicle);
-				vehicle->AddTire(node->m_body, node->m_joint);
-			}
-		}
 
 		auto FindJointComponent = [owner](const ndJointBilateralConstraint* const joint)
 		{
@@ -110,41 +100,79 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 			return (const UNewtonJoint*)nullptr;
 		};
 
-		// add all differentials
+		// add all tires, differentials and motor
 		for (ndMultiBodyVehicle::ndNode* node = vehicle->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*node->m_joint;
-			if (joint && !strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferential"))
+			if (node->m_joint)
 			{
-				const UNewtonJointVehicleDifferential* const componentOwner = Cast<UNewtonJointVehicleDifferential>(FindJointComponent(joint));
-				ndAssert(componentOwner);
-				if (componentOwner)
+				const char* const className = node->m_joint->ClassName();
+				if (!strcmp(className, "ndMultiBodyVehicleTireJoint"))
 				{
-					// set the procedural shape
-					ndBodyKinematic* const differentialBody = joint->GetBody0();
-					const ndMatrix matrix(vehicle->GetLocalFrame() * differentialBody->GetMatrix());
-					differentialBody->SetMatrix(matrix);
+					ndMultiBodyVehicleTireJoint* const joint = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
+					//ndMultiBodyVehicleTireJointInfo info(tire->GetInfo());
+					joint->SetVehicleOwner(vehicle);
+					vehicle->AddTire(node->m_body, node->m_joint);
+				}
+				else if (!strcmp(className, "ndMultiBodyVehicleMotor"))
+				{
+					ndMultiBodyVehicleMotor* const joint = (ndMultiBodyVehicleMotor*)*node->m_joint;
+					joint->SetVehicleOwner(vehicle);
 
-					ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
-					diffCollision.SetCollisionMode(false);
-					differentialBody->SetCollisionShape(diffCollision);
-					differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
-//differentialBody->SetMassMatrix(componentOwner->BodyMass * 10.0f, diffCollision);
-//ndVector xxxx(10.0f, 0.0f, 0.0f, 0.0f);
-//differentialBody->SetOmega(xxxx);
+					const UNewtonJointVehicleMotor* const componentOwner = Cast<UNewtonJointVehicleMotor>(FindJointComponent(joint));
+					if (componentOwner)
+					{
+						// set the procedural shape
+						ndBodyKinematic* const motorBody = joint->GetBody0();
+						const ndMatrix matrix(vehicle->GetLocalFrame() * motorBody->GetMatrix());
+						motorBody->SetMatrix(matrix);
 
-					differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+						ndShapeInstance motorCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
+						motorCollision.SetCollisionMode(false);
+						motorBody->SetCollisionShape(motorCollision);
+						motorBody->SetMassMatrix(componentOwner->BodyMass, motorCollision);
 
-					ndMatrix localMatrix0;
-					ndMatrix localMatrix1;
-					node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
-					node->m_joint->SetLocalMatrix0(localMatrix0);
-					node->m_joint->SetLocalMatrix1(localMatrix1);
-					vehicle->AddDifferential(node->m_body, node->m_joint);
+						//differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+
+						ndMatrix localMatrix0;
+						ndMatrix localMatrix1;
+						node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
+						node->m_joint->SetLocalMatrix0(localMatrix0);
+						node->m_joint->SetLocalMatrix1(localMatrix1);
+
+						vehicle->AddMotor(node->m_body, node->m_joint);
+					}
+				}
+				else if (!strcmp(className, "ndMultiBodyVehicleDifferential"))
+				{
+					ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*node->m_joint;
+					const UNewtonJointVehicleDifferential* const componentOwner = Cast<UNewtonJointVehicleDifferential>(FindJointComponent(joint));
+					ndAssert(componentOwner);
+					if (componentOwner)
+					{
+						// set the procedural shape
+						ndBodyKinematic* const differentialBody = joint->GetBody0();
+						const ndMatrix matrix(vehicle->GetLocalFrame() * differentialBody->GetMatrix());
+						differentialBody->SetMatrix(matrix);
+
+						ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
+						diffCollision.SetCollisionMode(false);
+						differentialBody->SetCollisionShape(diffCollision);
+						differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
+
+						//differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+
+						ndMatrix localMatrix0;
+						ndMatrix localMatrix1;
+						node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
+						node->m_joint->SetLocalMatrix0(localMatrix0);
+						node->m_joint->SetLocalMatrix1(localMatrix1);
+						vehicle->AddDifferential(node->m_body, node->m_joint);
+					}
 				}
 			}
 		}
 
+		// add all loops, axles and gear box
 		const ndList<ndModelArticulation::ndNode>& loops = vehicle->GetCloseLoops();
 		for (ndList<ndModelArticulation::ndNode>::ndNode* node = loops.GetFirst(); node; node = node->GetNext())
 		{

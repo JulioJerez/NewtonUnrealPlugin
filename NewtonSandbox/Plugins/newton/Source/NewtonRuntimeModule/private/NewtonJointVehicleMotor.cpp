@@ -51,10 +51,8 @@ ndJointBilateralConstraint* UNewtonJointVehicleMotor::CreateJoint()
 
 	if (body0 && body1)
 	{
-		//const ndMatrix matrix(GetPivotMatrix());
-		check (0)
-		//ndMultiBodyVehicleMotor* const joint = new ndMultiBodyVehicleMotor(body0, body1, radPerSec);
-		//return joint;
+		ndMultiBodyVehicleMotor* const joint = new ndMultiBodyVehicleMotor(body0, body1);
+		return joint;
 	}
 	return nullptr;
 }
