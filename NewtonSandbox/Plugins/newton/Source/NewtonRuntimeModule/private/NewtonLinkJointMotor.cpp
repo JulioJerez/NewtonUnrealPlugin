@@ -19,26 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoopDifferentialAxle.h"
-
+#include "NewtonLinkJointMotor.h"
 #include "NewtonCommons.h"
-#include "NewtonJointLoopDifferentialAxle.h"
+#include "NewtonJointVehicleMotor.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonLinkJointLoopDifferentialAxle::UNewtonLinkJointLoopDifferentialAxle()
+UNewtonLinkJointMotor::UNewtonLinkJointMotor()
 	:Super()
 {
-	Name = TEXT("differentialAxle");
+	Name = TEXT("motor");
+
+	BodyMass = 25.0f;
+	BodyRadio = 25.0f;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkJointLoopDifferentialAxle::CreateBlueprintProxy() const
+TObjectPtr<USceneComponent> UNewtonLinkJointMotor::CreateBlueprintProxy() const
 {
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointLoopDifferentialAxle>(UNewtonJointLoopDifferentialAxle::StaticClass(), Name, RF_Transient));
+	check(0);
+	//TObjectPtr<USceneComponent> component(NewObject<UNewtonLinkJointMotor>(UNewtonLinkJointMotor::StaticClass(), Name, RF_Transient));
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointVehicleMotor>(UNewtonJointVehicleMotor::StaticClass(), Name, RF_Transient));
 	return component;
 }
 
-void UNewtonLinkJointLoopDifferentialAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
+void UNewtonLinkJointMotor::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	UNewtonJointLoopDifferentialAxle* const joint = Cast<UNewtonJointLoopDifferentialAxle>(component.Get());
+	UNewtonJointVehicleMotor* const joint = Cast<UNewtonJointVehicleMotor>(component.Get());
+
 	SetCommonProperties(joint);
+
+	check(0);
+	joint->BodyMass = BodyMass;
+	joint->BodyRadio = BodyRadio;
 }

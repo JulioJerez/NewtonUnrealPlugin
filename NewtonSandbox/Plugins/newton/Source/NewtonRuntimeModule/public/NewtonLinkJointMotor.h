@@ -19,23 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
 #pragma once
 
-#include "NewtonJointLoop.h"
-#include "NewtonJointDifferentialAxle.generated.h"
+#include "CoreMinimal.h"
+#include "NewtonLinkJoint.h"
+#include "NewtonLinkJointMotor.generated.h"
 
-//class ndWorld;
-//class ANewtonWorldActor;
-
-UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
-class UNewtonJointDifferentialAxle : public UNewtonJointLoop
+/**
+ * 
+ */
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointMotor : public UNewtonLinkJoint
 {
 	GENERATED_BODY()
-	
-	public:
-	// Sets default values for this component's properties
-	UNewtonJointDifferentialAxle();
 
-	virtual void DrawGizmo(float timestep) const override;
-	virtual ndJointBilateralConstraint* CreateJoint() override;
+	public:
+	UNewtonLinkJointMotor();
+
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f, ClampMax = 100.0f))
+	float BodyMass;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 25.0f, ClampMax = 100.0f))
+	float BodyRadio;
 };

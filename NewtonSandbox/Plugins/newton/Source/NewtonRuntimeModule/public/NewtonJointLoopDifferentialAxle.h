@@ -19,26 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoopDifferentialAxle.h"
+#pragma once
 
-#include "NewtonCommons.h"
-#include "NewtonJointLoopDifferentialAxle.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+#include "NewtonJointLoop.h"
+#include "NewtonJointLoopDifferentialAxle.generated.h"
 
-UNewtonLinkJointLoopDifferentialAxle::UNewtonLinkJointLoopDifferentialAxle()
-	:Super()
+
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
+class UNewtonJointLoopDifferentialAxle : public UNewtonJointLoop
 {
-	Name = TEXT("differentialAxle");
-}
+	GENERATED_BODY()
+	
+	public:
+	// Sets default values for this component's properties
+	UNewtonJointLoopDifferentialAxle();
 
-TObjectPtr<USceneComponent> UNewtonLinkJointLoopDifferentialAxle::CreateBlueprintProxy() const
-{
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointLoopDifferentialAxle>(UNewtonJointLoopDifferentialAxle::StaticClass(), Name, RF_Transient));
-	return component;
-}
-
-void UNewtonLinkJointLoopDifferentialAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
-{
-	UNewtonJointLoopDifferentialAxle* const joint = Cast<UNewtonJointLoopDifferentialAxle>(component.Get());
-	SetCommonProperties(joint);
-}
+	virtual void DrawGizmo(float timestep) const override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
+};

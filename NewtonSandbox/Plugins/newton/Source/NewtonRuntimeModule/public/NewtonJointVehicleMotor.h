@@ -19,26 +19,27 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoopDifferentialAxle.h"
+#pragma once
 
-#include "NewtonCommons.h"
-#include "NewtonJointLoopDifferentialAxle.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+#include "CoreMinimal.h"
+#include "NewtonJoint.h"
+#include "NewtonJointVehicleMotor.generated.h"
 
-UNewtonLinkJointLoopDifferentialAxle::UNewtonLinkJointLoopDifferentialAxle()
-	:Super()
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
+class UNewtonJointVehicleMotor : public UNewtonJoint
 {
-	Name = TEXT("differentialAxle");
-}
+	GENERATED_BODY()
+	
+	public:
+	// Sets default values for this component's properties
+	UNewtonJointVehicleMotor();
 
-TObjectPtr<USceneComponent> UNewtonLinkJointLoopDifferentialAxle::CreateBlueprintProxy() const
-{
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointLoopDifferentialAxle>(UNewtonJointLoopDifferentialAxle::StaticClass(), Name, RF_Transient));
-	return component;
-}
+	virtual void DrawGizmo(float timestep) const override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
 
-void UNewtonLinkJointLoopDifferentialAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
-{
-	UNewtonJointLoopDifferentialAxle* const joint = Cast<UNewtonJointLoopDifferentialAxle>(component.Get());
-	SetCommonProperties(joint);
-}
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f, ClampMax = 100.0f))
+	float BodyMass;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 25.0f, ClampMax = 100.0f))
+	float BodyRadio;
+};

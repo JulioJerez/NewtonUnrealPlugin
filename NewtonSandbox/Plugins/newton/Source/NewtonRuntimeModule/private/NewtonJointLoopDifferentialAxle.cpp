@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonJointDifferentialAxle.h"
+#include "NewtonJointLoopDifferentialAxle.h"
 #include "Animation\Skeleton.h"
 
 #include "NewtonModel.h"
@@ -31,12 +31,12 @@
 #include "NewtonJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonJointDifferentialAxle::UNewtonJointDifferentialAxle()
+UNewtonJointLoopDifferentialAxle::UNewtonJointLoopDifferentialAxle()
 	:Super()
 {
 }
 
-void UNewtonJointDifferentialAxle::DrawGizmo(float timestep) const
+void UNewtonJointLoopDifferentialAxle::DrawGizmo(float timestep) const
 {
 	const UWorld* const world = GetWorld();
 	ndFloat32 scale = DebugScale * UNREAL_UNIT_SYSTEM;
@@ -60,7 +60,7 @@ void UNewtonJointDifferentialAxle::DrawGizmo(float timestep) const
 }
 
 // Called when the game starts
-ndJointBilateralConstraint* UNewtonJointDifferentialAxle::CreateJoint()
+ndJointBilateralConstraint* UNewtonJointLoopDifferentialAxle::CreateJoint()
 {
 	Super::CreateJoint();
 	

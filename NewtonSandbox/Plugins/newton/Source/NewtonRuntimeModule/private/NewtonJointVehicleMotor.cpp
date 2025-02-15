@@ -19,26 +19,43 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoopDifferentialAxle.h"
+#include "NewtonJointVehicleMotor.h"
 
-#include "NewtonCommons.h"
-#include "NewtonJointLoopDifferentialAxle.h"
+#include "NewtonRigidBody.h"
+#include "NewtonWorldActor.h"
+#include "NewtonRuntimeModule.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonLinkJointLoopDifferentialAxle::UNewtonLinkJointLoopDifferentialAxle()
+UNewtonJointVehicleMotor::UNewtonJointVehicleMotor()
 	:Super()
 {
-	Name = TEXT("differentialAxle");
+	BodyMass = 25.0f;
+	BodyRadio = 25.0f;
 }
 
-TObjectPtr<USceneComponent> UNewtonLinkJointLoopDifferentialAxle::CreateBlueprintProxy() const
+void UNewtonJointVehicleMotor::DrawGizmo(float timestep) const
 {
-	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointLoopDifferentialAxle>(UNewtonJointLoopDifferentialAxle::StaticClass(), Name, RF_Transient));
-	return component;
+	const FTransform transform(GetComponentTransform());
+	DrawDebugCoordinateSystem(GetWorld(), transform.GetLocation(), transform.Rotator(), DebugScale, false, timestep);
 }
 
-void UNewtonLinkJointLoopDifferentialAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
+// Called when the game starts
+ndJointBilateralConstraint* UNewtonJointVehicleMotor::CreateJoint()
 {
-	UNewtonJointLoopDifferentialAxle* const joint = Cast<UNewtonJointLoopDifferentialAxle>(component.Get());
-	SetCommonProperties(joint);
+	Super::CreateJoint();
+
+	check(!m_joint);
+	ndBodyKinematic* body0;
+	ndBodyKinematic* body1;
+	GetBodyPairs(&body0, &body1);
+
+	if (body0 && body1)
+	{
+		//const ndMatrix matrix(GetPivotMatrix());
+		check (0)
+		//ndMultiBodyVehicleMotor* const joint = new ndMultiBodyVehicleMotor(body0, body1, radPerSec);
+		//return joint;
+	}
+	return nullptr;
 }
+
