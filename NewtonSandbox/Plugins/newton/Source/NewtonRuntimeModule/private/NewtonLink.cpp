@@ -32,6 +32,7 @@ UNewtonLink::UNewtonLink()
 
 	m_hidden = false;
 	ShowDebug = true;
+	DebugScale = 1.0f;
 }
 
 void UNewtonLink::AttachNode(UNewtonLink* const node)

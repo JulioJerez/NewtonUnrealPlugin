@@ -46,8 +46,5 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoop : public UNewtonLink
 	int BoneIndex;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	float DebugScale;
-
-	UPROPERTY(EditAnywhere, Category = Newton)
 	FTransform TargetFrame;
 };

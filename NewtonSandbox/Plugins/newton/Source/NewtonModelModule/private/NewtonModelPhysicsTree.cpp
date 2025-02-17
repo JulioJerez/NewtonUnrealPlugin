@@ -40,7 +40,7 @@
 #include "NewtonModelPhysicsTreeItemRow.h"
 #include "NewtonModelPhysicsTreeCommands.h"
 #include "NewtonModelPhysicsTreeItemBody.h"
-#include "NewtonModelPhysicsTreeItemLoop.h"
+#include "NewtonModelPhysicsTreeItemJointLoop.h"
 #include "NewtonModelPhysicsTreeItemShapeBox.h"
 #include "NewtonModelPhysicsTreeItemJointTire.h"
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
@@ -54,9 +54,9 @@
 #include "NewtonModelPhysicsTreeItemShapeCylinder.h"
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexhull.h"
-#include "NewtonModelPhysicsTreeItemLoopEffector6dof.h"
+#include "NewtonModelPhysicsTreeItemJointLoopEffector6dof.h"
 #include "NewtonModelPhysicsTreeItemJointDifferential.h"
-#include "NewtonModelPhysicsTreeItemJointDifferentialAxle.h"
+#include "NewtonModelPhysicsTreeItemJointLoopDifferentialAxle.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexApproximate.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
@@ -442,14 +442,14 @@ void FNewtonModelPhysicsTree::OnAddJointDifferentialRow()
 
 void FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemLoopEffector6dof(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkLoopEffector6dof>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopEffector6dof(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoop6dofEffector>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddLoopRow(item);
 }
 
 void FNewtonModelPhysicsTree::OnAddJointDifferentialAxleRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferentialAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopDifferentialAxle>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopDifferentialAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopVehicleDifferentialAxle>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddLoopRow(item);
 }
@@ -1205,19 +1205,18 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(item);
 			parent = item;
 		}
-		else if (Cast<UNewtonLinkJointLoopDifferentialAxle>(node))
+		else if (Cast<UNewtonLinkJointLoopVehicleDifferentialAxle>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferentialAxle(parent, proxyNode, m_editor)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopDifferentialAxle(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}
-		else if (Cast<UNewtonLinkLoopEffector6dof>(node))
+		else if (Cast<UNewtonLinkJointLoop6dofEffector>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemLoopEffector6dof(parent, proxyNode, m_editor)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopEffector6dof(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}
-
 		else if (Cast<UNewtonLinkCollisionBox>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeBox(parent, proxyNode, m_editor)));
@@ -1267,9 +1266,14 @@ void FNewtonModelPhysicsTree::BuildTree()
 	
 		for (int i = 0; i < node->Children.Num(); ++i)
 		{
-			parentStack[stack] = parent;
-			nodeStack[stack] = node->Children[i];
-			stack++;
+			const UNewtonLink* const childNode = node->Children[i];
+			check(childNode);
+			if (childNode)
+			{
+				parentStack[stack] = parent;
+				nodeStack[stack] = node->Children[i];
+				stack++;
+			}
 		}
 	}
 	

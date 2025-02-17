@@ -40,7 +40,4 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJoint : public UNewtonLink
 	UNewtonLinkJoint();
 
 	void SetCommonProperties(UNewtonJoint* const joint) const;
-
-	UPROPERTY(EditAnywhere)
-	float DebugScale;
 };

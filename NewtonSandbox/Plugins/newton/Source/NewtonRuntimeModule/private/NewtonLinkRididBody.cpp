@@ -31,11 +31,9 @@
 UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 	:Super()
 {
+	Mass = 1.0f;
 	Name = TEXT("rigidBody");
 	BoneIndex = -1;
-
-	Mass = 1.0f;
-	DebugScale = 1.0f;
 }
 
 FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(TObjectPtr<USkeletalMesh> mesh, int boneIndex,

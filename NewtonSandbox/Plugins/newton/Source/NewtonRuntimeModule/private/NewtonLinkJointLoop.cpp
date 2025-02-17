@@ -30,7 +30,6 @@ UNewtonLinkJointLoop::UNewtonLinkJointLoop()
 	:Super()
 {
 	BoneIndex = -1;
-	DebugScale = 1.0f;
 	BoneName = TEXT("None");
 	TargetFrame = FTransform();
 }

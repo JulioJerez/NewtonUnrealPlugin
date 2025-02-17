@@ -54,7 +54,4 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkRigidBody : public UNewtonLink
 
 	UPROPERTY()
 	FVector ShapeGeometricCenter;
-
-	UPROPERTY(EditAnywhere)
-	float DebugScale;
 };

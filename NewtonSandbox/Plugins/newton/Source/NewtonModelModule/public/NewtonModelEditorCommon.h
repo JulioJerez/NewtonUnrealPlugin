@@ -40,12 +40,12 @@
 #include "NewtonLinkCollisionSphere.h"
 #include "NewtonLinkCollisionCapsule.h"
 #include "NewtonLinkJointVehicleTire.h"
-#include "NewtonLinkLoopEffector6dof.h"
+#include "NewtonLinkJointLoop6dofEffector.h"
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkJointDifferential.h"
 #include "NewtonLinkCollisionConvexhull.h"
-#include "NewtonLinkJointLoopDifferentialAxle.h"
 #include "NewtonLinkCollisionConvexApproximate.h"
+#include "NewtonLinkJointLoopVehicleDifferentialAxle.h"
 
 #define NEWTON_EDITOR_DEBUG_THICKENESS  0.4f
 #define NEWTON_EDITOR_DEBUG_JOINT_COLOR	FColor::Red
