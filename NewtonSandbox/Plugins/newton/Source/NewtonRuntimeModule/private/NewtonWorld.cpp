@@ -148,7 +148,7 @@ void NewtonWorld::StartGame()
 		if (modelComponent)
 		{
 			ndModelArticulation* const model = modelComponent->CreateModel(m_owner);
-			modelComponent->m_model = model;
+			//modelComponent->m_model = model;
 			newtonWorld->AddModel(model);
 		}
 		else

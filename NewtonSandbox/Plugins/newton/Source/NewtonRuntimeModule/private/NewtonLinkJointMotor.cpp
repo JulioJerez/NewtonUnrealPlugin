@@ -28,7 +28,6 @@ UNewtonLinkJointMotor::UNewtonLinkJointMotor()
 	:Super()
 {
 	Name = TEXT("motor");
-
 	BodyMass = 25.0f;
 	BodyRadio = 25.0f;
 }

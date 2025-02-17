@@ -46,9 +46,10 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 
 	TSharedPtr<FUICommandInfo> ShowDebug;
 	TSharedPtr<FUICommandInfo> ClearDebug;
+	TSharedPtr<FUICommandInfo> DeleteSelectedRow;
 	TSharedPtr<FUICommandInfo> ResetSelectedBone;
 
-	// create node commands
+	// generic collisions shapes
 	TSharedPtr<FUICommandInfo> AddShapeBox;
 	TSharedPtr<FUICommandInfo> AddShapeWheel;
 	TSharedPtr<FUICommandInfo> AddShapeSphere;
@@ -57,16 +58,21 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 	TSharedPtr<FUICommandInfo> AddShapeConvexhull;
 	TSharedPtr<FUICommandInfo> AddShapeConvexAggragate;
 
-	TSharedPtr<FUICommandInfo> AddJointTire;
+	// generic bilateral constrains
 	TSharedPtr<FUICommandInfo> AddJointWheel;
 	TSharedPtr<FUICommandInfo> AddJointHinge;
 	TSharedPtr<FUICommandInfo> AddJointSlider;
 	TSharedPtr<FUICommandInfo> AddJointRoller;
+
+	// constraints loops
+	TSharedPtr<FUICommandInfo> AddJointLoop6dofEffector;
+
+	// generic vehicle bilateral constrains
+	TSharedPtr<FUICommandInfo> AddJointTire;
 	TSharedPtr<FUICommandInfo> AddJointMotor;
-	TSharedPtr<FUICommandInfo> AddJointDifferential;
+	TSharedPtr<FUICommandInfo> AddJointVehicleDifferential;
 
-	TSharedPtr<FUICommandInfo> AddLoopEffector6dof;
-	TSharedPtr<FUICommandInfo> AddJointDifferentialAxle;
-
-	TSharedPtr<FUICommandInfo> DeleteSelectedRow;
+	// vehicle constraints loops
+	TSharedPtr<FUICommandInfo> AddJointLoopVehicleGearBox;
+	TSharedPtr<FUICommandInfo> AddJointLoopVehicleDifferentialAxle;
 };

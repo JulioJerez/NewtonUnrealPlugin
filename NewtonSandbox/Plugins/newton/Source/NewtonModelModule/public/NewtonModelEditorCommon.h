@@ -40,10 +40,11 @@
 #include "NewtonLinkCollisionSphere.h"
 #include "NewtonLinkCollisionCapsule.h"
 #include "NewtonLinkJointVehicleTire.h"
-#include "NewtonLinkJointLoop6dofEffector.h"
 #include "NewtonLinkCollisionCylinder.h"
 #include "NewtonLinkJointDifferential.h"
 #include "NewtonLinkCollisionConvexhull.h"
+#include "NewtonLinkJointLoop6dofEffector.h"
+#include "NewtonLinkJointLoopVehicleGearBox.h"
 #include "NewtonLinkCollisionConvexApproximate.h"
 #include "NewtonLinkJointLoopVehicleDifferentialAxle.h"
 

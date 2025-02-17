@@ -28,7 +28,6 @@ UNewtonLinkJointDifferential::UNewtonLinkJointDifferential()
 	:Super()
 {
 	Name = TEXT("differential");
-
 	BodyMass = 25.0f;
 	BodyRadio = 25.0f;
 	LimitedSlipRpmLock = 30.0f;

@@ -54,10 +54,11 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(AddJointWheel, "wheel joint", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointTire, "vehicle tire joint", "Joint must be child of the vehicle chassis body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointMotor, "vehicle motor", "Joint must be child of the vehicle chassis body", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddJointDifferential, "vehicle differential", "Joint must be child of the vehicle chassis body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointVehicleDifferential, "vehicle differential", "Joint must be child of the vehicle chassis body", EUserInterfaceActionType::Button, FInputChord());
 	
-	UI_COMMAND(AddLoopEffector6dof, "6 dof effector loop", "loop must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(AddJointDifferentialAxle, "vehicle differential axle loop", "Joint must be child of the vehicle differential body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointLoop6dofEffector, "6 dof effector loop", "loop must be child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointLoopVehicleGearBox, "vehicle gear box loop", "Joint must be child of the vehicle head differential", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointLoopVehicleDifferentialAxle, "vehicle differential axle loop", "Joint must be child of the vehicle differential body", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(AddShapeBox, "box shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddShapeSphere, "sphere shape", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());

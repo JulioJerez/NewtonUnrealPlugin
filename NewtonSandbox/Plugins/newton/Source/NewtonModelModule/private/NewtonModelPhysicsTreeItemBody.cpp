@@ -23,6 +23,7 @@
 #include "NewtonModelPhysicsTreeItemBody.h"
 
 #include "NewtonModelEditor.h"
+#include "NewtonModelPhysicsTreeItemShape.h"
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItemBodyRoot::FNewtonModelPhysicsTreeItemBodyRoot(const FNewtonModelPhysicsTreeItemBodyRoot& src)
@@ -106,7 +107,7 @@ FMatrix FNewtonModelPhysicsTreeItemBody::GetWidgetMatrix() const
 	for (int i = m_acyclicGraph->m_children.Num() - 1; i >= 0; --i)
 	{
 		TSharedPtr<FNewtonModelPhysicsTreeItem> childItem(m_acyclicGraph->m_children[i]->m_item);
-		if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
+		if (childItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemShape::GetRtti()))
 		{
 			childrenShapes.Push(Cast<UNewtonLinkCollision>(childItem->m_node));
 		}

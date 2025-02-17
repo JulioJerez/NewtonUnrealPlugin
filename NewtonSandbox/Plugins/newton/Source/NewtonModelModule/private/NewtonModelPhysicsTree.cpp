@@ -54,10 +54,11 @@
 #include "NewtonModelPhysicsTreeItemShapeCylinder.h"
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexhull.h"
-#include "NewtonModelPhysicsTreeItemJointLoopEffector6dof.h"
 #include "NewtonModelPhysicsTreeItemJointDifferential.h"
-#include "NewtonModelPhysicsTreeItemJointLoopDifferentialAxle.h"
+#include "NewtonModelPhysicsTreeItemJointLoop6dofEffector.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexApproximate.h"
+#include "NewtonModelPhysicsTreeItemJointLoopVehicleGearBox.h"
+#include "NewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
 
@@ -163,7 +164,7 @@ void FNewtonModelPhysicsTree::OnGetChildren(TSharedPtr<FNewtonModelPhysicsTreeIt
 		{
 			outChildren.Push(childItem);
 		}
-		else if (childItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemJoint")))
+		else if (childItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemJoint::GetRtti()))
 		{
 			const FNewtonModelPhysicsTreeItemAcyclicGraph* const childItemNode = childItem->GetAcyclicGraph();
 			check(childItemNode->m_children.Num() == 1);
@@ -193,7 +194,7 @@ void FNewtonModelPhysicsTree::OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsT
 
 void FNewtonModelPhysicsTree::OnResetSelectedBone()
 {
-	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()))
 	{
 		int stack = 1;
 		FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
@@ -252,7 +253,7 @@ void FNewtonModelPhysicsTree::OnToggleShapeVisibility()
 	for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
 	{
 		TSharedPtr<FNewtonModelPhysicsTreeItem> item (*it);
-		if (item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape")))
+		if (item->IsOfRttiByName(FNewtonModelPhysicsTreeItemShape::GetRtti()))
 		{
 			item->GetNode()->m_hidden = model->m_hideShapes;
 		}
@@ -268,7 +269,7 @@ void FNewtonModelPhysicsTree::OnToggleJointVisibility()
 	for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
 	{
 		TSharedPtr<FNewtonModelPhysicsTreeItem> item(*it);
-		if (item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemJoint")))
+		if (item->IsOfRttiByName(FNewtonModelPhysicsTreeItemJoint::GetRtti()))
 		{
 			item->GetNode()->m_hidden = model->m_hideJoints;
 		}
@@ -278,7 +279,29 @@ void FNewtonModelPhysicsTree::OnToggleJointVisibility()
 
 bool FNewtonModelPhysicsTree::OnCanAddChildRow() const
 {
-	return m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody"));
+	return m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti());
+}
+
+bool FNewtonModelPhysicsTree::OnCanAddVehicleGearBoxRow() const
+{
+	if (OnCanAddChildRow())
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> parent (m_selectedItem->GetParent());
+		if (parent.IsValid() && parent->IsOfRttiByName(FNewtonModelPhysicsTreeItemJointDifferential::GetRtti()))
+		{
+			const FName motorClassName(FNewtonModelPhysicsTreeItemJoint::GetRtti());
+			for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
+			{
+				TSharedPtr<FNewtonModelPhysicsTreeItem> item(*it);
+				if (item.IsValid() && item->IsOfRttiByName(motorClassName))
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 void FNewtonModelPhysicsTree::AddLoopRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& loopItem)
@@ -287,7 +310,7 @@ void FNewtonModelPhysicsTree::AddLoopRow(const TSharedRef<FNewtonModelPhysicsTre
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(loopItem, m_selectedItem->GetAcyclicGraph());
 
 	check(loopItem->GetParent() == m_selectedItem);
-	check(loopItem->GetParent()->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+	check(loopItem->GetParent()->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
 	check(loopItem->GetParent()->GetNode()->Transform.GetScale3D().X == 1.0f);
 	check(loopItem->GetParent()->GetNode()->Transform.GetScale3D().Y == 1.0f);
 	check(loopItem->GetParent()->GetNode()->Transform.GetScale3D().Z == 1.0f);
@@ -310,7 +333,7 @@ void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTr
 	new FNewtonModelPhysicsTreeItemAcyclicGraph(shapeItem, m_selectedItem->GetAcyclicGraph());
 
 	check(shapeItem->GetParent() == m_selectedItem);
-	check(shapeItem->GetParent()->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+	check(shapeItem->GetParent()->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().X == 1.0f);
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().Y == 1.0f);
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().Z == 1.0f);
@@ -426,38 +449,57 @@ void FNewtonModelPhysicsTree::OnAddJointTireRow()
 	AddJointRow(item);
 }
 
-void FNewtonModelPhysicsTree::OnAddJointMotorRow()
+void FNewtonModelPhysicsTree::OnAddJointVehicleMotorRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointMotor(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointMotor>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
 
-void FNewtonModelPhysicsTree::OnAddJointDifferentialRow()
+void FNewtonModelPhysicsTree::OnAddJointVehicleDifferentialRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointDifferential>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
 
-void FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow()
+void FNewtonModelPhysicsTree::OnAddJointLoop6dofEffectorRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopEffector6dof(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoop6dofEffector>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoop6dofEffector(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoop6dofEffector>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddLoopRow(item);
 }
 
-void FNewtonModelPhysicsTree::OnAddJointDifferentialAxleRow()
+void FNewtonModelPhysicsTree::OnAddJointLoopVehicleDifferentialAxleRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopDifferentialAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopVehicleDifferentialAxle>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopVehicleDifferentialAxle>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddLoopRow(item);
+}
+
+void FNewtonModelPhysicsTree::OnAddJointLoopVehicleGearBoxRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopVehicleGearBox>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddLoopRow(item);
+
+	//m_items.Add(item);
+	//new FNewtonModelPhysicsTreeItemAcyclicGraph(item, m_selectedItem->GetAcyclicGraph());
+	//const FName motorClassName(FNewtonModelPhysicsTreeItemJoint::GetRtti());
+	//for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
+	//{
+	//	TSharedPtr<FNewtonModelPhysicsTreeItem> parent((*it)->GetParent());
+	//	if (parent.IsValid() && parent->IsOfRttiByName(motorClassName))
+	//	{
+	//		TSharedPtr<FNewtonModelPhysicsTreeItemBody> itemBody(FNewtonModelPhysicsTreeItemBody *it);
+	//	}
+	//}
 }
 
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-	return m_selectedItem.IsValid() && !m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody"));
+	return m_selectedItem.IsValid() && !m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti());
 }
 
 void FNewtonModelPhysicsTree::OnDeleteSelectedRow()
@@ -466,7 +508,7 @@ void FNewtonModelPhysicsTree::OnDeleteSelectedRow()
 	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
 
 	check(m_selectedItem.IsValid());
-	check(!m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+	check(!m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
 
 	nodeStack[0] = m_selectedItem->GetAcyclicGraph();
 	while (stack)
@@ -574,19 +616,23 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 	commandList.MapAction(menuActions.AddJointMotor
-		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointMotorRow)
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointVehicleMotorRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
-	commandList.MapAction(menuActions.AddJointDifferential
-		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointDifferentialRow)
+	commandList.MapAction(menuActions.AddJointVehicleDifferential
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointVehicleDifferentialRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
-	commandList.MapAction(menuActions.AddJointDifferentialAxle
-		, FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointDifferentialAxleRow)
-		, FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+	commandList.MapAction(menuActions.AddJointLoopVehicleGearBox
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopVehicleGearBoxRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddVehicleGearBoxRow));
 
-	commandList.MapAction(menuActions.AddLoopEffector6dof
-		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopEffector6dofRow)
+	commandList.MapAction(menuActions.AddJointLoopVehicleDifferentialAxle
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopVehicleDifferentialAxleRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
+	commandList.MapAction(menuActions.AddJointLoop6dofEffector
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoop6dofEffectorRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
 
@@ -623,22 +669,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 	FMenuBuilder menuBuilder(true, m_uiCommandList);
 	const FNewtonModelPhysicsTreeCommands& actions = FNewtonModelPhysicsTreeCommands::Get();
 
-	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJoints", LOCTEXT("AddJointsActions", "Add joints"));
-		menuBuilder.AddMenuEntry(actions.AddJointHinge);
-		menuBuilder.AddMenuEntry(actions.AddJointSlider);
-		menuBuilder.AddMenuEntry(actions.AddJointRoller);
-		menuBuilder.AddMenuEntry(actions.AddJointWheel);
-		menuBuilder.AddMenuEntry(actions.AddJointTire);
-		menuBuilder.AddMenuEntry(actions.AddJointMotor);
-		menuBuilder.AddMenuEntry(actions.AddJointDifferential);
-	menuBuilder.EndSection();
-
-	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddJointsLoopActions", "Add Joints Loop"));
-		menuBuilder.AddMenuEntry(actions.AddLoopEffector6dof);
-		menuBuilder.AddMenuEntry(actions.AddJointDifferentialAxle);
-	menuBuilder.EndSection();
-
-	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "Add collision shapes"));
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "collision shapes"));
 		menuBuilder.AddMenuEntry(actions.AddShapeBox);
 		menuBuilder.AddMenuEntry(actions.AddShapeSphere);
 		menuBuilder.AddMenuEntry(actions.AddShapeCapsule);
@@ -646,6 +677,25 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddShapeWheel);
 		menuBuilder.AddMenuEntry(actions.AddShapeConvexhull);
 		menuBuilder.AddMenuEntry(actions.AddShapeConvexAggragate);
+	menuBuilder.EndSection();
+
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddJoints", LOCTEXT("AddJointsActions", "open loop joints"));
+		menuBuilder.AddMenuEntry(actions.AddJointHinge);
+		menuBuilder.AddMenuEntry(actions.AddJointSlider);
+		menuBuilder.AddMenuEntry(actions.AddJointRoller);
+		menuBuilder.AddMenuEntry(actions.AddJointWheel);
+	menuBuilder.EndSection();
+
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddLoops", LOCTEXT("AddJointsLoopActions", "close loop Joints"));
+		menuBuilder.AddMenuEntry(actions.AddJointLoop6dofEffector);
+	menuBuilder.EndSection();
+
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddVehicleJoints", LOCTEXT("AddJointsVehicleActions", "vehicle joints"));
+		menuBuilder.AddMenuEntry(actions.AddJointTire);
+		menuBuilder.AddMenuEntry(actions.AddJointMotor);
+		menuBuilder.AddMenuEntry(actions.AddJointVehicleDifferential);
+		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleGearBox);
+		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleDifferentialAxle);
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeDeleteItems", LOCTEXT("DeleteItemAction", "Delete items"));
@@ -824,7 +874,7 @@ void FNewtonModelPhysicsTree::RebuildAcyclicTree()
 {
 	check(m_root.Num() == 1);
 	check(m_root[0].IsValid());
-	check(m_root[0]->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBodyRoot")));
+	check(m_root[0]->IsOfRttiByName(FNewtonModelPhysicsTreeItemBodyRoot::GetRtti()));
 	
 	if (m_acyclicGraph)
 	{
@@ -924,7 +974,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 		return;
 	}
 
-	if (!m_selectedItem->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+	if (!m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()))
 	{
 		return;
 	}
@@ -1014,7 +1064,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 				for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
 				{
 					TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
-					if (itemInSet->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")))
+					if (itemInSet->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()))
 					{
 						UNewtonLinkRigidBody* const node = Cast<UNewtonLinkRigidBody>(itemInSet->GetNode());
 						check(node);
@@ -1062,7 +1112,7 @@ void FNewtonModelPhysicsTree::DetailViewBoneSelectedUpdated(const TSharedPtr<ISk
 		for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
 		{
 			TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
-			if ((itemInSet->GetParent() == m_selectedItem) && (itemInSet->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemShape"))))
+			if ((itemInSet->GetParent() == m_selectedItem) && (itemInSet->IsOfRttiByName(FNewtonModelPhysicsTreeItemShape::GetRtti())))
 			{
 				UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_selectedItem->GetParent()->GetNode());
 				check(shapeNodeInfo);
@@ -1205,15 +1255,21 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(item);
 			parent = item;
 		}
+		else if (Cast<UNewtonLinkJointLoopVehicleGearBox>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
 		else if (Cast<UNewtonLinkJointLoopVehicleDifferentialAxle>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopDifferentialAxle(parent, proxyNode, m_editor)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}
 		else if (Cast<UNewtonLinkJointLoop6dofEffector>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopEffector6dof(parent, proxyNode, m_editor)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoop6dofEffector(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

@@ -115,9 +115,6 @@ ndJointBilateralConstraint* UNewtonJointLoopVehicleDifferentialAxle::CreateJoint
 	{
 		ndBodyKinematic* const childBody = childComponent->GetBody();
 		ndBodyKinematic* const parentBody = parentComponet->GetBody();
-		//const FTransform transform(GetRelativeTransform());
-		//const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
-		//const ndMatrix childMarix(ToNewtonMatrix(TargetFrame) * parentMarix);
 
 		const UNewtonJointVehicleTire* tireJoint = nullptr;
 		const UNewtonJointVehicleDifferential* differentialJoint = nullptr;
@@ -140,7 +137,6 @@ ndJointBilateralConstraint* UNewtonJointLoopVehicleDifferentialAxle::CreateJoint
 
 		const FTransform transform(GetRelativeTransform());
 		const ndMatrix childMarix(tireJoint->GetJoint()->CalculateGlobalMatrix0());
-		//const ndMatrix parentMarix(differentialJoint->GetJoint()->CalculateGlobalMatrix0());
 		const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
 		
 		const ndVector upPin(parentMarix.m_up);

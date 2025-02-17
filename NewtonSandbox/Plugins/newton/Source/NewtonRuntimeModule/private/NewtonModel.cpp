@@ -178,9 +178,14 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 		{
 			ndModelArticulation::ndNode& vehicleNode = node->GetInfo();
 			ndJointBilateralConstraint* const joint = *vehicleNode.m_joint;
-			if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferentialAxle"))
+			const char* const className = joint->ClassName();
+			if (!strcmp(className, "ndMultiBodyVehicleDifferentialAxle"))
 			{
 				vehicle->AddDifferentialAxle(vehicleNode.m_joint);
+			}
+			else if (!strcmp(className, "ndMultiBodyVehicleGearBox"))
+			{
+				vehicle->AddGearBox(vehicleNode.m_joint);
 			}
 			else
 			{
@@ -278,6 +283,8 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 	ndFixSizeArray<ndModelArticulation::ndNode*, ND_STACK_DEPTH> parentStack;
 
 	ndModelArticulation* const articulatedModel = CreateSubClassModel();
+	m_model = articulatedModel;
+
 	stack.PushBack(owner->GetRootComponent());
 	parentStack.PushBack(nullptr);
 	while (stack.GetCount())

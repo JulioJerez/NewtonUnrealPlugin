@@ -21,6 +21,7 @@
 
 
 #include "NewtonModelPhysicsTreeItemJointLoop.h"
+#include "NewtonModelPhysicsTreeItemBody.h"
 #include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItemJointLoop::FNewtonModelPhysicsTreeItemJointLoop(const FNewtonModelPhysicsTreeItemJointLoop& src)
@@ -102,7 +103,7 @@ void FNewtonModelPhysicsTreeItemJointLoop::ApplyDeltaTransform(const FVector& in
 		const FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicGraph = m_acyclicGraph;
 		check(acyclicGraph->m_children.Num() == 1);
 		FNewtonModelPhysicsTreeItemAcyclicGraph* const acyclicChild = acyclicGraph->m_children[0];
-		check(acyclicChild->m_item->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+		check(acyclicChild->m_item->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
 		UNewtonLinkRigidBody* const childBodyNode = Cast<UNewtonLinkRigidBody>(acyclicChild->m_item->m_node);
 		check(childBodyNode);
 

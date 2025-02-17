@@ -23,6 +23,7 @@
 #include "NewtonModelPhysicsTreeItemShape.h"
 
 #include "NewtonModelEditor.h"
+#include "NewtonModelPhysicsTreeItemBody.h"
 
 FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewtonModelPhysicsTreeItemShape& src)
 	:FNewtonModelPhysicsTreeItem(src)
@@ -135,7 +136,7 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 		return;
 	}
 
-	check(m_parent->IsOfRttiByName(TEXT("FNewtonModelPhysicsTreeItemBody")));
+	check(m_parent->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
 	const UNewtonLinkRigidBody* const bodyNode = Cast<UNewtonLinkRigidBody>(m_parent->m_node);
 	check(bodyNode);
 	if (bodyNode->BoneIndex < 0)
