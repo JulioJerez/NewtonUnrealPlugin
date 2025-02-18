@@ -56,4 +56,3 @@ ndJointBilateralConstraint* UNewtonJointVehicleMotor::CreateJoint()
 	}
 	return nullptr;
 }
-

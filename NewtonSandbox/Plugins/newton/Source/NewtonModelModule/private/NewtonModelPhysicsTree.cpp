@@ -611,11 +611,11 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointWheelRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
-	commandList.MapAction(menuActions.AddJointTire
+	commandList.MapAction(menuActions.AddJointVehicleTire
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointTireRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
-	commandList.MapAction(menuActions.AddJointMotor
+	commandList.MapAction(menuActions.AddJointVehicleMotor
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointVehicleMotorRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
@@ -691,8 +691,8 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddVehicleJoints", LOCTEXT("AddJointsVehicleActions", "vehicle joints"));
-		menuBuilder.AddMenuEntry(actions.AddJointTire);
-		menuBuilder.AddMenuEntry(actions.AddJointMotor);
+		menuBuilder.AddMenuEntry(actions.AddJointVehicleTire);
+		menuBuilder.AddMenuEntry(actions.AddJointVehicleMotor);
 		menuBuilder.AddMenuEntry(actions.AddJointVehicleDifferential);
 		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleGearBox);
 		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleDifferentialAxle);
@@ -934,6 +934,11 @@ void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 			node->GetNode()->Transform.SetScale3D(unitScale);
 		}
 		else if (Cast<UNewtonLinkJoint>(node->GetNode()))
+		{
+			scale = scale * node->GetNode()->Transform.GetScale3D();
+			node->GetNode()->Transform.SetScale3D(unitScale);
+		}
+		else if (Cast<UNewtonLinkJointLoop>(node->GetNode()))
 		{
 			scale = scale * node->GetNode()->Transform.GetScale3D();
 			node->GetNode()->Transform.SetScale3D(unitScale);

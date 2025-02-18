@@ -68,8 +68,8 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 	TSharedPtr<FUICommandInfo> AddJointLoop6dofEffector;
 
 	// generic vehicle bilateral constrains
-	TSharedPtr<FUICommandInfo> AddJointTire;
-	TSharedPtr<FUICommandInfo> AddJointMotor;
+	TSharedPtr<FUICommandInfo> AddJointVehicleTire;
+	TSharedPtr<FUICommandInfo> AddJointVehicleMotor;
 	TSharedPtr<FUICommandInfo> AddJointVehicleDifferential;
 
 	// vehicle constraints loops

@@ -121,7 +121,6 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 
 					vehicle->AddTire(node->m_body, node->m_joint);
 				}
-
 				else if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()))
 				{
 					ndMultiBodyVehicleMotor* const joint = (ndMultiBodyVehicleMotor*)*node->m_joint;
@@ -183,11 +182,11 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			ndModelArticulation::ndNode& vehicleNode = node->GetInfo();
 			ndJointBilateralConstraint* const joint = *vehicleNode.m_joint;
 			const char* const className = joint->ClassName();
-			if (!strcmp(className, "ndMultiBodyVehicleDifferentialAxle"))
+			if (!strcmp(className, ndMultiBodyVehicleDifferentialAxle::StaticClassName()))
 			{
 				vehicle->AddDifferentialAxle(vehicleNode.m_joint);
 			}
-			else if (!strcmp(className, "ndMultiBodyVehicleGearBox"))
+			else if (!strcmp(className, ndMultiBodyVehicleGearBox::StaticClassName()))
 			{
 				vehicle->AddGearBox(vehicleNode.m_joint);
 				ndMultiBodyVehicleGearBox* const gearBox = vehicle->GetGearBox();
@@ -217,6 +216,10 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 		{
 			m_sleepingState = false;
 			//ApplyInputs(world, timestep);
+
+			ndMultiBodyVehicleMotor* const motor = vehicle->GetMotor();
+			motor->SetTorqueAndRpm(200.0f, 900.0f);
+
 			vehicle->Update(world, timestep);
 		}
 		ndModelNotify::Update(world, timestep);
@@ -359,11 +362,9 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 				ndSharedPtr<ndModelNotify> notify(new ndModelVehicleNotify(this, articulatedModel->GetAsMultiBodyVehicle()));
 				articulatedModel->SetNotifyCallback(notify);
 
-				ndWorld* world = worldActor->GetNewtonWorld();
-				ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(articulatedModel->GetRoot()->m_body->GetMatrix(), articulatedModel->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-				world->AddJoint(fixJoint);;
-				//articulatedModel->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0f, 0.0f, 0.0f));
-
+				//ndWorld* world = worldActor->GetNewtonWorld();
+				//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(articulatedModel->GetRoot()->m_body->GetMatrix(), articulatedModel->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+				//world->AddJoint(fixJoint);
 				break;
 			}
 

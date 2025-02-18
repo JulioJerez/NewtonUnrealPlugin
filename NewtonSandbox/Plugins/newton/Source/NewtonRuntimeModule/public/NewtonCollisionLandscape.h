@@ -51,7 +51,7 @@ class UNewtonCollisionLandscape : public UNewtonCollision
 	virtual ndShape* CreateShape() const override;
 	virtual long long CalculateHash() const override;
 	virtual ndShapeInstance* CreateInstanceShape() const override;
-	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;;
+	virtual ndShapeInstance* CreateBodyInstanceShape(const ndMatrix& bodyMatrix) const override;
 
 	TArray<char> m_materials;
 	//TArray<float> m_heightfield;

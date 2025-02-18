@@ -80,7 +80,7 @@ void UNewtonCollisionConvexHull::GenerateMesh(const USceneComponent* const meshC
 	const ndVector bakedScale(scale.Scale(UNREAL_INV_UNIT_SYSTEM));
 	
 	const FStaticMeshLODResources& renderLOD = renderResource[0];
-	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;;
+	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = renderLOD.VertexBuffers;
 	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
 	
 	ndArray<ndBigVector> points;

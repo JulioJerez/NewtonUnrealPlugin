@@ -70,7 +70,7 @@ ndJointBilateralConstraint* UNewtonJointLoopVehicleDifferentialAxle::CreateJoint
 	check(owner);
 	UNewtonModel* const model = owner->FindComponentByClass<UNewtonModel>();
 	check(model);
-	USkeleton* const skeleton = model->NewtonAsset->SkeletalMeshAsset->GetSkeleton();;
+	USkeleton* const skeleton = model->NewtonAsset->SkeletalMeshAsset->GetSkeleton();
 	const FReferenceSkeleton& refSkeleton = skeleton->GetReferenceSkeleton();
 	const TArray<FMeshBoneInfo>& boneInfo = refSkeleton.GetRefBoneInfo();
 	
