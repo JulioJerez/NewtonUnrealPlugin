@@ -84,8 +84,6 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 
 		check(vehicle->GetRoot());
 		vehicle->AddChassis(vehicle->GetRoot()->m_body);
-vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0f, 0.0f, 0.0f));
-
 
 		auto FindJointComponent = [owner](const ndJointBilateralConstraint* const joint)
 		{
@@ -106,18 +104,30 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 			if (node->m_joint)
 			{
 				const char* const className = node->m_joint->ClassName();
-				if (!strcmp(className, "ndMultiBodyVehicleTireJoint"))
+				//if (!strcmp(className, "ndMultiBodyVehicleTireJoint"))
+				if (!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()))
 				{
 					ndMultiBodyVehicleTireJoint* const joint = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
 					//ndMultiBodyVehicleTireJointInfo info(tire->GetInfo());
 					joint->SetVehicleOwner(vehicle);
+					ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+					// make intetia spherical
+					ndVector massMatrix(body->GetMassMatrix());
+					ndFloat32 maxInertia = ndMax(ndMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+					massMatrix.m_x = maxInertia;
+					massMatrix.m_y = maxInertia;
+					massMatrix.m_z = maxInertia;
+					body->SetMassMatrix(massMatrix);
+
 					vehicle->AddTire(node->m_body, node->m_joint);
 				}
-				else if (!strcmp(className, "ndMultiBodyVehicleMotor"))
+				//else if (!strcmp(className, "ndMultiBodyVehicleMotor"))
+				else if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()))
 				{
 					ndMultiBodyVehicleMotor* const joint = (ndMultiBodyVehicleMotor*)*node->m_joint;
 					joint->SetVehicleOwner(vehicle);
-
+					
 					const UNewtonJointVehicleMotor* const componentOwner = Cast<UNewtonJointVehicleMotor>(FindJointComponent(joint));
 					if (componentOwner)
 					{
@@ -125,24 +135,23 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 						ndBodyKinematic* const motorBody = joint->GetBody0();
 						const ndMatrix matrix(vehicle->GetLocalFrame() * motorBody->GetMatrix());
 						motorBody->SetMatrix(matrix);
-
+					
 						ndShapeInstance motorCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
 						motorCollision.SetCollisionMode(false);
 						motorBody->SetCollisionShape(motorCollision);
 						motorBody->SetMassMatrix(componentOwner->BodyMass, motorCollision);
-
-						//differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
-
+					
 						ndMatrix localMatrix0;
 						ndMatrix localMatrix1;
 						node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
 						node->m_joint->SetLocalMatrix0(localMatrix0);
 						node->m_joint->SetLocalMatrix1(localMatrix1);
-
+					
 						vehicle->AddMotor(node->m_body, node->m_joint);
 					}
 				}
-				else if (!strcmp(className, "ndMultiBodyVehicleDifferential"))
+				//else if (!strcmp(className, "ndMultiBodyVehicleDifferential"))
+				else if (!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
 				{
 					ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*node->m_joint;
 					const UNewtonJointVehicleDifferential* const componentOwner = Cast<UNewtonJointVehicleDifferential>(FindJointComponent(joint));
@@ -153,14 +162,12 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 						ndBodyKinematic* const differentialBody = joint->GetBody0();
 						const ndMatrix matrix(vehicle->GetLocalFrame() * differentialBody->GetMatrix());
 						differentialBody->SetMatrix(matrix);
-
+					
 						ndShapeInstance diffCollision(new ndShapeSphere(componentOwner->BodyRadio * UNREAL_INV_UNIT_SYSTEM));
 						diffCollision.SetCollisionMode(false);
 						differentialBody->SetCollisionShape(diffCollision);
 						differentialBody->SetMassMatrix(componentOwner->BodyMass, diffCollision);
-
-						//differentialBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
-
+					
 						ndMatrix localMatrix0;
 						ndMatrix localMatrix1;
 						node->m_joint->CalculateLocalMatrix(matrix, localMatrix0, localMatrix1);
@@ -192,6 +199,8 @@ vehicle->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0
 				check(0);
 			}
 		}
+
+		vehicle->SetVehicleSolverModel(false);
 	}
 
 	void Debug(ndConstraintDebugCallback& context) const override
@@ -350,6 +359,12 @@ ndModelArticulation* UNewtonModel::CreateModel(ANewtonWorldActor* const worldAct
 				check(articulatedModel->GetAsMultiBodyVehicle());
 				ndSharedPtr<ndModelNotify> notify(new ndModelVehicleNotify(this, articulatedModel->GetAsMultiBodyVehicle()));
 				articulatedModel->SetNotifyCallback(notify);
+
+				ndWorld* world = worldActor->GetNewtonWorld();
+				ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(articulatedModel->GetRoot()->m_body->GetMatrix(), articulatedModel->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+				world->AddJoint(fixJoint);;
+				//articulatedModel->GetRoot()->m_body->GetAsBodyDynamic()->SetMassMatrix(ndVector(0.0f, 0.0f, 0.0f, 0.0f));
+
 				break;
 			}
 

@@ -82,8 +82,8 @@ ndJointBilateralConstraint* UNewtonJointWheel::CreateJoint()
 		ndWheelDescriptor desc;
 		desc.m_springK = SpringK;
 		desc.m_damperC = DamperC;
-		desc.m_upperStop = UpperStop;
-		desc.m_lowerStop = LowerStop;
+		desc.m_upperStop = UpperStop * UNREAL_INV_UNIT_SYSTEM;
+		desc.m_lowerStop = LowerStop * UNREAL_INV_UNIT_SYSTEM;
 		desc.m_regularizer = Regularizer;
 		desc.m_brakeTorque = BrakeTorque;
 		desc.m_steeringAngle = SteeringAngle;
