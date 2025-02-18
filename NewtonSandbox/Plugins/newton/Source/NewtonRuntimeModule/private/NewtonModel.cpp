@@ -104,7 +104,6 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			if (node->m_joint)
 			{
 				const char* const className = node->m_joint->ClassName();
-				//if (!strcmp(className, "ndMultiBodyVehicleTireJoint"))
 				if (!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()))
 				{
 					ndMultiBodyVehicleTireJoint* const joint = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
@@ -122,7 +121,7 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 
 					vehicle->AddTire(node->m_body, node->m_joint);
 				}
-				//else if (!strcmp(className, "ndMultiBodyVehicleMotor"))
+
 				else if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()))
 				{
 					ndMultiBodyVehicleMotor* const joint = (ndMultiBodyVehicleMotor*)*node->m_joint;
@@ -150,7 +149,6 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 						vehicle->AddMotor(node->m_body, node->m_joint);
 					}
 				}
-				//else if (!strcmp(className, "ndMultiBodyVehicleDifferential"))
 				else if (!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
 				{
 					ndMultiBodyVehicleDifferential* const joint = (ndMultiBodyVehicleDifferential*)*node->m_joint;
@@ -180,8 +178,7 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 		}
 
 		// add all loops, axles and gear box
-		const ndList<ndModelArticulation::ndNode>& loops = vehicle->GetCloseLoops();
-		for (ndList<ndModelArticulation::ndNode>::ndNode* node = loops.GetFirst(); node; node = node->GetNext())
+		for (ndList<ndModelArticulation::ndNode>::ndNode* node = vehicle->GetCloseLoops().GetFirst(); node; node = node->GetNext())
 		{
 			ndModelArticulation::ndNode& vehicleNode = node->GetInfo();
 			ndJointBilateralConstraint* const joint = *vehicleNode.m_joint;
@@ -193,6 +190,8 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			else if (!strcmp(className, "ndMultiBodyVehicleGearBox"))
 			{
 				vehicle->AddGearBox(vehicleNode.m_joint);
+				ndMultiBodyVehicleGearBox* const gearBox = vehicle->GetGearBox();
+				gearBox->SetRatio(10.0f);
 			}
 			else
 			{
