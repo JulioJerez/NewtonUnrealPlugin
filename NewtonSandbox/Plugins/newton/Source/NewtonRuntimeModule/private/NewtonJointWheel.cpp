@@ -33,7 +33,7 @@ UNewtonJointWheel::UNewtonJointWheel()
 	DamperC = 50.0f;
 	UpperStop = 25.0f;
 	LowerStop = -25.0f;
-	Regularizer = 0.1f;
+	Regularizer = 0.2f;
 	BrakeTorque = 0.0f;
 	SteeringAngle = 0.0f;
 	HandBrakeTorque = 0.0f;
