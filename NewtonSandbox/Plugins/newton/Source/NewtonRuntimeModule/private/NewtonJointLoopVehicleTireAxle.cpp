@@ -55,10 +55,23 @@ void UNewtonJointLoopVehicleTireAxle::DrawGizmo(float timestep) const
 	};
 	
 	// draw references frames
-	const FTransform parentTransform(GetComponentTransform());
+	if (m_joint)
+	{
+		ndMatrix matrix0;
+		ndMatrix matrix1;
+		m_joint->CalculateGlobalMatrix(matrix0, matrix1);
 
-	DrawFrame(TargetFrame * parentTransform);
-	DrawFrame(DifferentialFrame * parentTransform);
+		const FTransform transform0(ToUnrealTransform(matrix0));
+		const FTransform transform1(ToUnrealTransform(matrix1));
+		DrawFrame(transform0);
+		DrawFrame(transform1);
+	}
+	else
+	{
+		const FTransform parentTransform(GetComponentTransform());
+		DrawFrame(TargetFrame * parentTransform);
+		DrawFrame(DifferentialFrame * parentTransform);
+	}
 }
 
 // Called when the game starts

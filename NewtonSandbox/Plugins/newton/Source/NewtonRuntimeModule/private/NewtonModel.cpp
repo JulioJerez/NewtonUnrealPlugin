@@ -218,7 +218,7 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			//ApplyInputs(world, timestep);
 
 			ndMultiBodyVehicleMotor* const motor = vehicle->GetMotor();
-			motor->SetTorqueAndRpm(200.0f, 900.0f);
+			motor->SetTorqueAndRpm(200.0f, 1500.0f);
 
 			vehicle->Update(world, timestep);
 		}

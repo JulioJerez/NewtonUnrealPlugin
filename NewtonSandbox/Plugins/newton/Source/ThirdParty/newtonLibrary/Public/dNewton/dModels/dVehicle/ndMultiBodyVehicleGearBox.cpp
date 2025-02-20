@@ -36,11 +36,20 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox()
 }
 
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const, bool reverseSpin)
-	:ndJointGear(ndFloat32(1.0f), motor->GetMatrix().m_front.Scale (reverseSpin ? ndFloat32 (-1.0f) : ndFloat32(1.0f)), differential, motor->GetMatrix().m_front, motor)
+	:ndJointGear(ndFloat32(1.0f), motor->GetMatrix().m_front, differential, motor->GetMatrix().m_front, motor)
 	,m_idleOmega(ndFloat32(1.0f))
 	,m_clutchTorque(ndFloat32 (1.0e5f))
 	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
 {
+	ndMatrix matrix0(ndGetIdentityMatrix());
+	ndMatrix matrix1(ndGetIdentityMatrix());
+	if (reverseSpin)
+	{
+		matrix0 = ndYawMatrix(ndPi);
+	}
+	SetLocalMatrix0(matrix0);
+	SetLocalMatrix1(matrix1);
+
 	SetRatio(ndFloat32(0.0f));
 	SetSolverModel(m_jointkinematicCloseLoop);
 }

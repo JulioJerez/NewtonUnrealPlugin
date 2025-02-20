@@ -54,10 +54,24 @@ void UNewtonJointLoopVehicleGearBox::DrawGizmo(float timestep) const
 		DrawDebugLine(world, positionParent, positionParent + scale * yAxisParent, FColor::Green, false, timestep, thickness);
 	};
 	
-	// draw references frames
-	const FTransform parentTransform(GetComponentTransform());
-	DrawFrame(parentTransform);
-	DrawFrame(TargetFrame * parentTransform);
+	if (m_joint)
+	{
+		ndMatrix matrix0;
+		ndMatrix matrix1;
+		m_joint->CalculateGlobalMatrix(matrix0, matrix1);
+
+		const FTransform transform0(ToUnrealTransform(matrix0));
+		const FTransform transform1(ToUnrealTransform(matrix1));
+		DrawFrame(transform0);
+		DrawFrame(transform1);
+	}
+	else
+	{
+		// draw references frames
+		const FTransform parentTransform(GetComponentTransform());
+		DrawFrame(parentTransform);
+		DrawFrame(TargetFrame * parentTransform);
+	}
 }
 
 // Called when the game starts
