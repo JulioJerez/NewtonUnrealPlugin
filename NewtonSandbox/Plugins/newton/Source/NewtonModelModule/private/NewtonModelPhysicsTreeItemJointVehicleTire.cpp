@@ -20,29 +20,29 @@
 */
 
 
-#include "NewtonModelPhysicsTreeItemJointTire.h"
+#include "NewtonModelPhysicsTreeItemJointVehicleTire.h"
 
-FNewtonModelPhysicsTreeItemJointTire::FNewtonModelPhysicsTreeItemJointTire(const FNewtonModelPhysicsTreeItemJointTire& src)
+FNewtonModelPhysicsTreeItemJointVehicleTire::FNewtonModelPhysicsTreeItemJointVehicleTire(const FNewtonModelPhysicsTreeItemJointVehicleTire& src)
 	:FNewtonModelPhysicsTreeItemJoint(src)
 {
 }
 
-FNewtonModelPhysicsTreeItemJointTire::FNewtonModelPhysicsTreeItemJointTire(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemJointVehicleTire::FNewtonModelPhysicsTreeItemJointVehicleTire(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode, editor)
 {
 }
 
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointTire::Clone() const
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointVehicleTire::Clone() const
 {
-	return new FNewtonModelPhysicsTreeItemJointTire(*this);
+	return new FNewtonModelPhysicsTreeItemJointVehicleTire(*this);
 }
 
-int FNewtonModelPhysicsTreeItemJointTire::GetFreeDof() const
+int FNewtonModelPhysicsTreeItemJointVehicleTire::GetFreeDof() const
 {
 	return 2;
 }
 
-void FNewtonModelPhysicsTreeItemJointTire::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+void FNewtonModelPhysicsTreeItemJointVehicleTire::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
 	const UNewtonLinkJointVehicleTire* const jointNode = Cast<UNewtonLinkJointVehicleTire>(m_node);
 	check(jointNode);

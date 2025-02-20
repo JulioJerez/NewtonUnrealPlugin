@@ -24,13 +24,13 @@
 
 #include "NewtonModelPhysicsTreeItemJoint.h"
 
-class FNewtonModelPhysicsTreeItemJointDifferential : public FNewtonModelPhysicsTreeItemJoint
+class FNewtonModelPhysicsTreeItemJointVehicleDifferential : public FNewtonModelPhysicsTreeItemJoint
 {
 	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointDifferential, FNewtonModelPhysicsTreeItemJoint)
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointVehicleDifferential, FNewtonModelPhysicsTreeItemJoint)
 
-	FNewtonModelPhysicsTreeItemJointDifferential(const FNewtonModelPhysicsTreeItemJointDifferential& src);
-	FNewtonModelPhysicsTreeItemJointDifferential(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
+	FNewtonModelPhysicsTreeItemJointVehicleDifferential(const FNewtonModelPhysicsTreeItemJointVehicleDifferential& src);
+	FNewtonModelPhysicsTreeItemJointVehicleDifferential(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
 	virtual int GetFreeDof() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;

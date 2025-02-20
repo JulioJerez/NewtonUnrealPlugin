@@ -20,29 +20,29 @@
 */
 
 
-#include "NewtonModelPhysicsTreeItemJointMotor.h"
+#include "NewtonModelPhysicsTreeItemJointVehicleMotor.h"
 
-FNewtonModelPhysicsTreeItemJointMotor::FNewtonModelPhysicsTreeItemJointMotor(const FNewtonModelPhysicsTreeItemJointMotor& src)
+FNewtonModelPhysicsTreeItemJointVehicleMotor::FNewtonModelPhysicsTreeItemJointVehicleMotor(const FNewtonModelPhysicsTreeItemJointVehicleMotor& src)
 	:FNewtonModelPhysicsTreeItemJoint(src)
 {
 }
 
-FNewtonModelPhysicsTreeItemJointMotor::FNewtonModelPhysicsTreeItemJointMotor(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemJointVehicleMotor::FNewtonModelPhysicsTreeItemJointVehicleMotor(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode, editor)
 {
 }
 
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointMotor::Clone() const
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointVehicleMotor::Clone() const
 {
-	return new FNewtonModelPhysicsTreeItemJointMotor(*this);
+	return new FNewtonModelPhysicsTreeItemJointVehicleMotor(*this);
 }
 
-int FNewtonModelPhysicsTreeItemJointMotor::GetFreeDof() const
+int FNewtonModelPhysicsTreeItemJointVehicleMotor::GetFreeDof() const
 {
 	return 1;
 }
 
-void FNewtonModelPhysicsTreeItemJointMotor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+void FNewtonModelPhysicsTreeItemJointVehicleMotor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
 	const UNewtonLinkJointVehicleMotor* const jointNode = Cast<UNewtonLinkJointVehicleMotor>(m_node);
 	check(jointNode);

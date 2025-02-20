@@ -20,29 +20,29 @@
 */
 
 
-#include "NewtonModelPhysicsTreeItemJointDifferential.h"
+#include "NewtonModelPhysicsTreeItemJointVehicleDifferential.h"
 
-FNewtonModelPhysicsTreeItemJointDifferential::FNewtonModelPhysicsTreeItemJointDifferential(const FNewtonModelPhysicsTreeItemJointDifferential& src)
+FNewtonModelPhysicsTreeItemJointVehicleDifferential::FNewtonModelPhysicsTreeItemJointVehicleDifferential(const FNewtonModelPhysicsTreeItemJointVehicleDifferential& src)
 	:FNewtonModelPhysicsTreeItemJoint(src)
 {
 }
 
-FNewtonModelPhysicsTreeItemJointDifferential::FNewtonModelPhysicsTreeItemJointDifferential(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
+FNewtonModelPhysicsTreeItemJointVehicleDifferential::FNewtonModelPhysicsTreeItemJointVehicleDifferential(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode, editor)
 {
 }
 
-FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointDifferential::Clone() const
+FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointVehicleDifferential::Clone() const
 {
-	return new FNewtonModelPhysicsTreeItemJointDifferential(*this);
+	return new FNewtonModelPhysicsTreeItemJointVehicleDifferential(*this);
 }
 
-int FNewtonModelPhysicsTreeItemJointDifferential::GetFreeDof() const
+int FNewtonModelPhysicsTreeItemJointVehicleDifferential::GetFreeDof() const
 {
 	return 2;
 }
 
-void FNewtonModelPhysicsTreeItemJointDifferential::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
+void FNewtonModelPhysicsTreeItemJointVehicleDifferential::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
 	const UNewtonLinkJointVehicleDifferential* const jointNode = Cast<UNewtonLinkJointVehicleDifferential>(m_node);
 	check(jointNode);

@@ -34,6 +34,7 @@
 UNewtonJointLoopVehicleTireAxle::UNewtonJointLoopVehicleTireAxle()
 	:Super()
 {
+	DifferentialFrame = FTransform();
 }
 
 void UNewtonJointLoopVehicleTireAxle::DrawGizmo(float timestep) const
@@ -55,8 +56,9 @@ void UNewtonJointLoopVehicleTireAxle::DrawGizmo(float timestep) const
 	
 	// draw references frames
 	const FTransform parentTransform(GetComponentTransform());
-	DrawFrame(parentTransform);
+
 	DrawFrame(TargetFrame * parentTransform);
+	DrawFrame(DifferentialFrame * parentTransform);
 }
 
 // Called when the game starts
@@ -68,83 +70,50 @@ ndJointBilateralConstraint* UNewtonJointLoopVehicleTireAxle::CreateJoint()
 
 	AActor* const owner = GetOwner();
 	check(owner);
-	UNewtonModel* const model = owner->FindComponentByClass<UNewtonModel>();
-	check(model);
-	USkeleton* const skeleton = model->NewtonAsset->SkeletalMeshAsset->GetSkeleton();
-	const FReferenceSkeleton& refSkeleton = skeleton->GetReferenceSkeleton();
-	const TArray<FMeshBoneInfo>& boneInfo = refSkeleton.GetRefBoneInfo();
-	
-	ndInt32 boneIndex = -1;
-	for (ndInt32 i = boneInfo.Num() - 1; i >= 0; --i)
+
+	UNewtonRigidBody* const differentialBodyComponet = Cast<UNewtonRigidBody>(GetAttachParent());
+	check(differentialBodyComponet);
+
+	if (differentialBodyComponet)
 	{
-		if (boneInfo[i].Name == ReferencedBodyName)
+		const UNewtonRigidBody* tireBodyComponent = nullptr;
+		const FString bodyName(ReferencedBodyName.ToString());
+		for (TSet<UActorComponent*>::TConstIterator it(owner->GetComponents().CreateConstIterator()); it; ++it)
 		{
-			boneIndex = i;
-			break;
-		}
-	}
-	check(boneIndex != -1);
-	
-	UNewtonRigidBody* childComponent = nullptr;
-	ndFixSizeArray<USceneComponent*, ND_STACK_DEPTH> stack;
-	stack.PushBack(owner->GetRootComponent());
-	while (stack.GetCount())
-	{
-		USceneComponent* const component = stack.Pop();
-		check(component);
-		UNewtonRigidBody* const bodyComponent = Cast<UNewtonRigidBody>(component);
-		if (Cast<UNewtonRigidBody>(component))
-		{
-			if (bodyComponent->BoneIndex == boneIndex)
+			const UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(*it);
+			if (body)
 			{
-				childComponent = bodyComponent;
-				break;
+				UNewtonJointVehicleTire* const tire = Cast<UNewtonJointVehicleTire>(body->GetAttachParent());
+				if (tire)
+				{
+					const FString name(tire->GetFName().ToString());
+					int32 index = name.Find(bodyName);
+					if (index == 0)
+					{
+						tireBodyComponent = body;
+						break;
+					}
+				}
 			}
 		}
-	
-		const TArray<TObjectPtr<USceneComponent>>& childrenComp = component->GetAttachChildren();
-		for (ndInt32 i = childrenComp.Num() - 1; i >= 0; --i)
+		check(tireBodyComponent);
+		if (tireBodyComponent)
 		{
-			stack.PushBack(childrenComp[i].Get());
+			ndBodyKinematic* const tireBody = tireBodyComponent->GetBody();
+			ndBodyKinematic* const differentialBody = differentialBodyComponet->GetBody();
+
+			const UNewtonJointVehicleTire* const tireJoint = Cast<UNewtonJointVehicleTire>(tireBodyComponent->GetAttachParent());
+			check(tireJoint);
+			const FTransform transform(DifferentialFrame * GetRelativeTransform());
+			const ndMatrix childMarix(tireJoint->GetJoint()->CalculateGlobalMatrix0());
+			const ndMatrix parentMarix(ToNewtonMatrix(transform) * differentialBody->GetMatrix());
+			
+			const ndVector upPin(parentMarix.m_up);
+			const ndVector pin(parentMarix.m_front);
+			const ndVector drivePin(childMarix.m_front);
+			ndMultiBodyVehicleDifferentialAxle* const joint = new ndMultiBodyVehicleDifferentialAxle(pin, upPin, differentialBody, drivePin, tireBody);
+			return joint;
 		}
-	}
-	
-	UNewtonRigidBody* const parentComponet = Cast<UNewtonRigidBody>(GetAttachParent());
-	check(parentComponet);
-	if (parentComponet && childComponent)
-	{
-		ndBodyKinematic* const childBody = childComponent->GetBody();
-		ndBodyKinematic* const parentBody = parentComponet->GetBody();
-
-		const UNewtonJointVehicleTire* tireJoint = nullptr;
-		const UNewtonJointVehicleDifferential* differentialJoint = nullptr;
-		for (TSet<UActorComponent*>::TConstIterator it(parentComponet->GetOwner()->GetComponents().CreateConstIterator()); it; ++it)
-		{
-			const UNewtonJointVehicleTire* const wheelJoint = Cast<UNewtonJointVehicleTire>(*it);
-			if (wheelJoint && (wheelJoint->GetJoint()->GetBody0() == childBody))
-			{
-				tireJoint = wheelJoint;
-			}
-
-			const UNewtonJointVehicleDifferential* const diffJoint = Cast<UNewtonJointVehicleDifferential>(*it);
-			if (diffJoint && (diffJoint->GetJoint()->GetBody0() == parentBody))
-			{
-				differentialJoint = diffJoint;
-			}
-		}
-		check(tireJoint);
-		check(differentialJoint);
-
-		const FTransform transform(GetRelativeTransform());
-		const ndMatrix childMarix(tireJoint->GetJoint()->CalculateGlobalMatrix0());
-		const ndMatrix parentMarix(ToNewtonMatrix(transform) * parentBody->GetMatrix());
-		
-		const ndVector upPin(parentMarix.m_up);
-		const ndVector pin(parentMarix.m_front);
-		const ndVector drivePin(childMarix.m_front);
-		ndMultiBodyVehicleDifferentialAxle* const joint = new ndMultiBodyVehicleDifferentialAxle(pin, upPin, parentBody, drivePin, childBody);
-		
-		return joint;
 	}
 	return nullptr;
 }

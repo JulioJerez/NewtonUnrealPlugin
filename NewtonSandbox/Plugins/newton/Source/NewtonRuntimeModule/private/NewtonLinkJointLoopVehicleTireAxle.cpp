@@ -40,7 +40,8 @@ TObjectPtr<USceneComponent> UNewtonLinkJointLoopVehicleTireAxle::CreateBlueprint
 
 void UNewtonLinkJointLoopVehicleTireAxle::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	check(0);
 	UNewtonJointLoopVehicleTireAxle* const joint = Cast<UNewtonJointLoopVehicleTireAxle>(component.Get());
 	SetCommonProperties(joint);
+
+	joint->DifferentialFrame = DifferentialFrame;
 }

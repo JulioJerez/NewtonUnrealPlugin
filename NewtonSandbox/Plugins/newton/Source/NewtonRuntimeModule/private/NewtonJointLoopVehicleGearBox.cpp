@@ -71,31 +71,41 @@ ndJointBilateralConstraint* UNewtonJointLoopVehicleGearBox::CreateJoint()
 	check(owner);
 	UNewtonModel* const model = owner->FindComponentByClass<UNewtonModel>();
 
-	const UNewtonRigidBody* motorBody = nullptr;
-	const UNewtonRigidBody* const differentialBody = Cast<UNewtonRigidBody>(GetAttachParent());
-	check(differentialBody && Cast<UNewtonJointVehicleDifferential>(differentialBody->GetAttachParent()));
+	const UNewtonRigidBody* differentialBody = nullptr;
+	const UNewtonRigidBody* const motorBody = Cast<UNewtonRigidBody>(GetAttachParent());
+	check(motorBody && Cast<UNewtonJointVehicleMotor>(motorBody->GetAttachParent()));
 
+	const FString bodyName(ReferencedBodyName.ToString());
 	for (TSet<UActorComponent*>::TConstIterator it(owner->GetComponents().CreateConstIterator()); it; ++it)
 	{
 		const UNewtonRigidBody* const body = Cast<UNewtonRigidBody>(*it);
-		if (body && Cast<UNewtonJointVehicleMotor>(body->GetAttachParent()))
+		if (body)
 		{
-			motorBody = body;
-			break;
+			UNewtonJointVehicleDifferential* const differential = Cast<UNewtonJointVehicleDifferential>(body->GetAttachParent());
+			if (differential)
+			{
+				const FString name(differential->GetFName().ToString());
+				int32 index = name.Find(bodyName);
+				if (index == 0)
+				{
+					differentialBody = body;
+					break;
+				}
+			}
 		}
 	}
-	check(motorBody);
+	check(differentialBody);
 	
 	if (motorBody && differentialBody)
 	{
 		const UNewtonModel* const vehicle = owner->FindComponentByClass<UNewtonModel>();
 		check(vehicle && vehicle->m_model);
-		ndMultiBodyVehicleGearBox* const joint = new ndMultiBodyVehicleGearBox(motorBody->GetBody(), differentialBody->GetBody(), vehicle->m_model->GetAsMultiBodyVehicle());
+
+		const FVector motorPin(TargetFrame.GetUnitAxis(EAxis::X));
+		bool reverseSpin = motorPin.X < 0.0f ? true : false;
+
+		ndMultiBodyVehicleGearBox* const joint = new ndMultiBodyVehicleGearBox(motorBody->GetBody(), differentialBody->GetBody(), vehicle->m_model->GetAsMultiBodyVehicle(), reverseSpin);
 		return joint;
 	}
 	return nullptr;
 }
-
-
-
-

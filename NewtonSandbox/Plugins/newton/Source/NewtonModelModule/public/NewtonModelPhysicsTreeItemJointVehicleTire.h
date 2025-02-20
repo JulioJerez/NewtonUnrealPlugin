@@ -24,13 +24,13 @@
 
 #include "NewtonModelPhysicsTreeItemJoint.h"
 
-class FNewtonModelPhysicsTreeItemJointTire : public FNewtonModelPhysicsTreeItemJoint
+class FNewtonModelPhysicsTreeItemJointVehicleTire : public FNewtonModelPhysicsTreeItemJoint
 {
 	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointTire, FNewtonModelPhysicsTreeItemJoint)
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointVehicleTire, FNewtonModelPhysicsTreeItemJoint)
 
-	FNewtonModelPhysicsTreeItemJointTire(const FNewtonModelPhysicsTreeItemJointTire& src);
-	FNewtonModelPhysicsTreeItemJointTire(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
+	FNewtonModelPhysicsTreeItemJointVehicleTire(const FNewtonModelPhysicsTreeItemJointVehicleTire& src);
+	FNewtonModelPhysicsTreeItemJointVehicleTire(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
 	virtual int GetFreeDof() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;

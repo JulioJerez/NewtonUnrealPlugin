@@ -49,6 +49,32 @@ void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::DebugDraw(const FSceneV
 
 void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::OnPropertyChange(const FPropertyChangedEvent& event)
 {
-	check(0);
 	FNewtonModelPhysicsTreeItemJointLoop::OnPropertyChange(event);
 } 
+
+void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::PrepareNode() const
+{
+	FNewtonModelPhysicsTreeItemJointLoop::PrepareNode();
+
+	UNewtonLinkJointLoop* const jointNode = Cast<UNewtonLinkJointLoop>(m_node);
+	jointNode->m_selectionNames.Empty();
+
+	TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>> items(m_editor->GetNewtonModelPhysicsTree()->GetItems());
+	for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(items); it; ++it)
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
+		if (Cast<UNewtonLinkRigidBody>(itemInSet->GetNode()))
+		{
+			TSharedPtr<FNewtonModelPhysicsTreeItem> parentItem(itemInSet->GetParent());
+			if (parentItem.IsValid())
+			{
+				TObjectPtr<UNewtonLink> link(parentItem->GetNode());
+				//if (Cast<UNewtonLinkJointVehicleTire>(link))
+				if (Cast<UNewtonLinkJointVehicleDifferential>(link))
+				{
+					jointNode->m_selectionNames.Push(link->Name);
+				}
+			}
+		}
+	}
+}

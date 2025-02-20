@@ -34,6 +34,7 @@ class FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox : public FNewtonModelPh
 
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
+	virtual void PrepareNode() const override;
 	virtual void OnPropertyChange(const FPropertyChangedEvent& event) override;
 	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 };

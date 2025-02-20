@@ -22,27 +22,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "NewtonLinkJoint.h"
-#include "NewtonLinkJointMotor.generated.h"
+#include "NewtonModelPhysicsTreeItemJoint.h"
 
-/**
- * 
- */
-UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkJointMotor : public UNewtonLinkJoint
+class FNewtonModelPhysicsTreeItemJointVehicleMotor : public FNewtonModelPhysicsTreeItemJoint
 {
-	GENERATED_BODY()
-
 	public:
-	UNewtonLinkJointMotor();
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointVehicleMotor, FNewtonModelPhysicsTreeItemJoint)
 
-	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+	FNewtonModelPhysicsTreeItemJointVehicleMotor(const FNewtonModelPhysicsTreeItemJointVehicleMotor& src);
+	FNewtonModelPhysicsTreeItemJointVehicleMotor(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f, ClampMax = 100.0f))
-	float BodyMass;
+	virtual int GetFreeDof() const override;
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 25.0f, ClampMax = 100.0f))
-	float BodyRadio;
+	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
 };

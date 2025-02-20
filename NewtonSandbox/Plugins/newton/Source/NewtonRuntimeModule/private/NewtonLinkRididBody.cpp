@@ -25,6 +25,7 @@
 #include "NewtonRigidBody.h"
 #include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
+#include "NewtonLinkJointVehicleMotor.h"
 #include "NewtonLinkJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
@@ -83,6 +84,11 @@ void UNewtonLinkRigidBody::PostCreate(const UNewtonLink* const parentNde)
 		if (differential)
 		{
 			Mass = differential->BodyMass;
+		}
+		const UNewtonLinkJointVehicleMotor* const motor = Cast<UNewtonLinkJointVehicleMotor>(parentNde);
+		if (motor)
+		{
+			Mass = motor->BodyMass;
 		}
 	}
 }
