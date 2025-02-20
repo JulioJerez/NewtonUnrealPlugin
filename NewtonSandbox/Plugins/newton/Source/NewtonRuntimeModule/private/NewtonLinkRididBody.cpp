@@ -25,7 +25,7 @@
 #include "NewtonRigidBody.h"
 #include "NewtonLinkJoint.h"
 #include "NewtonLinkCollision.h"
-#include "NewtonLinkJointDifferential.h"
+#include "NewtonLinkJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
 UNewtonLinkRigidBody::UNewtonLinkRigidBody()
@@ -79,7 +79,7 @@ void UNewtonLinkRigidBody::PostCreate(const UNewtonLink* const parentNde)
 	Super::PostCreate(parentNde);
 	if (parentNde && Cast<UNewtonLinkJoint>(parentNde))
 	{
-		const UNewtonLinkJointDifferential* const differential = Cast<UNewtonLinkJointDifferential>(parentNde);
+		const UNewtonLinkJointVehicleDifferential* const differential = Cast<UNewtonLinkJointVehicleDifferential>(parentNde);
 		if (differential)
 		{
 			Mass = differential->BodyMass;

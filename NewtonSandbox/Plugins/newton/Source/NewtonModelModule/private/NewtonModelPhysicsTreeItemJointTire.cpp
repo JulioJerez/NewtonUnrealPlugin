@@ -23,12 +23,12 @@
 #include "NewtonModelPhysicsTreeItemJointTire.h"
 
 FNewtonModelPhysicsTreeItemJointTire::FNewtonModelPhysicsTreeItemJointTire(const FNewtonModelPhysicsTreeItemJointTire& src)
-	:FNewtonModelPhysicsTreeItemJointWheel(src)
+	:FNewtonModelPhysicsTreeItemJoint(src)
 {
 }
 
 FNewtonModelPhysicsTreeItemJointTire::FNewtonModelPhysicsTreeItemJointTire(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
-	:FNewtonModelPhysicsTreeItemJointWheel(parentNode, modelNode, editor)
+	:FNewtonModelPhysicsTreeItemJoint(parentNode, modelNode, editor)
 {
 }
 
@@ -44,5 +44,26 @@ int FNewtonModelPhysicsTreeItemJointTire::GetFreeDof() const
 
 void FNewtonModelPhysicsTreeItemJointTire::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	FNewtonModelPhysicsTreeItemJointWheel::DebugDraw(view, viewport, pdi);
+	const UNewtonLinkJointVehicleTire* const jointNode = Cast<UNewtonLinkJointVehicleTire>(m_node);
+	check(jointNode);
+
+	if (jointNode->m_hidden || !jointNode->ShowDebug)
+	{
+		return;
+	}
+
+	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
+	const FColor pinColor(NEWTON_EDITOR_DEBUG_JOINT_COLOR);
+
+	FMatrix matrix(GetWidgetMatrix());
+	float scale = jointNode->DebugScale;
+
+	const FVector pinDir(matrix.GetUnitAxis(EAxis::X));
+	const FVector pinStart(matrix.GetOrigin());
+	const FVector pinEnd(pinStart + pinDir * (scale * 0.5f * 100.0f));
+
+	FMatrix coneMatrix(matrix);
+	coneMatrix.SetOrigin(pinEnd);
+	DrawCone(pdi, coneMatrix, pinColor);
+	pdi->DrawLine(pinStart, pinEnd, pinColor, SDPG_Foreground, thickness);
 }

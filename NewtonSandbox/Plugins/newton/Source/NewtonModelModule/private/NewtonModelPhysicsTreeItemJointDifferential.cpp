@@ -44,7 +44,7 @@ int FNewtonModelPhysicsTreeItemJointDifferential::GetFreeDof() const
 
 void FNewtonModelPhysicsTreeItemJointDifferential::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonLinkJointDifferential* const jointNode = Cast<UNewtonLinkJointDifferential>(m_node);
+	const UNewtonLinkJointVehicleDifferential* const jointNode = Cast<UNewtonLinkJointVehicleDifferential>(m_node);
 	check(jointNode);
 
 	if (jointNode->m_hidden || !jointNode->ShowDebug)

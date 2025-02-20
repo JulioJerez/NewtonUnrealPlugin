@@ -77,48 +77,5 @@ void FNewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle::DebugDraw(cons
 
 void FNewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle::OnPropertyChange(const FPropertyChangedEvent& event)
 {
-	FNewtonModelPhysicsTreeItemJointLoop::OnPropertyChange(event);
-	//FProperty* const property = event.Property;
-	//if (property->GetName() != TEXT("BoneIndex"))
-	//{
-	//	return;
-	//}
-	//
-	//check(GetParent());
-	//UNewtonLinkJointLoop* const loopNode = Cast<UNewtonLinkJointLoop>(m_node);
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> parentBodyItem(GetParent());
-	//
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> childBodyItem(nullptr);
-	//TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>> items(m_editor->GetNewtonModelPhysicsTree()->GetItems());
-	//for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(items); it; ++it)
-	//{
-	//	TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
-	//	if (itemInSet->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()))
-	//	{
-	//		UNewtonLinkRigidBody* const node = Cast<UNewtonLinkRigidBody>(itemInSet->GetNode());
-	//		check(node);
-	//		if (node->BoneIndex == loopNode->BoneIndex)
-	//		{
-	//			childBodyItem = itemInSet;
-	//			break;
-	//		}
-	//	}
-	//}
-	//
-	//if (!childBodyItem || (parentBodyItem == childBodyItem))
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("LoopJoint childBody not found"));
-	//	loopNode->BoneIndex = -1;
-	//	loopNode->BoneName = TEXT("none");
-	//	return;
-	//}
-	//
-	//const UNewtonLinkRigidBody* const childBody = Cast<UNewtonLinkRigidBody>(childBodyItem->GetNode());
-	//UNewtonLinkJointLoopVehicleDifferentialAxle* const effectorNode = Cast<UNewtonLinkJointLoopVehicleDifferentialAxle>(loopNode);
-	//check(childBody);
-	//check(effectorNode);
-	//check(childBody->BoneIndex == effectorNode->BoneIndex);
-	//
-	//effectorNode->BoneName = childBody->BoneName;
-	//effectorNode->TargetFrame = childBodyItem->CalculateGlobalTransform() * childBodyItem->CalculateGlobalTransform().Inverse();
+	check(0);
 } 

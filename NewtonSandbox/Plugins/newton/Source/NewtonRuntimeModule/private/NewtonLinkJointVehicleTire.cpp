@@ -29,6 +29,15 @@ UNewtonLinkJointVehicleTire::UNewtonLinkJointVehicleTire()
 	:Super()
 {
 	Name = TEXT("tire");
+
+	SpringK = 10000.0f;
+	DamperC = 50.0f;
+	UpperStop = 25.0f;
+	LowerStop = -25.0f;
+	Regularizer = 0.1f;
+	BrakeTorque = 0.0f;
+	SteeringAngle = 0.0f;
+	HandBrakeTorque = 0.0f;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointVehicleTire::CreateBlueprintProxy() const
@@ -39,5 +48,17 @@ TObjectPtr<USceneComponent> UNewtonLinkJointVehicleTire::CreateBlueprintProxy() 
 
 void UNewtonLinkJointVehicleTire::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	Super::InitBlueprintProxy(component, mesh);
+	UNewtonJointVehicleTire* const joint = Cast<UNewtonJointVehicleTire>(component.Get());
+	//Super::InitBlueprintProxy(component, mesh);
+
+	SetCommonProperties(joint);
+
+	joint->SpringK = SpringK;
+	joint->DamperC = DamperC;
+	joint->UpperStop = UpperStop;
+	joint->LowerStop = LowerStop;
+	joint->Regularizer = Regularizer;
+	joint->BrakeTorque = BrakeTorque;
+	joint->SteeringAngle = SteeringAngle;
+	joint->HandBrakeTorque = HandBrakeTorque;
 }

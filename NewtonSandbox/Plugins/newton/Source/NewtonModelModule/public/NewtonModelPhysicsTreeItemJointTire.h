@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "NewtonModelPhysicsTreeItemJointWheel.h"
+#include "NewtonModelPhysicsTreeItemJoint.h"
 
-class FNewtonModelPhysicsTreeItemJointTire : public FNewtonModelPhysicsTreeItemJointWheel
+class FNewtonModelPhysicsTreeItemJointTire : public FNewtonModelPhysicsTreeItemJoint
 {
 	public:
-	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointTire, FNewtonModelPhysicsTreeItemJointWheel)
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointTire, FNewtonModelPhysicsTreeItemJoint)
 
 	FNewtonModelPhysicsTreeItemJointTire(const FNewtonModelPhysicsTreeItemJointTire& src);
 	FNewtonModelPhysicsTreeItemJointTire(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);

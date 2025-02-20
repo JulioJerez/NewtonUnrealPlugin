@@ -19,35 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoop.h"
 
-#include "NewtonJoint.h"
-#include "NewtonCommons.h"
-#include "NewtonJointLoop.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+#pragma once
 
-UNewtonLinkJointLoop::UNewtonLinkJointLoop()
-	:Super()
+#include "NewtonModelPhysicsTreeItemJointLoop.h"
+
+class FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle : public FNewtonModelPhysicsTreeItemJointLoop
 {
-	//BoneIndex = -1;
-	//BoneName = TEXT("None");
-	TargetBodyName = TEXT("None");
-	TargetFrame = FTransform();
-}
+	public:
+	NEWTON_ADD_RTTI(FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle, FNewtonModelPhysicsTreeItemJointLoop)
 
-void UNewtonLinkJointLoop::SetCommonProperties(UNewtonJoint* const joint) const
-{
-	UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
-	check(loop);
+	FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle(const FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle& src);
+	FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
-	loop->ShowDebug = true;
-	loop->TargetFrame = TargetFrame;
-	//loop->ReferencedBodyName = BoneName;
-	loop->ReferencedBodyName = TargetBodyName;
-}
+	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 
-TArray<FName> UNewtonLinkJointLoop::GetNameArray() const
-{
-	//return { TEXT("body0"), TEXT("body1") };
-	return m_selectionNames;
-}
+	virtual void PrepareNode() const override;
+	virtual void OnPropertyChange(const FPropertyChangedEvent& event) override;
+	virtual void DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const override;
+};

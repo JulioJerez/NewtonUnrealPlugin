@@ -31,7 +31,6 @@ UNewtonLinkJoint::UNewtonLinkJoint()
 	DebugScale = 1.0f;
 }
 
-
 void UNewtonLinkJoint::SetCommonProperties(UNewtonJoint* const joint) const
 {
 	joint->ShowDebug = true;

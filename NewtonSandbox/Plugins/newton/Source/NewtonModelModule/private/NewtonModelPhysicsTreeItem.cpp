@@ -151,6 +151,10 @@ void FNewtonModelPhysicsTreeItem::ApplyDeltaTransform(const FVector& inDrag, con
 	check(0);
 }
 
+void FNewtonModelPhysicsTreeItem::PrepareNode() const
+{
+}
+
 bool FNewtonModelPhysicsTreeItem::HaveSelection() const
 {
 	UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
@@ -159,7 +163,6 @@ bool FNewtonModelPhysicsTreeItem::HaveSelection() const
 
 void FNewtonModelPhysicsTreeItem::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	//const UNewtonLinkJointLoopVehicleDifferentialAxle* const jointNode = Cast<UNewtonLinkJointLoopVehicleDifferentialAxle>(m_node);
 	const UNewtonLinkJointLoop* const jointNode = Cast<UNewtonLinkJointLoop>(m_node);
 
 	check(jointNode);
@@ -194,7 +197,7 @@ void FNewtonModelPhysicsTreeItem::DebugDraw(const FSceneView* const view, FViewp
 void FNewtonModelPhysicsTreeItem::OnPropertyChange(const FPropertyChangedEvent& event)
 {
 	FProperty* const property = event.Property;
-	if (property->GetName() != TEXT("BoneIndex"))
+	if (property->GetName() != TEXT("TargetBodyName"))
 	{
 		return;
 	}
@@ -208,32 +211,19 @@ void FNewtonModelPhysicsTreeItem::OnPropertyChange(const FPropertyChangedEvent& 
 	for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(items); it; ++it)
 	{
 		TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
-		if (itemInSet->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()))
+		UNewtonLink* const linkNode = Cast<UNewtonLink>(itemInSet->GetNode());
+		FName xxx(linkNode->GetFName());
+		if (linkNode->Name == loopNode->TargetBodyName)
+		//if (linkNode->GetFName() == loopNode->TargetBodyName)
 		{
-			UNewtonLinkRigidBody* const node = Cast<UNewtonLinkRigidBody>(itemInSet->GetNode());
-			check(node);
-			if (node->BoneIndex == loopNode->BoneIndex)
-			{
-				childBodyItem = itemInSet;
-				break;
-			}
+			childBodyItem = itemInSet;
+			break;
 		}
 	}
 
-	if (!childBodyItem || (parentBodyItem == childBodyItem))
+	if (childBodyItem.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LoopJoint childBody not found"));
-		loopNode->BoneIndex = -1;
-		loopNode->BoneName = TEXT("none");
-		return;
+		//const UNewtonLinkRigidBody* const childBody = Cast<UNewtonLinkRigidBody>(childBodyItem->GetNode());
+		loopNode->TargetFrame = childBodyItem->CalculateGlobalTransform() * parentBodyItem->CalculateGlobalTransform().Inverse();
 	}
-
-	const UNewtonLinkRigidBody* const childBody = Cast<UNewtonLinkRigidBody>(childBodyItem->GetNode());
-	UNewtonLinkJointLoopVehicleDifferentialAxle* const effectorNode = Cast<UNewtonLinkJointLoopVehicleDifferentialAxle>(loopNode);
-	check(childBody);
-	check(effectorNode);
-	check(childBody->BoneIndex == effectorNode->BoneIndex);
-
-	effectorNode->BoneName = childBody->BoneName;
-	effectorNode->TargetFrame = childBodyItem->CalculateGlobalTransform() * childBodyItem->CalculateGlobalTransform().Inverse();
 }

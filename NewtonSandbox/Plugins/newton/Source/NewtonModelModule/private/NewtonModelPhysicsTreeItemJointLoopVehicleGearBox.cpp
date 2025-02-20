@@ -49,5 +49,6 @@ void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::DebugDraw(const FSceneV
 
 void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::OnPropertyChange(const FPropertyChangedEvent& event)
 {
+	check(0);
 	FNewtonModelPhysicsTreeItemJointLoop::OnPropertyChange(event);
 } 

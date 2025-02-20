@@ -19,35 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoop.h"
+#pragma once
 
-#include "NewtonJoint.h"
-#include "NewtonCommons.h"
 #include "NewtonJointLoop.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+#include "NewtonJointLoopVehicleTireAxle.generated.h"
 
-UNewtonLinkJointLoop::UNewtonLinkJointLoop()
-	:Super()
+UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
+class UNewtonJointLoopVehicleTireAxle : public UNewtonJointLoop
 {
-	//BoneIndex = -1;
-	//BoneName = TEXT("None");
-	TargetBodyName = TEXT("None");
-	TargetFrame = FTransform();
-}
+	GENERATED_BODY()
+	
+	public:
+	// Sets default values for this component's properties
+	UNewtonJointLoopVehicleTireAxle();
 
-void UNewtonLinkJointLoop::SetCommonProperties(UNewtonJoint* const joint) const
-{
-	UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
-	check(loop);
-
-	loop->ShowDebug = true;
-	loop->TargetFrame = TargetFrame;
-	//loop->ReferencedBodyName = BoneName;
-	loop->ReferencedBodyName = TargetBodyName;
-}
-
-TArray<FName> UNewtonLinkJointLoop::GetNameArray() const
-{
-	//return { TEXT("body0"), TEXT("body1") };
-	return m_selectionNames;
-}
+	virtual void DrawGizmo(float timestep) const override;
+	virtual ndJointBilateralConstraint* CreateJoint() override;
+};

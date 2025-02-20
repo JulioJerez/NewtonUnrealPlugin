@@ -58,6 +58,7 @@
 #include "NewtonModelPhysicsTreeItemJointLoop6dofEffector.h"
 #include "NewtonModelPhysicsTreeItemShapeConvexApproximate.h"
 #include "NewtonModelPhysicsTreeItemJointLoopVehicleGearBox.h"
+#include "NewtonModelPhysicsTreeItemJointLoopVehicleTireAxle.h"
 #include "NewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle.h"
 
 #define LOCTEXT_NAMESPACE "FNewtonModelPhysicsTree"
@@ -181,6 +182,8 @@ void FNewtonModelPhysicsTree::OnSelectionChanged(TSharedPtr<FNewtonModelPhysicsT
 	if (m_selectedItem.IsValid())
 	{
 		m_oldSelectedName = m_selectedItem->GetDisplayName();
+
+		m_selectedItem->PrepareNode();
 		detailView->SetObject(item->GetNode());
 	}
 	else
@@ -451,14 +454,14 @@ void FNewtonModelPhysicsTree::OnAddJointTireRow()
 
 void FNewtonModelPhysicsTree::OnAddJointVehicleMotorRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointMotor(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointMotor>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointMotor(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointVehicleMotor>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
 
 void FNewtonModelPhysicsTree::OnAddJointVehicleDifferentialRow()
 {
-	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointDifferential>()), m_editor)));
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointVehicleDifferential>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddJointRow(item);
 }
@@ -477,23 +480,18 @@ void FNewtonModelPhysicsTree::OnAddJointLoopVehicleDifferentialAxleRow()
 	AddLoopRow(item);
 }
 
+void FNewtonModelPhysicsTree::OnAddJointLoopVehicleTireAxleRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopVehicleTireAxle>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	AddLoopRow(item);
+}
+
 void FNewtonModelPhysicsTree::OnAddJointLoopVehicleGearBoxRow()
 {
 	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkJointLoopVehicleGearBox>()), m_editor)));
 	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
 	AddLoopRow(item);
-
-	//m_items.Add(item);
-	//new FNewtonModelPhysicsTreeItemAcyclicGraph(item, m_selectedItem->GetAcyclicGraph());
-	//const FName motorClassName(FNewtonModelPhysicsTreeItemJoint::GetRtti());
-	//for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(m_items); it; ++it)
-	//{
-	//	TSharedPtr<FNewtonModelPhysicsTreeItem> parent((*it)->GetParent());
-	//	if (parent.IsValid() && parent->IsOfRttiByName(motorClassName))
-	//	{
-	//		TSharedPtr<FNewtonModelPhysicsTreeItemBody> itemBody(FNewtonModelPhysicsTreeItemBody *it);
-	//	}
-	//}
 }
 
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
@@ -631,6 +629,10 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopVehicleDifferentialAxleRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
 
+	commandList.MapAction(menuActions.AddJointLoopVehicleTireAxle
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopVehicleTireAxleRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+
 	commandList.MapAction(menuActions.AddJointLoop6dofEffector
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoop6dofEffectorRow)
 		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
@@ -695,6 +697,7 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 		menuBuilder.AddMenuEntry(actions.AddJointVehicleMotor);
 		menuBuilder.AddMenuEntry(actions.AddJointVehicleDifferential);
 		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleGearBox);
+		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleTireAxle);
 		menuBuilder.AddMenuEntry(actions.AddJointLoopVehicleDifferentialAxle);
 	menuBuilder.EndSection();
 
@@ -1238,7 +1241,7 @@ void FNewtonModelPhysicsTree::BuildTree()
 		}
 		else if (Cast<UNewtonLinkJointVehicleTire>(node))
 		{
-			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointWheel(parent, proxyNode, m_editor)));
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointTire(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}
@@ -1248,13 +1251,13 @@ void FNewtonModelPhysicsTree::BuildTree()
 			m_items.Add(item);
 			parent = item;
 		}
-		else if (Cast<UNewtonLinkJointMotor>(node))
+		else if (Cast<UNewtonLinkJointVehicleMotor>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointMotor(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}
-		else if (Cast<UNewtonLinkJointDifferential>(node))
+		else if (Cast<UNewtonLinkJointVehicleDifferential>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointDifferential(parent, proxyNode, m_editor)));
 			m_items.Add(item);
@@ -1269,6 +1272,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkJointLoopVehicleDifferentialAxle>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleDifferentialAxle(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkJointLoopVehicleTireAxle>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

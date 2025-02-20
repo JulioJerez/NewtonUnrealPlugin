@@ -22,14 +22,15 @@
 
 #pragma once
 
-#include "NewtonLinkJointWheel.h"
+#include "CoreMinimal.h"
+#include "NewtonLinkJoint.h"
 #include "NewtonLinkJointVehicleTire.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class NEWTONRUNTIMEMODULE_API UNewtonLinkJointVehicleTire : public UNewtonLinkJointWheel
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointVehicleTire : public UNewtonLinkJoint
 {
 	GENERATED_BODY()
 
@@ -39,4 +40,27 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointVehicleTire : public UNewtonLinkJo
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
 	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 100.0f, ClampMax = 100000.0f))
+	float SpringK;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 10.0f, ClampMax = 1000.0f))
+	float DamperC;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = -0.0f, ClampMax = 100.0f))
+	float UpperStop;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = -100.0f, ClampMax = 0.0f))
+	float LowerStop;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.00001f, ClampMax = 1.0f))
+	float Regularizer;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 100000.0f))
+	float BrakeTorque;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = -45.0f, ClampMax = -45.0f))
+	float SteeringAngle;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 100000.0f))
+	float HandBrakeTorque;
 };

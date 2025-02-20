@@ -19,35 +19,27 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
+#pragma once
+
+#include "CoreMinimal.h"
 #include "NewtonLinkJointLoop.h"
+#include "NewtonLinkJointLoopVehicleTireAxle.generated.h"
 
-#include "NewtonJoint.h"
-#include "NewtonCommons.h"
-#include "NewtonJointLoop.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
-
-UNewtonLinkJointLoop::UNewtonLinkJointLoop()
-	:Super()
+/**
+ * 
+ */
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoopVehicleTireAxle : public UNewtonLinkJointLoop
 {
-	//BoneIndex = -1;
-	//BoneName = TEXT("None");
-	TargetBodyName = TEXT("None");
-	TargetFrame = FTransform();
-}
+	GENERATED_BODY()
 
-void UNewtonLinkJointLoop::SetCommonProperties(UNewtonJoint* const joint) const
-{
-	UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
-	check(loop);
+	public:
+	UNewtonLinkJointLoopVehicleTireAxle();
 
-	loop->ShowDebug = true;
-	loop->TargetFrame = TargetFrame;
-	//loop->ReferencedBodyName = BoneName;
-	loop->ReferencedBodyName = TargetBodyName;
-}
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-TArray<FName> UNewtonLinkJointLoop::GetNameArray() const
-{
-	//return { TEXT("body0"), TEXT("body1") };
-	return m_selectionNames;
-}
+	UPROPERTY(EditAnywhere, Category = Newton)
+	FTransform DifferentialFrame;
+};

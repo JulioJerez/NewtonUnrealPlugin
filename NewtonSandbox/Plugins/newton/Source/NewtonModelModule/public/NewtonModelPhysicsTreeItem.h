@@ -48,6 +48,7 @@ class FNewtonModelPhysicsTreeItem: public TSharedFromThis<FNewtonModelPhysicsTre
 	FNewtonModelPhysicsTreeItemAcyclicGraph* GetAcyclicGraph() const;
 	void GenerateWidgetForNameColumn(TSharedPtr< SHorizontalBox > box, FIsSelected inIsSelected);
 
+	virtual void PrepareNode() const;
 	virtual bool HaveSelection() const;
 	virtual bool ShouldDrawWidget() const;
 	virtual FMatrix GetWidgetMatrix() const;

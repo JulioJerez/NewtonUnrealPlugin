@@ -74,5 +74,6 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 
 	// vehicle constraints loops
 	TSharedPtr<FUICommandInfo> AddJointLoopVehicleGearBox;
+	TSharedPtr<FUICommandInfo> AddJointLoopVehicleTireAxle;
 	TSharedPtr<FUICommandInfo> AddJointLoopVehicleDifferentialAxle;
 };

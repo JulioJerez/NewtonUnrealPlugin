@@ -59,6 +59,7 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(AddJointVehicleMotor, "vehicle motor", "Joint must be child of the vehicle chassis body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointVehicleDifferential, "vehicle differential", "Joint must be child of the vehicle chassis body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointLoopVehicleGearBox, "vehicle gear box", "Joint must be child of the vehicle head differential", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(AddJointLoopVehicleTireAxle, "vehicle tire axle", "Joint must be child of the vehicle differential body", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointLoopVehicleDifferentialAxle, "vehicle differential axle", "Joint must be child of the vehicle differential body", EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(AddShapeBox, "box", "collision shape must be a child of a rigid body", EUserInterfaceActionType::Button, FInputChord());

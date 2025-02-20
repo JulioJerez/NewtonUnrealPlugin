@@ -19,35 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoop.h"
 
-#include "NewtonJoint.h"
-#include "NewtonCommons.h"
-#include "NewtonJointLoop.h"
-#include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
+#pragma once
 
-UNewtonLinkJointLoop::UNewtonLinkJointLoop()
-	:Super()
+#include "CoreMinimal.h"
+#include "NewtonLinkJoint.h"
+#include "NewtonLinkJointVehicleMotor.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class NEWTONRUNTIMEMODULE_API UNewtonLinkJointVehicleMotor : public UNewtonLinkJoint
 {
-	//BoneIndex = -1;
-	//BoneName = TEXT("None");
-	TargetBodyName = TEXT("None");
-	TargetFrame = FTransform();
-}
+	GENERATED_BODY()
 
-void UNewtonLinkJointLoop::SetCommonProperties(UNewtonJoint* const joint) const
-{
-	UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
-	check(loop);
+	public:
+	UNewtonLinkJointVehicleMotor();
 
-	loop->ShowDebug = true;
-	loop->TargetFrame = TargetFrame;
-	//loop->ReferencedBodyName = BoneName;
-	loop->ReferencedBodyName = TargetBodyName;
-}
+	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
-TArray<FName> UNewtonLinkJointLoop::GetNameArray() const
-{
-	//return { TEXT("body0"), TEXT("body1") };
-	return m_selectionNames;
-}
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 10.0f, ClampMax = 100.0f))
+	float BodyMass;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 25.0f, ClampMax = 100.0f))
+	float BodyRadio;
+};

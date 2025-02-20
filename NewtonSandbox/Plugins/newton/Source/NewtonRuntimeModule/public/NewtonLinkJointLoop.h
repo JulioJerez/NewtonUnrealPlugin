@@ -39,12 +39,14 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoop : public UNewtonLink
 
 	void SetCommonProperties(UNewtonJoint* const joint) const;
 
-	UPROPERTY(VisibleAnywhere, Category = Newton)
-	FName BoneName;
+	UFUNCTION()
+	TArray<FName> GetNameArray() const;
 
-	UPROPERTY(EditAnywhere, Category = Newton)
-	int BoneIndex;
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (GetOptions = "GetNameArray"))
+	FName TargetBodyName;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
 	FTransform TargetFrame;
+
+	TArray<FName> m_selectionNames;
 };

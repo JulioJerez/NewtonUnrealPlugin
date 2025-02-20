@@ -63,5 +63,4 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointWheel : public UNewtonLinkJoint
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.0f, ClampMax = 100000.0f))
 	float HandBrakeTorque;
-
 };

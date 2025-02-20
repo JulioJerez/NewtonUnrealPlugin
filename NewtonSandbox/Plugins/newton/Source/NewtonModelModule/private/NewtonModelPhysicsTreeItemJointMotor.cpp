@@ -44,7 +44,7 @@ int FNewtonModelPhysicsTreeItemJointMotor::GetFreeDof() const
 
 void FNewtonModelPhysicsTreeItemJointMotor::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	const UNewtonLinkJointMotor* const jointNode = Cast<UNewtonLinkJointMotor>(m_node);
+	const UNewtonLinkJointVehicleMotor* const jointNode = Cast<UNewtonLinkJointVehicleMotor>(m_node);
 	check(jointNode);
 
 	if (jointNode->m_hidden || !jointNode->ShowDebug)

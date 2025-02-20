@@ -19,35 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "NewtonLinkJointLoop.h"
-
-#include "NewtonJoint.h"
+#include "NewtonLinkJointVehicleDifferential.h"
 #include "NewtonCommons.h"
-#include "NewtonJointLoop.h"
+#include "NewtonJointVehicleDifferential.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
-UNewtonLinkJointLoop::UNewtonLinkJointLoop()
+UNewtonLinkJointVehicleDifferential::UNewtonLinkJointVehicleDifferential()
 	:Super()
 {
-	//BoneIndex = -1;
-	//BoneName = TEXT("None");
-	TargetBodyName = TEXT("None");
-	TargetFrame = FTransform();
+	Name = TEXT("differential");
+	BodyMass = 25.0f;
+	BodyRadio = 25.0f;
+	LimitedSlipRpmLock = 30.0f;
 }
 
-void UNewtonLinkJointLoop::SetCommonProperties(UNewtonJoint* const joint) const
+TObjectPtr<USceneComponent> UNewtonLinkJointVehicleDifferential::CreateBlueprintProxy() const
 {
-	UNewtonJointLoop* const loop = Cast<UNewtonJointLoop>(joint);
-	check(loop);
-
-	loop->ShowDebug = true;
-	loop->TargetFrame = TargetFrame;
-	//loop->ReferencedBodyName = BoneName;
-	loop->ReferencedBodyName = TargetBodyName;
+	TObjectPtr<USceneComponent> component(NewObject<UNewtonJointVehicleDifferential>(UNewtonJointVehicleDifferential::StaticClass(), Name, RF_Transient));
+	return component;
 }
 
-TArray<FName> UNewtonLinkJointLoop::GetNameArray() const
+void UNewtonLinkJointVehicleDifferential::InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const
 {
-	//return { TEXT("body0"), TEXT("body1") };
-	return m_selectionNames;
+	UNewtonJointVehicleDifferential* const joint = Cast<UNewtonJointVehicleDifferential>(component.Get());
+
+	SetCommonProperties(joint);
+
+	joint->BodyMass = BodyMass;
+	joint->BodyRadio = BodyRadio;
+	joint->LimitedSlipRpmLock = LimitedSlipRpmLock;
 }
