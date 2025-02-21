@@ -29,7 +29,7 @@ UNewtonLinkJointLoopVehicleTireAxle::UNewtonLinkJointLoopVehicleTireAxle()
 	:Super()
 {
 	Name = TEXT("tireAxle");
-	DifferentialFrame = FTransform();
+	ReverseGear = false;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointLoopVehicleTireAxle::CreateBlueprintProxy() const
@@ -43,5 +43,11 @@ void UNewtonLinkJointLoopVehicleTireAxle::InitBlueprintProxy(TObjectPtr<USceneCo
 	UNewtonJointLoopVehicleTireAxle* const joint = Cast<UNewtonJointLoopVehicleTireAxle>(component.Get());
 	SetCommonProperties(joint);
 
-	joint->DifferentialFrame = DifferentialFrame;
+	FTransform gear;
+	if (ReverseGear)
+	{
+		const FRotator rotator(0.0f, 0.0f, 180.0f);
+		gear.SetRotation(FQuat(rotator));
+	}
+	joint->DifferentialFrame = gear;
 }

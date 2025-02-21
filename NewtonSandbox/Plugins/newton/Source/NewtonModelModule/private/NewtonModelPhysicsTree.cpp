@@ -311,6 +311,43 @@ bool FNewtonModelPhysicsTree::OnCanAddVehicleGearBoxRow() const
 	return false;
 }
 
+bool FNewtonModelPhysicsTree::OnCanAddVehicleMotorRow() const
+{
+	if (OnCanAddChildRow())
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> parent(m_selectedItem->GetParent());
+		if (!parent.IsValid())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool FNewtonModelPhysicsTree::OnCanAddVehicleDifferentialRow() const
+{
+	return OnCanAddVehicleMotorRow();
+}
+
+bool FNewtonModelPhysicsTree::OnCanAddVehicleTireRow() const
+{
+	if (OnCanAddChildRow())
+	{
+		TSharedPtr<FNewtonModelPhysicsTreeItem> parent(m_selectedItem->GetParent());
+		if (!parent.IsValid())
+		{
+			return true;
+		}
+		if (!parent->IsOfRttiByName(FNewtonModelPhysicsTreeItemJointVehicleTire::GetRtti()) &&
+			!parent->IsOfRttiByName(FNewtonModelPhysicsTreeItemJointVehicleMotor::GetRtti()) &&
+			!parent->IsOfRttiByName(FNewtonModelPhysicsTreeItemJointVehicleDifferential::GetRtti()))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void FNewtonModelPhysicsTree::AddLoopRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& loopItem)
 {
 	m_items.Add(loopItem);
@@ -615,15 +652,15 @@ void FNewtonModelPhysicsTree::BindCommands()
 
 	commandList.MapAction(menuActions.AddJointVehicleTire
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointTireRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddVehicleTireRow));
 
 	commandList.MapAction(menuActions.AddJointVehicleMotor
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointVehicleMotorRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddVehicleMotorRow));
 
 	commandList.MapAction(menuActions.AddJointVehicleDifferential
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointVehicleDifferentialRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddVehicleDifferentialRow));
 
 	commandList.MapAction(menuActions.AddJointLoopVehicleGearBox
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoopVehicleGearBoxRow)

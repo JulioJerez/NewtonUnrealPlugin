@@ -29,6 +29,7 @@ UNewtonLinkJointLoopVehicleDifferentialAxle::UNewtonLinkJointLoopVehicleDifferen
 	:Super()
 {
 	Name = TEXT("differentialAxle");
+	ReverseGear = false;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointLoopVehicleDifferentialAxle::CreateBlueprintProxy() const
@@ -41,4 +42,12 @@ void UNewtonLinkJointLoopVehicleDifferentialAxle::InitBlueprintProxy(TObjectPtr<
 {
 	UNewtonJointLoopVehicleDifferentialAxle* const joint = Cast<UNewtonJointLoopVehicleDifferentialAxle>(component.Get());
 	SetCommonProperties(joint);
+
+	FTransform gear;
+	if (ReverseGear)
+	{
+		const FRotator rotator(0.0f, 0.0f, 180.0f);
+		gear.SetRotation(FQuat(rotator));
+	}
+	joint->DifferentialFrame = gear;
 }

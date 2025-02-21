@@ -212,9 +212,7 @@ void FNewtonModelPhysicsTreeItem::OnPropertyChange(const FPropertyChangedEvent& 
 	{
 		TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
 		UNewtonLink* const linkNode = Cast<UNewtonLink>(itemInSet->GetNode());
-		FName xxx(linkNode->GetFName());
 		if (linkNode->Name == loopNode->TargetBodyName)
-		//if (linkNode->GetFName() == loopNode->TargetBodyName)
 		{
 			childBodyItem = itemInSet;
 			break;
@@ -223,7 +221,6 @@ void FNewtonModelPhysicsTreeItem::OnPropertyChange(const FPropertyChangedEvent& 
 
 	if (childBodyItem.IsValid())
 	{
-		//const UNewtonLinkRigidBody* const childBody = Cast<UNewtonLinkRigidBody>(childBodyItem->GetNode());
 		loopNode->TargetFrame = childBodyItem->CalculateGlobalTransform() * parentBodyItem->CalculateGlobalTransform().Inverse();
 	}
 }

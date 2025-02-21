@@ -41,5 +41,5 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoopVehicleTireAxle : public UNewt
 	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	FTransform DifferentialFrame;
+	bool ReverseGear;
 };

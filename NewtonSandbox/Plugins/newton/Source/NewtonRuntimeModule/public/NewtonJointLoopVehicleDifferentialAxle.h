@@ -35,4 +35,7 @@ class UNewtonJointLoopVehicleDifferentialAxle : public UNewtonJointLoop
 
 	virtual void DrawGizmo(float timestep) const override;
 	virtual ndJointBilateralConstraint* CreateJoint() override;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	FTransform DifferentialFrame;
 };

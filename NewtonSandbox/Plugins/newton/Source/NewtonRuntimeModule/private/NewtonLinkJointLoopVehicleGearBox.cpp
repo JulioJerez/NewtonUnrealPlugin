@@ -29,6 +29,7 @@ UNewtonLinkJointLoopVehicleGearBox::UNewtonLinkJointLoopVehicleGearBox()
 	:Super()
 {
 	Name = TEXT("gearBox");
+	ReverseGear = false;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointLoopVehicleGearBox::CreateBlueprintProxy() const
@@ -41,4 +42,12 @@ void UNewtonLinkJointLoopVehicleGearBox::InitBlueprintProxy(TObjectPtr<USceneCom
 {
 	UNewtonJointLoopVehicleGearBox* const joint = Cast<UNewtonJointLoopVehicleGearBox>(component.Get());
 	SetCommonProperties(joint);
+
+	FTransform gear;
+	if (ReverseGear)
+	{
+		const FRotator rotator(0.0f, 180.0f, 0.0f);
+		gear.SetRotation(FQuat(rotator));
+		joint->TargetFrame = gear * joint->TargetFrame;
+	}
 }

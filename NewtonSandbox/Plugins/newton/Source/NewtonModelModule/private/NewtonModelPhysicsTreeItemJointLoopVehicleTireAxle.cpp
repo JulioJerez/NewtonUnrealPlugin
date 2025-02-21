@@ -86,7 +86,13 @@ void FNewtonModelPhysicsTreeItemJointLoopVehicleTireAxle::DebugDraw(const FScene
 	const UNewtonLinkJointLoopVehicleTireAxle* const axle = Cast<UNewtonLinkJointLoopVehicleTireAxle>(jointNode);
 	check(axle);
 
-	const FTransform differentialTransform(axle->DifferentialFrame * parentTransform);
+	FTransform gear;
+	if (axle->ReverseGear)
+	{
+		const FRotator rotator(0.0f, 0.0f, 180.0f);
+		gear.SetRotation(FQuat(rotator));
+	}
+	const FTransform differentialTransform(gear * parentTransform);
 	const FVector positionParent(differentialTransform.GetLocation());
 	const FVector xAxisParent(differentialTransform.GetUnitAxis(EAxis::X));
 	const FVector yAxisParent(differentialTransform.GetUnitAxis(EAxis::Y));

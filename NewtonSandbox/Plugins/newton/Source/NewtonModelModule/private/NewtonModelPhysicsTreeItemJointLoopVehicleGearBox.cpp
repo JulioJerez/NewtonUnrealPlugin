@@ -44,7 +44,46 @@ FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox:
 
 void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const
 {
-	FNewtonModelPhysicsTreeItemJointLoop::DebugDraw(view, viewport, pdi);
+	const UNewtonLinkJointLoop* const jointNode = Cast<UNewtonLinkJointLoop>(m_node);
+
+	check(jointNode);
+
+	if (jointNode->m_hidden || !jointNode->ShowDebug)
+	{
+		return;
+	}
+
+	float scale = jointNode->DebugScale * 5.0f;
+	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS * 5.0f;
+	const FTransform parentTransform(CalculateGlobalTransform());
+
+	const UNewtonLinkJointLoopVehicleGearBox* const axle = Cast<UNewtonLinkJointLoopVehicleGearBox>(jointNode);
+	check(axle);
+
+	const FTransform differentialTransform(parentTransform);
+	const FVector positionParent(differentialTransform.GetLocation());
+	const FVector xAxisParent(differentialTransform.GetUnitAxis(EAxis::X));
+	const FVector yAxisParent(differentialTransform.GetUnitAxis(EAxis::Y));
+	const FVector zAxisParent(differentialTransform.GetUnitAxis(EAxis::Z));
+	pdi->DrawLine(positionParent, positionParent + scale * xAxisParent, FColor::Red, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionParent, positionParent + scale * yAxisParent, FColor::Green, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionParent, positionParent + scale * zAxisParent, FColor::Blue, SDPG_Foreground, thickness);
+
+	FTransform gear;
+	if (axle->ReverseGear)
+	{
+		const FRotator rotator(0.0f, 180.0f, 0.0f);
+		FMatrix xxx(FQuat(rotator).ToMatrix());
+		gear.SetRotation(FQuat(rotator));
+	}
+	const FTransform childTransform(gear * jointNode->TargetFrame * parentTransform);
+	const FVector positionChild(childTransform.GetLocation());
+	const FVector xAxisChild(childTransform.GetUnitAxis(EAxis::X));
+	const FVector yAxisChild(childTransform.GetUnitAxis(EAxis::Y));
+	const FVector zAxisChild(childTransform.GetUnitAxis(EAxis::Z));
+	pdi->DrawLine(positionChild, positionChild + scale * xAxisChild, FColor::Red, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionChild, positionChild + scale * yAxisChild, FColor::Green, SDPG_Foreground, thickness);
+	pdi->DrawLine(positionChild, positionChild + scale * zAxisChild, FColor::Blue, SDPG_Foreground, thickness);
 }
 
 void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::OnPropertyChange(const FPropertyChangedEvent& event)

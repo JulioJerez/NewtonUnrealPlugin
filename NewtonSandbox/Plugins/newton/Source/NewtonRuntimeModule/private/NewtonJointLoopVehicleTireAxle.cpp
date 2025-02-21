@@ -115,16 +115,17 @@ ndJointBilateralConstraint* UNewtonJointLoopVehicleTireAxle::CreateJoint()
 			ndBodyKinematic* const tireBody = tireBodyComponent->GetBody();
 			ndBodyKinematic* const differentialBody = differentialBodyComponet->GetBody();
 
+			const FTransform transform(DifferentialFrame * GetRelativeTransform());
+			const ndMatrix parentMarix(ToNewtonMatrix(transform) * differentialBody->GetMatrix());
+			const ndVector upPin(parentMarix.m_up);
+			const ndVector frontPin(parentMarix.m_front);
+
 			const UNewtonJointVehicleTire* const tireJoint = Cast<UNewtonJointVehicleTire>(tireBodyComponent->GetAttachParent());
 			check(tireJoint);
-			const FTransform transform(DifferentialFrame * GetRelativeTransform());
 			const ndMatrix childMarix(tireJoint->GetJoint()->CalculateGlobalMatrix0());
-			const ndMatrix parentMarix(ToNewtonMatrix(transform) * differentialBody->GetMatrix());
-			
-			const ndVector upPin(parentMarix.m_up);
-			const ndVector pin(parentMarix.m_front);
 			const ndVector drivePin(childMarix.m_front);
-			ndMultiBodyVehicleDifferentialAxle* const joint = new ndMultiBodyVehicleDifferentialAxle(pin, upPin, differentialBody, drivePin, tireBody);
+
+			ndMultiBodyVehicleDifferentialAxle* const joint = new ndMultiBodyVehicleDifferentialAxle(frontPin, upPin, differentialBody, drivePin, tireBody);
 			return joint;
 		}
 	}

@@ -89,10 +89,13 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	// delegates
 	bool OnCanAddChildRow() const;
-	bool CanDeleteSelectedRow() const;
-
 	bool OnCanAddVehicleAxleRow() const;
+	bool OnCanAddVehicleTireRow() const;
+	bool OnCanAddVehicleMotorRow() const;
 	bool OnCanAddVehicleGearBoxRow() const;
+	bool OnCanAddVehicleDifferentialRow() const;
+
+	bool CanDeleteSelectedRow() const;
 	
 	void OnAddJointTireRow();
 	void OnAddJointHingeRow();

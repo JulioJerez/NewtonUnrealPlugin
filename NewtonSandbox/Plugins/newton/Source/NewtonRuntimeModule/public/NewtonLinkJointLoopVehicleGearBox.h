@@ -39,4 +39,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointLoopVehicleGearBox : public UNewto
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
 	void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	bool ReverseGear;
 };

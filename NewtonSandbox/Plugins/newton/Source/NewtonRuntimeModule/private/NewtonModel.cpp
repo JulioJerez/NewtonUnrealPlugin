@@ -222,13 +222,11 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 
 			vehicle->Update(world, timestep);
 		}
-		ndModelNotify::Update(world, timestep);
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override
 	{
 		UNewtonModel::ModelNotify::PostUpdate(world, timestep);
-		ndModelNotify::PostUpdate(world, timestep);
 		ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 		if (vehicle && !m_sleepingState)
 		{
