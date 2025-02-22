@@ -205,6 +205,27 @@ void UNewtonJointLoop6dofEffector::SetTargetTransform(const FTransform& transfor
 	}
 }
 
+FVector UNewtonJointLoop6dofEffector::WorldLocationToEffectorSpace(const FVector& worldPosition)
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+	const ndVector posit(ndFloat32(worldPosition.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(worldPosition.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(worldPosition.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(1.0f));
+
+	joint->CalculateGlobalMatrix(matrix0, matrix1);
+	const ndVector effectorPosit(matrix1.UntransformVector(posit));
+	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+
+	ndFloat32 angle0 = ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x);
+	ndFloat32 angle = ndAtan2(effectorPosit.m_y, effectorPosit.m_x) - angle0;
+	const ndVector localPosit(ndRollMatrix(angle).UnrotateVector(effectorPosit) - refMatrix.m_posit);
+
+	ndFloat32 azimuth = angle * ndRadToDegree;
+	ndFloat32 x = localPosit.m_x * UNREAL_UNIT_SYSTEM;
+	ndFloat32 z = localPosit.m_z * UNREAL_UNIT_SYSTEM;
+	return FVector(x, azimuth, z);
+}
+
 FVector UNewtonJointLoop6dofEffector::ClipRobotTarget()
 {
 	check(m_joint);
@@ -216,9 +237,10 @@ FVector UNewtonJointLoop6dofEffector::ClipRobotTarget()
 	ndFloat32 angle0 = ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x);
 	ndFloat32 angle = ndAtan2(currentEffectorMatrix.m_posit.m_y, currentEffectorMatrix.m_posit.m_x) - angle0;
 	const ndVector localPosit(ndRollMatrix(angle).UnrotateVector(currentEffectorMatrix.m_posit) - refMatrix.m_posit);
+
+	ndFloat32 azimuth = angle * ndRadToDegree;
 	ndFloat32 x = (localPosit.m_x - 0.01f * ndSign(localPosit.m_x)) * UNREAL_UNIT_SYSTEM;
 	ndFloat32 z = (localPosit.m_z - 0.01f * ndSign(localPosit.m_z)) * UNREAL_UNIT_SYSTEM;
-	ndFloat32 azimuth = angle * ndRadToDegree;
 	return FVector(x, azimuth, z);
 }
 

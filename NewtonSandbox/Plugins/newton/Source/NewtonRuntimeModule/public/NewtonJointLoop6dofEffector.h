@@ -38,6 +38,9 @@ class UNewtonJointLoop6dofEffector : public UNewtonJointLoop
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
+	FVector WorldLocationToEffectorSpace(const FVector& worldPosition);
+
+	UFUNCTION(BlueprintCallable, Category = Newton)
 	FTransform GetTargetTransform() const;
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
