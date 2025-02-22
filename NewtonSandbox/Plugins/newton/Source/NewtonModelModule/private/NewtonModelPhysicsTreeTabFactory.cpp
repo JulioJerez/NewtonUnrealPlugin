@@ -68,10 +68,6 @@ TSharedRef<SWidget> FNewtonModelPhysicsTreeTabFactory::CreateTabBody(const FWork
 	check(editor.IsValid());
 	TSharedPtr<FNewtonModelPhysicsTree> physicsTree(editor->GetNewtonModelPhysicsTree());
 	check(physicsTree.IsValid());
-
-
-
-
 	return physicsTree.ToSharedRef();
 #endif
 }

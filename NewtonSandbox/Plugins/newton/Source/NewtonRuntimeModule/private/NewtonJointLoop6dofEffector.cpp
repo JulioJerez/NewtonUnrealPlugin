@@ -175,7 +175,6 @@ ndJointBilateralConstraint* UNewtonJointLoop6dofEffector::CreateJoint()
 	return nullptr;
 }
 
-
 FTransform UNewtonJointLoop6dofEffector::GetTargetTransform() const
 {
 	check(m_joint);
@@ -225,9 +224,6 @@ FVector UNewtonJointLoop6dofEffector::ClipRobotTarget()
 
 void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll)
 {
-	check(m_joint);
-	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
-
 	// save target for debugging porpuses 
 	m_targetX = x;
 	m_targetZ = z;
@@ -235,6 +231,9 @@ void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimut
 	m_targetRoll = roll;
 	m_targetPitch = pitch;
 	m_targetAzimuth = azimuth;
+
+	check(m_joint);
+	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
 
 	const ndVector upPin(0.0f, 0.0f, 1.0f, 0.0f);
 	const ndMatrix currentMatrix(joint->GetEffectorMatrix());

@@ -151,6 +151,12 @@ void FNewtonModelPhysicsTreeItem::ApplyDeltaTransform(const FVector& inDrag, con
 	check(0);
 }
 
+
+int FNewtonModelPhysicsTreeItem::GetFreeDof() const
+{
+	return 0;
+}
+
 void FNewtonModelPhysicsTreeItem::PrepareNode() const
 {
 }

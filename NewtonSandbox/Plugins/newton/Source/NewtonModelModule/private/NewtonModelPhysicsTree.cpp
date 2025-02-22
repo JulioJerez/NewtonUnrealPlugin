@@ -298,6 +298,47 @@ bool FNewtonModelPhysicsTree::OnCanAddVehicleAxleRow() const
 	return false;
 }
 
+bool FNewtonModelPhysicsTree::OnCanAdd6dofEffectorRow() const
+{
+	if (OnCanAddChildRow())
+	{
+		int stack = 1;
+		int dofSum[TREE_STACK_DEPTH];
+		FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
+
+		check(m_selectedItem.IsValid());
+		check(Cast<UNewtonLinkRigidBody>(m_selectedItem->GetNode()));
+
+		dofSum[0] = 0;
+		nodeStack[0] = m_selectedItem->GetAcyclicGraph();
+		while (stack)
+		{
+			stack--;
+			int sum = dofSum[stack];
+			FNewtonModelPhysicsTreeItemAcyclicGraph* const node = nodeStack[stack];
+			//const UNewtonLinkJoint* const joint = Cast<UNewtonLinkJoint>(node->m_item->GetNode());
+			//if (joint && !Cast<UNewtonLinkJointLoop>(joint))
+			//{
+			//	sum += node->m_item->GetFreeDof();
+			//}
+			sum += node->m_item->GetFreeDof();
+
+			if (sum >= 6)
+			{
+				return true;
+			}
+
+			for (int i = node->m_children.Num() - 1; i >= 0; --i)
+			{
+				dofSum[stack] = sum;
+				nodeStack[stack] = node->m_children[i];
+				stack++;
+			}
+		}
+	}
+	return false;
+}
+
 bool FNewtonModelPhysicsTree::OnCanAddVehicleGearBoxRow() const
 {
 	if (OnCanAddChildRow())
@@ -676,7 +717,7 @@ void FNewtonModelPhysicsTree::BindCommands()
 
 	commandList.MapAction(menuActions.AddJointLoop6dofEffector
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointLoop6dofEffectorRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAdd6dofEffectorRow));
 
 	// delete any node action
 	commandList.MapAction(menuActions.DeleteSelectedRow 

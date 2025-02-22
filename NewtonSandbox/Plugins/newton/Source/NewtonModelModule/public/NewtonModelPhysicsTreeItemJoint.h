@@ -32,7 +32,7 @@ class FNewtonModelPhysicsTreeItemJoint : public FNewtonModelPhysicsTreeItem
 	FNewtonModelPhysicsTreeItemJoint(const FNewtonModelPhysicsTreeItemJoint& src);
 	FNewtonModelPhysicsTreeItemJoint(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor);
 
-	virtual int GetFreeDof() const;
+	virtual int GetFreeDof() const override;
 	virtual FName BrushName() const override;
 	virtual FNewtonModelPhysicsTreeItem* Clone() const override;
 

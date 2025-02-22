@@ -26,6 +26,7 @@
 #include "NewtonModelPhysicsTree.h"
 #include "NewtonModelPhysicsTreeItemBody.h"
 #include "NewtonModelPhysicsTreeItemJoint.h"
+#include "NewtonModelPhysicsTreeItemAcyclicGraphs.h"
 
 FNewtonModelPhysicsTreeItemJointLoop6dofEffector::FNewtonModelPhysicsTreeItemJointLoop6dofEffector(const FNewtonModelPhysicsTreeItemJointLoop6dofEffector& src)
 	:FNewtonModelPhysicsTreeItemJointLoop(src)
@@ -75,112 +76,45 @@ void FNewtonModelPhysicsTreeItemJointLoop6dofEffector::DebugDraw(const FSceneVie
 	pdi->DrawLine(positionChild, positionChild + scale * zAxisChild, FColor::Blue, SDPG_Foreground, thickness);
 }
 
+void FNewtonModelPhysicsTreeItemJointLoop6dofEffector::PrepareNode() const
+{
+	FNewtonModelPhysicsTreeItemJointLoop::PrepareNode();
+
+	UNewtonLinkJointLoop* const jointNode = Cast<UNewtonLinkJointLoop>(m_node);
+	jointNode->m_selectionNames.Empty();
+
+	int stack = 1;
+	int dofSum[TREE_STACK_DEPTH];
+	FNewtonModelPhysicsTreeItemAcyclicGraph* nodeStack[TREE_STACK_DEPTH];
+
+	dofSum[0] = 0;
+	nodeStack[0] = GetParent()->GetAcyclicGraph();
+	while (stack)
+	{
+		stack--;
+		int sum = dofSum[stack];
+		FNewtonModelPhysicsTreeItemAcyclicGraph* const node = nodeStack[stack];
+
+		sum += node->m_item->GetFreeDof();
+		if (sum >= 6)
+		{
+			const UNewtonLinkRigidBody* const body = Cast<UNewtonLinkRigidBody>(node->m_item->GetNode());
+			if (body)
+			{
+				jointNode->m_selectionNames.Push(body->Name);
+			}
+		}
+		
+		for (int i = node->m_children.Num() - 1; i >= 0; --i)
+		{
+			dofSum[stack] = sum;
+			nodeStack[stack] = node->m_children[i];
+			stack++;
+		}
+	}
+}
+
 void FNewtonModelPhysicsTreeItemJointLoop6dofEffector::OnPropertyChange(const FPropertyChangedEvent& event)
 {
-	check(0);
-	//FNewtonModelPhysicsTreeItemJointLoop::OnPropertyChange(event);
-	//FProperty* const property = event.Property;
-	//if (property->GetName() != TEXT("BoneIndex"))
-	//{
-	//	return;
-	//}
-	//
-	//check(GetParent());
-	//UNewtonLinkJointLoop* const loopNode = Cast<UNewtonLinkJointLoop>(m_node);
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem0(GetParent());
-	//const UNewtonLinkRigidBody* const body0 = Cast<UNewtonLinkRigidBody>(bodyItem0->GetNode());
-	//if (!body0 || (body0->BoneIndex < 0))
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("LoopJoint parentBody is not mapped to a bone"));
-	//	loopNode->BoneIndex = -1;
-	//	loopNode->BoneName = TEXT("none");
-	//	return;
-	//}
-	//
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> bodyItem1(nullptr);
-	//TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>> items(m_editor->GetNewtonModelPhysicsTree()->GetItems());
-	//for (TSet<TSharedPtr<FNewtonModelPhysicsTreeItem>>::TConstIterator it(items); it; ++it)
-	//{
-	//	TSharedPtr<FNewtonModelPhysicsTreeItem> itemInSet(*it);
-	//	if (itemInSet->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()))
-	//	{
-	//		UNewtonLinkRigidBody* const node = Cast<UNewtonLinkRigidBody>(itemInSet->GetNode());
-	//		check(node);
-	//		if (node->BoneIndex == loopNode->BoneIndex)
-	//		{
-	//			bodyItem1 = itemInSet;
-	//			break;
-	//		}
-	//	}
-	//}
-	//
-	//if (!bodyItem1)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("LoopJoint childBody not found"));
-	//	loopNode->BoneIndex = -1;
-	//	loopNode->BoneName = TEXT("none");
-	//	return;
-	//}
-	//
-	//auto IsChildOf = [](TSharedPtr<FNewtonModelPhysicsTreeItem> child, TSharedPtr<FNewtonModelPhysicsTreeItem> parent)
-	//{
-	//	for (TSharedPtr<FNewtonModelPhysicsTreeItem> node(child); node != nullptr; node = node->GetParent())
-	//	{
-	//		if (node == parent)
-	//		{
-	//			return true;
-	//		}
-	//	}
-	//	return false;
-	//};
-	//
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> childItem(nullptr);
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> parentItem(nullptr);
-	//if (IsChildOf(bodyItem0, bodyItem1))
-	//{
-	//	childItem = bodyItem0;
-	//	parentItem = bodyItem1;
-	//}
-	//else if (IsChildOf(bodyItem1, bodyItem0))
-	//{
-	//	childItem = bodyItem1;
-	//	parentItem = bodyItem0;
-	//}
-	//
-	//if (!childItem || !parentItem)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("node are not part of the same ik chain"));
-	//	loopNode->BoneIndex = -1;
-	//	loopNode->BoneName = TEXT("none");
-	//	return;
-	//}
-	//
-	//int dof = 0;
-	//TSharedPtr<FNewtonModelPhysicsTreeItem> node(childItem);
-	//do
-	//{
-	//	if (node->IsOfRttiByName(FNewtonModelPhysicsTreeItemJoint::GetRtti()))
-	//	{
-	//		const FNewtonModelPhysicsTreeItemJoint* const jointItem = (FNewtonModelPhysicsTreeItemJoint*)node.Get();
-	//		dof += jointItem->GetFreeDof();
-	//	}
-	//	node = node->GetParent();
-	//} while (node && (node != parentItem));
-	//
-	//if (dof < 6)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("selected bone is in the ik chain but the chain is underdetermined"));
-	//	loopNode->BoneIndex = -1;
-	//	loopNode->BoneName = TEXT("none");
-	//	return;
-	//}
-	//
-	//const UNewtonLinkRigidBody* const body1 = Cast<UNewtonLinkRigidBody>(bodyItem1->GetNode());
-	//UNewtonLinkJointLoop6dofEffector* const effectorNode = Cast<UNewtonLinkJointLoop6dofEffector>(loopNode);
-	//check(body1);
-	//check(effectorNode);
-	//check(body1->BoneIndex == effectorNode->BoneIndex);
-	//
-	//effectorNode->BoneName = body1->BoneName;
-	//effectorNode->TargetFrame = childItem->CalculateGlobalTransform() * parentItem->CalculateGlobalTransform().Inverse();
+	FNewtonModelPhysicsTreeItemJointLoop::OnPropertyChange(event);
 } 

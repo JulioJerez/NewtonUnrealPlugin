@@ -108,7 +108,6 @@ void FNewtonModelPhysicsTreeItemJointLoopVehicleGearBox::PrepareNode() const
 			if (parentItem.IsValid())
 			{
 				TObjectPtr<UNewtonLink> link(parentItem->GetNode());
-				//if (Cast<UNewtonLinkJointVehicleTire>(link))
 				if (Cast<UNewtonLinkJointVehicleDifferential>(link))
 				{
 					jointNode->m_selectionNames.Push(link->Name);
