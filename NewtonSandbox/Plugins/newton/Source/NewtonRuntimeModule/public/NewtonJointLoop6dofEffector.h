@@ -24,6 +24,21 @@
 #include "NewtonJointLoop.h"
 #include "NewtonJointLoop6dofEffector.generated.h"
 
+USTRUCT(BlueprintType)
+struct FRobotTargetPosit
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float X;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Z;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Azimuth;
+};
+
 
 UCLASS(ClassGroup = NewtonJoints, meta = (BlueprintSpawnableComponent))
 class UNewtonJointLoop6dofEffector : public UNewtonJointLoop
@@ -38,7 +53,7 @@ class UNewtonJointLoop6dofEffector : public UNewtonJointLoop
 	virtual ndJointBilateralConstraint* CreateJoint() override;
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
-	FVector WorldLocationToEffectorSpace(const FVector& worldPosition);
+	FRobotTargetPosit WorldLocationToEffectorSpace(const FVector& worldPosition);
 
 	UFUNCTION(BlueprintCallable, Category = Newton)
 	FTransform GetTargetTransform() const;
@@ -77,10 +92,8 @@ class UNewtonJointLoop6dofEffector : public UNewtonJointLoop
 	float LinearRegularizer;
 
 	FMatrix m_referenceFrame;
-	float m_targetX;
-	float m_targetZ;
+	FRobotTargetPosit m_target;
 	float m_targetYaw;
 	float m_targetRoll;
 	float m_targetPitch;
-	float m_targetAzimuth;
 };

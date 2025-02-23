@@ -38,12 +38,12 @@ UNewtonJointLoop6dofEffector::UNewtonJointLoop6dofEffector()
 	AngularMaxTorque = 10000.0f;
 	AngularRegularizer = 1.0e-5f;
 
-	m_targetX = 0.0f;
-	m_targetZ = 0.0f;
+	m_target.X = 0.0f;
+	m_target.Z = 0.0f;
 	m_targetYaw = 0.0f;
 	m_targetRoll = 0.0f;
 	m_targetPitch = 0.0f;
-	m_targetAzimuth = 0.0f;
+	m_target.Azimuth = 0.0f;
 
 	LinearDamper = 500.0f;
 	LinearSpring = 10000.0f;
@@ -85,10 +85,15 @@ void UNewtonJointLoop6dofEffector::DrawGizmo(float timestep) const
 
 		// calculate the target frame for debug draw
 		const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
-		const ndVector referencePoint(refMatrix.m_posit);
-		const ndVector step(m_targetX * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f), m_targetZ * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f));
-		const ndMatrix azimuthRotation(ndRollMatrix(m_targetAzimuth * ndDegreeToRad));
-		const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
+		const ndMatrix similarRotation(ndRollMatrix(ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x)));
+
+		const ndVector localPosit(similarRotation.UnrotateVector(refMatrix.m_posit));
+		const ndVector planePosition(m_target.X * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f), m_target.Z * UNREAL_INV_UNIT_SYSTEM, ndFloat32(0.0f));
+		const ndVector paramTarget(localPosit + planePosition);
+		const ndVector referencePoint(similarRotation.RotateVector(paramTarget));
+
+		const ndMatrix azimuthRotation(ndRollMatrix(m_target.Azimuth * ndDegreeToRad));
+		const ndVector target(azimuthRotation.RotateVector(referencePoint));
 
 		ndMatrix targetMatrix(ndRollMatrix(m_targetRoll * ndDegreeToRad) * ndYawMatrix(m_targetYaw * ndDegreeToRad) * ndPitchMatrix(m_targetPitch * ndDegreeToRad));
 		targetMatrix.m_posit = target;
@@ -205,27 +210,6 @@ void UNewtonJointLoop6dofEffector::SetTargetTransform(const FTransform& transfor
 	}
 }
 
-FVector UNewtonJointLoop6dofEffector::WorldLocationToEffectorSpace(const FVector& worldPosition)
-{
-	ndMatrix matrix0;
-	ndMatrix matrix1;
-	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
-	const ndVector posit(ndFloat32(worldPosition.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(worldPosition.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(worldPosition.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(1.0f));
-
-	joint->CalculateGlobalMatrix(matrix0, matrix1);
-	const ndVector effectorPosit(matrix1.UntransformVector(posit));
-	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
-
-	ndFloat32 angle0 = ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x);
-	ndFloat32 angle = ndAtan2(effectorPosit.m_y, effectorPosit.m_x) - angle0;
-	const ndVector localPosit(ndRollMatrix(angle).UnrotateVector(effectorPosit) - refMatrix.m_posit);
-
-	ndFloat32 azimuth = angle * ndRadToDegree;
-	ndFloat32 x = localPosit.m_x * UNREAL_UNIT_SYSTEM;
-	ndFloat32 z = localPosit.m_z * UNREAL_UNIT_SYSTEM;
-	return FVector(x, azimuth, z);
-}
-
 FVector UNewtonJointLoop6dofEffector::ClipRobotTarget()
 {
 	check(m_joint);
@@ -247,117 +231,125 @@ FVector UNewtonJointLoop6dofEffector::ClipRobotTarget()
 void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimuth, float pitch, float yaw, float roll)
 {
 	// save target for debugging porpuses 
-	m_targetX = x;
-	m_targetZ = z;
+	m_target.X = x;
+	m_target.Z = z;
 	m_targetYaw = yaw;
 	m_targetRoll = roll;
 	m_targetPitch = pitch;
-	m_targetAzimuth = azimuth;
+	m_target.Azimuth = azimuth;
 
 	check(m_joint);
 	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
-
-	const ndVector upPin(0.0f, 0.0f, 1.0f, 0.0f);
-	const ndMatrix currentMatrix(joint->GetEffectorMatrix());
-	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
 
 	// claculate the orientation
 	yaw *= ndDegreeToRad; 
 	roll *= ndDegreeToRad;
 	pitch *= ndDegreeToRad;
-	const ndMatrix targetMatrix(ndRollMatrix(roll) * ndYawMatrix(yaw) * ndPitchMatrix(pitch));
-
-	ndQuaternion targetRotation(targetMatrix);
-	const ndQuaternion currentRotation(currentMatrix);
-	if (currentRotation.DotProduct(targetRotation).GetScalar() < 0.0f)
-	{
-		targetRotation = targetRotation.Scale(-1.0f);
-	}
-	
-	ndVector omega(currentRotation.CalcAverageOmega(targetRotation, 1.0f));
-	ndFloat32 omegaMag = ndSqrt(omega.DotProduct(omega).GetScalar());
-	ndFloat32 omegaSpeed = 5.0f * ndDegreeToRad;
-	
-	ndQuaternion rotation(targetRotation);
-	if (omegaMag > omegaSpeed)
-	{
-		omega = omega.Normalize().Scale(omegaSpeed);
-		rotation = currentRotation.IntegrateOmega(omega, 1.0f);
-	}
-	ndMatrix matrix(ndCalculateMatrix(rotation, currentMatrix.m_posit));
 
 	// calculate the target position
 	azimuth *= ndDegreeToRad;
 	x = x * UNREAL_INV_UNIT_SYSTEM;
 	z = z * UNREAL_INV_UNIT_SYSTEM;
 
-	const ndVector referencePoint(refMatrix.m_posit);
-	const ndVector step(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
-	const ndVector source(currentMatrix.m_posit);
+	// interpolate translation
+	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+	const ndMatrix similarRotation(ndRollMatrix(ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x)));
+	const ndVector localPosit(similarRotation.UnrotateVector(refMatrix.m_posit));
+	const ndVector planePosition(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
+	const ndVector target(localPosit + planePosition);
 
-	const ndMatrix azimuthRotation(ndRollMatrix(azimuth));
-	const ndVector target(azimuthRotation.RotateVector(referencePoint + step));
+	const ndMatrix currentMatrix(joint->GetOffsetMatrix());
+	const ndVector effectorPosit(similarRotation.UnrotateVector(currentMatrix.m_posit));
+	ndFloat32 effectorAzimuth = ndAtan2(effectorPosit.m_y, effectorPosit.m_x);
+	const ndMatrix effectorAzimuthRotation(ndRollMatrix(effectorAzimuth));
+	ndVector currentPosit(effectorAzimuthRotation.UnrotateVector(effectorPosit));
 
 	ndFloat32 longitudinalStep = 0.05f;
-	ndFloat32 angularStep = 2.0f * ndDegreeToRad;
-
-	auto CalculateTargetPosition = [&source, &target, &upPin, longitudinalStep, angularStep]()
+	for (ndInt32 i = 0; i < 3; ++i)
 	{
-		const ndVector mask(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), 0.0f);
-		const ndVector src(source * mask);
-		const ndVector dst(target * mask);
-		const ndVector src1(src - upPin * (src.DotProduct(upPin)));
-		const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
-		const ndVector srcDir(src1.Normalize());
-		const ndVector dstDir(dst1.Normalize());
-		ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-		ndFloat32 angle = ndAcos(cosAngle);
-		
-		ndVector result(src);
-		if (ndAbs(angle) > angularStep)
+		ndFloat32 step = target[i] - currentPosit[i];
+		if (ndAbs(step) > longitudinalStep)
 		{
-			const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
-			const ndQuaternion rotation(pin, angularStep);
-			result = rotation.RotateVector(result);
+			currentPosit[i] += longitudinalStep * ndSign(step);
 		}
-		
-		auto PlaneRotation = [&result, &dst, &upPin, longitudinalStep]()
+		else
 		{
-			const ndVector src1(result - upPin * (result.DotProduct(upPin)));
-			const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
-			const ndVector srcDir(src1.Normalize());
-			const ndVector dstDir(dst1.Normalize());
-			ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-			ndFloat32 angle = ndAcos(cosAngle);
-		
-			ndVector target(dst);
-			if (ndAbs(angle) > ndFloat32(1.0e-3f))
-			{
-				const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
-				const ndQuaternion rotation(pin, angle);
-				target = rotation.UnrotateVector(target);
-			}
-		
-			for (ndInt32 i = 0; i < 3; ++i)
-			{
-				ndFloat32 step = target[i] - result[i];
-				if (ndAbs(step) > longitudinalStep)
-				{
-					result[i] += longitudinalStep * ndSign(step);
-				}
-				else
-				{
-					result[i] = target[i];
-				}
-			}
-			return result;
-		};
-		result = PlaneRotation();
+			currentPosit[i] = target[i];
+		}
+	}
 
-		result.m_w = ndFloat32(1.0f);
-		return result;
-	};
-	matrix.m_posit = CalculateTargetPosition();
+	currentPosit = effectorAzimuthRotation.RotateVector(currentPosit);
 
+	ndFloat32 slowAngularStep = ndDegreeToRad * 0.25f;
+	ndFloat32 fastAngularStep = slowAngularStep * 2.0f;
+	ndFloat32 deltaAzimuth = azimuth - effectorAzimuth;
+	if (ndAbs(deltaAzimuth) > fastAngularStep)
+	{
+		azimuth = ndSign(deltaAzimuth) * fastAngularStep;
+	}
+	else if (ndAbs(deltaAzimuth) > slowAngularStep)
+	{
+		azimuth = ndSign(deltaAzimuth) * slowAngularStep;
+	}
+	else
+	{
+		azimuth = 0.0f;
+	}
+
+	const ndMatrix azimuthRotation(ndRollMatrix(azimuth));
+	currentPosit = azimuthRotation.RotateVector(currentPosit);
+	currentPosit = similarRotation.RotateVector(currentPosit);
+
+	// interpolate rotations
+	const ndMatrix targetMatrix(ndRollMatrix(roll) * ndYawMatrix(yaw) * ndPitchMatrix(pitch));
+	ndQuaternion targetRotation(targetMatrix);
+	const ndQuaternion currentRotation(currentMatrix);
+	if (currentRotation.DotProduct(targetRotation).GetScalar() < 0.0f)
+	{
+		targetRotation = targetRotation.Scale(-1.0f);
+	}
+	ndVector omega(currentRotation.CalcAverageOmega(targetRotation, 1.0f));
+	ndFloat32 omegaMag = ndSqrt(omega.DotProduct(omega).GetScalar());
+	ndFloat32 omegaSpeed = 5.0f * ndDegreeToRad;
+
+	ndQuaternion rotation(targetRotation);
+	if (omegaMag > omegaSpeed)
+	{
+		omega = omega.Normalize().Scale(omegaSpeed);
+		rotation = currentRotation.IntegrateOmega(omega, 1.0f);
+	}
+	ndMatrix matrix(ndCalculateMatrix(rotation, currentPosit));
+	matrix.m_posit.m_w = 1.0f;
 	SetTargetTransform(ToUnrealTransform(matrix));
+
+	//{
+	//	ndMatrix matrix1(joint->CalculateGlobalMatrix1());
+	//	FTransform transform1(ToUnrealTransform(matrix1));
+	//	FRobotTargetPosit xxx0(WorldLocationToEffectorSpace(transform1.GetLocation()));
+	//	FRobotTargetPosit xxx1(WorldLocationToEffectorSpace(transform1.GetLocation()));
+	//}
+}
+
+FRobotTargetPosit UNewtonJointLoop6dofEffector::WorldLocationToEffectorSpace(const FVector& worldPosition)
+{
+	ndIk6DofEffector* const joint = (ndIk6DofEffector*)m_joint;
+
+	const ndMatrix refMatrix(ToNewtonMatrix(m_referenceFrame));
+	const ndMatrix similarRotation(ndRollMatrix(ndAtan2(refMatrix.m_posit.m_y, refMatrix.m_posit.m_x)));
+	const ndVector refPosit(similarRotation.UnrotateVector(refMatrix.m_posit));
+	
+	const ndMatrix baseMatrix(joint->CalculateGlobalBaseMatrix1());
+	const ndVector localPosit(baseMatrix.UntransformVector(ndVector(ndFloat32(worldPosition.X * UNREAL_INV_UNIT_SYSTEM), ndFloat32(worldPosition.Y * UNREAL_INV_UNIT_SYSTEM), ndFloat32(worldPosition.Z * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f))));
+	const ndVector alignPosit(similarRotation.UnrotateVector(localPosit));
+
+	ndFloat32 rollAngle = ndAtan2(alignPosit.m_y, alignPosit.m_x);
+	const ndMatrix azimuthRotation(ndRollMatrix(rollAngle));
+	const ndVector target(azimuthRotation.UnrotateVector(alignPosit));
+	const ndVector params(target - refPosit);
+
+	FRobotTargetPosit result;
+	result.X = params.m_x * UNREAL_UNIT_SYSTEM;
+	result.Z = params.m_z * UNREAL_UNIT_SYSTEM;
+	result.Azimuth = rollAngle * ndRadToDegree;
+	return result;
 }
