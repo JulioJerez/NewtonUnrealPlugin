@@ -38,7 +38,7 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox()
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const, bool reverseSpin)
 	:ndJointGear(ndFloat32(1.0f), motor->GetMatrix().m_front, differential, motor->GetMatrix().m_front, motor)
 	,m_idleOmega(ndFloat32(1.0f))
-	,m_clutchTorque(ndFloat32 (1.0e5f))
+	,m_clutchTorque(ndFloat32(1.0e5f))
 	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
 {
 	ndMatrix matrix0(ndGetIdentityMatrix());

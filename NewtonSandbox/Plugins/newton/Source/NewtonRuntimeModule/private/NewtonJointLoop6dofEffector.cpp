@@ -321,13 +321,6 @@ void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimut
 	ndMatrix matrix(ndCalculateMatrix(rotation, currentPosit));
 	matrix.m_posit.m_w = 1.0f;
 	SetTargetTransform(ToUnrealTransform(matrix));
-
-	//{
-	//	ndMatrix matrix1(joint->CalculateGlobalMatrix1());
-	//	FTransform transform1(ToUnrealTransform(matrix1));
-	//	FRobotTargetPosit xxx0(WorldLocationToEffectorSpace(transform1.GetLocation()));
-	//	FRobotTargetPosit xxx1(WorldLocationToEffectorSpace(transform1.GetLocation()));
-	//}
 }
 
 FRobotTargetPosit UNewtonJointLoop6dofEffector::WorldLocationToEffectorSpace(const FVector& worldPosition)
