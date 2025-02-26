@@ -56,9 +56,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonModel : public UActorComponent
 	bool ShowDebug;
 
 	UPROPERTY(EditAnywhere, Category = Newton)
-	bool UseFullContactModel;
-
-	UPROPERTY(EditAnywhere, Category = Newton)
 	UNewtonAsset* NewtonAsset;
 
 	ndModelArticulation* m_model;

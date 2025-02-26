@@ -53,24 +53,6 @@ class UNewtonModel::ModelNotify : public ndModelNotify
 	void Update(ndWorld* const world, ndFloat32 timestep) override
 	{
 		ndModelNotify::Update(world, timestep);
-		ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-		check(model);
-		check(model->GetRoot()->m_body);
-		ndBodyKinematic* rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-		check(rootBody);
-		ndSkeletonContainer* skeleton = rootBody->GetSkeleton();
-		if (!rootBody->GetSkeleton())
-		{
-			ndBodyKinematic* body = model->GetRoot()->GetFirstChild()->m_body->GetAsBodyKinematic();
-			check(body);
-			skeleton = body->GetSkeleton();
-			check(skeleton);
-		}
-		if (skeleton && (skeleton->GetContactModel() != m_owner->UseFullContactModel))
-		{
-			skeleton->SetContactModel(m_owner->UseFullContactModel);
-		}
-
 		if (m_onModelUpdate)
 		{
 			AActor* const actorOwner = m_owner->GetOwner();
@@ -99,7 +81,6 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 		:UNewtonModel::ModelNotify(owner, vehicle)
 	{
 		m_sleepingState = false;
-		m_owner->UseFullContactModel = false;
 
 		check(vehicle->GetRoot());
 		vehicle->AddChassis(vehicle->GetRoot()->m_body);
@@ -267,7 +248,6 @@ UNewtonModel::UNewtonModel()
 	ShowDebug = true;
 	m_model = nullptr;
 	NewtonAsset = nullptr;
-	UseFullContactModel = false;
 	RegenerateBluePrint = false;
 	PrimaryComponentTick.bCanEverTick = true;
 }

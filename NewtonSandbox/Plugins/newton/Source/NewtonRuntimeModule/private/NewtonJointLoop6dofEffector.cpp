@@ -264,7 +264,7 @@ void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimut
 	const ndMatrix effectorAzimuthRotation(ndRollMatrix(effectorAzimuth));
 	ndVector currentPosit(effectorAzimuthRotation.UnrotateVector(effectorPosit));
 
-	ndFloat32 longitudinalStep = 0.05f;
+	ndFloat32 longitudinalStep = 0.0125f;
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		ndFloat32 step = target[i] - currentPosit[i];
@@ -280,7 +280,7 @@ void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimut
 
 	currentPosit = effectorAzimuthRotation.RotateVector(currentPosit);
 
-	ndFloat32 slowAngularStep = ndDegreeToRad * 0.25f;
+	ndFloat32 slowAngularStep = ndDegreeToRad * 0.125f;
 	ndFloat32 fastAngularStep = slowAngularStep * 2.0f;
 	ndFloat32 deltaAzimuth = azimuth - effectorAzimuth;
 	if (ndAbs(deltaAzimuth) > fastAngularStep)

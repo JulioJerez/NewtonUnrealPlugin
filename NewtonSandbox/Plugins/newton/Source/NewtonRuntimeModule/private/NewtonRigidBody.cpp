@@ -677,23 +677,6 @@ void UNewtonRigidBody::TickComponent(float deltaTime, ELevelTick tickType, FActo
 		DrawGizmo(deltaTime);
 		SetRelativeTransform(m_localTransform);
 		SetComponentToWorld(m_globalTransform);
-
-		//UWorld* xxxxxxx = GetWorld();
-		//if (Mass > 0.0f && (xxxxxxx->WorldType == EWorldType::PIE))
-		//{
-		//	FVector xxxx(m_localTransform.GetLocation());
-		//	UE_LOG(LogTemp, Display, TEXT("%s p(%f %f %f)"), RefSceneActor ? TEXT("blueprint") : TEXT("scene"), xxxx.X, xxxx.Y, xxxx.Z);
-		//}
-		//if (RefSceneActor && Cast<UNewtonJoint>(GetAttachParent()))
-		//{
-		//	USceneComponent* const sceneComponent = RefSceneActor->GetRootComponent();
-		//	check(sceneComponent);
-		//	const FTransform actorTransform(m_refActorBindTransform * m_globalTransform);
-		//
-		//	sceneComponent->SetRelativeTransform(actorTransform);
-		//	sceneComponent->SetComponentToWorld(actorTransform);
-		//	sceneComponent->MarkRenderInstancesDirty();
-		//}
 	}
 }
 
