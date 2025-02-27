@@ -270,6 +270,7 @@ void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimut
 		ndFloat32 step = target[i] - currentPosit[i];
 		if (ndAbs(step) > longitudinalStep)
 		{
+			AwakeBodies();
 			currentPosit[i] += longitudinalStep * ndSign(step);
 		}
 		else
@@ -285,10 +286,12 @@ void UNewtonJointLoop6dofEffector::SetRobotTarget(float x, float z, float azimut
 	ndFloat32 deltaAzimuth = azimuth - effectorAzimuth;
 	if (ndAbs(deltaAzimuth) > fastAngularStep)
 	{
+		AwakeBodies();
 		azimuth = ndSign(deltaAzimuth) * fastAngularStep;
 	}
 	else if (ndAbs(deltaAzimuth) > slowAngularStep)
 	{
+		AwakeBodies();
 		azimuth = ndSign(deltaAzimuth) * slowAngularStep;
 	}
 	else
