@@ -40,39 +40,29 @@ UNewtonLinkRigidBody::UNewtonLinkRigidBody()
 FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(TObjectPtr<USkeletalMesh> mesh, int boneIndex,
 	const FTransform& globalTransform, const TArray<const UNewtonLinkCollision*>& childen) const
 {
-	FVector com(0.0f, 0.0f, 0.0f);
-	if (childen.Num() == 1)
+	ndFloat32 volume = 0.0f;
+	ndVector centerOfGravity (0.0f, 0.0f, 0.0f, 0.0f);
+	for (int i = childen.Num() - 1; i >= 0; --i)
 	{
 		ndBodyKinematic body;
-		const UNewtonLinkCollision* const shapeNode = childen[0];
+		const UNewtonLinkCollision* const shapeNode = childen[i];
 		ndShapeInstance shape(shapeNode->CreateInstance(mesh, boneIndex));
-		
+
 		const ndMatrix bodyMatrix(ToNewtonMatrix(globalTransform));
 		const ndMatrix shapeLocalMatrix(ToNewtonMatrix(shapeNode->Transform));
 		FVector scale(globalTransform.GetScale3D() * shapeNode->Transform.GetScale3D());
-		
+
 		body.SetMatrix(bodyMatrix);
 		shape.SetLocalMatrix(shapeLocalMatrix);
-		shape.SetScale(ndVector(float(scale.X), float(scale.Y), float(scale.Z), float (1.0f)));
+		shape.SetScale(ndVector(float(scale.X), float(scale.Y), float(scale.Z), float(1.0f)));
 		body.SetIntrinsicMassMatrix(1.0f, shape);
-		
-		ndVector centerOfGravity(body.GetCentreOfMass());
-		
-		com.X = centerOfGravity.m_x * UNREAL_UNIT_SYSTEM;
-		com.Y = centerOfGravity.m_y * UNREAL_UNIT_SYSTEM;
-		com.Z = centerOfGravity.m_z * UNREAL_UNIT_SYSTEM;
-	}
-	else if (childen.Num() > 1)
-	{
-		check(0);
-		//for (int i = childen.Num() - 1; i >= 0; --i)
-		//{
-		//	const UNewtonLinkCollision* const shapeNode = childen[i];
-		//	ndShapeInstance instance(shapeNode->CreateInstance());
-		//}
-	}
 
-	return com;
+		ndFloat32 vol = shape.GetVolume();
+		centerOfGravity += body.GetCentreOfMass().Scale(vol);
+		volume += vol;
+	}
+	centerOfGravity = centerOfGravity.Scale(UNREAL_UNIT_SYSTEM / volume);
+	return FVector(centerOfGravity.m_x, centerOfGravity.m_y, centerOfGravity.m_y);
 }
 
 void UNewtonLinkRigidBody::PostCreate(const UNewtonLink* const parentNde)

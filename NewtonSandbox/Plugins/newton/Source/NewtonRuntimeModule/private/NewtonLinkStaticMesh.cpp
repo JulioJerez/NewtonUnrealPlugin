@@ -29,6 +29,7 @@ UNewtonLinkStaticMesh::UNewtonLinkStaticMesh()
 {
 	DebugScale = 1.0f;
 	StaticMesh = nullptr;
+	ExcludeFromBlueprint = false;
 }
 
 void UNewtonLinkStaticMesh::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
@@ -84,6 +85,10 @@ void UNewtonLinkStaticMesh::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) 
 
 TObjectPtr<USceneComponent> UNewtonLinkStaticMesh::CreateBlueprintProxy() const
 {
+	if (ExcludeFromBlueprint)
+	{
+		return TObjectPtr<UStaticMeshComponent>(nullptr);
+	}
 	TObjectPtr<UStaticMeshComponent> component(NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass(), Name, RF_Transient));
 	return component;
 }

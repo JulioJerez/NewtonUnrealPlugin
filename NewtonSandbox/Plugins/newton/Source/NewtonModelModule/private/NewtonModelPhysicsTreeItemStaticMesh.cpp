@@ -124,7 +124,7 @@ void FNewtonModelPhysicsTreeItemStaticMesh::DebugDrawSolid(FPrimitiveDrawInterfa
 void FNewtonModelPhysicsTreeItemStaticMesh::DebugDrawWireFrame(FPrimitiveDrawInterface* const pdi) const
 {
 	UNewtonLinkStaticMesh* const meshNode = Cast<UNewtonLinkStaticMesh>(m_node);
-	if (m_wireFrameMesh.Num())
+	if (meshNode->ShowDebug && m_wireFrameMesh.Num())
 	{
 		const FLinearColor color(FColor::Black);
 		float thickness = NEWTON_EDITOR_DEBUG_THICKENESS * 2.0f;

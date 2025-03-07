@@ -153,44 +153,47 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 		TObjectPtr<USceneComponent> parentComponentProxy (parentProxy.Pop());
 		TObjectPtr<USceneComponent> componentProxy(link->CreateBlueprintProxy());
 
-		USCS_Node* const blueprintNode = constructScript->CreateNode(componentProxy->GetClass(), link->Name);
-
-		links.PushBack(link);
-		proxies.PushBack(componentProxy);
-		bluePrintNodes.PushBack(blueprintNode);
-
-		if (!parent)
+		if (componentProxy)
 		{
-			constructScript->AddNode(blueprintNode);
-			AddSkeletalMesh(model, blueprintNode);
-		}
-		else
-		{
-			check(parentComponentProxy != nullptr);
-			parent->AddChildNode(blueprintNode);
-			componentProxy->AttachToComponent(parentComponentProxy, FAttachmentTransformRules::KeepRelativeTransform);
-		}
+			USCS_Node* const blueprintNode = constructScript->CreateNode(componentProxy->GetClass(), link->Name);
 
-		const FTransform globalTransform(link->CalculateGlobalTransform());
-		componentProxy->SetRelativeRotation_Direct(link->Transform.Rotator());
-		componentProxy->SetRelativeScale3D_Direct(link->Transform.GetScale3D());
-		componentProxy->SetRelativeLocation_Direct(link->Transform.GetTranslation());
-		componentProxy->SetComponentToWorld(globalTransform);
+			links.PushBack(link);
+			proxies.PushBack(componentProxy);
+			bluePrintNodes.PushBack(blueprintNode);
 
-		USceneComponent* const nodeComponent = Cast<USceneComponent>(blueprintNode->ComponentTemplate);
-		if (nodeComponent)
-		{
-			nodeComponent->SetRelativeRotation_Direct(link->Transform.Rotator());
-			nodeComponent->SetRelativeScale3D_Direct(link->Transform.GetScale3D());
-			nodeComponent->SetRelativeLocation_Direct(link->Transform.GetTranslation());
-			nodeComponent->SetComponentToWorld(globalTransform);
-		}
-	
-		for (int i = 0; i < link->Children.Num(); ++i)
-		{
-			parentPool.PushBack(blueprintNode);
-			parentProxy.PushBack(componentProxy);
-			stackPool.PushBack(link->Children[i]);
+			if (!parent)
+			{
+				constructScript->AddNode(blueprintNode);
+				AddSkeletalMesh(model, blueprintNode);
+			}
+			else
+			{
+				check(parentComponentProxy != nullptr);
+				parent->AddChildNode(blueprintNode);
+				componentProxy->AttachToComponent(parentComponentProxy, FAttachmentTransformRules::KeepRelativeTransform);
+			}
+
+			const FTransform globalTransform(link->CalculateGlobalTransform());
+			componentProxy->SetRelativeRotation_Direct(link->Transform.Rotator());
+			componentProxy->SetRelativeScale3D_Direct(link->Transform.GetScale3D());
+			componentProxy->SetRelativeLocation_Direct(link->Transform.GetTranslation());
+			componentProxy->SetComponentToWorld(globalTransform);
+
+			USceneComponent* const nodeComponent = Cast<USceneComponent>(blueprintNode->ComponentTemplate);
+			if (nodeComponent)
+			{
+				nodeComponent->SetRelativeRotation_Direct(link->Transform.Rotator());
+				nodeComponent->SetRelativeScale3D_Direct(link->Transform.GetScale3D());
+				nodeComponent->SetRelativeLocation_Direct(link->Transform.GetTranslation());
+				nodeComponent->SetComponentToWorld(globalTransform);
+			}
+
+			for (int i = 0; i < link->Children.Num(); ++i)
+			{
+				parentPool.PushBack(blueprintNode);
+				parentProxy.PushBack(componentProxy);
+				stackPool.PushBack(link->Children[i]);
+			}
 		}
 	}
 	

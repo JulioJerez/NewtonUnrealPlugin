@@ -75,7 +75,6 @@ void UNewtonLinkCollisionConvexhull::GetBoneVertices(TArray<FVector>& points, TO
 
 ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
-	ndArray<ndVector> points;
 	if (boneIndex > 0)
 	{
 		if (!m_hull.Num())
@@ -91,16 +90,21 @@ ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkele
 			ndMatrix transformMatrix;
 			scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
 
-			m_hull.Empty();
 			for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
 			{
 				const FVector meshPosint(bonePoints[i]);
 				const ndVector p(float(meshPosint.X * UNREAL_INV_UNIT_SYSTEM), float(meshPosint.Y * UNREAL_INV_UNIT_SYSTEM), float(meshPosint.Z * UNREAL_INV_UNIT_SYSTEM), float(1.0f));
 				const ndVector p1(transformMatrix.UntransformVector(p));
 				const FVector cachePoint(float(p1.m_x), float(p1.m_y), float(p1.m_z));
-				points.PushBack(p1);
 				m_hull.Push(cachePoint);
 			}
+		}
+
+		ndArray<ndVector> points;
+		for (ndInt32 i = m_hull.Num() - 1; i >= 0; --i)
+		{
+			const FVector p(m_hull[i]);
+			points.PushBack (ndVector (float(p.X), float(p.Y), float(p.Z), float(1.0f)));
 		}
 		ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
 		return instance;
@@ -168,21 +172,6 @@ void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneCompone
 	check(parentBody);
 	if (parentBody)
 	{
-		//const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
-		//ndMatrix scaleMatrix (ToNewtonMatrix(refBoneMatrix));
-		//
-		//ndVector scale;
-		//ndMatrix stretchAxis;
-		//ndMatrix transformMatrix;
-		//scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-		//
-		//ndArray<ndBigVector> points;
-		//for (ndInt32 i = m_hull.Num() - 1; i >= 0; --i)
-		//{
-		//	const ndVector p(float(m_hull[i].X), float(m_hull[i].Y), float(m_hull[i].Z), float(1.0f));
-		//	points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
-		//}
-
 		ndArray<ndBigVector> points;
 		for (ndInt32 i = m_hull.Num() - 1; i >= 0; --i)
 		{

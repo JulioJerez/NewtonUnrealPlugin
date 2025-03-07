@@ -46,6 +46,6 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkStaticMesh : public UNewtonLink
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UStaticMesh> StaticMesh;
 
-	//UPROPERTY(EditAnywhere, Category = Newton, meta = (AllowPrivateAccess = "true"))
-	//bool HideMesh;
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (AllowPrivateAccess = "true"))
+	bool ExcludeFromBlueprint;
 };
