@@ -45,6 +45,7 @@
 #include "NewtonModelPhysicsTreeItemShapeWheel.h"
 #include "NewtonModelPhysicsTreeItemJointHinge.h"
 #include "NewtonModelPhysicsTreeItemJointWheel.h"
+#include "NewtonModelPhysicsTreeItemStaticMesh.h"
 #include "NewtonModelPhysicsTreeItemJointRoller.h"
 #include "NewtonModelPhysicsTreeItemJointSlider.h"
 #include "NewtonModelPhysicsTreeItemShapeSphere.h"
@@ -285,6 +286,19 @@ bool FNewtonModelPhysicsTree::OnCanAddChildRow() const
 	return m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti());
 }
 
+bool FNewtonModelPhysicsTree::OnCanAddChildShapeRow() const
+{
+	if (OnCanAddChildRow())
+	{
+		return true;
+	}
+	if (m_selectedItem.IsValid() && m_selectedItem->IsOfRttiByName(FNewtonModelPhysicsTreeItemStaticMesh::GetRtti()))
+	{
+		return true;
+	}
+	return false;
+}
+
 bool FNewtonModelPhysicsTree::OnCanAddVehicleAxleRow() const
 {
 	if (OnCanAddChildRow())
@@ -415,23 +429,24 @@ void FNewtonModelPhysicsTree::AddLoopRow(const TSharedRef<FNewtonModelPhysicsTre
 void FNewtonModelPhysicsTree::AddShapeRow(const TSharedRef<FNewtonModelPhysicsTreeItem>& shapeItem)
 {
 	m_items.Add(shapeItem);
-	new FNewtonModelPhysicsTreeItemAcyclicGraph(shapeItem, m_selectedItem->GetAcyclicGraph());
-
-	check(shapeItem->GetParent() == m_selectedItem);
+	
+	TSharedPtr<FNewtonModelPhysicsTreeItem> parentItem(shapeItem->GetParent());
+	new FNewtonModelPhysicsTreeItemAcyclicGraph(shapeItem, parentItem->GetAcyclicGraph());
+	check(shapeItem->GetParent() == parentItem);
 	check(shapeItem->GetParent()->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().X == 1.0f);
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().Y == 1.0f);
 	check(shapeItem->GetParent()->GetNode()->Transform.GetScale3D().Z == 1.0f);
-
+	
 	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(shapeItem->GetNode());
-	UNewtonLinkRigidBody* const bodyNodeInfo = Cast<UNewtonLinkRigidBody>(m_selectedItem->GetNode());
-
+	UNewtonLinkRigidBody* const bodyNodeInfo = Cast<UNewtonLinkRigidBody>(parentItem->GetNode());
+	
 	check(bodyNodeInfo);
 	check(shapeNodeInfo);
-	shapeNodeInfo->Transform = FTransform();
+	//shapeNodeInfo->Transform = FTransform();
 	const FString name(bodyNodeInfo->BoneName.GetPlainNameString() + "_" + shapeNodeInfo->Name.GetPlainNameString());
 	shapeNodeInfo->Name = m_uniqueNames.GetUniqueName(FName(*name));
-
+	
 	RefreshView();
 }
 
@@ -576,6 +591,37 @@ void FNewtonModelPhysicsTree::OnAddJointLoopVehicleGearBoxRow()
 	AddLoopRow(item);
 }
 
+bool FNewtonModelPhysicsTree::OnCanAddStaticMeshRow() const
+{
+	return OnCanAddChildRow();
+}
+
+void FNewtonModelPhysicsTree::OnAddStaticMeshRow()
+{
+	TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemStaticMesh(m_selectedItem, TObjectPtr<UNewtonLink>(NewObject<UNewtonLinkStaticMesh>()), m_editor)));
+	item->GetNode()->Name = m_uniqueNames.GetUniqueName(item->GetDisplayName());
+	
+	m_items.Add(item);
+	new FNewtonModelPhysicsTreeItemAcyclicGraph(item, m_selectedItem->GetAcyclicGraph());
+
+	check(item->GetParent() == m_selectedItem);
+	check(item->GetParent()->IsOfRttiByName(FNewtonModelPhysicsTreeItemBody::GetRtti()));
+	check(item->GetParent()->GetNode()->Transform.GetScale3D().X == 1.0f);
+	check(item->GetParent()->GetNode()->Transform.GetScale3D().Y == 1.0f);
+	check(item->GetParent()->GetNode()->Transform.GetScale3D().Z == 1.0f);
+
+	UNewtonLinkStaticMesh* const meshNodeInfo = Cast<UNewtonLinkStaticMesh>(item->GetNode());
+	UNewtonLinkRigidBody* const bodyNodeInfo = Cast<UNewtonLinkRigidBody>(m_selectedItem->GetNode());
+
+	check(bodyNodeInfo);
+	check(meshNodeInfo);
+	meshNodeInfo->Transform = FTransform();
+	const FString name(bodyNodeInfo->BoneName.GetPlainNameString() + "_" + meshNodeInfo->Name.GetPlainNameString());
+	meshNodeInfo->Name = m_uniqueNames.GetUniqueName(FName(*name));
+
+	RefreshView();
+}
+
 bool FNewtonModelPhysicsTree::CanDeleteSelectedRow() const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("TODO: remember complete function:%s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
@@ -647,33 +693,38 @@ void FNewtonModelPhysicsTree::BindCommands()
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnResetSelectedBone));
 
 	// add physics tree building actions
+	commandList.MapAction(menuActions.AddStaticMesh
+		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddStaticMeshRow)
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddStaticMeshRow));
+
+	// add physics tree building actions
 	commandList.MapAction(menuActions.AddShapeBox
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeBoxRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddShapeSphere
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeSphereRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddShapeCapsule
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeCapsuleRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddShapeCylinder
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeCylinderRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddShapeWheel
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeWheelRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddShapeConvexhull
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeConvexhullRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddShapeConvexAggragate
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddShapeConvexAggragateRow)
-		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildRow));
+		,FCanExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnCanAddChildShapeRow));
 
 	commandList.MapAction(menuActions.AddJointHinge
 		,FExecuteAction::CreateSP(this, &FNewtonModelPhysicsTree::OnAddJointHingeRow)
@@ -751,6 +802,10 @@ TSharedPtr< SWidget > FNewtonModelPhysicsTree::CreateContextMenu()
 {
 	FMenuBuilder menuBuilder(true, m_uiCommandList);
 	const FNewtonModelPhysicsTreeCommands& actions = FNewtonModelPhysicsTreeCommands::Get();
+
+	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddUnrealAssets", LOCTEXT("AddStaticMeshActions", "static mesh"));
+		menuBuilder.AddMenuEntry(actions.AddStaticMesh);
+	menuBuilder.EndSection();
 
 	menuBuilder.BeginSection("NewtonModelPhysicsTreeAddShape", LOCTEXT("AddShapeActions", "collision shapes"));
 		menuBuilder.AddMenuEntry(actions.AddShapeBox);
@@ -1407,6 +1462,12 @@ void FNewtonModelPhysicsTree::BuildTree()
 		else if (Cast<UNewtonLinkCollisionConvexApproximate>(node))
 		{
 			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemShapeConvexApproximate(parent, proxyNode, m_editor)));
+			m_items.Add(item);
+			parent = item;
+		}
+		else if (Cast<UNewtonLinkStaticMesh>(node))
+		{
+			TSharedRef<FNewtonModelPhysicsTreeItem> item(MakeShareable(new FNewtonModelPhysicsTreeItemStaticMesh(parent, proxyNode, m_editor)));
 			m_items.Add(item);
 			parent = item;
 		}

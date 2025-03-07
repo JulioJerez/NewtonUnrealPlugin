@@ -44,65 +44,33 @@ void UNewtonLinkCollisionConvexhull::GetBoneVertices(TArray<FVector>& points, TO
 	// this is ridiculous, moronic unreal does not make a simple lookup table for bone indices,  
 	// instead, it makes a stupid section and a double indirection. 
 	// unreal graphics are awesome, but the software is quite inefficient and mediocre, I am not impressed. 	
-	 
-	#if 1
-		const FSkeletalMeshModel* const importedResource = mesh->GetImportedModel();
-		const FSkeletalMeshLODModel* const model = &importedResource->LODModels[0];
-		for (int32 index = model->Sections.Num() - 1; index >= 0; --index)
+	const FSkeletalMeshModel* const importedResource = mesh->GetImportedModel();
+	const FSkeletalMeshLODModel* const model = &importedResource->LODModels[0];
+	for (int32 index = model->Sections.Num() - 1; index >= 0; --index)
+	{
+		const FSkelMeshSection& section = model->Sections[index];
+		for (int32 i = section.SoftVertices.Num() - 1; i >= 0 ; --i)
 		{
-			const FSkelMeshSection& section = model->Sections[index];
-			for (int32 i = section.SoftVertices.Num() - 1; i >= 0 ; --i)
-			{
-				const FSoftSkinVertex* const softVert = &section.SoftVertices[i];
+			const FSoftSkinVertex* const softVert = &section.SoftVertices[i];
 
-				ndInt32 bone = -1;
-				ndInt32 maxWeight = 0;
-				for (int32 j = 0; j < MAX_TOTAL_INFLUENCES; ++j)
+			ndInt32 bone = -1;
+			ndInt32 maxWeight = 0;
+			for (int32 j = 0; j < MAX_TOTAL_INFLUENCES; ++j)
+			{
+				if (softVert->InfluenceWeights[j] > maxWeight)
 				{
-					if (softVert->InfluenceWeights[j] > maxWeight)
-					{
-						bone = softVert->InfluenceBones[j];
-						maxWeight = softVert->InfluenceWeights[j];
-					}
-				}
-				check(bone >= 0);
-				if (section.BoneMap[bone] == boneIndex)
-				{
-					const FVector skinVertex(softVert->Position);
-					points.Push(skinVertex);
+					bone = softVert->InfluenceBones[j];
+					maxWeight = softVert->InfluenceWeights[j];
 				}
 			}
-		}
-	#else
-		const FSkeletalMeshRenderData* const resourceData = skinMesh->GetResourceForRendering();
-		const FSkeletalMeshLODRenderData* const renderResource = &resourceData->LODRenderData[0];
-		const FStaticMeshVertexBuffers* const vertexBuffer = &renderResource->StaticVertexBuffers;
-		const FSkinWeightVertexBuffer* const weightBuffer = renderResource->GetSkinWeightVertexBuffer();
-		for (ndInt32 vertexIndex = weightBuffer->GetNumVertices() - 1; vertexIndex >= 0 ; --vertexIndex)
-		{
-			uint32 vertexWeightOffset = 0;
-			uint32 vertexInfluenceCount = 0;
-			weightBuffer->GetVertexInfluenceOffsetCount(vertexIndex, vertexWeightOffset, vertexInfluenceCount);
-
-			ndInt32 bone = -2;
-			float maxWeight = -1;
-
-			for (ndInt32 influenceIndex = vertexInfluenceCount - 1; influenceIndex >= 0; --influenceIndex)
+			check(bone >= 0);
+			if (section.BoneMap[bone] == boneIndex)
 			{
-				float weight = weightBuffer->GetBoneWeight(vertexIndex, influenceIndex);
-				if (weight > maxWeight)
-				{
-					maxWeight = weight;
-					bone = weightBuffer->GetBoneIndex(vertexIndex, influenceIndex);
-				}
-			}
-			if (boneIndex == bone)
-			{
-				const FVector skinVertex (vertexBuffer->PositionVertexBuffer.VertexPosition(vertexIndex));
+				const FVector skinVertex(softVert->Position);
 				points.Push(skinVertex);
 			}
 		}
-	#endif
+	}
 }
 
 ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
@@ -110,35 +78,80 @@ ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<USkele
 	ndArray<ndVector> points;
 	if (boneIndex > 0)
 	{
-		TArray<FVector> bonePoints;
-		GetBoneVertices(bonePoints, mesh, boneIndex);
-
-		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(boneIndex));
-		//ndMatrix scaleMatrix;
-		//for (ndInt32 i = 0; i < 4; ++i)
-		//{
-		//	for (ndInt32 j = 0; j < 4; ++j)
-		//	{
-		//		scaleMatrix[i][j] = refBoneMatrix.M[i][j];
-		//	}
-		//}
-		ndMatrix scaleMatrix(ToNewtonMatrix(refBoneMatrix));
-
-		ndVector scale;
-		ndMatrix stretchAxis;
-		ndMatrix transformMatrix;
-		scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-
-		for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
+		if (!m_hull.Num())
 		{
-			const ndVector p(float(bonePoints[i].X), float(bonePoints[i].Y), float(bonePoints[i].Z), float(1.0f));
-			points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
+			TArray<FVector> bonePoints;
+			GetBoneVertices(bonePoints, mesh, boneIndex);
+
+			const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(boneIndex));
+			ndMatrix scaleMatrix(ToNewtonMatrix(refBoneMatrix));
+
+			ndVector scale;
+			ndMatrix stretchAxis;
+			ndMatrix transformMatrix;
+			scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+
+			m_hull.Empty();
+			for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
+			{
+				const FVector meshPosint(bonePoints[i]);
+				const ndVector p(float(meshPosint.X * UNREAL_INV_UNIT_SYSTEM), float(meshPosint.Y * UNREAL_INV_UNIT_SYSTEM), float(meshPosint.Z * UNREAL_INV_UNIT_SYSTEM), float(1.0f));
+				const ndVector p1(transformMatrix.UntransformVector(p));
+				const FVector cachePoint(float(p1.m_x), float(p1.m_y), float(p1.m_z));
+				points.PushBack(p1);
+				m_hull.Push(cachePoint);
+			}
 		}
 		ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
 		return instance;
 	}
 	check(0);
 	ndShapeInstance instance(new ndShapeNull());
+	return instance;
+}
+
+ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(TObjectPtr<UStaticMesh> mesh) const
+{
+	ndArray<ndVector> points;
+	FStaticMeshRenderData* const renderData = mesh->GetRenderData();
+	check(renderData);
+	FStaticMeshLODResources& modelLod = renderData->LODResources[0];
+	FRawStaticIndexBuffer* const indexBuffer = &modelLod.IndexBuffer;
+
+	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = modelLod.VertexBuffers;
+	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
+
+	m_hull.Empty();
+	const FStaticMeshSectionArray& sections = modelLod.Sections;
+	for (int32 index = sections.Num() - 1; index >= 0; --index)
+	{
+		const FStaticMeshSection& section = modelLod.Sections[index];
+		for (ndInt32 i = 0; i < ndInt32(section.NumTriangles); ++i)
+		{
+			for (ndInt32 j = 0; j < 3; ++j)
+			{
+				ndInt32 k = indexBuffer->GetIndex(section.FirstIndex + i * 3 + j);
+				const FVector p(positBuffer.VertexPosition(k) * UNREAL_INV_UNIT_SYSTEM);
+				const ndVector q(float(p.X), float(p.Y), float(p.Z), float(1.0f));
+				m_hull.Push(p);
+				points.PushBack(q);
+			}
+		}
+	}
+	ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
+	return instance;
+}
+
+ndShapeInstance UNewtonLinkCollisionConvexhull::CreateInstance(const TArray<FVector>& hull) const
+{
+	ndArray<ndVector> points;
+	for (int32 i = hull.Num() - 1; i >= 0; --i)
+	{
+		ndVector p(ndFloat32 (hull[i].X), ndFloat32(hull[i].Y), ndFloat32(hull[i].Z), ndFloat32(1.0f));
+		points.PushBack(p);
+	}
+
+	ndShapeInstance instance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 1.0e-3f, &points[0].m_x, 128));
 	return instance;
 }
 
@@ -153,24 +166,28 @@ void UNewtonLinkCollisionConvexhull::InitBlueprintProxy(TObjectPtr<USceneCompone
 {
 	UNewtonLinkRigidBody* const parentBody = Cast<UNewtonLinkRigidBody>(Parent);
 	check(parentBody);
-	if (parentBody && parentBody->BoneIndex > 0)
+	if (parentBody)
 	{
-		TArray<FVector> bonePoints;
-		GetBoneVertices(bonePoints, mesh, parentBody->BoneIndex);
-	
-		const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
-		ndMatrix scaleMatrix (ToNewtonMatrix(refBoneMatrix));
-	
-		ndVector scale;
-		ndMatrix stretchAxis;
-		ndMatrix transformMatrix;
-		scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-	
+		//const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(parentBody->BoneIndex));
+		//ndMatrix scaleMatrix (ToNewtonMatrix(refBoneMatrix));
+		//
+		//ndVector scale;
+		//ndMatrix stretchAxis;
+		//ndMatrix transformMatrix;
+		//scaleMatrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+		//
+		//ndArray<ndBigVector> points;
+		//for (ndInt32 i = m_hull.Num() - 1; i >= 0; --i)
+		//{
+		//	const ndVector p(float(m_hull[i].X), float(m_hull[i].Y), float(m_hull[i].Z), float(1.0f));
+		//	points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
+		//}
+
 		ndArray<ndBigVector> points;
-		for (ndInt32 i = bonePoints.Num() - 1; i >= 0; --i)
+		for (ndInt32 i = m_hull.Num() - 1; i >= 0; --i)
 		{
-			const ndVector p(float(bonePoints[i].X), float(bonePoints[i].Y), float(bonePoints[i].Z), float(1.0f));
-			points.PushBack(transformMatrix.UntransformVector(p).Scale(UNREAL_INV_UNIT_SYSTEM));
+			const ndVector p(float(m_hull[i].X), float(m_hull[i].Y), float(m_hull[i].Z), float(1.0f));
+			points.PushBack(p);
 		}
 
 		UNewtonCollisionConvexHull* const shape = Cast<UNewtonCollisionConvexHull>(component.Get());

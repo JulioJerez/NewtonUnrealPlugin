@@ -89,6 +89,7 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 
 	// delegates
 	bool OnCanAddChildRow() const;
+	bool OnCanAddChildShapeRow() const;
 	bool OnCanAdd6dofEffectorRow() const;
 
 	bool OnCanAddVehicleAxleRow() const;
@@ -121,6 +122,9 @@ class FNewtonModelPhysicsTree : public SCompoundWidget
 	void OnAddShapeCylinderRow();
 	void OnAddShapeConvexhullRow();
 	void OnAddShapeConvexAggragateRow();
+
+	void OnAddStaticMeshRow();
+	bool OnCanAddStaticMeshRow() const;
 
 	void OnShowDebug();
 	void OnClearDebug();

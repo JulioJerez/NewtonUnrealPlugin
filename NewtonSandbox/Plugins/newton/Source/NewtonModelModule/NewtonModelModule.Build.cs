@@ -12,6 +12,7 @@ public class NewtonModelModule: ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] 
         {
+            "RHI",
             "Core",
             "Slate",
             "Engine",

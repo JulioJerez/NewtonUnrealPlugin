@@ -43,6 +43,15 @@ ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<USkeletalMe
 	return instance;
 }
 
+ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<UStaticMesh>) const
+{
+	ndShapeInstance instance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)));
+
+	const ndVector scale(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
+	instance.SetScale(scale);
+	return instance;
+}
+
 TObjectPtr<USceneComponent> UNewtonLinkCollisionWheel::CreateBlueprintProxy() const
 {
 	TObjectPtr<USceneComponent> component(NewObject<UNewtonCollisionWheel>(UNewtonCollisionWheel::StaticClass(), Name, RF_Transient));

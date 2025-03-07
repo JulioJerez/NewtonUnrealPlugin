@@ -48,6 +48,8 @@ void FNewtonModelPhysicsTreeCommands::RegisterCommands()
 	UI_COMMAND(ClearDebug, "Hide all debug info", "Hide all debug info", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(ResetSelectedBone, "Reset mapped bone", "clear the selected bone", EUserInterfaceActionType::Button, FInputChord());
 
+	UI_COMMAND(AddStaticMesh, "static mesh", "static mesh must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
+
 	UI_COMMAND(AddJointHinge, "hinge", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointSlider, "slider", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddJointRoller, "roller", "Joint must be child of a rigid body ", EUserInterfaceActionType::Button, FInputChord());

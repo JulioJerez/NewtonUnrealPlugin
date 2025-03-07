@@ -195,21 +195,21 @@ void UNewtonModelBlueprintBuilder::BuildHierarchy(UNewtonModel* const model)
 	}
 	
 	// post init nodes
-	//bluePrintNodes.PushBack(constructScript->GetDefaultSceneRootNode());
-	//while (bluePrintNodes.GetCount())
-	//{
-	//	USCS_Node* const node = parentPool.Pop();
-	//
-	//
-	//	const TArray<USCS_Node*>& children = node->GetChildNodes();
-	//	for (int i = 0; i < children.Num(); ++i)
-	//	{
-	//		bluePrintNodes.PushBack(children[i]);
-	//	}
-	//}
-
-
 	TObjectPtr<USkeletalMesh> mesh(asset->SkeletalMeshAsset);
+
+	// init unreal nodes
+	for (int i = 0; i < links.GetCount(); ++i)
+	{
+		UNewtonLink* const link = links[i];
+		USCS_Node* const blueprintNode = bluePrintNodes[i];
+		TObjectPtr<USceneComponent> componentProxy(proxies[i]);
+
+		if (Cast<UPrimitiveComponent>(componentProxy))
+		{
+			link->InitBlueprintProxy(componentProxy, mesh);
+			UEditorEngine::CopyPropertiesForUnrelatedObjects(componentProxy, blueprintNode->ComponentTemplate);
+		}
+	}
 
 	// initalize shape
 	for (int i = 0; i < links.GetCount(); ++i)

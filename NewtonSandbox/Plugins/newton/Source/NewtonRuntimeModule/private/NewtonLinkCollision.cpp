@@ -27,6 +27,85 @@
 #include "NewtonLinkRigidBody.h"
 #include "ThirdParty/newtonLibrary/Public/dNewton/ndNewton.h"
 
+class UNewtonLinkCollision::DebugWireframeMeshBuilder : public ndShapeDebugNotify
+{
+	public:
+	struct EdgeKey
+	{
+		EdgeKey(const FVector& p0, const FVector& p1)
+		{
+			m_data[0] = ndInt32(p0.X * 100.0f);
+			m_data[1] = ndInt32(p0.Y * 100.0f);
+			m_data[2] = ndInt32(p0.Z * 100.0f);
+			m_data[3] = ndInt32(p1.X * 100.0f);
+			m_data[4] = ndInt32(p1.Y * 100.0f);
+			m_data[5] = ndInt32(p1.Z * 100.0f);
+		}
+
+		bool operator>(const EdgeKey& src) const
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				if (m_data[i] >= src.m_data[i])
+				{
+					if (m_data[i] > src.m_data[i])
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		bool operator<(const EdgeKey& src) const
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				if (m_data[i] <= src.m_data[i])
+				{
+					if (m_data[i] < src.m_data[i])
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		int m_data[6];
+	};
+
+	DebugWireframeMeshBuilder(TArray<FVector>& wireFrameMesh)
+		:ndShapeDebugNotify()
+		, m_wireFrameMesh(wireFrameMesh)
+	{
+		m_wireFrameMesh.Empty();
+	}
+
+	void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
+	{
+		const ndVector q0(faceArray[vertexCount - 1].Scale(UNREAL_UNIT_SYSTEM));
+
+		FVector p0(float(q0.m_x), float(q0.m_y), float(q0.m_z));
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			const ndVector q(faceArray[i].Scale(UNREAL_UNIT_SYSTEM));
+			const FVector p(float(q.m_x), float(q.m_y), float(q.m_z));
+
+			if (!m_filter.Find(EdgeKey(p0, p)))
+			{
+				m_wireFrameMesh.Push(p);
+				m_wireFrameMesh.Push(p0);
+				m_filter.Insert(0, EdgeKey(p, p0));
+			}
+			p0 = p;
+		}
+	}
+
+	ndTree<ndInt32, EdgeKey> m_filter;
+	TArray<FVector>& m_wireFrameMesh;
+};
+
 UNewtonLinkCollision::UNewtonLinkCollision()
 	:Super()
 {
@@ -34,91 +113,40 @@ UNewtonLinkCollision::UNewtonLinkCollision()
 
 void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const
 {
-	class DebugWireframeMeshBuilder : public ndShapeDebugNotify
-	{
-		public:
-		struct EdgeKey
-		{
-			EdgeKey(const FVector& p0, const FVector& p1)
-			{
-				m_data[0] = ndInt32 (p0.X * 100.0f);
-				m_data[1] = ndInt32 (p0.Y * 100.0f);
-				m_data[2] = ndInt32 (p0.Z * 100.0f);
-				m_data[3] = ndInt32 (p1.X * 100.0f);
-				m_data[4] = ndInt32 (p1.Y * 100.0f);
-				m_data[5] = ndInt32 (p1.Z * 100.0f);
-			}
-
-			bool operator>(const EdgeKey& src) const
-			{
-				for (int i = 0; i < 6; ++i)
-				{
-					if (m_data[i] >= src.m_data[i])
-					{
-						if (m_data[i] > src.m_data[i])
-						{
-							return true;
-						}
-					}
-				}
-				return false;
-			}
-
-			bool operator<(const EdgeKey& src) const
-			{
-				for (int i = 0; i < 6; ++i)
-				{
-					if (m_data[i] <= src.m_data[i])
-					{
-						if (m_data[i] < src.m_data[i])
-						{
-							return true;
-						}
-					}
-				}
-				return false;
-			}
-
-			int m_data[6];
-		};
-
-		DebugWireframeMeshBuilder(TArray<FVector>& wireFrameMesh)
-			:ndShapeDebugNotify()
-			,m_wireFrameMesh(wireFrameMesh)
-		{
-			m_wireFrameMesh.Empty();
-		}
-
-		void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
-		{
-			const ndVector q0(faceArray[vertexCount - 1].Scale(UNREAL_UNIT_SYSTEM));
-
-			FVector p0(float(q0.m_x), float(q0.m_y), float(q0.m_z));
-			for (ndInt32 i = 0; i < vertexCount; ++i)
-			{
-				const ndVector q(faceArray[i].Scale(UNREAL_UNIT_SYSTEM));
-				const FVector p(float(q.m_x), float(q.m_y), float(q.m_z));
-
-				if (!m_filter.Find(EdgeKey(p0, p)))
-				{
-					m_wireFrameMesh.Push(p);
-					m_wireFrameMesh.Push(p0);
-					m_filter.Insert(0, EdgeKey(p, p0));
-				}
-				p0 = p;
-			}
-		}
-
-		ndTree<ndInt32, EdgeKey> m_filter;
-		TArray<FVector>& m_wireFrameMesh;
-	};
-
 	ndShapeInstance instance(CreateInstance(mesh, boneIndex));
 	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
 	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
 }
 
+void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, TObjectPtr<UStaticMesh> mesh) const
+{
+	ndShapeInstance instance(CreateInstance(mesh));
+	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
+	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
+}
+
+void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, const TArray<FVector>& hull) const
+{
+	ndShapeInstance instance(CreateInstance(hull));
+	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
+	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
+}
+
 ndShapeInstance UNewtonLinkCollision::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+{
+	check(0);
+	ndShapeInstance instance(ndShapeInstance(new ndShapeNull()));
+	return instance;
+}
+
+ndShapeInstance UNewtonLinkCollision::CreateInstance(TObjectPtr<UStaticMesh> mesh) const
+{
+	check(0);
+	ndShapeInstance instance(ndShapeInstance(new ndShapeNull()));
+	return instance;
+}
+
+ndShapeInstance UNewtonLinkCollision::CreateInstance(const TArray<FVector>& hull) const
 {
 	check(0);
 	ndShapeInstance instance(ndShapeInstance(new ndShapeNull()));

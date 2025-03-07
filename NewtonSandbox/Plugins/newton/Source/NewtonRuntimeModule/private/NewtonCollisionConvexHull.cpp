@@ -56,10 +56,6 @@ ndShape* UNewtonCollisionConvexHull::CreateShape() const
 			const ndVector p(ndFloat32(ShapeHull.Points[i].X), ndFloat32(ShapeHull.Points[i].Y), ndFloat32(ShapeHull.Points[i].Z), ndFloat32(0.0f));
 			points.PushBack(p);
 		}
-
-		int xxxx0 = sizeof(ndShape);
-		int xxxx1 = sizeof(ndShapeConvex);
-		int xxxx2 = sizeof(ndShapeConvexHull);
 		ndShape* const shape = new ndShapeConvexHull(ShapeHull.Points.Num(), sizeof(ndVector), Tolerance, &points[0].m_x, MaxVertexCount);
 		return shape;
 	}

@@ -49,6 +49,9 @@ class FNewtonModelPhysicsTreeCommands : public TCommands<FNewtonModelPhysicsTree
 	TSharedPtr<FUICommandInfo> DeleteSelectedRow;
 	TSharedPtr<FUICommandInfo> ResetSelectedBone;
 
+	// generic unreal assets
+	TSharedPtr<FUICommandInfo> AddStaticMesh;
+
 	// generic collisions shapes
 	TSharedPtr<FUICommandInfo> AddShapeBox;
 	TSharedPtr<FUICommandInfo> AddShapeWheel;

@@ -31,6 +31,12 @@ FNewtonModelPhysicsTreeItemShapeConvexhull::FNewtonModelPhysicsTreeItemShapeConv
 FNewtonModelPhysicsTreeItemShapeConvexhull::FNewtonModelPhysicsTreeItemShapeConvexhull(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
 {
+	UNewtonLinkCollisionConvexhull* const shapeNodeInfo = Cast<UNewtonLinkCollisionConvexhull>(m_node);
+	check(shapeNodeInfo);
+	if (shapeNodeInfo->m_hull.Num())
+	{
+		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, shapeNodeInfo->m_hull);
+	}
 }
 
 FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeConvexhull::Clone() const
