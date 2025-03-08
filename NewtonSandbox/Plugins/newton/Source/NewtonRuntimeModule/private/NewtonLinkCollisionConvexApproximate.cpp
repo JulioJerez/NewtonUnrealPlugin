@@ -110,28 +110,7 @@ ndShapeInstance UNewtonLinkCollisionConvexApproximate::CreateInstance(TObjectPtr
 		GetBoneMesh(boneMeshHullApproximate->m_inputMesh, mesh, boneIndex);
 		if (boneMeshHullApproximate->m_inputMesh.m_faces.GetCount() > 0)
 		{
-			//long long newHash = ndCRC64(ndShapeCompound::StaticClassName(), strlen(ndShapeCompound::StaticClassName()), 0);
-			//newHash = ndCRC64(&boneMeshHullApproximate->m_inputMesh.m_points[0].m_x, boneMeshHullApproximate->m_inputMesh.m_points.GetCount() * sizeof(ndHullPoint), newHash);
-			//newHash = ndCRC64(&boneMeshHullApproximate->m_inputMesh.m_faces[0].m_i0, boneMeshHullApproximate->m_inputMesh.m_faces.GetCount() * sizeof(ndHullInputMesh::ndFace), newHash);
-			//if (newHash != ShapeHullsHash)
-			{
-				//ShapeHullsHash = uint64(newHash);
-				boneMeshHullApproximate->Execute();
-		
-				//ShapeHulls.SetNum(0);
-				//ndArray<ndHullOutput*>& hullArray = boneMeshHullApproximate->m_ouputHulls;
-				//for (ndInt32 i = ndInt32(hullArray.GetCount() - 1); i >= 0; --i)
-				//{
-				//	FndCachedHullPoints hullPoints;
-				//	const ndHullOutput& hull = *hullArray[i];
-				//	for (ndInt32 j = ndInt32(hull.GetCount() - 1); j >= 0; --j)
-				//	{
-				//		const FVector p(float(hull[j].m_x), float(hull[j].m_y), float(hull[j].m_z));
-				//		hullPoints.Points.Push(p);
-				//	}
-				//	ShapeHulls.Push(hullPoints);
-				//}
-			}
+			boneMeshHullApproximate->Execute();
 		
 			const FMatrix refBoneMatrix(mesh->GetComposedRefPoseMatrix(boneIndex));
 			ndMatrix scaleMatrix(ToNewtonMatrix(refBoneMatrix));
@@ -188,18 +167,18 @@ ndShapeInstance UNewtonLinkCollisionConvexApproximate::CreateInstance(TObjectPtr
 	const FStaticMeshVertexBuffers& staticMeshVertexBuffer = modelLod.VertexBuffers;
 	const FPositionVertexBuffer& positBuffer = staticMeshVertexBuffer.PositionVertexBuffer;
 
-	TSharedPtr<ndConvexApproximation> boneMeshHullApproximate(new ndConvexApproximation(64, true));
-	boneMeshHullApproximate->m_maxPointPerHull = 64;
+	TSharedPtr<ndConvexApproximation> meshHullApproximate(new ndConvexApproximation(64, true));
+	meshHullApproximate->m_maxPointPerHull = 64;
 
-	ndHullInputMesh& boneMesh = boneMeshHullApproximate->m_inputMesh;
-	for (int32 index = positBuffer.GetNumVertices() - 1; index >= 0; --index)
+	ndHullInputMesh& inputMesh = meshHullApproximate->m_inputMesh;
+	for (int32 index = 0; index < ndInt32 (positBuffer.GetNumVertices()); ++index)
 	{
 		ndHullPoint hullPoint;
 		const FVector p(positBuffer.VertexPosition(index));
 		hullPoint.m_x = ndReal(p.X * UNREAL_INV_UNIT_SYSTEM);
 		hullPoint.m_y = ndReal(p.Y * UNREAL_INV_UNIT_SYSTEM);
 		hullPoint.m_z = ndReal(p.Z * UNREAL_INV_UNIT_SYSTEM);
-		boneMesh.m_points.PushBack(hullPoint);
+		inputMesh.m_points.PushBack(hullPoint);
 	}
 
 	const FStaticMeshSectionArray& sections = modelLod.Sections;
@@ -212,12 +191,19 @@ ndShapeInstance UNewtonLinkCollisionConvexApproximate::CreateInstance(TObjectPtr
 			face.m_i0 = indexBuffer->GetIndex(section.FirstIndex + i * 3 + 0);
 			face.m_i1 = indexBuffer->GetIndex(section.FirstIndex + i * 3 + 1);
 			face.m_i2 = indexBuffer->GetIndex(section.FirstIndex + i * 3 + 2);
-			boneMesh.m_faces.PushBack(face);
+			inputMesh.m_faces.PushBack(face);
+
+
+			ndHullPoint xxxx[3];
+			xxxx[0] = inputMesh.m_points[face.m_i0];
+			xxxx[1] = inputMesh.m_points[face.m_i1];
+			xxxx[2] = inputMesh.m_points[face.m_i2];
+			xxxx[2] = inputMesh.m_points[face.m_i2];
 		}
 	}
 
-	boneMeshHullApproximate->Execute();
-	ndArray<ndHullOutput*>& hullArray = boneMeshHullApproximate->m_ouputHulls;
+	meshHullApproximate->Execute();
+	ndArray<ndHullOutput*>& hullArray = meshHullApproximate->m_ouputHulls;
 
 	ShapeHulls.SetNum(0);
 	ndShapeCompound* const compound = new ndShapeCompound();
@@ -235,7 +221,7 @@ ndShapeInstance UNewtonLinkCollisionConvexApproximate::CreateInstance(TObjectPtr
 			points.PushBack(p);
 		}
 		ShapeHulls.Push(hullPoints);
-		ndShape* const shape = new ndShapeConvexHull(ndInt32(points.GetCount()), ndInt32(sizeof(ndVector)), boneMeshHullApproximate->m_tolerance, &points[0].m_x);
+		ndShape* const shape = new ndShapeConvexHull(ndInt32(points.GetCount()), ndInt32(sizeof(ndVector)), meshHullApproximate->m_tolerance, &points[0].m_x);
 		ndShapeInstance* const subInstance = new ndShapeInstance(shape);
 		compound->AddCollision(subInstance);
 		delete subInstance;
