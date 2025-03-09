@@ -161,10 +161,10 @@ void FNewtonModelPhysicsTreeItemShape::DebugDraw(const FSceneView* const view, F
 		return;
 	}
 
-	//const FColor color(FColor::Blue);
+	const FColor color(FColor::Blue);
 	//const FColor color(FColor::Purple);
-	const FLinearColor color(FColor::Purple);
-	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS;
+	//const FLinearColor color(FColor::Purple);
+	float thickness = NEWTON_EDITOR_DEBUG_THICKENESS * 2.0f;
 	
 	const FTransform transform(CalculateGlobalTransform());
 	for (int i = m_wireFrameMesh.Num() - 2; i >= 0; i -= 2)

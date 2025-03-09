@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "NewtonModelPhysicsTreeItemStaticMesh.h"
 
 #include "NewtonModelEditor.h"
@@ -126,7 +125,7 @@ void FNewtonModelPhysicsTreeItemStaticMesh::DebugDrawWireFrame(FPrimitiveDrawInt
 	UNewtonLinkStaticMesh* const meshNode = Cast<UNewtonLinkStaticMesh>(m_node);
 	if (meshNode->ShowDebug && m_wireFrameMesh.Num())
 	{
-		const FLinearColor color(FColor::Black);
+		const FLinearColor color(FColor::Yellow);
 		float thickness = NEWTON_EDITOR_DEBUG_THICKENESS * 2.0f;
 
 		const FTransform transform(CalculateGlobalTransform());
