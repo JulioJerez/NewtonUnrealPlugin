@@ -36,20 +36,22 @@ UNewtonLinkCollisionBox::UNewtonLinkCollisionBox()
 	SizeZ = 100.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionBox::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
-{
-	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
-	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
-	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
-	return ndShapeInstance (new ndShapeBox(x, y, z));
-}
-
-ndShapeInstance UNewtonLinkCollisionBox::CreateInstance(TObjectPtr<UStaticMesh>) const
+ndShapeInstance UNewtonLinkCollisionBox::CreateInstance() const
 {
 	float x = SizeX * UNREAL_INV_UNIT_SYSTEM;
 	float y = SizeY * UNREAL_INV_UNIT_SYSTEM;
 	float z = SizeZ * UNREAL_INV_UNIT_SYSTEM;
 	return ndShapeInstance(new ndShapeBox(x, y, z));
+}
+
+ndShapeInstance UNewtonLinkCollisionBox::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+{
+	return CreateInstance();
+}
+
+ndShapeInstance UNewtonLinkCollisionBox::CreateInstance(TObjectPtr<UStaticMesh>) const
+{
+	return CreateInstance();
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionBox::CreateBlueprintProxy() const

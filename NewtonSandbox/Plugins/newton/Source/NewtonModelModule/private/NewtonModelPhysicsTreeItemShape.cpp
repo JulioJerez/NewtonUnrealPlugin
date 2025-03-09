@@ -33,6 +33,11 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(const FNewton
 FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItem(parentNode, modelNode, editor)
 {
+}
+
+//void FNewtonModelPhysicsTreeItemShape::Init(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
+void FNewtonModelPhysicsTreeItemShape::Init()
+{
 	UNewtonLinkCollision* const shapeNodeInfo = Cast<UNewtonLinkCollision>(m_node);
 	check(shapeNodeInfo);
 
@@ -55,7 +60,7 @@ FNewtonModelPhysicsTreeItemShape::FNewtonModelPhysicsTreeItemShape(TSharedPtr<FN
 		UNewtonLinkStaticMesh* const staticMeshParentNodeInfo = Cast<UNewtonLinkStaticMesh>(m_parent->GetNode());
 		check(staticMeshParentNodeInfo);
 		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, staticMeshParentNodeInfo->StaticMesh);
-		m_parent = parentNode->GetParent();
+		m_parent = m_parent->GetParent();
 	}
 }
 

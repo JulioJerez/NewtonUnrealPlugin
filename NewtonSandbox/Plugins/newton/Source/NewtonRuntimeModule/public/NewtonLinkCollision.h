@@ -42,10 +42,11 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollision : public UNewtonLink
 	public: 
 	UNewtonLinkCollision();
 
-	virtual ndShapeInstance CreateInstance(const TArray<FVector>& hull) const;
+	virtual ndShapeInstance CreateInstance() const;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<UStaticMesh> mesh) const;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
-	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, const TArray<FVector>& hull) const;
+
+	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const;
 	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, TObjectPtr<UStaticMesh> mesh) const;
 	void CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
 };

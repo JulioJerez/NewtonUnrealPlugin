@@ -26,6 +26,7 @@
 #define UNREAL_INV_UNIT_SYSTEM		float (1.0f / UNREAL_UNIT_SYSTEM)
 
 #define ND_STACK_DEPTH				2048
+#define ND_HULL_TOLERANCE			float(1.0e-3f)
 #define ND_DEBUG_MESH_COLOR			FColor(255.0f, 0.0f, 0.0f, 128.0f)
 
 #define ND_MODEL_UPDATE_EVENT_NAME "OnNewtonModelUpdate"

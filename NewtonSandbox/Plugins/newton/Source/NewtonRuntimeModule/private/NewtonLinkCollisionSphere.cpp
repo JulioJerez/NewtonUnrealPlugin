@@ -36,16 +36,20 @@ UNewtonLinkCollisionSphere::UNewtonLinkCollisionSphere()
 	Radio = 50.0f;
 }
 
-ndShapeInstance UNewtonLinkCollisionSphere::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+ndShapeInstance UNewtonLinkCollisionSphere::CreateInstance() const
 {
 	ndShapeInstance instance(new ndShapeSphere(Radio * UNREAL_INV_UNIT_SYSTEM));
 	return instance;
 }
 
+ndShapeInstance UNewtonLinkCollisionSphere::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+{
+	return CreateInstance();
+}
+
 ndShapeInstance UNewtonLinkCollisionSphere::CreateInstance(TObjectPtr<UStaticMesh> mesh) const
 {
-	ndShapeInstance instance(new ndShapeSphere(Radio * UNREAL_INV_UNIT_SYSTEM));
-	return instance;
+	return CreateInstance();
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionSphere::CreateBlueprintProxy() const

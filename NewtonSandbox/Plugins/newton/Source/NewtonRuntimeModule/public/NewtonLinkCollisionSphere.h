@@ -36,6 +36,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionSphere : public UNewtonLinkCol
 	UNewtonLinkCollisionSphere();
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+
+	virtual ndShapeInstance CreateInstance() const override;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<UStaticMesh> mesh) const override;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;

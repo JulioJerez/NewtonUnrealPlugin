@@ -236,6 +236,7 @@ void FNewtonModelPhysicsTree::OnShowDebug()
 		UNewtonLink* const nodeInfo = Cast<UNewtonLink>(itemInSet->GetNode());
 		nodeInfo->ShowDebug = true;
 	}
+	RefreshView();
 }
 
 void FNewtonModelPhysicsTree::OnClearDebug()
@@ -246,8 +247,8 @@ void FNewtonModelPhysicsTree::OnClearDebug()
 		UNewtonLink* const nodeInfo = Cast<UNewtonLink>(itemInSet->GetNode());
 		nodeInfo->ShowDebug = false;
 	}
+	RefreshView();
 }
-
 
 void FNewtonModelPhysicsTree::OnToggleShapeVisibility()
 {
@@ -1538,6 +1539,7 @@ void FNewtonModelPhysicsTree::SaveModel()
 	saveArgs.SaveFlags = SAVE_NoError;
 	saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
 	UPackage::SavePackage(package, nullptr, *packageFileName, saveArgs);
+	UPackage::WaitForAsyncFileWrites();
 }
 
 void FNewtonModelPhysicsTree::DebugDraw(const FSceneView* const view, FViewport* const viewport, FPrimitiveDrawInterface* const pdi) const

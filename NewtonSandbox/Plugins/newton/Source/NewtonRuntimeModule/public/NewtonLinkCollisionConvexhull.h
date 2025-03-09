@@ -26,8 +26,6 @@
 #include "NewtonLinkCollision.h"
 #include "NewtonLinkCollisionConvexhull.generated.h"
 
-
-
 UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexhull : public UNewtonLinkCollision
 {
@@ -36,7 +34,8 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexhull : public UNewtonLin
 	UNewtonLinkCollisionConvexhull();
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
-	virtual ndShapeInstance CreateInstance(const TArray<FVector>& hull) const override;
+
+	virtual ndShapeInstance CreateInstance() const override;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<UStaticMesh> mesh) const override;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;

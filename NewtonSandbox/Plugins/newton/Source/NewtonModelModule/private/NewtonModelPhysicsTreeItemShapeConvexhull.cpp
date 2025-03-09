@@ -22,6 +22,8 @@
 
 #include "NewtonModelPhysicsTreeItemShapeConvexhull.h"
 
+#include "NewtonModelEditor.h"
+
 FNewtonModelPhysicsTreeItemShapeConvexhull::FNewtonModelPhysicsTreeItemShapeConvexhull(const FNewtonModelPhysicsTreeItemShapeConvexhull& src)
 	:FNewtonModelPhysicsTreeItemShape(src)
 {
@@ -33,9 +35,34 @@ FNewtonModelPhysicsTreeItemShapeConvexhull::FNewtonModelPhysicsTreeItemShapeConv
 {
 	UNewtonLinkCollisionConvexhull* const shapeNodeInfo = Cast<UNewtonLinkCollisionConvexhull>(m_node);
 	check(shapeNodeInfo);
+
+	check(m_parent);
+	const FTransform parentTranform(m_parent->CalculateGlobalTransform());
+	const FVector scale(parentTranform.GetScale3D());
+	shapeNodeInfo->Transform.SetScale3D(FVector(1.0f / scale.X, 1.0f / scale.Y, 1.0f / scale.Z));
+	
 	if (shapeNodeInfo->m_hull.Num())
 	{
-		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, shapeNodeInfo->m_hull);
+		shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
+	}
+	else 
+	{
+		UNewtonLinkRigidBody* const parentNodeInfo = Cast<UNewtonLinkRigidBody>(m_parent->GetNode());
+		if (parentNodeInfo)
+		{
+			UNewtonAsset* const asset = m_editor->GetNewtonModel();
+			shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, asset->SkeletalMeshAsset, parentNodeInfo->BoneIndex);
+		}
+		else
+		{
+			shapeNodeInfo->Transform = m_parent->m_node->Transform;
+			shapeNodeInfo->Transform.SetScale3D(FVector(1.0f / scale.X, 1.0f / scale.Y, 1.0f / scale.Z));
+
+			UNewtonLinkStaticMesh* const staticMeshParentNodeInfo = Cast<UNewtonLinkStaticMesh>(m_parent->GetNode());
+			check(staticMeshParentNodeInfo);
+			shapeNodeInfo->CreateWireFrameMesh(m_wireFrameMesh, staticMeshParentNodeInfo->StaticMesh);
+			m_parent = m_parent->GetParent();
+		}
 	}
 }
 

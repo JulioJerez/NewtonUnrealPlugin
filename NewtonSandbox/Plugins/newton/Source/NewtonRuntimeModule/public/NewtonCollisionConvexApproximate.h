@@ -69,9 +69,6 @@ class UNewtonCollisionConvexApproximate : public UNewtonCollision
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 1, ClampMax = 128))
 	int MaxConvexes;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0, ClampMax = 1.0))
-	float Tolerance;
-	
 	UPROPERTY(EditAnywhere, Category = Newton)
 	TArray<FndCachedHullPoints> ShapeHulls;
 

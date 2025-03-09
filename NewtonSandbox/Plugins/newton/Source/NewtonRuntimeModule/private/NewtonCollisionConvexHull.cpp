@@ -30,7 +30,6 @@
 
 UNewtonCollisionConvexHull::UNewtonCollisionConvexHull()
 	:Super()
-	,Tolerance(1.0e-4f)
 	,MaxVertexCount(128)
 {
 }
@@ -56,7 +55,7 @@ ndShape* UNewtonCollisionConvexHull::CreateShape() const
 			const ndVector p(ndFloat32(ShapeHull.Points[i].X), ndFloat32(ShapeHull.Points[i].Y), ndFloat32(ShapeHull.Points[i].Z), ndFloat32(0.0f));
 			points.PushBack(p);
 		}
-		ndShape* const shape = new ndShapeConvexHull(ShapeHull.Points.Num(), sizeof(ndVector), Tolerance, &points[0].m_x, MaxVertexCount);
+		ndShape* const shape = new ndShapeConvexHull(ShapeHull.Points.Num(), sizeof(ndVector), ND_HULL_TOLERANCE, &points[0].m_x, MaxVertexCount);
 		return shape;
 	}
 	return new ndShapeNull();
@@ -86,7 +85,7 @@ void UNewtonCollisionConvexHull::GenerateMesh(const USceneComponent* const meshC
 		const ndVector q(ndFloat32(p.X), ndFloat32(p.Y), ndFloat32(p.Z), ndFloat32(1.0f));
 		points.PushBack(q * bakedScale);
 	}
-	ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), Tolerance, MaxVertexCount);
+	ndConvexHull3d convexHull(&points[0].m_x, sizeof(ndBigVector), points.GetCount(), ND_HULL_TOLERANCE, MaxVertexCount);
 	const ndArray<ndBigVector>& convexVertex = convexHull.GetVertexPool();
 	
 	ShapeHull.Points.SetNum(0);

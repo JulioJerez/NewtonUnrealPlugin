@@ -119,7 +119,7 @@ class NEWTONMODELMODULE_API FNewtonModelEditor : public FPersonaAssetEditorToolk
 	// save model when closing editor
 	FDelegateHandle m_onCloseHandle;
 
-	bool m_modelSaved;
+	int m_modelSaved;
 	static FName m_identifier;
 	static FEditorModeID m_id;
 	friend class FNewtonModelPhysicsTree;

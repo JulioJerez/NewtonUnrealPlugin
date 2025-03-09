@@ -31,6 +31,7 @@ FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylind
 FNewtonModelPhysicsTreeItemShapeCylinder::FNewtonModelPhysicsTreeItemShapeCylinder(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
 {
+	Init();
 }
 
 FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeCylinder::Clone() const

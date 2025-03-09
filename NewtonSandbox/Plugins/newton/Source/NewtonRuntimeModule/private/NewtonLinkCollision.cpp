@@ -125,9 +125,9 @@ void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, T
 	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
 }
 
-void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh, const TArray<FVector>& hull) const
+void UNewtonLinkCollision::CreateWireFrameMesh(TArray<FVector>& wireFrameMesh) const
 {
-	ndShapeInstance instance(CreateInstance(hull));
+	ndShapeInstance instance(CreateInstance());
 	DebugWireframeMeshBuilder wireframe(wireFrameMesh);
 	instance.DebugShape(ndGetIdentityMatrix(), wireframe);
 }
@@ -146,7 +146,7 @@ ndShapeInstance UNewtonLinkCollision::CreateInstance(TObjectPtr<UStaticMesh> mes
 	return instance;
 }
 
-ndShapeInstance UNewtonLinkCollision::CreateInstance(const TArray<FVector>& hull) const
+ndShapeInstance UNewtonLinkCollision::CreateInstance() const
 {
 	check(0);
 	ndShapeInstance instance(ndShapeInstance(new ndShapeNull()));

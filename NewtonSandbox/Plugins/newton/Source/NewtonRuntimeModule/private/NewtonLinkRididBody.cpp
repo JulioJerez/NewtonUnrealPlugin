@@ -46,7 +46,8 @@ FVector UNewtonLinkRigidBody::CalculateLocalCenterOfMass(TObjectPtr<USkeletalMes
 	{
 		ndBodyKinematic body;
 		const UNewtonLinkCollision* const shapeNode = childen[i];
-		ndShapeInstance shape(shapeNode->CreateInstance(mesh, boneIndex));
+		//ndShapeInstance shape(shapeNode->CreateInstance(mesh, boneIndex));
+		ndShapeInstance shape(shapeNode->CreateInstance());
 
 		const ndMatrix bodyMatrix(ToNewtonMatrix(globalTransform));
 		const ndMatrix shapeLocalMatrix(ToNewtonMatrix(shapeNode->Transform));

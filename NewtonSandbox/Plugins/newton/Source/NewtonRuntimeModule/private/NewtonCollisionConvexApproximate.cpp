@@ -78,7 +78,6 @@ UNewtonCollisionConvexApproximate::UNewtonCollisionConvexApproximate()
 {
 	Generate = false;
 	MaxConvexes = 16;
-	Tolerance = 0.0f;
 	NumberOfConvex = 0;
 	HighResolution = false;
 	MaxVertexPerConvex = 32;
@@ -113,7 +112,8 @@ ndConvexHullSet* UNewtonCollisionConvexApproximate::CreateConvexApproximationSha
 	}
 
 	ConvexVhacdGenerator* const vhacdHullSet = new ConvexVhacdGenerator(MaxConvexes, HighResolution);
-	vhacdHullSet->m_tolerance = 1.0e-3f + Tolerance * 0.1f;
+	//vhacdHullSet->m_tolerance = 1.0e-3f + Tolerance * 0.1f;
+	vhacdHullSet->m_tolerance = ND_HULL_TOLERANCE;
 	vhacdHullSet->m_maxPointPerHull = MaxVertexPerConvex;
 
 	const FStaticMeshLODResources* const renderLOD = GetRenderLOD();
@@ -201,7 +201,7 @@ ndShape* UNewtonCollisionConvexApproximate::CreateShape() const
 				const ndVector p(ndFloat32(hull.Points[i].X), ndFloat32(hull.Points[i].Y), ndFloat32(hull.Points[i].Z), ndFloat32(0.0f));
 				points.PushBack(p);
 			}
-			ndShape* const shape = new ndShapeConvexHull(hull.Points.Num(), sizeof(ndVector), Tolerance, &points[0].m_x);
+			ndShape* const shape = new ndShapeConvexHull(hull.Points.Num(), sizeof(ndVector), ND_HULL_TOLERANCE, &points[0].m_x);
 			ndShapeInstance* const subInstance = new ndShapeInstance(shape);
 			compound->AddCollision(subInstance);
 			delete subInstance;

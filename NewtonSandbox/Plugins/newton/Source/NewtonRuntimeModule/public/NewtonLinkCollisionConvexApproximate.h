@@ -35,9 +35,12 @@ UCLASS()
 class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexApproximate : public UNewtonLinkCollision
 {
 	GENERATED_BODY()
+	public:
 	UNewtonLinkCollisionConvexApproximate();
 
 	virtual TObjectPtr<USceneComponent> CreateBlueprintProxy() const override;
+
+	virtual ndShapeInstance CreateInstance() const override;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<UStaticMesh> mesh) const override;
 	virtual ndShapeInstance CreateInstance(TObjectPtr<USkeletalMesh> mesh, int boneIndex) const override;
 	virtual void InitBlueprintProxy(TObjectPtr<USceneComponent> component, TObjectPtr<USkeletalMesh> mesh) const override;
@@ -45,8 +48,5 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkCollisionConvexApproximate : public UNe
 	void GetBoneMesh(ndHullInputMesh& boneMesh, TObjectPtr<USkeletalMesh> mesh, int boneIndex) const;
 
 	UPROPERTY()
-	mutable uint64 ShapeHullsHash____;
-
-	UPROPERTY()
-	mutable TArray<FndCachedHullPoints> ShapeHulls;
+	mutable TArray<FndCachedHullPoints> m_hulls;
 };

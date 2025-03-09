@@ -34,7 +34,7 @@ UNewtonLinkCollisionWheel::UNewtonLinkCollisionWheel()
 	Name = TEXT("wheel");
 }
 
-ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance() const
 {
 	ndShapeInstance instance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)));
 
@@ -43,13 +43,14 @@ ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<USkeletalMe
 	return instance;
 }
 
+ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<USkeletalMesh>, int) const
+{
+	return CreateInstance();
+}
+
 ndShapeInstance UNewtonLinkCollisionWheel::CreateInstance(TObjectPtr<UStaticMesh>) const
 {
-	ndShapeInstance instance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)));
-
-	const ndVector scale(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
-	instance.SetScale(scale);
-	return instance;
+	return CreateInstance();
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkCollisionWheel::CreateBlueprintProxy() const

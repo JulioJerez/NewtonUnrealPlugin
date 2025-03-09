@@ -31,6 +31,7 @@ FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(c
 FNewtonModelPhysicsTreeItemShapeSphere::FNewtonModelPhysicsTreeItemShapeSphere(TSharedPtr<FNewtonModelPhysicsTreeItem> parentNode, TObjectPtr<UNewtonLink> modelNode, FNewtonModelEditor* const editor)
 	:FNewtonModelPhysicsTreeItemShape(parentNode, modelNode, editor)
 {
+	Init();
 }
 
 FNewtonModelPhysicsTreeItem* FNewtonModelPhysicsTreeItemShapeSphere::Clone() const

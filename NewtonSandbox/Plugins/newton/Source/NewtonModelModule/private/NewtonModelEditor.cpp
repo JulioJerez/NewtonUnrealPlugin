@@ -55,7 +55,7 @@ FNewtonModelEditor::FNewtonModelEditor()
 	:FPersonaAssetEditorToolkit()
 	,IHasPersonaToolkit()
 {
-	m_modelSaved = false;
+	m_modelSaved = 0;
 	m_newtonModel = nullptr;
 	m_skeletonTree = nullptr;
 	m_selectedBone = nullptr;
@@ -272,12 +272,12 @@ void FNewtonModelEditor::OnClose()
 }
 void FNewtonModelEditor::OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext)
 {
-	if (!m_modelSaved)
+	//UE_LOG(LogTemp, Warning, TEXT("this recurse, therefore we have to stop it: %s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
+	m_modelSaved++;
+	if (m_modelSaved == 1)
 	{
-		// avoid recursion when saving model
-		m_modelSaved = true;
 		m_skeletonPhysicsTree->SaveModel();
-		m_modelSaved = false;
+		m_modelSaved = 0;
 	}
 }
 
