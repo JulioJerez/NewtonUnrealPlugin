@@ -55,7 +55,6 @@ FNewtonModelEditor::FNewtonModelEditor()
 	:FPersonaAssetEditorToolkit()
 	,IHasPersonaToolkit()
 {
-	m_modelSaved = 0;
 	m_newtonModel = nullptr;
 	m_skeletonTree = nullptr;
 	m_selectedBone = nullptr;
@@ -265,20 +264,13 @@ void FNewtonModelEditor::OnMeshClick(HActor* hitProxy, const FViewportClick& cli
 
 void FNewtonModelEditor::OnClose()
 {
-	FCoreUObjectDelegates::OnObjectPreSave.Remove(m_onCloseHandle);
 	m_skeletonPhysicsTree->SaveModel();
-	
 	FPersonaAssetEditorToolkit::OnClose();
 }
-void FNewtonModelEditor::OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext)
+
+void FNewtonModelEditor::SaveAsset_Execute()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("this recurse, therefore we have to stop it: %s  file:%s line:%d"), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__);
-	m_modelSaved++;
-	if (m_modelSaved == 1)
-	{
-		m_skeletonPhysicsTree->SaveModel();
-		m_modelSaved = 0;
-	}
+	m_skeletonPhysicsTree->SaveModel();
 }
 
 void FNewtonModelEditor::BindCommands()
@@ -334,9 +326,6 @@ void FNewtonModelEditor::InitEditor(const EToolkitMode::Type mode, const TShared
 
 	SetCurrentMode(NewtonModelEditorMode::m_editorModelName);
 	
-	// register callback for rebuild model when click save button
-	m_onCloseHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw(this, &FNewtonModelEditor::OnObjectSave);
-
 	m_previewScene->RegisterOnMeshClick(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
 	//m_previewScene->RegisterOnDeselectAll(FOnMeshClick::CreateSP(this, &FNewtonModelEditor::OnMeshClick));
 	m_previewScene->SetAllowMeshHitProxies(true);

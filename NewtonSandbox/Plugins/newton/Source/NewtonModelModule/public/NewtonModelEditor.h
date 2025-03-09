@@ -71,7 +71,6 @@ class NEWTONMODELMODULE_API FNewtonModelEditor : public FPersonaAssetEditorToolk
 	// Delegates
 	void OnMeshClick(HActor* hitProxy, const FViewportClick& click);
 	void OnViewportCreated(const TSharedRef<IPersonaViewport>& viewport);
-	void OnObjectSave(UObject* savedObject, FObjectPreSaveContext saveContext);
 	void OnNodeDetailViewPropertiesUpdated(const FPropertyChangedEvent& event);
 	void OnPreviewSceneSettingsCustomized(IDetailLayoutBuilder& detailBuilder);
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& propertyChangedEvent);
@@ -82,6 +81,7 @@ class NEWTONMODELMODULE_API FNewtonModelEditor : public FPersonaAssetEditorToolk
 
 	// Toolkit methods
 	virtual void OnClose() override;
+	virtual void SaveAsset_Execute() override;
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
@@ -119,7 +119,6 @@ class NEWTONMODELMODULE_API FNewtonModelEditor : public FPersonaAssetEditorToolk
 	// save model when closing editor
 	FDelegateHandle m_onCloseHandle;
 
-	int m_modelSaved;
 	static FName m_identifier;
 	static FEditorModeID m_id;
 	friend class FNewtonModelPhysicsTree;

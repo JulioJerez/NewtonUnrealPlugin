@@ -1083,6 +1083,11 @@ void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 			scale = scale * node->GetNode()->Transform.GetScale3D();
 			node->GetNode()->Transform.SetScale3D(unitScale);
 		}
+		else if (Cast<UNewtonLinkStaticMesh>(node->GetNode()))
+		{
+			scale = scale * node->GetNode()->Transform.GetScale3D();
+			node->GetNode()->Transform.SetScale3D(unitScale);
+		}
 		else if (Cast<UNewtonLinkCollision>(node->GetNode()))
 		{
 			node->GetNode()->Transform.SetScale3D(node->GetNode()->Transform.GetScale3D() * scale);
