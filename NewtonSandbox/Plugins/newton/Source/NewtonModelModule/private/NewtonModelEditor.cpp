@@ -205,11 +205,12 @@ void FNewtonModelEditor::OnPreviewSceneCreated(const TSharedRef<IPersonaPreviewS
 	AActor* const actor = personaPreviewScene->GetActor();
 
 	// Create the preview component
-	//UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
 	UDebugSkelMeshComponent* const skeletalMeshComponent = personaPreviewScene->GetPreviewMeshComponent();
-	USkeletalMesh* XXX0 = m_skeletalMeshAssetCached;
-	USkeletalMesh* XXX1 = skeletalMeshComponent->GetSkeletalMeshAsset();
-	check(XXX0 == XXX1);
+
+	//UDebugSkelMeshComponent* const skeletalMeshComponent = NewObject<UDebugSkelMeshComponent>(actor);
+	//USkeletalMesh* XXX0 = m_skeletalMeshAssetCached;
+	//USkeletalMesh* XXX1 = skeletalMeshComponent->GetSkeletalMeshAsset();
+	//check(XXX0 == XXX1);
 
 	//skeletalMeshComponent->SetSkeletalMesh(m_skeletalMeshAssetCached);
 	skeletalMeshComponent->SetDisablePostProcessBlueprint(true);

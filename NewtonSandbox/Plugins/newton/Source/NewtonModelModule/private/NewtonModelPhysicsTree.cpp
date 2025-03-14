@@ -1068,29 +1068,30 @@ void FNewtonModelPhysicsTree::NormalizeTransformsScale()
 		FVector scale(scalePool[stack]);
 		TSharedPtr<FNewtonModelPhysicsTreeItem> node(stackPool[stack]);
 
-		if (Cast<UNewtonLinkRigidBody>(node->GetNode()))
+		TObjectPtr<UNewtonLink> link(node->GetNode());
+		if (Cast<UNewtonLinkRigidBody>(link))
 		{
-			scale = scale * node->GetNode()->Transform.GetScale3D();
-			node->GetNode()->Transform.SetScale3D(unitScale);
+			scale = scale * link->Transform.GetScale3D();
+			link->Transform.SetScale3D(unitScale);
 		}
-		else if (Cast<UNewtonLinkJoint>(node->GetNode()))
+		else if (Cast<UNewtonLinkJoint>(link))
 		{
-			scale = scale * node->GetNode()->Transform.GetScale3D();
-			node->GetNode()->Transform.SetScale3D(unitScale);
+			scale = scale * link->Transform.GetScale3D();
+			link->Transform.SetScale3D(unitScale);
 		}
-		else if (Cast<UNewtonLinkJointLoop>(node->GetNode()))
+		else if (Cast<UNewtonLinkJointLoop>(link))
 		{
-			scale = scale * node->GetNode()->Transform.GetScale3D();
-			node->GetNode()->Transform.SetScale3D(unitScale);
+			scale = scale * link->Transform.GetScale3D();
+			link->Transform.SetScale3D(unitScale);
 		}
 		else if (Cast<UNewtonLinkStaticMesh>(node->GetNode()))
 		{
-			scale = scale * node->GetNode()->Transform.GetScale3D();
-			node->GetNode()->Transform.SetScale3D(unitScale);
+			scale = scale * link->Transform.GetScale3D();
+			link->Transform.SetScale3D(unitScale);
 		}
 		else if (Cast<UNewtonLinkCollision>(node->GetNode()))
 		{
-			node->GetNode()->Transform.SetScale3D(node->GetNode()->Transform.GetScale3D() * scale);
+			link->Transform.SetScale3D(link->Transform.GetScale3D() * scale);
 			scale = unitScale;
 		}
 		else

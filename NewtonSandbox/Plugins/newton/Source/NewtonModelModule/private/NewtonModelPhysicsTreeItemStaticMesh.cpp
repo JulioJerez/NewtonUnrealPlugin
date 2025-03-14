@@ -58,7 +58,6 @@ void FNewtonModelPhysicsTreeItemStaticMesh::CreateWireFrameMesh() const
 		const FTransform parentTranform(m_parent->CalculateGlobalTransform());
 		const FVector scale(parentTranform.GetScale3D());
 		meshNodeInfo->Transform.SetScale3D(FVector(1.0f / scale.X, 1.0f / scale.Y, 1.0f / scale.Z));
-
 		meshNodeInfo->CreateWireFrameMesh(m_wireFrameMesh);
 	}
 }
@@ -75,6 +74,7 @@ void FNewtonModelPhysicsTreeItemStaticMesh::OnPropertyChange(const FPropertyChan
 
 void FNewtonModelPhysicsTreeItemStaticMesh::DebugDrawSolid(FPrimitiveDrawInterface* const pdi) const
 {
+	check(0);
 	const UNewtonLinkStaticMesh* const meshNode = Cast<UNewtonLinkStaticMesh>(m_node);
 
 	const FStaticMeshRenderData* const renderData = meshNode->StaticMesh->GetRenderData();

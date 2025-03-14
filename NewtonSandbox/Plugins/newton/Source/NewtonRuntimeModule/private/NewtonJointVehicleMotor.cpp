@@ -31,6 +31,10 @@ UNewtonJointVehicleMotor::UNewtonJointVehicleMotor()
 {
 	BodyMass = 25.0f;
 	BodyRadio = 25.0f;
+
+	TestRPM = 1500.0f;
+	TestToque = 200.0f;
+	EnableTestTorque = false;
 }
 
 void UNewtonJointVehicleMotor::DrawGizmo(float timestep) const

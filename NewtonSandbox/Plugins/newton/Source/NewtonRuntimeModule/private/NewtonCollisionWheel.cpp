@@ -89,7 +89,6 @@ ndShapeInstance* UNewtonCollisionWheel::CreateBodyInstanceShape(const ndMatrix& 
 	const ndVector scale2(ndFloat32(Width * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(Radio * UNREAL_INV_UNIT_SYSTEM), ndFloat32(0.0f));
 	instance->SetScale(scale1 * scale2);
 
-	//const ndMatrix alignment (ndYawMatrix(ndPi * 0.5f));
 	const ndMatrix alignment(ndGetIdentityMatrix());
 	instance->SetLocalMatrix(alignment * instance->GetLocalMatrix());
 	return instance;

@@ -107,11 +107,10 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 				if (!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()))
 				{
 					ndMultiBodyVehicleTireJoint* const joint = (ndMultiBodyVehicleTireJoint*)*node->m_joint;
-					//ndMultiBodyVehicleTireJointInfo info(tire->GetInfo());
 					joint->SetVehicleOwner(vehicle);
 					ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
 
-					// make intetia spherical
+					// make inertia spherical
 					ndVector massMatrix(body->GetMassMatrix());
 					ndFloat32 maxInertia = ndMax(ndMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
 					massMatrix.m_x = maxInertia;
@@ -198,6 +197,10 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 			}
 		}
 
+		// save the vehicle motor for later use in teh update
+		AActor* const actorOwner = owner->GetOwner();
+		m_motor = actorOwner->FindComponentByClass<UNewtonJointVehicleMotor>();
+
 		vehicle->SetVehicleSolverModel(false);
 	}
 
@@ -215,12 +218,17 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 		if (vehicle && !vehicle->IsSleeping())
 		{
 			m_sleepingState = false;
-			//ApplyInputs(world, timestep);
-
-			ndMultiBodyVehicleMotor* const motor = vehicle->GetMotor();
-			if (motor)
+			if (m_motor && m_motor->EnableTestTorque)
 			{
-				motor->SetTorqueAndRpm(200.0f, 1500.0f);
+				ndMultiBodyVehicleMotor* const motor = vehicle->GetMotor();
+				if (motor)
+				{
+					motor->SetTorqueAndRpm(m_motor->TestToque, m_motor->TestRPM);
+				}
+			}
+			else
+			{
+				//ApplyInputs(world, timestep);
 			}
 			vehicle->Update(world, timestep);
 		}
@@ -242,6 +250,8 @@ class ndModelVehicleNotify : public UNewtonModel::ModelNotify
 	}
 
 	bool m_sleepingState;
+	TObjectPtr<UNewtonJointVehicleMotor> m_motor;
+	 
 };
 
 UNewtonModel::UNewtonModel()

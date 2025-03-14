@@ -58,7 +58,7 @@ class NEWTONRUNTIMEMODULE_API UNewtonAsset : public UObject
 	UPROPERTY()
 	bool m_hideJoints;
 
-	UPROPERTY(EditAnywhere, Category = Newton, meta = (ValidEnumValues = "m_baseModel, m_vehicleModel"))
+	UPROPERTY()
 	ModelsType m_modelType;
 };
 

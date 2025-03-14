@@ -30,6 +30,9 @@ UNewtonLinkJointVehicleMotor::UNewtonLinkJointVehicleMotor()
 	Name = TEXT("motor");
 	BodyMass = 25.0f;
 	BodyRadio = 25.0f;
+	TestRPM = 1500.0f;
+	TestToque = 200.0f;
+	EnableTestTorque = false;
 }
 
 TObjectPtr<USceneComponent> UNewtonLinkJointVehicleMotor::CreateBlueprintProxy() const
@@ -46,4 +49,8 @@ void UNewtonLinkJointVehicleMotor::InitBlueprintProxy(TObjectPtr<USceneComponent
 
 	joint->BodyMass = BodyMass;
 	joint->BodyRadio = BodyRadio;
+
+	joint->TestRPM = TestRPM;
+	joint->TestToque = TestToque;
+	joint->EnableTestTorque = EnableTestTorque;
 }

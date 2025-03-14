@@ -45,4 +45,13 @@ class NEWTONRUNTIMEMODULE_API UNewtonLinkJointVehicleMotor : public UNewtonLinkJ
 
 	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 25.0f, ClampMax = 100.0f))
 	float BodyRadio;
+
+	UPROPERTY(EditAnywhere, Category = Newton)
+	bool EnableTestTorque;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
+	float TestToque;
+
+	UPROPERTY(EditAnywhere, Category = Newton, meta = (ClampMin = 0.0f, ClampMax = 10000.0f))
+	float TestRPM;
 };
