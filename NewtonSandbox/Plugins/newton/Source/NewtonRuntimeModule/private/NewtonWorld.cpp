@@ -38,6 +38,18 @@ class NewtonWorld::PhysicsEngine : public ndWorld
 		m_initiladed = false;
 	}
 
+	void MainUpdate() override
+	{
+		TRACE_CPUPROFILER_EVENT_SCOPE(newton);
+		ndWorld::MainUpdate();
+	}
+
+	void WorkerUpdate(ndInt32 threadIndex) override
+	{
+		TRACE_CPUPROFILER_EVENT_SCOPE(newtonThread);
+		ndWorld::WorkerUpdate(threadIndex);
+	}
+
 	void PreUpdate(ndFloat32 timestep) override
 	{
 		ndWorld::PreUpdate(timestep);
