@@ -120,6 +120,15 @@ class ndSkeletonContainer
 		ndInt8 m_swapJacobianBodiesIndex;
 	};
 
+	//class ndNodeList : public ndList<ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
+	//{
+	//	public:
+	//	ndNodeList()
+	//		:ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >()
+	//	{
+	//	}
+	//};
+
 	class ndNodeList : public ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
 	{
 		public:
@@ -203,6 +212,7 @@ class ndSkeletonContainer
 	ndNode* AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent);
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
+	void AddExtraContacts();
 	void InitLoopMassMatrix();
 	void RegularizeLcp() const;
 	void ClearCloseLoopJoints();
